@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao">
+    
+	<sql id="tMisDunnedHistoryColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.taskid AS "taskid",
+		a.amount AS "amount",
+		a.dunnedtime AS "dunnedtime",
+		a.ispayoff AS "ispayoff",
+		a.overduedays AS "overduedays",
+		a.reliefamount AS "reliefamount",
+		a.field1 AS "field1",
+		a.partialdealcode AS "partialdealcode",
+		a.createby AS "createBy.name",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.name",
+		a.updatedate AS "updateDate"
+	</sql>
+	
+	<sql id="tMisDunnedHistoryJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisDunnedHistory">
+		SELECT 
+			<include refid="tMisDunnedHistoryColumns"/>
+		FROM t_mis_dunned_history a
+		<include refid="tMisDunnedHistoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunnedHistory">
+		SELECT 
+			<include refid="tMisDunnedHistoryColumns"/>
+		FROM t_mis_dunned_history a
+		<include refid="tMisDunnedHistoryJoins"/>
+		<where>
+			
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="taskid != null and taskid!= ''">
+				a.taskid = #{taskid}
+			</if>
+			<if test="amount != null and amount != ''">
+				AND a.amount = #{amount}
+			</if>
+			<if test="dunnedtime != null and dunnedtime != ''">
+				AND a.dunnedtime = #{dunnedtime}
+			</if>
+			<if test="ispayoff != null and ispayoff != ''">
+				AND a.ispayoff = #{ispayoff}
+			</if>
+			<if test="overduedays != null and overduedays != ''">
+				AND a.overduedays = #{overduedays}
+			</if>
+			<if test="reliefamount != null and reliefamount != ''">
+				AND a.reliefamount = #{reliefamount}
+			</if>
+			<if test="field1 != null and field1 != ''">
+				AND a.field1 = #{field1}
+			</if>
+			<if test="partialdealcode != null and partialdealcode != ''">
+				AND a.partialdealcode = #{partialdealcode}
+			</if>
+			<!-- <if test="createby != null and createby != ''">
+				AND a.createby = #{createby}
+			</if>
+			<if test="createdate != null and createdate != ''">
+				AND a.createdate = #{createdate}
+			</if>
+			<if test="updateby != null and updateby != ''">
+				AND a.updateby = #{updateby}
+			</if>
+			<if test="updatedate != null and updatedate != ''">
+				AND a.updatedate = #{updatedate}
+			</if> -->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunnedHistory">
+		SELECT 
+			<include refid="tMisDunnedHistoryColumns"/>
+		FROM t_mis_dunned_history a
+		<include refid="tMisDunnedHistoryJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunned_history(
+			id,
+			taskid,
+			amount,
+			dunnedtime,
+			ispayoff,
+			overduedays,
+			reliefamount,
+			field1,
+			partialdealcode,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{taskid},
+			#{amount},
+			#{dunnedtime},
+			#{ispayoff},
+			#{overduedays},
+			#{reliefamount},
+			#{field1},
+			#{partialdealcode},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunned_history SET 	
+			taskid = #{taskid},
+			amount = #{amount},
+			dunnedtime = #{dunnedtime},
+			ispayoff = #{ispayoff},
+			overduedays = #{overduedays},
+			reliefamount = #{reliefamount},
+			field1 = #{field1},
+			partialdealcode = #{partialdealcode},
+			createby = #{createBy.name},
+			createdate = #{createdate},
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunned_history
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SRiskOrderAfterLoanDao">
+    
+	<sql id="sRiskOrderAfterLoanColumns">
+		a.id AS "id",
+		a.orderapply AS "orderapply",
+		a.orderloan AS "orderloan",
+		a.captialloan AS "captialloan",
+		a.captialremit AS "captialremit",
+		a.capitalremitpaid AS "capitalremitpaid",
+		a.capitalremitunpaid AS "capitalremitunpaid",
+		a.captialloanpaid AS "captialloanpaid",
+		a.commissionamount AS "commissionamount",
+		a.commissionamountpaid AS "commissionamountpaid",
+		a.couponamountpaid AS "couponamountpaid",
+		a.capitaldelay AS "capitaldelay",
+		a.delaypaid AS "delaypaid",
+		a.overdueamount AS "overdueamount",
+		a.overdueamountpaid AS "overdueamountpaid",
+		a.reliefamount AS "reliefamount",
+		a.receivedamount AS "receivedamount",
+		a.receivedoverdueamount AS "receivedoverdueamount",
+		a.receivedoverdueamount7 AS "receivedoverdueamount7",
+		a.receivedoverdueamount14 AS "receivedoverdueamount14",
+		a.receivedoverdueamount21 AS "receivedoverdueamount21",
+		a.receivedoverdueamount28 AS "receivedoverdueamount28",
+		a.receivedoverdueamount29 AS "receivedoverdueamount29",
+		a.receivedoverdueamount119 AS "receivedoverdueamount119",
+		a.receivedoverdueamount120 AS "receivedoverdueamount120",
+		a.createtime AS "createtime",
+		a.PartialCapital AS "partialcapital",
+		a.PartialCost AS "partialcost",
+		a.PartialOverdue AS "partialoverdue"
+	</sql>
+	
+	<sql id="sRiskOrderAfterLoanJoins">
+	</sql>
+    
+	<select id="get" resultType="SRiskOrderAfterLoan">
+		SELECT 
+			<include refid="sRiskOrderAfterLoanColumns"/>
+		FROM s_risk_order_after_loan a
+		<include refid="sRiskOrderAfterLoanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SRiskOrderAfterLoan">
+		SELECT 
+			<include refid="sRiskOrderAfterLoanColumns"/>
+		FROM s_risk_order_after_loan a
+		<include refid="sRiskOrderAfterLoanJoins"/>
+		<where>
+<!-- 			<if test="createtime != null and createtime != ''"> -->
+<!-- 				AND a.createtime = #{createtime} -->
+<!-- 			</if> -->
+			<if test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''">
+				AND a.createtime BETWEEN #{beginDatetime} AND #{endDatetime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SRiskOrderAfterLoan">
+		SELECT 
+			<include refid="sRiskOrderAfterLoanColumns"/>
+		FROM s_risk_order_after_loan a
+		<include refid="sRiskOrderAfterLoanJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			     ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_risk_order_after_loan(
+			orderapply,
+			orderloan,
+			captialloan,
+			captialremit,
+			capitalremitpaid,
+			capitalremitunpaid,
+			captialloanpaid,
+			commissionamount,
+			commissionamountpaid,
+			couponamountpaid,
+			capitaldelay,
+			delaypaid,
+			overdueamount,
+			overdueamountpaid,
+			reliefamount,
+			receivedamount,
+			receivedoverdueamount,
+			receivedoverdueamount7,
+			receivedoverdueamount14,
+			receivedoverdueamount21,
+			receivedoverdueamount28,
+			receivedoverdueamount29,
+			createtime
+		) VALUES (
+			#{orderapply},
+			#{orderloan},
+			#{captialloan},
+			#{captialremit},
+			#{capitalremitpaid},
+			#{capitalremitunpaid},
+			#{captialloanpaid},
+			#{commissionamount},
+			#{commissionamountpaid},
+			#{couponamountpaid},
+			#{capitaldelay},
+			#{delaypaid},
+			#{overdueamount},
+			#{overdueamountpaid},
+			#{reliefamount},
+			#{receivedamount},
+			#{receivedoverdueamount},
+			#{receivedoverdueamount7},
+			#{receivedoverdueamount14},
+			#{receivedoverdueamount21},
+			#{receivedoverdueamount28},
+			#{receivedoverdueamount29},
+			#{createtime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_risk_order_after_loan SET 	
+			orderapply = #{orderapply},
+			orderloan = #{orderloan},
+			captialloan = #{captialloan},
+			captialremit = #{captialremit},
+			capitalremitpaid = #{capitalremitpaid},
+			capitalremitunpaid = #{capitalremitunpaid},
+			captialloanpaid = #{captialloanpaid},
+			commissionamount = #{commissionamount},
+			commissionamountpaid = #{commissionamountpaid},
+			couponamountpaid = #{couponamountpaid},
+			capitaldelay = #{capitaldelay},
+			delaypaid = #{delaypaid},
+			overdueamount = #{overdueamount},
+			overdueamountpaid = #{overdueamountpaid},
+			reliefamount = #{reliefamount},
+			receivedamount = #{receivedamount},
+			receivedoverdueamount = #{receivedoverdueamount},
+			receivedoverdueamount7 = #{receivedoverdueamount7},
+			receivedoverdueamount14 = #{receivedoverdueamount14},
+			receivedoverdueamount21 = #{receivedoverdueamount21},
+			receivedoverdueamount28 = #{receivedoverdueamount28},
+			receivedoverdueamount29 = #{receivedoverdueamount29},
+			createtime = #{createtime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_risk_order_after_loan
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

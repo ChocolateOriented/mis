@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao">
+    
+	<sql id="tMisDunningPeopleColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.name AS "name",
+		a.dunningpeopletype AS "dunningpeopletype",
+		a.rate AS "rate",
+		a.begin AS "begin",
+		a.end AS "end",
+		a.field1 AS "field1",
+		a.createby AS "createBy.id",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.id",
+		a.updatedate AS "updateDate",
+		a.auto AS "auto",
+		a.Invalid AS Invalid
+	</sql>
+	
+	<sql id="tMisDunningPeopleJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		<include refid="tMisDunningPeopleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+			<include refid="tMisDunningPeopleJoins"/>
+		<where>
+		    <!-- 只显示未删除的催收人员  -->
+		    	a.Invalid = 't'
+		    <if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+<!-- 					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if> -->
+<!-- 					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if> -->
+<!-- 					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if> -->
+			</if>
+			<if test="dunningpeopletype != null and dunningpeopletype != ''">
+				AND a.dunningpeopletype = #{dunningpeopletype}
+			</if>
+			<if test="begin != null and end != null and begin != '' and end != ''">
+				AND a.begin = #{begin} AND  a.end = #{end}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} a.begin desc
+			</when>
+			<otherwise>
+			    ORDER BY a.begin desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		<include refid="tMisDunningPeopleJoins"/>
+		<where>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} desc
+			</when>
+			<otherwise>
+			    ORDER BY a.begin desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findUserList" resultType="com.thinkgem.jeesite.modules.sys.entity.User">
+		SELECT 
+			u.*
+			FROM sys_user u
+			LEFT JOIN t_mis_dunning_people p on p.id = u.id
+		WHERE 
+			p.id is NULL  and u.del_flag = 0
+	</select>
+
+	<select id="findDunningPeopleByType" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		<!-- 只显示未删除的催收人员  -->
+		WHERE a.dunningpeopletype = #{peopleType} and a.Invalid = 't'
+	</select>	
+		
+	<select id="findDunningPeopleCycleByIds" resultType="TMisDunningPeople">
+		SELECT 
+			a.begin AS "begin",
+			a.end AS "end"
+		FROM t_mis_dunning_people a
+			WHERE a.Id in 
+			<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+		GROUP BY  BEGIN,END 
+	</select>	
+	
+	<select id="findDunningPeopleGroupby" resultType="TMisDunningPeople">
+		SELECT 
+			a.begin AS "begin",
+			a.end AS "end"
+		FROM t_mis_dunning_people a
+			WHERE a.Invalid = 't'
+		GROUP BY  BEGIN,END 
+	</select>	
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_people(
+			id,
+			name,
+			dunningpeopletype,
+			rate,
+			begin,
+			end,
+			field1,
+			auto,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{name},
+			#{dunningpeopletype},
+			#{rate},
+			#{begin},
+			#{end},
+			'active',
+			#{auto},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_people SET 
+			id = #{id},	
+			name = #{name},
+			dunningpeopletype = #{dunningpeopletype},
+			rate = #{rate},
+			begin = #{begin},
+			end = #{end},
+			field1 = #{field1},
+			auto = #{auto},
+			createby = #{createBy.id},
+			createdate = #{createDate},
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+		WHERE dbid = #{dbid}
+	</update>
+	
+	<update id="delete">
+		UPDATE t_mis_dunning_people SET 
+			Invalid = 'f',
+			auto = 'f',
+			field1 = 'leave'
+		WHERE id = #{id}
+	</update>
+
+	<select id="findByPeriod" resultType="TMisDunningPeople" parameterType="map">
+	    <!-- 只显示未删除的催收人员  -->
+		select * from t_mis_dunning_people where auto = 't' and Invalid = 't' and begin = #{BEGIN} and end = #{END} 
+		<!-- and DunningPeopleType=#{PEOPLE_TYPE}  -->
+	</select>
+	
+	
+	<select id="findPeopleBybeginEnd" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+			WHERE  a.Invalid = 't'
+		<if test="begin != null and end != null ">
+			AND a.begin = #{begin} AND  a.end = #{end}
+		</if>
+	</select>
+	
+	
+</mapper>

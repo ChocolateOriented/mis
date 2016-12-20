@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SRiskOrderWithRepaymenttimeDao">
+    
+	<sql id="sRiskOrderWithRepaymenttimeColumns">
+		a.id AS "id",
+		a.month AS "month",
+		a.overduerate AS "overduerate",
+		a.within7daysrate AS "within7daysrate",
+		a.within14daysrate AS "within14daysrate",
+		a.within21daysrate AS "within21daysrate",
+		a.within35daysrate AS "within35daysrate",
+		a.over36daysrate AS "over36daysrate",
+		a.mo9rate AS "mo9rate",
+		a.allrate AS "allrate",
+		a.mo9amount AS "mo9amount",
+		a.allamount AS "allamount",
+		a.with14DaysRate AS "with14DaysRate",
+		a.with35DaysRate AS "with35DaysRate"
+	</sql>
+	
+	<sql id="sRiskOrderWithRepaymenttimeJoins">
+	</sql>
+    
+	<select id="get" resultType="SRiskOrderWithRepaymenttime">
+		SELECT 
+			<include refid="sRiskOrderWithRepaymenttimeColumns"/>
+		FROM s_risk_order_with_repaymenttime a
+		<include refid="sRiskOrderWithRepaymenttimeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SRiskOrderWithRepaymenttime">
+		SELECT 
+			<include refid="sRiskOrderWithRepaymenttimeColumns"/>
+		FROM s_risk_order_with_repaymenttime a
+		<include refid="sRiskOrderWithRepaymenttimeJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} a.id desc
+			</when>
+			<otherwise>
+			    ORDER BY  a.id desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SRiskOrderWithRepaymenttime">
+		SELECT 
+			<include refid="sRiskOrderWithRepaymenttimeColumns"/>
+		FROM s_risk_order_with_repaymenttime a
+		<include refid="sRiskOrderWithRepaymenttimeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_risk_order_with_repaymenttime(
+			month,
+			overduerate,
+			within7daysrate,
+			within14daysrate,
+			within21daysrate,
+			within35daysrate,
+			over36daysrate,
+			mo9rate,
+			allrate,
+			mo9amount,
+			allamount
+		) VALUES (
+			#{month},
+			#{overduerate},
+			#{within7daysrate},
+			#{within14daysrate},
+			#{within21daysrate},
+			#{within35daysrate},
+			#{over36daysrate},
+			#{mo9rate},
+			#{allrate},
+			#{mo9amount},
+			#{allamount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_risk_order_with_repaymenttime SET 	
+			month = #{month},
+			overduerate = #{overduerate},
+			within7daysrate = #{within7daysrate},
+			within14daysrate = #{within14daysrate},
+			within21daysrate = #{within21daysrate},
+			within35daysrate = #{within35daysrate},
+			over36daysrate = #{over36daysrate},
+			mo9rate = #{mo9rate},
+			allrate = #{allrate},
+			mo9amount = #{mo9amount},
+			allamount = #{allamount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_risk_order_with_repaymenttime
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

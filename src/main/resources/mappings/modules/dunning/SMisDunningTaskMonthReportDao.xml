@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.SMisDunningTaskMonthReportDao">
+    
+	<sql id="sMisDunningTaskMonthReportColumns">
+		a.id AS "id",
+		a.month AS "month",
+		a.dunningpeoplename AS "dunningpeoplename",
+		a.dunningperiod AS "dunningperiod",
+		a.dunningtasknum AS "dunningtasknum",
+		a.dunningtaskfinished AS "dunningtaskfinished",
+		a.dunningtaskrate AS "dunningtaskrate",
+		a.dunningtelnum AS "dunningtelnum",
+		a.dunningsmsnum AS "dunningsmsnum",
+		a.dunningrepaymentamount AS "dunningrepaymentamount",
+		a.dunningpayoffamount AS "dunningpayoffamount",
+		a.dunningpayoffcapital AS "dunningpayoffcapital",
+		a.dunningprofitamount AS "dunningprofitamount"
+	</sql>
+	
+	<sql id="sMisDunningTaskMonthReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SMisDunningTaskMonthReport">
+		SELECT 
+			<include refid="sMisDunningTaskMonthReportColumns"/>
+		FROM s_mis_dunning_task_month_report a
+		<include refid="sMisDunningTaskMonthReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SMisDunningTaskMonthReport">
+		SELECT 
+			<include refid="sMisDunningTaskMonthReportColumns"/>
+		FROM s_mis_dunning_task_month_report a
+		<include refid="sMisDunningTaskMonthReportJoins"/>
+		<where>
+			
+			<if test="month != null and month != ''">
+				AND a.month = #{month}
+			</if>
+			<if test="dunningpeoplename != null and dunningpeoplename != ''">
+				AND a.dunningpeoplename = #{dunningpeoplename}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SMisDunningTaskMonthReport">
+		SELECT 
+			<include refid="sMisDunningTaskMonthReportColumns"/>
+		FROM s_mis_dunning_task_month_report a
+		<include refid="sMisDunningTaskMonthReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_mis_dunning_task_month_report(
+			month,
+			dunningpeoplename,
+			dunningperiod,
+			dunningtasknum,
+			dunningtaskfinished,
+			dunningtaskrate,
+			dunningtelnum,
+			dunningsmsnum,
+			dunningrepaymentamount,
+			dunningpayoffamount,
+			dunningpayoffcapital,
+			dunningprofitamount
+		) VALUES (
+			#{month},
+			#{dunningpeoplename},
+			#{dunningperiod},
+			#{dunningtasknum},
+			#{dunningtaskfinished},
+			#{dunningtaskrate},
+			#{dunningtelnum},
+			#{dunningsmsnum},
+			#{dunningrepaymentamount},
+			#{dunningpayoffamount},
+			#{dunningpayoffcapital},
+			#{dunningprofitamount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_mis_dunning_task_month_report SET 	
+			month = #{month},
+			dunningpeoplename = #{dunningpeoplename},
+			dunningperiod = #{dunningperiod},
+			dunningtasknum = #{dunningtasknum},
+			dunningtaskfinished = #{dunningtaskfinished},
+			dunningtaskrate = #{dunningtaskrate},
+			dunningtelnum = #{dunningtelnum},
+			dunningsmsnum = #{dunningsmsnum},
+			dunningrepaymentamount = #{dunningrepaymentamount},
+			dunningpayoffamount = #{dunningpayoffamount},
+			dunningpayoffcapital = #{dunningpayoffcapital},
+			dunningprofitamount = #{dunningprofitamount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_mis_dunning_task_month_report
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

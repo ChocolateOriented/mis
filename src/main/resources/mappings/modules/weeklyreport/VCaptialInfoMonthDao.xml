@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.VCaptialInfoMonthDao">
+    
+	<sql id="vCaptialInfoMonthColumns">
+		a.month AS "month",
+		a.amount AS "amount",
+		a.txn_amount AS "txnAmount",
+		a.fee_percent AS "feePercent",
+		a.distributor_amount AS "distributorAmount",
+		a.total_amount AS "totalAmount",
+		a.channelfee_amount AS "channelfeeAmount",
+		a.channelfee_percent AS "channelfeePercent",
+		a.mobi_amount AS "mobiAmount",
+		a.mobi_percent AS "mobiPercent",
+		a.sms_amount AS "smsAmount",
+		a.sms_percent AS "smsPercent"
+	</sql>
+	
+	<sql id="vCaptialInfoMonthJoins">
+	</sql>
+    
+	<select id="get" resultType="VCaptialInfoMonth">
+		SELECT 
+			<include refid="vCaptialInfoMonthColumns"/>
+		FROM v_captial_info_month a
+		<include refid="vCaptialInfoMonthJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VCaptialInfoMonth">
+		SELECT 
+			<include refid="vCaptialInfoMonthColumns"/>
+		FROM v_captial_info_month a
+		<include refid="vCaptialInfoMonthJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VCaptialInfoMonth">
+		SELECT 
+			<include refid="vCaptialInfoMonthColumns"/>
+		FROM v_captial_info_month a
+		<include refid="vCaptialInfoMonthJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO v_captial_info_month(
+			amount,
+			txn_amount,
+			fee_percent,
+			distributor_amount,
+			total_amount,
+			channelfee_amount,
+			channelfee_percent,
+			mobi_amount,
+			mobi_percent,
+			sms_amount,
+			sms_percent
+		) VALUES (
+			#{amount},
+			#{txnAmount},
+			#{feePercent},
+			#{distributorAmount},
+			#{totalAmount},
+			#{channelfeeAmount},
+			#{channelfeePercent},
+			#{mobiAmount},
+			#{mobiPercent},
+			#{smsAmount},
+			#{smsPercent}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE v_captial_info_month SET 	
+			amount = #{amount},
+			txn_amount = #{txnAmount},
+			fee_percent = #{feePercent},
+			distributor_amount = #{distributorAmount},
+			total_amount = #{totalAmount},
+			channelfee_amount = #{channelfeeAmount},
+			channelfee_percent = #{channelfeePercent},
+			mobi_amount = #{mobiAmount},
+			mobi_percent = #{mobiPercent},
+			sms_amount = #{smsAmount},
+			sms_percent = #{smsPercent}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM v_captial_info_month
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

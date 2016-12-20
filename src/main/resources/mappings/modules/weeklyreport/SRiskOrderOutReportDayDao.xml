@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SRiskOrderOutReportDayDao">
+    
+	<sql id="sRiskOrderOutReportDayColumns">
+		a.id AS "id",
+		a.createtime AS "createtime",
+		a.dunningpeoplename AS "dunningpeoplename",
+		a.dunningordernum AS "dunningordernum",
+		a.dunningordercapitalamount AS "dunningordercapitalamount",
+		a.dunningorderamount AS "dunningorderamount",
+		a.repayordernum AS "repayordernum",
+		a.repayordercapitalamount AS "repayordercapitalamount",
+		a.repayorderamount AS "repayorderamount",
+		a.payoffordernum AS "payoffordernum",
+		a.payofforderamount AS "payofforderamount",
+		a.basiccommission AS "basiccommission"
+	</sql>
+	
+	<sql id="sRiskOrderOutReportDayJoins">
+	</sql>
+    
+	<select id="get" resultType="SRiskOrderOutReportDay">
+		SELECT 
+			<include refid="sRiskOrderOutReportDayColumns"/>
+		FROM s_risk_order_out_report_day a
+		<include refid="sRiskOrderOutReportDayJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SRiskOrderOutReportDay">
+		SELECT 
+			<include refid="sRiskOrderOutReportDayColumns"/>
+		FROM s_risk_order_out_report_day a
+		<include refid="sRiskOrderOutReportDayJoins"/>
+		<where>
+		    <choose>
+				<when test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''">
+					AND a.createtime BETWEEN #{beginDatetime} AND #{endDatetime} 
+				</when>
+				<otherwise>
+<!-- 			     <![CDATA[ -->
+<!-- 			    	AND a.createtime = date_format(now(),'%Y-%m-%d') -->
+<!-- 			     ]]> -->
+				</otherwise>
+			</choose>
+<!-- 			<if test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''"> -->
+<!-- 				AND a.createtime BETWEEN #{beginDatetime} AND #{endDatetime} -->
+<!-- 			</if> -->
+			<if test="dunningpeoplename != null and dunningpeoplename != ''">
+			    AND a.dunningpeoplename LIKE concat('%',#{dunningpeoplename},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}  a.id desc 
+			</when>
+			<otherwise>
+			    ORDER BY a.id desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SRiskOrderOutReportDay">
+		SELECT 
+			<include refid="sRiskOrderOutReportDayColumns"/>
+		FROM s_risk_order_out_report_day a
+		<include refid="sRiskOrderOutReportDayJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_risk_order_out_report_day(
+			createtime,
+			dunningpeoplename,
+			dunningordernum,
+			dunningordercapitalamount,
+			dunningorderamount,
+			repayordernum,
+			repayordercapitalamount,
+			repayorderamount,
+			payoffordernum,
+			payofforderamount,
+			basiccommission
+		) VALUES (
+			#{createtime},
+			#{dunningpeoplename},
+			#{dunningordernum},
+			#{dunningordercapitalamount},
+			#{dunningorderamount},
+			#{repayordernum},
+			#{repayordercapitalamount},
+			#{repayorderamount},
+			#{payoffordernum},
+			#{payofforderamount},
+			#{basiccommission}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_risk_order_out_report_day SET 	
+			createtime = #{createtime},
+			dunningpeoplename = #{dunningpeoplename},
+			dunningordernum = #{dunningordernum},
+			dunningordercapitalamount = #{dunningordercapitalamount},
+			dunningorderamount = #{dunningorderamount},
+			repayordernum = #{repayordernum},
+			repayordercapitalamount = #{repayordercapitalamount},
+			repayorderamount = #{repayorderamount},
+			payoffordernum = #{payoffordernum},
+			payofforderamount = #{payofforderamount},
+			basiccommission = #{basiccommission}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_risk_order_out_report_day
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

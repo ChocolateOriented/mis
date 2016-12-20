@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao">
+
+    <sql id="tMisDunningTaskColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.dunningpeopleid AS "dunningpeopleid",
+		a.dealcode AS "dealcode",
+		a.capitalamount AS "capitalamount",
+		a.begin AS "begin",
+		a.deadline AS "deadline",
+		a.end AS "end",
+		a.dunningperiodbegin AS "dunningperiodbegin",
+		a.dunningperiodend AS "dunningperiodend",
+		a.dunnedamount AS "dunnedamount",
+		a.ispayoff AS "ispayoff",
+		a.reliefamount AS "reliefamount",
+		a.dunningtaskstatus AS "dunningtaskstatus",
+		a.amountonend AS "dunningAmounOnEnd",
+		a.field1 AS "field1",
+		a.repaymenttime AS "repaymentTime",
+		a.createby AS "createBy.id",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.id",
+		a.updatedate AS "updateDate",
+		a.repaymentTime AS "repaymentTime"
+	</sql>
+
+    <sql id="tMisDunningTaskJoins">
+    </sql>
+
+    <select id="get" resultType="TMisDunningTask">
+        SELECT
+        <include refid="tMisDunningTaskColumns"/>
+        FROM t_mis_dunning_task a
+        <include refid="tMisDunningTaskJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TMisDunningTask">
+        SELECT
+        <include refid="tMisDunningTaskColumns"/>
+        FROM t_mis_dunning_task a
+        <include refid="tMisDunningTaskJoins"/>
+        <where>
+
+            <if test="id != null and id != ''">
+                AND a.id = #{id}
+            </if>
+            <if test="dunningpeopleid != null and dunningpeopleid != ''">
+                AND a.dunningpeopleid = #{dunningpeopleid}
+            </if>
+            <if test="dealcode != null and dealcode != ''">
+                AND a.dealcode = #{dealcode}
+            </if>
+            <if test="capitalamount != null and capitalamount != ''">
+                AND a.capitalamount = #{capitalamount}
+            </if>
+            <if test="begin != null and begin != ''">
+                AND a.begin = #{begin}
+            </if>
+            <if test="deadline != null and deadline != ''">
+                AND a.deadline = #{deadline}
+            </if>
+            <if test="end != null and end != ''">
+                AND a.end = #{end}
+            </if>
+            <if test="dunningperiodbegin != null and dunningperiodbegin != ''">
+                AND a.dunningperiodbegin = #{dunningperiodbegin}
+            </if>
+            <if test="dunningperiodend != null and dunningperiodend != ''">
+                AND a.dunningperiodend = #{dunningperiodend}
+            </if>
+            <if test="dunnedamount != null and dunnedamount != ''">
+                AND a.dunnedamount = #{dunnedamount}
+            </if>
+            <if test="ispayoff != null and ispayoff != ''">
+                AND a.ispayoff = #{ispayoff}
+            </if>
+            <if test="reliefamount != null and reliefamount != ''">
+                AND a.reliefamount = #{reliefamount}
+            </if>
+            <if test="dunningtaskstatus != null and dunningtaskstatus != ''">
+                AND a.dunningtaskstatus = #{dunningtaskstatus}
+            </if>
+            <if test="field1 != null and field1 != ''">
+                AND a.field1 = #{field1}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="TMisDunningTask">
+        SELECT
+        <include refid="tMisDunningTaskColumns"/>
+        FROM t_mis_dunning_task a
+        <include refid="tMisDunningTaskJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO t_mis_dunning_task(
+			id,
+			dunningpeopleid,
+			dealcode,
+			capitalamount,
+			begin,
+			deadline,
+			end,
+			dunningperiodbegin,
+			dunningperiodend,
+			dunnedamount,
+			ispayoff,
+			reliefamount,
+			dunningtaskstatus,
+			amountonend,
+			field1,
+			repaymenttime,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dunningpeopleid},
+			#{dealcode},
+			#{capitalamount},
+			#{begin},
+			#{deadline},
+			#{end},
+			#{dunningperiodbegin},
+			#{dunningperiodend},
+			#{dunnedamount},
+			#{ispayoff},
+			#{reliefamount},
+			#{dunningtaskstatus},
+			#{dunningAmounOnEnd},
+			#{field1},
+			#{repaymentTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE t_mis_dunning_task SET 	
+			dunningpeopleid = #{dunningpeopleid},
+			dealcode = #{dealcode},
+			capitalamount = #{capitalamount},
+			begin = #{begin},
+			deadline = #{deadline},
+			end = #{end},
+			dunningperiodbegin = #{dunningperiodbegin},
+			dunningperiodend = #{dunningperiodend},
+			dunnedamount = #{dunnedamount},
+			ispayoff = #{ispayoff},
+			reliefamount = #{reliefamount},
+			dunningtaskstatus = #{dunningtaskstatus},
+			amountonend = #{dunningAmounOnEnd},
+			field1 = #{field1},
+			repaymenttime = #{repaymentTime},
+			createby = #{createBy.id},
+			createdate = #{createDate},
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+     <update id="updatedunningtime">
+		UPDATE t_mis_dunning_task SET 	
+			dunningtime = now()
+		WHERE id = #{id}
+	</update>
+	
+     <update id="updatedunningtimeList">
+		UPDATE t_mis_dunning_task SET 	
+			dunningtime = now()
+		WHERE id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
+
+    <update id="updateOrder">
+        <!-- 				<result property="reliefamount" column="modify_amount"/> -->
+        UPDATE t_risk_order SET
+        	modify_amount = #{reliefamount},
+			modify_flag = 1
+        WHERE dealcode = #{dealcode}
+    </update>
+    
+    <update id="updateOrderPartial" >
+		 UPDATE t_risk_order SET
+        	modify_amount = #{reliefamount},
+			modify_flag = 1
+		WHERE 
+			type = 'partial' and root_order_id = #{rootorderid}
+	</update>
+
+    <update id="updateOuterfiletime">
+        UPDATE t_risk_order SET
+        outerfiletime = #{outerfiletime}
+        WHERE dealcode in
+        <foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateTelRemark">
+		UPDATE t_mis_dunning_task SET 	
+			TelRemark = #{telremark}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		DELETE FROM t_mis_dunning_task
+		WHERE id = #{id}
+	</update>
+
+    <!-- 	<insert id="addOuterfiletime" > -->
+    <!-- 		INSERT INTO t_mis_dunning_outerfilelog( -->
+    <!-- 			dealcode, -->
+    <!-- 			realname, -->
+    <!-- 			mobile, -->
+    <!-- 			dunningpeoplename, -->
+    <!-- 			createdate -->
+    <!-- 		) VALUES ( -->
+    <!-- 			#{dealcode}, -->
+    <!-- 			#{realname}, -->
+    <!-- 			#{mobile}, -->
+    <!-- 			#{dunningpeoplename}, -->
+    <!-- 			#{createdate} -->
+    <!-- 		) -->
+    <!-- 	</insert> -->
+
+    <insert id="batchInsert">
+        insert into t_mis_dunning_outerfilelog (
+        dealcode,
+        realname,
+        mobile,
+        dunningpeoplename,
+        createdate
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.dealcode, jdbcType=VARCHAR }
+            , #{item.realname, jdbcType=VARCHAR }
+            , #{item.mobile, jdbcType=VARCHAR }
+            , #{item.dunningpeoplename, jdbcType=VARCHAR }
+            , #{item.createdate, jdbcType=TIMESTAMP }
+            )
+        </foreach>
+    </insert>
+
+    <insert id="generateTast">
+	    INSERT INTO t_mis_dunning_task(
+	    	Dealcode,
+	    	CapitalAmount,
+	    	DunnedAmount,
+	    	IsPayoff,
+	    	ReliefAmount,
+	    	DunningTaskStatus,
+	    	RepaymentTime)
+		SELECT 
+			dealcode,
+			amount,
+			0,
+			'F',
+			0,
+			0,
+			repayment_time 
+		FROM v_overdue_order 
+		WHERE overdue_days = 1
+	</insert>
+
+    <!--查找已还清催收任务-->
+    <select id="findPayoffDunningTask" resultType="TMisDunningTask" parameterType="map">
+        <!-- 	    <![CDATA[   	 ]]> -->
+        select t.* from t_mis_dunning_task t
+        left join t_risk_order o on o.dealcode = t.Dealcode
+        where o.status = 'payoff'
+        and ((payoff_time&gt;=t.Begin and payoff_time&lt;=t.Deadline and t.DunningTaskStatus='dunning')
+        or (payoff_time&gt;=t.Begin and payoff_time&lt;=t.End and (t.DunningTaskStatus ='expired' or t.DunningTaskStatus
+        = 'transfer' or t.DunningTaskStatus='end')))
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--查找已过期催款任务-->
+    <select id="findExpiredTask" resultType="TMisDunningTask" parameterType="map">
+		select * from t_mis_dunning_task where  date(Deadline) &lt;= date(now()) and DunningTaskStatus=#{STATUS_DUNNING} ORDER BY dbid
+	</select>
+
+    <resultMap type="com.mo9.risk.modules.dunning.entity.DunningPeriod" id="dunning_period">
+        <result property="begin" column="Begin"/>
+        <result property="end" column="End"/>
+    </resultMap>
+    
+    <!---查找当前有几种催收账期-->
+    <select id="findDunningPeriod" resultMap="dunning_period" parameterType="map">
+        <!-- 只显示未删除的催收人员  -->
+		select Begin,End from t_mis_dunning_people  where  auto = 't' and Invalid = 't' and begin is not null group by Begin,End order by Begin
+	</select>
+    <!---查找用户正在催收的任务数-->
+    <select id="findDunningTaskByPeople" resultType="map" parameterType="map">
+        <!-- 		select DunningPeopleId as people,count(*)as task_count  from t_mis_dunning_task where DunningPeriodBegin =  #{BEGIN} and DunningPeriodEnd = #{END} -->
+        <!-- 		and DunningTaskStatus=#{STATUS_DUNNING} group by DunningPeopleId -->
+        <!-- 只显示未删除的催收人员  -->
+        SELECT
+        p.id as people, IFNULL(TaskCount,0) as task_count
+        FROM
+        (select * from t_mis_dunning_people where auto = 't' and  Invalid = 't' and begin = #{BEGIN} and end = #{END}) AS p
+        left join (
+        select
+        DunningPeopleId,
+        count(1) AS TaskCount
+        FROM t_mis_dunning_task
+        WHERE 
+        DunningTaskStatus = #{STATUS_DUNNING}
+        GROUP BY DunningPeopleId
+        ) AS t ON p.id = t.DunningPeopleId;
+    </select>
+
+    <resultMap type="com.mo9.risk.modules.dunning.entity.TMisDunningOrder" id="dunning_order">
+        <result property="dealcode" column="dealcode"/>
+        <result property="amount" column="amount"/>
+        <result property="fee" column="cost_amount"/>
+        <result property="repaymentDate" column="repayment_time"/>
+        <result property="reliefamount" column="modify_amount"/>
+        <result property="reliefflag" column="modify_flag"/>
+        <result property="overdueAmount" column="overdue_amount"/>
+        <result property="status" column="status"/>
+        <result property="costAmount" column="cost_amount"/>
+        <result property="creditAmount" column="credit_amount"/>
+        <result property="couponId" column="coupons_id"/>
+        <result property="subCostAmount" column="sub_cost_amount"/>
+        <result property="defaultInterestAmount" column="default_interest_amount"/>
+    </resultMap>
+
+    <!--查找需要催款的订单-->
+    <select id="findNeedDunningOrder" resultMap="dunning_order" parameterType="map">
+		select o.* from t_risk_order o
+		left join t_mis_dunning_task t on t.dealcode=o.dealcode and t.DunningTaskStatus = 'dunning' 
+		where o.status = 'payment'
+		AND t.dbId IS NULL
+		and TIMESTAMPDIFF(DAY,date(repayment_time),date(now()))&gt;=#{BEGIN} and TIMESTAMPDIFF(DAY,date(repayment_time),date(now())) &lt;=#{END}
+	</select>
+
+    <!--根据订单号获取订单-->
+    <select id="findOrderByDealcode" resultMap="dunning_order" parameterType="String">
+		select * from t_risk_order where dealcode = #{dealcode}
+	</select>
+
+    <!--按订单号查询催收任务-->
+    <select id="findDunningTaskByDealcode" resultType="TMisDunningTask" parameterType="map">
+		select * from t_mis_dunning_task where DunningTaskStatus =#{STATUS_DUNNING} and Dealcode=#{DEALCODE};
+	</select>
+    <resultMap type="com.mo9.risk.modules.dunning.entity.DunningUserInfo" id="dunning_userinfo">
+        <result property="realName" column="real_name"/>
+        <result property="idCard" column="idCard"/>
+    </resultMap>
+    <select id="findDunningUserInfo" resultMap="dunning_userinfo" parameterType="String">
+		select idCard,real_name from t_risk_buyer_idcard b left join t_risk_order o on b.buyer_id = o.buyer_id where o.dealcode = #{DEALCODE}
+	</select>
+
+    <!-- 获取订单类  -->
+    <select id="getOrders" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+				SELECT
+					o.buyer_id AS "buyerid",
+					idc.real_name AS "realname",
+					o.dealcode AS "dealcode",
+					b.mobile AS "mobile", 
+					o.amount AS "amount",
+					IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+					repayment_time AS "repaymenttime",
+					CASE
+					WHEN o.`status` = 'payoff' THEN
+						DATEDIFF(
+							o.payoff_time,
+							o.repayment_time
+						)
+					WHEN o.`status` = 'payment' THEN
+						DATEDIFF(CURDATE(), o.repayment_time)
+					END AS overduedays,
+					o.`status` AS status,
+					p.`name` AS dunningpeoplename,
+					o.payoff_time AS payofftime,
+					t.dunningtaskstatus AS dunningtaskstatus,
+					t.DunningPeopleId AS dunningpeopleid,
+					t.id AS dunningtaskdbid,
+					o.outerfiletime AS outerfiletime
+				FROM
+					t_risk_order AS o
+				LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+				LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+				LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+				LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+				WHERE
+					o.type IN ('loan', 'partial' )
+					AND o.merchant_id = 7
+					AND o.`status` IN ('payoff', 'payment', 'partial' ) 
+					AND t.dbid IS NOT NULL
+					AND t.dunningtaskstatus IN ('dunning', 'finished' )  
+					AND o.dealcode = #{dealcode}  
+					<!-- 只显示未删除的催收人员  -->
+<!-- 					AND p.Invalid = 't' -->
+	</select>
+
+    <!-- 委外导出  -->
+    <select id="exportOuterFile" resultType="com.mo9.risk.modules.dunning.entity.DunningOuterFile">
+        SELECT
+        o.dealcode AS dealcode,
+        i.real_name AS realname,
+        b.mobile AS mobile,
+        i.idCard AS idcard,
+        i.sex AS sex,
+        IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0) AS amount,
+        IFNULL(o.cost_amount, 0) AS costamount,
+        TIMESTAMPDIFF(
+        DAY,
+        o.repayment_time,
+        CURDATE()
+        ) AS delaydays,
+        IFNULL(o.overdue_amount, 0) AS overdueamount,
+        IFNULL(o.balance, 0) AS balance,
+        IFNULL(o.credit_amount, 0) + IFNULL(overdue_amount, 0) - IFNULL(balance, 0) AS remainammount,
+<!--    IFNULL(o.modify_amount, 0) AS modifyamount, -->
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END AS modifyamount,
+        o.remit_time AS remittime,
+        o.days AS days,
+        o.repayment_time AS repaymenttime,
+        r.company_name AS companyname,
+        r.company_tel AS companytel,
+        r.link_name1 AS linkname1,
+        r.link_relation1 AS linkrelation1,
+        r.link_tel1 AS linktel1,
+        r.link_name2 AS linkname2,
+        r.link_relation2 AS linkrelation2,
+        r.link_tel2 AS linktel2
+        <!-- 				w.company_name AS companyname, -->
+        <!-- 				w.company_tel AS companytel, -->
+        <!-- 				c1.`name` AS linkname1, -->
+        <!-- 				CASE r1.family_relation -->
+        <!-- 				WHEN 'children' THEN '子女' -->
+        <!-- 				WHEN 'friend' THEN '朋友' -->
+        <!-- 				WHEN 'married' THEN '夫妻' -->
+        <!-- 				WHEN 'relatives' THEN '亲属' -->
+        <!-- 				WHEN 'workmate' THEN '同事' -->
+        <!-- 				WHEN 'parent' THEN '父母' -->
+        <!-- 				ELSE -->
+        <!-- 					NULL -->
+        <!-- 				END AS linkrelation1, -->
+        <!-- 				c1.tel AS linktel1, -->
+        <!-- 				c2.`name` AS linkname2, -->
+        <!-- 				CASE r2.family_relation -->
+        <!-- 				WHEN 'children' THEN '子女' -->
+        <!-- 				WHEN 'friend' THEN '朋友' -->
+        <!-- 				WHEN 'married' THEN '夫妻' -->
+        <!-- 				WHEN 'relatives' THEN '亲属' -->
+        <!-- 				WHEN 'workmate' THEN '同事' -->
+        <!-- 				WHEN 'parent' THEN '父母' -->
+        <!-- 				ELSE -->
+        <!-- 					NULL -->
+        <!-- 				END AS linkrelation2, -->
+        <!-- 				c2.tel AS linktel2 -->
+        FROM
+        t_risk_order AS o
+        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        LEFT JOIN t_risk_buyer_idcard AS i ON o.buyer_id = i.buyer_id
+        LEFT JOIN s_user_relationship as r ON r.buyer_id = o.buyer_id
+        <!-- 			LEFT JOIN t_risk_buyer_workinfo AS w ON o.buyer_id = w.buyer_id -->
+        <!-- 			LEFT JOIN ( -->
+        <!-- 				SELECT -->
+        <!-- 					buyer_id, -->
+        <!-- 					MIN(buyer_contact_id) AS link_id1, -->
+        <!-- 					MAX(buyer_contact_id) AS link_id2 -->
+        <!-- 				FROM -->
+        <!-- 					t_risk_buyer2contacts -->
+        <!-- 				WHERE -->
+        <!-- 					type IS NOT NULL -->
+        <!-- 				AND family_relation != 'callLog' -->
+        <!-- 				GROUP BY -->
+        <!-- 					buyer_id -->
+        <!-- 			) AS r ON r.buyer_id = o.buyer_id -->
+        <!-- 			LEFT JOIN t_risk_contact AS c1 ON r.link_id1 = c1.id -->
+        <!-- 			LEFT JOIN t_risk_contact AS c2 ON r.link_id2 = c2.id -->
+        <!-- 			LEFT JOIN t_risk_buyer2contacts AS r1 ON r1.buyer_contact_id = r.link_id1 and r1.buyer_id=r.buyer_id -->
+        <!-- 			LEFT JOIN t_risk_buyer2contacts AS r2 on r2.buyer_contact_id = r.link_id2 and r2.buyer_id=r.buyer_id -->
+        WHERE o.dealcode in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <!-- 		<where> -->
+        <!-- 			<if test="orders != null and orders != ''"> -->
+        <!-- 				AND  o.dealcode in  -->
+        <!-- 				<foreach item="item" index="index" collection="orders" open="(" separator="," close=")"> -->
+        <!--                      #{item} -->
+        <!--                 </foreach> -->
+        <!-- 			</if> -->
+        <!-- 		</where>		 -->
+    </select>
+
+    <!-- 历史借款信息 list -->
+    <select id="findOrderHistoryList" resultType="com.mo9.risk.modules.dunning.entity.OrderHistory">
+			SELECT
+				o.id AS orderid,
+				o.dealcode AS dealcode,
+				CASE
+			WHEN o.type = 'loan'
+			AND EXISTS (
+				SELECT
+					*
+				FROM
+					t_risk_buyer_credit AS c
+				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
+				WHERE
+					o.buyer_id = c.buyer_id
+				AND h.order_id = o.id
+				AND h. STATUS = 'pass'
+			) THEN
+				'普通订单'
+			WHEN o.type = 'loan'
+			AND NOT EXISTS (
+				SELECT
+					*
+				FROM
+					t_risk_buyer_credit AS c
+				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
+				WHERE
+					o.buyer_id = c.buyer_id
+				AND h.order_id = o.id
+				AND h. STATUS = 'pass'
+			) THEN
+				'续期订单'
+			WHEN o.type = 'partial' THEN
+				'部分还款'
+			END AS ordertype,
+			 o.credit_amount AS creditamount,
+			 o.days AS days,
+			 CASE
+			WHEN EXISTS (
+				SELECT
+					*
+				FROM
+					t_risk_buyer_credit AS c
+				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
+				WHERE
+					o.buyer_id = c.buyer_id
+				AND h.order_id = o.id
+				AND h. STATUS = 'pass'
+			) THEN
+				(
+					SELECT
+						DATE_FORMAT(
+							Max(h.create_time),
+							'%Y-%m-%d %H:%i'
+						)
+					FROM
+						t_risk_buyer_credit AS c
+					LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
+					WHERE
+						c.buyer_id = o.buyer_id
+					AND h.order_id = o.id
+					AND h.`status` = 'pendingExamine'
+				)
+			ELSE
+				o.create_time
+			END AS createtime,
+			 DATE_FORMAT(
+				o.remit_time,
+				'%Y-%m-%d %H:%i'
+			) AS remittime,
+			 o.repayment_time AS repaymenttime,
+			 CASE
+			WHEN o. STATUS = 'payment' THEN
+				datediff(CURDATE(), o.repayment_time)
+			WHEN o. STATUS = 'payoff' THEN
+				datediff(
+					o.payoff_time,
+					o.repayment_time
+				)
+			END AS delaydays,
+			 IFNULL(o.overdue_amount, 0) AS overdueamount,
+			 IFNULL(
+				o.default_interest_amount,
+				0
+			) AS defaultinterestamount,
+			 CASE
+			WHEN o.type = 'loan'
+			AND o.`status` = 'payment' THEN
+				'未还清'
+			WHEN o.`status` = 'payoff' THEN
+				'已还清'
+			WHEN o.type = 'partial'
+			AND o.`status` = 'partial' THEN
+				'未还清(部分还款)'
+			END AS STATUS,
+			 o.payoff_time AS payofftime,
+			 CASE 
+<!-- 			WHEN o.type = 'loan' THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)  -->
+			 	WHEN o.type = 'loan' THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)
+<!-- 			WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) -->
+				WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END
+			 END AS amount,
+			 o.root_order_id AS rootorderid,
+			 o1.dealcode AS roodealcode
+			FROM
+				t_risk_order AS o
+			LEFT JOIN t_risk_order AS o1 ON o.root_order_id = o1.id
+			WHERE
+				o.type IN ('loan', 'partial')
+			AND o.merchant_id = 7
+			AND o.`status` IN (
+				'payment',
+				'partial',
+				'payoff'
+			)
+			AND o.buyer_id = #{buyerid}
+			ORDER BY
+				o.buyer_id,
+				o.remit_time;
+	</select>
+<!-- 催收留案功能-留案提交 Patch 0001 by GQWU at 2016-11-10 start -->
+	<update id="updateDunningTimeByDealcodes">
+		UPDATE t_mis_dunning_task SET 	
+			Deadline = #{deferDate}
+		WHERE Dealcode in 
+		<foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
+<!-- 催收留案功能-留案提交 Patch 0001 by GQWU at 2016-11-10 end -->
+
+<!-- 催收留案功能-订单查询 Patch 0001 by GQWU at 2016-11-25 start -->
+<!-- 仅查询留案逻辑所需部分数据，非逾期订单完整数据 -->
+	<select id="findOrdersByDealcodes"  resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+		
+		o.dealcode AS dealcode,
+        o.repayment_time AS repaymenttime,
+        t.Deadline AS deadline,
+        p.DunningPeopleType AS DunningPeopleType
+        
+        FROM
+        t_risk_order AS o
+        LEFT JOIN t_mis_dunning_task AS t ON t.Dealcode = o.dealcode
+        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+        
+		WHERE t.DunningTaskStatus = 'dunning' AND t.Dealcode in 
+		<foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</select>
+<!-- 催收留案功能-订单查询 Patch 0001 by GQWU at 2016-11-25 end -->
+
+    <!-- 催收列表 list -->
+    <select id="findOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        o.buyer_id AS "buyerid",
+        idc.real_name AS "realname",
+        o.dealcode AS "dealcode",
+        b.mobile AS "mobile",
+        o.amount AS "amount",
+<!--    IFNULL(o.credit_amount, 0) - IFNULL(o.modify_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount, -->
+		IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+        repayment_time AS "repaymenttime",
+        CASE
+        WHEN o.`status` = 'payoff' THEN
+        DATEDIFF(
+        o.payoff_time,
+        o.repayment_time
+        )
+        WHEN o.`status` = 'payment' THEN
+        DATEDIFF(CURDATE(), o.repayment_time)
+        END AS overduedays,
+        o.`status` AS status,
+        p.`name` AS dunningpeoplename,
+        p.DunningPeopleType AS DunningPeopleType,
+        t.dunningtime AS "dunningtime",
+        o.payoff_time AS payofftime,
+        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
+        t.Deadline as deadline,
+        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
+        t.dunningtaskstatus AS dunningtaskstatus,
+        t.DunningPeopleId AS dunningpeopleid,
+        <!-- 					t.dbid AS dunningtaskdbid -->
+        t.id AS dunningtaskdbid,
+        t.telremark AS telremark,
+        o.outerfiletime AS outerfiletime
+        FROM
+        t_risk_order AS o
+        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+        LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+        WHERE
+        o.type IN ('loan', 'partial' )
+        AND o.merchant_id = 7
+        AND o.`status` IN ('payoff', 'payment', 'partial' )
+        AND t.dbid IS NOT NULL
+        <!-- 任务状态为正在催收的  -->
+        AND t.dunningtaskstatus IN ('dunning', 'finished' )
+        
+        <if test="dunningpeopleid != null and dunningpeopleid != ''">
+                <!-- 			     # 催收人过滤    -->
+                AND t.DunningPeopleId = #{dunningpeopleid}
+        </if>
+        
+        <if test="mobile != null and mobile != ''">
+                <!-- 			     # 手机号码 -->
+                AND b.mobile LIKE concat('%',#{mobile},'%')
+                <!-- 				AND mobile = #{mobile} -->
+        </if>
+        
+        <if test="realname != null and realname != ''">
+                <!-- 			    # 姓名 -->
+                AND idc.real_name LIKE concat('%',#{realname},'%')
+                <!-- 				AND realname = #{realname} -->
+        </if>
+        
+        <!-- 只显示未删除的催收人员  -->
+<!--         AND p.Invalid = 't' -->
+        ) AS d
+        <where>
+
+            <if test="names != null and names != ''">
+                AND dunningpeoplename in
+                <foreach item="item" index="index" collection="names" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
+                <!-- 			    # 逾期天数 -->
+                <!-- 				AND overduedays BETWEEN #{beginOverduedays} AND #{endOverduedays} -->
+                <![CDATA[
+    					AND  overduedays >= #{beginOverduedays} AND overduedays <= #{endOverduedays}   
+      			  ]]>
+            </if>
+            <if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
+                <!-- 			    # 到期还款日期-->
+                AND repaymenttime BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
+            </if>
+            <if test="beginPayofftime != null and endPayofftime != null and beginPayofftime != '' and endPayofftime != ''">
+                <!-- 			    # 还清日期-->
+                AND payofftime BETWEEN #{beginPayofftime} AND #{endPayofftime}
+            </if>
+            <if test="status != null and status != ''">
+                <!-- 			    # 订单状态 payoff 已还清 payment  -->
+                AND status = #{status}
+            </if>
+            <!-- 			# 任务状态  -->
+            <if test="dunningtaskstatus != null and dunningtaskstatus != ''">
+                AND dunningtaskstatus = #{dunningtaskstatus}
+            </if>
+            
+            <!-- 			# 导出批次号时间  -->
+            <if test="beginOuterfiletime != null and endOuterfiletime != null and beginOuterfiletime != '' and endOuterfiletime != ''">
+                AND outerfiletime BETWEEN #{beginOuterfiletime} AND #{endOuterfiletime}
+            </if>
+<!--             <if test="outerfiletime != null and outerfiletime != ''"> -->
+<!-- 				AND DATE_FORMAT(outerfiletime, '%Y-%m-%d') = DATE_FORMAT(#{outerfiletime}, '%Y-%m-%d') -->
+<!--                 <![CDATA[ -->
+<!-- 					AND outerfiletime >= #{outerfiletime} AND outerfiletime < DATE_ADD(#{outerfiletime},INTERVAL 1 DAY) -->
+<!-- 				]]> -->
+<!--             </if> -->
+            
+<!--             <if test="overduedays != null and overduedays != ''"> -->
+                <!-- 			    # 委外主管过滤 -->
+<!--                 ${sqlMap.overdueday} #{overduedays} -->
+<!--             </if> -->
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                <!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+                ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
+            </when>
+            <otherwise>
+                <!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+                ORDER BY ${sqlMap.orderbyMap}
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--部分还款订单 -->
+    <resultMap type="com.mo9.risk.modules.dunning.entity.PartialOrder" id="partial_order">
+        <result property="taskId" column="task_id"/>
+        <result property="repayAmount" column="repay_amount"/>
+        <result property="repayTime" column="repay_time"/>
+        <result property="repayDealcode" column="repay_dealcode"/>
+        <result property="parentDealStatus" column="parent_deal_status"/>
+    </resultMap>
+    <!-- 查找最近部分还款的订单-->
+    <select id="findPartialOrders" resultMap="partial_order">
+ 		select tmp1.id as task_id,o2.balance*100 as repay_amount, o2.repayment_time as repay_time,o2.dealcode as repay_dealcode,tmp1.o1status as parent_deal_status from 
+ 		(select t.*,o1.id as dunning_order_id,o1.`status` as o1status from t_mis_dunning_task t left join t_risk_order o1 on t.dealcode = o1.dealcode) 
+ 		as tmp1 
+ 		left join t_risk_order o2 on tmp1.dunning_order_id = o2.root_order_id 
+ 		where o2.type = 'partial' and (o2.update_time>tmp1.lastRepayTime or tmp1.lastRepayTime is null) 
+ 		and ((o2.update_time &gt;=tmp1.Begin and update_time &lt;=tmp1.Deadline and tmp1.DunningTaskStatus='dunning') 
+ 		or (update_time &gt;=tmp1.Begin and update_time &lt;=tmp1.End and (tmp1.DunningTaskStatus ='expired' or tmp1.DunningTaskStatus = 'transfer'))) 
+ 		and o2.dealcode NOT IN (select PartialDealcode from t_mis_dunned_history where PartialDealcode is not null) 
+ 	</select>
+
+<!-- 	            #{datetime} AS datetime, -->
+<!-- 	            t.Name AS personnel, -->
+<!-- 				IFNULL(t.OrderFinishedNum / t.OrderNum * 100, 0) AS payoffpercentage, -->
+<!-- 				t.DunningPeopleId AS DunningPeopleId, -->
+<!-- 				t.OrderNum AS creditorder, -->
+<!-- 				t.OrderFinishedNum AS payorder, -->
+<!-- 				IFNULL(r.Tel, 0) AS telnum, -->
+<!-- 				IFNULL(r.Sms, 0) AS smsnum, -->
+<!-- 				IFNULL(t.repaymentAmount, 0) AS creditamount, -->
+<!-- 				IFNULL(t.payoffAmount, 0) AS payamount -->
+
+    <!-- 按月查询-->
+    <select id="findPerformanceMonthReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceMonthReport">
+        <![CDATA[
+	        SELECT
+	       		#{datetime} AS datetime,
+				t.Name AS personnel,
+				t.DunningPeopleId AS peopleid,
+				t.begin AS begin,
+				t.end AS end,
+				t.OrderNum AS creditorder,
+				t.OrderFinishedNum AS payorder,
+				IFNULL(t.OrderFinishedNum / t.OrderNum * 100, 0) AS payoffpercentage,
+				IFNULL(r.Tel, 0) AS telnum,
+				IFNULL(r.Sms, 0) AS smsnum,
+				IFNULL(t.repaymentAmount, 0) AS creditamount,
+				IFNULL(t.payoffAmount, 0)  AS payamount,
+				IFNULL(T.payoffCapital,0) AS payoffCapital,
+				IFNULL(t.profileAmount, 0) AS profileAmount
+			FROM
+				(SELECT
+			 
+					p.Name,
+			 
+					t.DunningPeopleId,
+			 
+					t.DunningPeriodBegin AS begin,
+			 
+					t.DunningPeriodEnd AS END,
+			 
+					COUNT(DISTINCT
+						CASE
+							WHEN t.DunningTaskStatus = 'finished'
+								AND o.`status` = 'payoff' 
+							    AND DATE(payoff_time) >= #{datetime_start} 
+								AND DATE(payoff_time) <= #{datetime_end}
+							THEN t.Id
+							WHEN t.DunningTaskStatus IN ('dunning', 'expired')
+							THEN t.Id
+							ELSE NULL
+						END
+					) AS OrderNum,
+			
+					SUM(
+						CASE 
+							WHEN 
+								o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+							THEN 1
+							ELSE 0 
+						END
+					) AS OrderFinishedNum,
+			
+					SUM(
+						CASE WHEN t.DunningTaskStatus = 'dunning' 
+								THEN IFNULL(credit_amount, 0) - IFNULL(sub_cost_amount, 0) + IFNULL(DATEDIFF(CURDATE(), o.repayment_time) * o.amount * 0.01, 0)
+							WHEN t.DunningTaskStatus = 'finished' AND DATE(o.payoff_time) >= #{datetime_start} AND DATE(o.payoff_time) <= #{datetime_end}
+								THEN IFNULL(credit_amount, 0) - IFNULL(sub_cost_amount, 0) + IFNULL(o.overdue_amount, 0)
+							WHEN t.DunningTaskStatus in ('expired', 'end')
+								THEN IFNULL(credit_amount, 0) - IFNULL(sub_cost_amount, 0) + IFNULL(DATEDIFF(DATE_SUB(t.deadline,INTERVAL 1 DAY), o.repayment_time) * o.amount * 0.01, 0)
+							ELSE 0
+						END
+					) AS repaymentAmount,
+			
+					SUM(
+						CASE 
+							WHEN o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+								AND IFNULL(o.delay_days,0) = 0 
+							THEN IFNULL(credit_amount, 0) + IFNULL(overdue_amount, 0) - IFNULL(o.sub_cost_amount, 0) - CASE WHEN modify_flag = 1 THEN IFNULL(modify_amount, 0) ELSE 0 END
+							WHEN o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+								AND IFNULL(o.delay_days,0) > 0 
+							THEN IFNULL(cost_amount, 0) - (IFNULL(amount, 0) - IFNULL(credit_amount, 0)) - IFNULL(sub_cost_amount,0) + IFNULL(default_interest_amount, 0) + IFNULL(overdue_amount, 0)	
+							ELSE 0
+						END
+					) AS payoffAmount,
+					SUM(
+						CASE 
+							WHEN o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+								AND IFNULL(o.delay_days,0) = 0 
+							THEN IFNULL(amount, 0) - IFNULL(cost_amount, 0)
+							ELSE 0
+						END
+					) AS payoffCapital,
+					SUM(
+						CASE 
+							WHEN o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+								AND IFNULL(o.delay_days,0) = 0 
+							THEN IFNULL(cost_amount, 0) - (IFNULL(amount, 0) - IFNULL(credit_amount, 0)) - IFNULL(sub_cost_amount, 0) + IFNULL(overdue_amount, 0)
+							WHEN o.`status` = 'payoff' 
+								AND DATE(o.payoff_time) >= #{datetime_start} 
+								AND DATE(o.payoff_time) <= #{datetime_end} 
+								AND t.DunningTaskStatus = 'finished' 
+								AND IFNULL(o.delay_days,0) > 0 
+							THEN IFNULL(cost_amount, 0) - (IFNULL(amount, 0) - IFNULL(credit_amount, 0)) - IFNULL(sub_cost_amount,0) + IFNULL(default_interest_amount, 0) + IFNULL(overdue_amount, 0)	
+							ELSE 0
+						END				
+					) AS profileAmount
+			
+				FROM t_mis_dunning_task AS t
+				LEFT JOIN t_risk_order AS o ON t.Dealcode = o.dealcode
+				LEFT JOIN t_mis_dunning_people AS p ON p.Id = t.DunningPeopleId
+			
+				WHERE t.CreateDate <= #{datetime_end}
+					AND t.Deadline > #{datetime_start}
+					AND t.DunningTaskStatus IN ('dunning', 'finished', 'expired')
+					AND p.Name !='历史催收人'
+					AND p.field1 in  ('active', 'outer')
+				GROUP BY p.Name,t.DunningPeopleId, t.DunningPeriodBegin, t.DunningPeriodEnd
+				) AS t
+			LEFT JOIN (
+				SELECT
+			 
+					DunningPeopleName,
+			 
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS Tel,
+			 
+					SUM(CASE WHEN COntantType = 'sms' THEN 1 ELSE 0 END) AS Sms
+				FROM
+			 
+					t_mis_contant_record
+			 
+				WHERE DATE(CreateDate) >= #{datetime_start} AND DATE(CreateDate) <= #{datetime_end}
+				GROUP BY DunningPeopleName
+			) AS r ON t.DunningPeopleId = DunningPeopleName
+ 		]]>
+ 		
+ 		<where>
+            <if test="personnel != null and personnel != ''">
+                AND t.Name LIKE concat('%',#{personnel},'%')
+            </if>
+            <if test="begin != null and end != null and begin != '' and end != ''">
+                <![CDATA[
+    				AND  t.begin >= #{begin} AND t.end <= #{end}   
+      			]]>
+            </if>
+		  </where>
+			group by t.name, t.dunningPeopleId, t.Begin, t.End
+			order by t.begin,t.end
+
+
+    </select>
+
+    <!-- 按日查询-->
+    <select id="findPerformanceDayReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceDayReport">
+ 	    <![CDATA[
+
+			SELECT
+				#{datetimestart} AS datetimestart, 
+				#{datetimeend}  AS datetimeend, 
+				CASE WHEN t.DunningPeriodBegin IS NULL THEN p.Begin ELSE t.DunningPeriodBegin END AS begin,
+				CASE WHEN t.DunningPeriodEnd IS NULL THEN p.End ELSE t.DunningPeriodEnd END AS end,
+				p.Name AS personnel, 
+				IFNULL(t.payoffAmount, 0) AS payamount,
+				IFNULL(t.payoffOrder, 0) AS payorder,
+				IFNULL(r.tel, 0) AS telnum,
+				IFNULL(r.sms, 0) AS smsnum
+			FROM (
+				SELECT
+					ID,
+					NAME,
+					Begin,
+					End
+				FROM t_mis_dunning_people
+				WHERE Field1 = 'active'
+				) AS p
+			LEFT JOIN (
+				SELECT
+					t.DunningPeriodBegin,
+					t.DunningPeriodEnd,
+					t.DunningPeopleId,
+			
+					SUM(
+						CASE
+							WHEN IFNULL(o.delay_days, 0) > 0
+								THEN IFNULL(o.amount, 0) + IFNULL(o.cost_amount, 0) - IFNULL(o.credit_amount, 0) - IFNULL(o.sub_cost_amount,0) + IFNULL(o.default_interest_amount, 0) + IFNULL(o.overdue_amount, 0)
+							WHEN IFNULL(o.delay_days, 0) = 0
+								THEN IFNULL(o.credit_amount, 0) - IFNULL(o.sub_cost_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0)
+							ELSE 0
+						END
+					) AS payoffAmount,
+					# 还清任务数
+					COUNT(1) AS payoffOrder
+				FROM t_mis_dunning_task AS t 
+				LEFT JOIN t_risk_order AS o ON o.dealcode = t.Dealcode
+			
+				WHERE t.DunningTaskStatus = 'finished' 
+					  AND DATE(t.CreateDate) <= #{datetimeend} 
+					  AND o.type = 'loan'
+					  AND o.merchant_id = 7
+					  AND o.status = 'payoff'
+					  AND DATE(o.payoff_time) >= #{datetimestart}
+					  AND DATE(o.payoff_time) <= #{datetimeend}
+				GROUP BY t.DunningPeopleId ,t.DunningPeriodBegin, t.DunningPeriodEnd
+				)AS t ON t.DunningPeopleId = p.Id
+			LEFT JOIN (
+				SELECT
+					DATE(CreateDate) AS CreateTime,
+					DunningPeopleName,
+			
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS Tel,
+			
+					SUM(CASE WHEN COntantType = 'sms' THEN 1 ELSE 0 END) AS Sms
+				FROM
+					t_mis_contant_record
+				WHERE DATE(CreateDate) >= #{datetimestart} AND DATE(CreateDate) <= #{datetimeend}
+				GROUP BY DunningPeopleName
+			) AS r ON p.Id = r.DunningPeopleName 
+			
+		]]>
+	<!-- 		WHERE t.DunningPeriodBegin is not null AND t.DunningPeriodEnd is not null -->
+		<where>
+	        <if test="personnel != null and personnel != ''">
+	            AND p.Name LIKE concat('%',#{personnel},'%')
+	        </if>
+	        <if test="begin != null and end != null and begin != '' and end != ''">
+	            <![CDATA[
+				AND  begin >= #{begin} AND end <= #{end}   
+			    ]]>
+	        </if>
+        </where>
+		ORDER BY begin,end
+ 	</select>
+
+    <select id="findDunningCount" resultType="int">
+        SELECT count(*) 
+       		FROM t_mis_dunning_task  
+        where 
+       		dunningtaskstatus = 'dunning'
+        	and DunningPeopleId = #{dunningpeopleid}
+    </select>
+    
+
+</mapper>

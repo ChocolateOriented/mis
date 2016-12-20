@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TRiskBuyerWorkinfoDao">
+    
+	<sql id="tRiskBuyerWorkinfoColumns">
+		a.id AS "id",
+		a.company_name AS "companyName",
+		a.company_address AS "companyAddress",
+		a.company_tel AS "companyTel",
+		a.company_position AS "companyPosition",
+		a.buyer_id AS "buyerId",
+		a.owner_name AS "ownerName",
+		a.area_code AS "areaCode",
+		a.area_desc AS "areaDesc",
+		a.address AS "address",
+		a.remark AS "remark",
+		a.img_filed AS "imgFiled",
+		a.create_time AS "createTime",
+		a.company_tel2 AS "companyTel2",
+		a.work_life AS "workLife",
+<!-- 		IFNULL(d.smsNum, 0) AS smsNum1, -->
+		IFNULL(d.telNum, 0) AS telNum1,
+<!-- 		IFNULL(d2.smsNum, 0) AS smsNum2, -->
+		IFNULL(d2.telNum, 0) AS telNum2
+	</sql>
+	
+	<sql id="tRiskBuyerWorkinfoJoins">
+	</sql>
+	
+	<select id = "getWorkInfoByBuyerId" resultType="TRiskBuyerWorkinfo">
+	    SELECT 
+			<include refid="tRiskBuyerWorkinfoColumns"/>
+		FROM t_risk_buyer_workinfo a
+			LEFT JOIN (
+				SELECT
+					ContantTarget AS tel,
+<!-- 					SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum, -->
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+				FROM t_mis_contant_record
+				WHERE Dealcode = #{dealcode}   
+				GROUP BY ContantTarget
+			) AS d on d.tel = a.company_tel
+			LEFT JOIN (
+				SELECT
+					ContantTarget AS tel,
+<!-- 					SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum, -->
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+				FROM t_mis_contant_record
+				WHERE Dealcode =  #{dealcode}   
+				GROUP BY ContantTarget
+			) AS d2 on d2.tel = a.company_tel2
+		WHERE a.buyer_id = #{buyerId}   
+	</select>
+	
+	<select id = "getWorkTelByBuyerId" resultType = "TMisSendMsgInfo">
+	    SELECT 
+			a.buyer_id AS "buyerId",
+			a.company_tel AS tel,
+			c.real_name as realName,
+			a.company_name AS memo,
+			'worktel' AS relation
+		FROM t_risk_buyer_workinfo a  
+		LEFT JOIN t_risk_buyer_idcard  c ON a.buyer_id = c.buyer_id 
+		WHERE a.buyer_id = #{buyerId}
+	</select>
+	
+</mapper>

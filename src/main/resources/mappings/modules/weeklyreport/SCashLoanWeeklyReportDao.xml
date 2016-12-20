@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SCashLoanWeeklyReportDao">
+    
+	<sql id="sCashLoanWeeklyReportColumns">
+		a.id AS "id",
+		a.intervaldatetime AS "intervaldatetime",
+		a.ordernum AS "ordernum",
+		a.ordernumincludedelay AS "ordernumincludedelay",
+		a.ordernumnewuser AS "ordernumnewuser",
+		a.ordernumolduserincludedelay AS "ordernumolduserincludedelay",
+		a.ordernumolduser AS "ordernumolduser",
+		a.ordernumpayoffincludedelay AS "ordernumpayoffincludedelay",
+		a.ordernumpayoff AS "ordernumpayoff",
+		a.ordernumpayoffperiodincludedelay AS "ordernumpayoffperiodincludedelay",
+		a.ordernumpayoffperiod AS "ordernumpayoffperiod",
+		a.ordernumoverdue AS "ordernumoverdue",
+		a.ordernumoutsource AS "ordernumoutsource",
+		a.ordernumneworderperiod AS "ordernumneworderperiod",
+		a.ordernumneworderperiodappincludedelay AS "ordernumneworderperiodappincludedelay",
+		a.ordernumneworderperiodapppercentincludedelay AS "ordernumneworderperiodapppercentincludedelay",
+		a.ordernumneworderperiodapp AS "ordernumneworderperiodapp",
+		a.ordernumneworderperiodapppercent AS "ordernumneworderperiodapppercent",
+		a.ordernumneworderperiodwechatincludedelay AS "ordernumneworderperiodwechatincludedelay",
+		a.ordernumneworderperiodwechatpercentincludedelay AS "ordernumneworderperiodwechatpercentincludedelay",
+		a.ordernumneworderperiodwechat AS "ordernumneworderperiodwechat",
+		a.ordernumneworderperiodwechatpercent AS "ordernumneworderperiodwechatpercent",
+		a.ordernumneworderperiodamount500includedelay AS "ordernumneworderperiodamount500includedelay",
+		a.ordernumneworderperiodamount500percentincludedelay AS "ordernumneworderperiodamount500percentincludedelay",
+		a.ordernumneworderperiodamount500 AS "ordernumneworderperiodamount500",
+		a.ordernumneworderperiodamount500percent AS "ordernumneworderperiodamount500percent",
+		a.ordernumneworderperiodamount1000includedelay AS "ordernumneworderperiodamount1000includedelay",
+		a.ordernumneworderperiodamount1000percentincludedelay AS "ordernumneworderperiodamount1000percentincludedelay",
+		a.ordernumneworderperiodamount1000 AS "ordernumneworderperiodamount1000",
+		a.ordernumneworderperiodamount1000percent AS "ordernumneworderperiodamount1000percent",
+		a.ordernumneworderperiodamount1500includedelay AS "ordernumneworderperiodamount1500includedelay",
+		a.ordernumneworderperiodamount1500percentincludedelay AS "ordernumneworderperiodamount1500percentincludedelay",
+		a.ordernumneworderperiodamount1500 AS "ordernumneworderperiodamount1500",
+		a.ordernumneworderperiodamount1500percent AS "ordernumneworderperiodamount1500percent",
+		a.ordernumneworderperiodinterval7includedelay AS "ordernumneworderperiodinterval7includedelay",
+		a.ordernumneworderperiodinterval7percentincludedelay AS "ordernumneworderperiodinterval7percentincludedelay",
+		a.ordernumneworderperiodinterval7 AS "ordernumneworderperiodinterval7",
+		a.ordernumneworderperiodinterval7percent AS "ordernumneworderperiodinterval7percent",
+		a.ordernumneworderperiodinterval14includedelay AS "ordernumneworderperiodinterval14includedelay",
+		a.ordernumneworderperiodinterval14percentincludedelay AS "ordernumneworderperiodinterval14percentincludedelay",
+		a.ordernumneworderperiodinterval14 AS "ordernumneworderperiodinterval14",
+		a.ordernumneworderperiodinterval14percent AS "ordernumneworderperiodinterval14percent",
+		a.singleusernum AS "singleusernum",
+		a.amountnotrecovered AS "amountnotrecovered",
+		a.amountnotrecoveredoutsource AS "amountnotrecoveredoutsource",
+		a.amountperiodincreasedincludedelay AS "amountperiodincreasedincludedelay",
+		a.amountperiodincreased AS "amountperiodincreased",
+		a.amountallincome AS "amountallincome",
+		a.amountcreditincome AS "amountcreditincome",
+		a.amountdelayincome AS "amountdelayincome",
+		a.amountoverdueincome AS "amountoverdueincome",
+		a.amountoutsourceincome AS "amountoutsourceincome",
+		a.ordercancelperiodpercentapp AS "ordercancelperiodpercentapp",
+		a.ordercancelperioadpercentwechat AS "ordercancelperioadpercentwechat",
+		a.createtime AS "createtime"
+	</sql>
+	
+	<sql id="sCashLoanWeeklyReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SCashLoanWeeklyReport">
+		SELECT 
+			<include refid="sCashLoanWeeklyReportColumns"/>
+		FROM s_cash_loan_weekly_report a
+		<include refid="sCashLoanWeeklyReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SCashLoanWeeklyReport">
+		SELECT 
+			<include refid="sCashLoanWeeklyReportColumns"/>
+		FROM s_cash_loan_weekly_report a
+		<include refid="sCashLoanWeeklyReportJoins"/>
+		<where>
+			
+			<if test="intervaldatetime != null and intervaldatetime != ''">
+				AND a.intervaldatetime LIKE '%${intervaldatetime}%'
+			</if>
+			<if test="ordernum != null and ordernum != ''">
+				AND a.ordernum = #{ordernum}
+			</if>
+			<if test="ordernumincludedelay != null and ordernumincludedelay != ''">
+				AND a.ordernumincludedelay = #{ordernumincludedelay}
+			</if>
+			<if test="ordernumnewuser != null and ordernumnewuser != ''">
+				AND a.ordernumnewuser = #{ordernumnewuser}
+			</if>
+			<if test="ordernumolduserincludedelay != null and ordernumolduserincludedelay != ''">
+				AND a.ordernumolduserincludedelay = #{ordernumolduserincludedelay}
+			</if>
+			<if test="ordernumolduser != null and ordernumolduser != ''">
+				AND a.ordernumolduser = #{ordernumolduser}
+			</if>
+			<if test="ordernumpayoffincludedelay != null and ordernumpayoffincludedelay != ''">
+				AND a.ordernumpayoffincludedelay = #{ordernumpayoffincludedelay}
+			</if>
+			<if test="ordernumpayoff != null and ordernumpayoff != ''">
+				AND a.ordernumpayoff = #{ordernumpayoff}
+			</if>
+			<if test="ordernumpayoffperiodincludedelay != null and ordernumpayoffperiodincludedelay != ''">
+				AND a.ordernumpayoffperiodincludedelay = #{ordernumpayoffperiodincludedelay}
+			</if>
+			<if test="ordernumpayoffperiod != null and ordernumpayoffperiod != ''">
+				AND a.ordernumpayoffperiod = #{ordernumpayoffperiod}
+			</if>
+			<if test="ordernumoverdue != null and ordernumoverdue != ''">
+				AND a.ordernumoverdue = #{ordernumoverdue}
+			</if>
+			<if test="ordernumoutsource != null and ordernumoutsource != ''">
+				AND a.ordernumoutsource = #{ordernumoutsource}
+			</if>
+			<if test="ordernumneworderperiod != null and ordernumneworderperiod != ''">
+				AND a.ordernumneworderperiod = #{ordernumneworderperiod}
+			</if>
+			<if test="ordernumneworderperiodappincludedelay != null and ordernumneworderperiodappincludedelay != ''">
+				AND a.ordernumneworderperiodappincludedelay = #{ordernumneworderperiodappincludedelay}
+			</if>
+			<if test="ordernumneworderperiodapppercentincludedelay != null and ordernumneworderperiodapppercentincludedelay != ''">
+				AND a.ordernumneworderperiodapppercentincludedelay = #{ordernumneworderperiodapppercentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodapp != null and ordernumneworderperiodapp != ''">
+				AND a.ordernumneworderperiodapp = #{ordernumneworderperiodapp}
+			</if>
+			<if test="ordernumneworderperiodapppercent != null and ordernumneworderperiodapppercent != ''">
+				AND a.ordernumneworderperiodapppercent = #{ordernumneworderperiodapppercent}
+			</if>
+			<if test="ordernumneworderperiodwechatincludedelay != null and ordernumneworderperiodwechatincludedelay != ''">
+				AND a.ordernumneworderperiodwechatincludedelay = #{ordernumneworderperiodwechatincludedelay}
+			</if>
+			<if test="ordernumneworderperiodwechatpercentincludedelay != null and ordernumneworderperiodwechatpercentincludedelay != ''">
+				AND a.ordernumneworderperiodwechatpercentincludedelay = #{ordernumneworderperiodwechatpercentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodwechat != null and ordernumneworderperiodwechat != ''">
+				AND a.ordernumneworderperiodwechat = #{ordernumneworderperiodwechat}
+			</if>
+			<if test="ordernumneworderperiodwechatpercent != null and ordernumneworderperiodwechatpercent != ''">
+				AND a.ordernumneworderperiodwechatpercent = #{ordernumneworderperiodwechatpercent}
+			</if>
+			<if test="ordernumneworderperiodamount500includedelay != null and ordernumneworderperiodamount500includedelay != ''">
+				AND a.ordernumneworderperiodamount500includedelay = #{ordernumneworderperiodamount500includedelay}
+			</if>
+			<if test="ordernumneworderperiodamount500percentincludedelay != null and ordernumneworderperiodamount500percentincludedelay != ''">
+				AND a.ordernumneworderperiodamount500percentincludedelay = #{ordernumneworderperiodamount500percentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodamount500 != null and ordernumneworderperiodamount500 != ''">
+				AND a.ordernumneworderperiodamount500 = #{ordernumneworderperiodamount500}
+			</if>
+			<if test="ordernumneworderperiodamount500percent != null and ordernumneworderperiodamount500percent != ''">
+				AND a.ordernumneworderperiodamount500percent = #{ordernumneworderperiodamount500percent}
+			</if>
+			<if test="ordernumneworderperiodamount1000includedelay != null and ordernumneworderperiodamount1000includedelay != ''">
+				AND a.ordernumneworderperiodamount1000includedelay = #{ordernumneworderperiodamount1000includedelay}
+			</if>
+			<if test="ordernumneworderperiodamount1000percentincludedelay != null and ordernumneworderperiodamount1000percentincludedelay != ''">
+				AND a.ordernumneworderperiodamount1000percentincludedelay = #{ordernumneworderperiodamount1000percentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodamount1000 != null and ordernumneworderperiodamount1000 != ''">
+				AND a.ordernumneworderperiodamount1000 = #{ordernumneworderperiodamount1000}
+			</if>
+			<if test="ordernumneworderperiodamount1000percent != null and ordernumneworderperiodamount1000percent != ''">
+				AND a.ordernumneworderperiodamount1000percent = #{ordernumneworderperiodamount1000percent}
+			</if>
+			<if test="ordernumneworderperiodamount1500includedelay != null and ordernumneworderperiodamount1500includedelay != ''">
+				AND a.ordernumneworderperiodamount1500includedelay = #{ordernumneworderperiodamount1500includedelay}
+			</if>
+			<if test="ordernumneworderperiodamount1500percentincludedelay != null and ordernumneworderperiodamount1500percentincludedelay != ''">
+				AND a.ordernumneworderperiodamount1500percentincludedelay = #{ordernumneworderperiodamount1500percentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodamount1500 != null and ordernumneworderperiodamount1500 != ''">
+				AND a.ordernumneworderperiodamount1500 = #{ordernumneworderperiodamount1500}
+			</if>
+			<if test="ordernumneworderperiodamount1500percent != null and ordernumneworderperiodamount1500percent != ''">
+				AND a.ordernumneworderperiodamount1500percent = #{ordernumneworderperiodamount1500percent}
+			</if>
+			<if test="ordernumneworderperiodinterval7includedelay != null and ordernumneworderperiodinterval7includedelay != ''">
+				AND a.ordernumneworderperiodinterval7includedelay = #{ordernumneworderperiodinterval7includedelay}
+			</if>
+			<if test="ordernumneworderperiodinterval7percentincludedelay != null and ordernumneworderperiodinterval7percentincludedelay != ''">
+				AND a.ordernumneworderperiodinterval7percentincludedelay = #{ordernumneworderperiodinterval7percentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodinterval7 != null and ordernumneworderperiodinterval7 != ''">
+				AND a.ordernumneworderperiodinterval7 = #{ordernumneworderperiodinterval7}
+			</if>
+			<if test="ordernumneworderperiodinterval7percent != null and ordernumneworderperiodinterval7percent != ''">
+				AND a.ordernumneworderperiodinterval7percent = #{ordernumneworderperiodinterval7percent}
+			</if>
+			<if test="ordernumneworderperiodinterval14includedelay != null and ordernumneworderperiodinterval14includedelay != ''">
+				AND a.ordernumneworderperiodinterval14includedelay = #{ordernumneworderperiodinterval14includedelay}
+			</if>
+			<if test="ordernumneworderperiodinterval14percentincludedelay != null and ordernumneworderperiodinterval14percentincludedelay != ''">
+				AND a.ordernumneworderperiodinterval14percentincludedelay = #{ordernumneworderperiodinterval14percentincludedelay}
+			</if>
+			<if test="ordernumneworderperiodinterval14 != null and ordernumneworderperiodinterval14 != ''">
+				AND a.ordernumneworderperiodinterval14 = #{ordernumneworderperiodinterval14}
+			</if>
+			<if test="ordernumneworderperiodinterval14percent != null and ordernumneworderperiodinterval14percent != ''">
+				AND a.ordernumneworderperiodinterval14percent = #{ordernumneworderperiodinterval14percent}
+			</if>
+			<if test="singleusernum != null and singleusernum != ''">
+				AND a.singleusernum = #{singleusernum}
+			</if>
+			<if test="amountnotrecovered != null and amountnotrecovered != ''">
+				AND a.amountnotrecovered = #{amountnotrecovered}
+			</if>
+			<if test="amountnotrecoveredoutsource != null and amountnotrecoveredoutsource != ''">
+				AND a.amountnotrecoveredoutsource = #{amountnotrecoveredoutsource}
+			</if>
+			<if test="amountperiodincreasedincludedelay != null and amountperiodincreasedincludedelay != ''">
+				AND a.amountperiodincreasedincludedelay = #{amountperiodincreasedincludedelay}
+			</if>
+			<if test="amountperiodincreased != null and amountperiodincreased != ''">
+				AND a.amountperiodincreased = #{amountperiodincreased}
+			</if>
+			<if test="amountallincome != null and amountallincome != ''">
+				AND a.amountallincome = #{amountallincome}
+			</if>
+			<if test="amountcreditincome != null and amountcreditincome != ''">
+				AND a.amountcreditincome = #{amountcreditincome}
+			</if>
+			<if test="amountdelayincome != null and amountdelayincome != ''">
+				AND a.amountdelayincome = #{amountdelayincome}
+			</if>
+			<if test="amountoverdueincome != null and amountoverdueincome != ''">
+				AND a.amountoverdueincome = #{amountoverdueincome}
+			</if>
+			<if test="amountoutsourceincome != null and amountoutsourceincome != ''">
+				AND a.amountoutsourceincome = #{amountoutsourceincome}
+			</if>
+			<if test="ordercancelperiodpercentapp != null and ordercancelperiodpercentapp != ''">
+				AND a.ordercancelperiodpercentapp = #{ordercancelperiodpercentapp}
+			</if>
+			<if test="ordercancelperioadpercentwechat != null and ordercancelperioadpercentwechat != ''">
+				AND a.ordercancelperioadpercentwechat = #{ordercancelperioadpercentwechat}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}  DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.DatetimeEnd DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SCashLoanWeeklyReport">
+		SELECT 
+			<include refid="sCashLoanWeeklyReportColumns"/>
+		FROM s_cash_loan_weekly_report a
+		<include refid="sCashLoanWeeklyReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.DatetimeEnd DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_cash_loan_weekly_report(
+			intervaldatetime,
+			ordernum,
+			ordernumincludedelay,
+			ordernumnewuser,
+			ordernumolduserincludedelay,
+			ordernumolduser,
+			ordernumpayoffincludedelay,
+			ordernumpayoff,
+			ordernumpayoffperiodincludedelay,
+			ordernumpayoffperiod,
+			ordernumoverdue,
+			ordernumoutsource,
+			ordernumneworderperiod,
+			ordernumneworderperiodappincludedelay,
+			ordernumneworderperiodapppercentincludedelay,
+			ordernumneworderperiodapp,
+			ordernumneworderperiodapppercent,
+			ordernumneworderperiodwechatincludedelay,
+			ordernumneworderperiodwechatpercentincludedelay,
+			ordernumneworderperiodwechat,
+			ordernumneworderperiodwechatpercent,
+			ordernumneworderperiodamount500includedelay,
+			ordernumneworderperiodamount500percentincludedelay,
+			ordernumneworderperiodamount500,
+			ordernumneworderperiodamount500percent,
+			ordernumneworderperiodamount1000includedelay,
+			ordernumneworderperiodamount1000percentincludedelay,
+			ordernumneworderperiodamount1000,
+			ordernumneworderperiodamount1000percent,
+			ordernumneworderperiodamount1500includedelay,
+			ordernumneworderperiodamount1500percentincludedelay,
+			ordernumneworderperiodamount1500,
+			ordernumneworderperiodamount1500percent,
+			ordernumneworderperiodinterval7includedelay,
+			ordernumneworderperiodinterval7percentincludedelay,
+			ordernumneworderperiodinterval7,
+			ordernumneworderperiodinterval7percent,
+			ordernumneworderperiodinterval14includedelay,
+			ordernumneworderperiodinterval14percentincludedelay,
+			ordernumneworderperiodinterval14,
+			ordernumneworderperiodinterval14percent,
+			singleusernum,
+			amountnotrecovered,
+			amountnotrecoveredoutsource,
+			amountperiodincreasedincludedelay,
+			amountperiodincreased,
+			amountallincome,
+			amountcreditincome,
+			amountdelayincome,
+			amountoverdueincome,
+			amountoutsourceincome,
+			ordercancelperiodpercentapp,
+			ordercancelperioadpercentwechat,
+			createtime
+		) VALUES (
+			#{intervaldatetime},
+			#{ordernum},
+			#{ordernumincludedelay},
+			#{ordernumnewuser},
+			#{ordernumolduserincludedelay},
+			#{ordernumolduser},
+			#{ordernumpayoffincludedelay},
+			#{ordernumpayoff},
+			#{ordernumpayoffperiodincludedelay},
+			#{ordernumpayoffperiod},
+			#{ordernumoverdue},
+			#{ordernumoutsource},
+			#{ordernumneworderperiod},
+			#{ordernumneworderperiodappincludedelay},
+			#{ordernumneworderperiodapppercentincludedelay},
+			#{ordernumneworderperiodapp},
+			#{ordernumneworderperiodapppercent},
+			#{ordernumneworderperiodwechatincludedelay},
+			#{ordernumneworderperiodwechatpercentincludedelay},
+			#{ordernumneworderperiodwechat},
+			#{ordernumneworderperiodwechatpercent},
+			#{ordernumneworderperiodamount500includedelay},
+			#{ordernumneworderperiodamount500percentincludedelay},
+			#{ordernumneworderperiodamount500},
+			#{ordernumneworderperiodamount500percent},
+			#{ordernumneworderperiodamount1000includedelay},
+			#{ordernumneworderperiodamount1000percentincludedelay},
+			#{ordernumneworderperiodamount1000},
+			#{ordernumneworderperiodamount1000percent},
+			#{ordernumneworderperiodamount1500includedelay},
+			#{ordernumneworderperiodamount1500percentincludedelay},
+			#{ordernumneworderperiodamount1500},
+			#{ordernumneworderperiodamount1500percent},
+			#{ordernumneworderperiodinterval7includedelay},
+			#{ordernumneworderperiodinterval7percentincludedelay},
+			#{ordernumneworderperiodinterval7},
+			#{ordernumneworderperiodinterval7percent},
+			#{ordernumneworderperiodinterval14includedelay},
+			#{ordernumneworderperiodinterval14percentincludedelay},
+			#{ordernumneworderperiodinterval14},
+			#{ordernumneworderperiodinterval14percent},
+			#{singleusernum},
+			#{amountnotrecovered},
+			#{amountnotrecoveredoutsource},
+			#{amountperiodincreasedincludedelay},
+			#{amountperiodincreased},
+			#{amountallincome},
+			#{amountcreditincome},
+			#{amountdelayincome},
+			#{amountoverdueincome},
+			#{amountoutsourceincome},
+			#{ordercancelperiodpercentapp},
+			#{ordercancelperioadpercentwechat},
+			#{createtime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_cash_loan_weekly_report SET 	
+			intervaldatetime = #{intervaldatetime},
+			ordernum = #{ordernum},
+			ordernumincludedelay = #{ordernumincludedelay},
+			ordernumnewuser = #{ordernumnewuser},
+			ordernumolduserincludedelay = #{ordernumolduserincludedelay},
+			ordernumolduser = #{ordernumolduser},
+			ordernumpayoffincludedelay = #{ordernumpayoffincludedelay},
+			ordernumpayoff = #{ordernumpayoff},
+			ordernumpayoffperiodincludedelay = #{ordernumpayoffperiodincludedelay},
+			ordernumpayoffperiod = #{ordernumpayoffperiod},
+			ordernumoverdue = #{ordernumoverdue},
+			ordernumoutsource = #{ordernumoutsource},
+			ordernumneworderperiod = #{ordernumneworderperiod},
+			ordernumneworderperiodappincludedelay = #{ordernumneworderperiodappincludedelay},
+			ordernumneworderperiodapppercentincludedelay = #{ordernumneworderperiodapppercentincludedelay},
+			ordernumneworderperiodapp = #{ordernumneworderperiodapp},
+			ordernumneworderperiodapppercent = #{ordernumneworderperiodapppercent},
+			ordernumneworderperiodwechatincludedelay = #{ordernumneworderperiodwechatincludedelay},
+			ordernumneworderperiodwechatpercentincludedelay = #{ordernumneworderperiodwechatpercentincludedelay},
+			ordernumneworderperiodwechat = #{ordernumneworderperiodwechat},
+			ordernumneworderperiodwechatpercent = #{ordernumneworderperiodwechatpercent},
+			ordernumneworderperiodamount500includedelay = #{ordernumneworderperiodamount500includedelay},
+			ordernumneworderperiodamount500percentincludedelay = #{ordernumneworderperiodamount500percentincludedelay},
+			ordernumneworderperiodamount500 = #{ordernumneworderperiodamount500},
+			ordernumneworderperiodamount500percent = #{ordernumneworderperiodamount500percent},
+			ordernumneworderperiodamount1000includedelay = #{ordernumneworderperiodamount1000includedelay},
+			ordernumneworderperiodamount1000percentincludedelay = #{ordernumneworderperiodamount1000percentincludedelay},
+			ordernumneworderperiodamount1000 = #{ordernumneworderperiodamount1000},
+			ordernumneworderperiodamount1000percent = #{ordernumneworderperiodamount1000percent},
+			ordernumneworderperiodamount1500includedelay = #{ordernumneworderperiodamount1500includedelay},
+			ordernumneworderperiodamount1500percentincludedelay = #{ordernumneworderperiodamount1500percentincludedelay},
+			ordernumneworderperiodamount1500 = #{ordernumneworderperiodamount1500},
+			ordernumneworderperiodamount1500percent = #{ordernumneworderperiodamount1500percent},
+			ordernumneworderperiodinterval7includedelay = #{ordernumneworderperiodinterval7includedelay},
+			ordernumneworderperiodinterval7percentincludedelay = #{ordernumneworderperiodinterval7percentincludedelay},
+			ordernumneworderperiodinterval7 = #{ordernumneworderperiodinterval7},
+			ordernumneworderperiodinterval7percent = #{ordernumneworderperiodinterval7percent},
+			ordernumneworderperiodinterval14includedelay = #{ordernumneworderperiodinterval14includedelay},
+			ordernumneworderperiodinterval14percentincludedelay = #{ordernumneworderperiodinterval14percentincludedelay},
+			ordernumneworderperiodinterval14 = #{ordernumneworderperiodinterval14},
+			ordernumneworderperiodinterval14percent = #{ordernumneworderperiodinterval14percent},
+			singleusernum = #{singleusernum},
+			amountnotrecovered = #{amountnotrecovered},
+			amountnotrecoveredoutsource = #{amountnotrecoveredoutsource},
+			amountperiodincreasedincludedelay = #{amountperiodincreasedincludedelay},
+			amountperiodincreased = #{amountperiodincreased},
+			amountallincome = #{amountallincome},
+			amountcreditincome = #{amountcreditincome},
+			amountdelayincome = #{amountdelayincome},
+			amountoverdueincome = #{amountoverdueincome},
+			amountoutsourceincome = #{amountoutsourceincome},
+			ordercancelperiodpercentapp = #{ordercancelperiodpercentapp},
+			ordercancelperioadpercentwechat = #{ordercancelperioadpercentwechat},
+			createtime = #{createtime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_cash_loan_weekly_report
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--   累计订单数	  -->
+	<select id="findOrdernumincludedelay" resultType="SCashLoanWeeklyReport" useCache="false"> 
+		SELECT 
+			sc.ordernumincludedelay,sc.intervaldatetime 
+	       FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	<!--   新增订单数	  -->
+	<select id="findOrdernumUser" resultType="SCashLoanWeeklyReport" useCache="false">
+		SELECT 
+			sc.ordernumnewuser,sc.ordernumolduserincludedelay,sc.intervaldatetime
+		FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	
+	<!--   订单來源分布	  -->
+	<select id="findOrdernumneworderperiodpercent" resultType="SCashLoanWeeklyReport" useCache="false">
+		SELECT 
+			sc.ordernumneworderperiodapppercentincludedelay,sc.ordernumneworderperiodwechatpercentincludedelay,sc.intervaldatetime
+		FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	<!--   订单金額分布	  -->
+	<select id="findOrdernumneworderperiodamountpercent" resultType="SCashLoanWeeklyReport" useCache="false">
+		SELECT 
+			sc.ordernumneworderperiodamount500percentincludedelay,
+			sc.ordernumneworderperiodamount1000percentincludedelay,
+			sc.ordernumneworderperiodamount1500percentincludedelay,
+			sc.intervaldatetime
+		FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	<!--   总收益   -->
+	<select id="findAmountallincome" resultType="SCashLoanWeeklyReport" useCache="false">
+		SELECT 
+			sc.amountallincome,sc.intervaldatetime
+		FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	<!--   累计放款用户数   -->
+	<select id="findSingleusernum" resultType="SCashLoanWeeklyReport" useCache="false">
+		SELECT 
+			sc.singleusernum,sc.intervaldatetime
+		FROM s_cash_loan_weekly_report sc
+		ORDER BY sc.DatetimeEnd DESC limit  #{week} 
+	</select>
+	
+	
+	
+	
+</mapper>

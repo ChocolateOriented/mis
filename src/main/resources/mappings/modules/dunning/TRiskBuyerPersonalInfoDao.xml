@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao">
+  	
+	<select id = "getBuyerInfoByDealcode" resultType="TRiskBuyerPersonalInfo">
+	  SELECT
+		o.dealcode as "dealcode",
+		o.create_time as "createTime",
+		o.remit_time as "remitTime",
+		o.repayment_time as "repaymentTime",
+		o.buyer_id as "buyerId",
+		b.mobile as "mobile",
+		b.mobile_city as "mobileCity",
+		b.marital as "marital", 
+		c.real_name as "realName",
+		c.idCard as "idcard",
+<!-- 		CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""),IFNULL(b.address, "")) as "livingAddr", -->
+		CASE 
+			WHEN b.addr_province IS NOT NULL 
+			THEN CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""))
+			ELSE IFNULL(b.address, "")
+		END as "livingAddr",
+		
+		c.ocr_addr as "ocrAddr",
+		o.days as "days",
+		o.payoff_time as payOffTime,
+		CASE 
+			WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+			ELSE 0
+		END as "overdueDays",
+		(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusAmount",
+		IFNULL(o.cost_amount, 0) * 100  as "costAmout",
+		IFNULL(o.amount, 0) * 100 as "amount",
+		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
+		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
+		IFNULL(o.balance, 0) * 100 as "balance",
+<!-- 	IFNULL(o.modify_amount, 0) * 100 as "modifyAmount", -->
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
+<!-- 	(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)) * 100 as "creditAmount", -->
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		IFNULL(r.Delay_Count, 0) As delayCount,
+		c.sex As sex
+	FROM t_risk_order AS o
+	LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+	LEFT JOIN (
+		SELECT 
+			root_order_id,
+			COUNT(1) AS Delay_Count
+		FROM t_risk_order
+		WHERE
+			type = 'loan'
+				AND merchant_id = 7
+				AND root_order_id IS NOT NULL
+		GROUP BY
+			root_order_id
+	) AS r on o.root_order_id = r.root_order_id
+	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status in ('payment', 'payoff') and o.dealcode = #{dealcode} order by c.buyer_id desc limit 1
+	</select>
+	<select id = "getSelfTelInfo" resultType = 'TMisSendMsgInfo'>
+		SELECT 	   	
+			b.id as "buyerId",
+			b.mobile as "tel",
+			c.real_name as "name",
+			c.idCard as memo,
+			'self' as relation
+		FROM t_risk_buyer as b
+		INNER JOIN t_risk_buyer_idcard AS c ON b.id = c.buyer_id 
+		WHERE b.id = #{buyerId}
+	</select>
+	
+	<select id = "getBuyerListByRepaymentTime" resultType="TRiskBuyerPersonalInfo" parameterType="map">
+	  SELECT
+		o.dealcode as "dealcode",
+		o.create_time as "createTime",
+		o.remit_time as "remitTime",
+		o.repayment_time as "repaymentTime",
+		o.buyer_id as "buyerId",
+		b.mobile as "mobile",
+		c.real_name as "realName",
+		c.idCard as "idcard",
+		o.days as "days",
+		o.payoff_time as payOffTime,
+		DATEDIFF(curdate(), o.repayment_time) as "overdueDays",
+		(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusAmount",
+		IFNULL(o.cost_amount, 0) * 100  as "costAmout",
+		IFNULL(o.amount, 0) * 100 as "amount",
+		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
+		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
+		IFNULL(o.balance, 0) * 100 as "balance",
+<!-- 	IFNULL(o.modify_amount, 0) * 100 as "modifyAmount", -->
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
+<!-- 	(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)) * 100 as "creditAmount", -->
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+	IFNULL(r.Delay_Count, 0) As delayCount
+	FROM t_risk_order AS o
+	LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+	LEFT JOIN (
+		SELECT 
+			root_order_id,
+			COUNT(1) AS Delay_Count
+		FROM t_risk_order
+		WHERE
+			type = 'loan'
+				AND merchant_id = 7
+				AND root_order_id IS NOT NULL
+		GROUP BY
+			root_order_id
+	) AS r on o.root_order_id = r.root_order_id
+	WHERE o.type = 'loan' AND o.status = 'payment' and  to_days(o.repayment_time) - to_days(now())  = 1
+	<choose>
+		<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</when>
+		<otherwise>
+		</otherwise>
+	</choose>
+	</select>
+	
+	
+	
+	<select id = "getNewBuyerInfoByDealcode" resultType="TRiskBuyerPersonalInfo">
+	  SELECT
+		o.dealcode as "dealcode",
+		o.create_time as "createTime",
+		o.remit_time as "remitTime",
+		o.repayment_time as "repaymentTime",
+		o.buyer_id as "buyerId",
+		b.mobile as "mobile",
+		b.mobile_city as "mobileCity",
+		b.marital as "marital", 
+		c.real_name as "realName",
+		c.idCard as "idcard",
+		CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""),IFNULL(b.address, "")) as "livingAddr",
+		c.ocr_addr as "ocrAddr",
+		o.days as "days",
+		o.payoff_time as payOffTime,
+		CASE 
+			WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+			ELSE 0
+		END as "overdueDays",
+		(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusAmount",
+		IFNULL(o.cost_amount, 0) * 100  as "costAmout",
+		IFNULL(o.credit_amount, 0) * 100 as "amount",
+		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
+		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
+		IFNULL(o.balance, 0) * 100 as "balance",
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		IFNULL(r.Delay_Count, 0) As delayCount,
+		c.sex As sex,
+		IFNULL(q.bank_no,"") AS remitBankNo,
+		IFNULL(q.bank_id,"") AS remitBankName,
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0)  - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END )* 100 as "repaymentAmount"
+	FROM t_risk_order AS o
+	LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+	LEFT JOIN (
+		SELECT 
+			root_order_id,
+			COUNT(1) AS Delay_Count
+		FROM t_risk_order
+		WHERE
+			type = 'loan'
+				AND merchant_id = 7
+				AND root_order_id IS NOT NULL
+		GROUP BY
+			root_order_id
+	) AS r on o.root_order_id = r.root_order_id
+	LEFT JOIN t_risk_buyer2bankinfo AS p ON o.buyer_id = p.buyer_id 
+	LEFT JOIN  t_risk_bankinfo AS q ON p.bank_id = q.id
+	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status in ('payment', 'payoff') and o.dealcode = #{dealcode}
+	</select>
+	
+</mapper>

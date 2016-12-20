@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.TMisDunningOuterFeeDao">
+    
+	<sql id="tMisDunningOuterFeeColumns">
+		a.id AS "id",
+		a.dunningpeopleid AS "dunningpeopleid",
+		p.name AS "dunningpeoplename",
+		a.dunningdaybegin AS "dunningdaybegin",
+		a.dunningdayend AS "dunningdayend",
+		a.dunningfee AS "dunningfee",
+		a.datetimebegin AS "datetimebegin",
+		a.datetimeend AS "datetimeend"
+	</sql>
+	
+	<sql id="tMisDunningOuterFeeJoins">
+	    LEFT JOIN t_mis_dunning_people p ON p.Id = a.dunningpeopleid
+	</sql>
+    
+	<select id="get" resultType="TMisDunningOuterFee">
+		SELECT 
+			<include refid="tMisDunningOuterFeeColumns"/>
+		FROM t_mis_dunning_outer_fee a
+			<include refid="tMisDunningOuterFeeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningOuterFee">
+		SELECT 
+			<include refid="tMisDunningOuterFeeColumns"/>
+		FROM t_mis_dunning_outer_fee a
+			<include refid="tMisDunningOuterFeeJoins"/>
+		<where>
+			<if test="dunningpeopleid != null and dunningpeopleid != ''">
+				AND a.dunningpeopleid = #{dunningpeopleid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningOuterFee">
+		SELECT 
+			<include refid="tMisDunningOuterFeeColumns"/>
+		FROM t_mis_dunning_outer_fee a
+		<include refid="tMisDunningOuterFeeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListOneByNewFee" resultType="TMisDunningOuterFee">
+		SELECT 
+			<include refid="tMisDunningOuterFeeColumns"/>
+		FROM t_mis_dunning_outer_fee a
+			<include refid="tMisDunningOuterFeeJoins"/>
+		WHERE 
+		     a.dunningpeopleid = #{dunningpeopleid} 
+		     AND a.dunningdaybegin = #{dunningdaybegin} 
+		     AND a.dunningdayend = #{dunningdayend} 
+			 AND a.datetimeend is null 
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_outer_fee(
+			dunningpeopleid,
+			dunningdaybegin,
+			dunningdayend,
+			dunningfee,
+			datetimebegin
+<!-- 			datetimeend -->
+		) VALUES (
+			#{dunningpeopleid},
+			#{dunningdaybegin},
+			#{dunningdayend},
+			#{dunningfee},
+			#{datetimebegin}
+<!-- 			#{datetimeend} -->
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_outer_fee SET 	
+			dunningpeopleid = #{dunningpeopleid},
+			dunningdaybegin = #{dunningdaybegin},
+			dunningdayend = #{dunningdayend},
+			dunningfee = #{dunningfee},
+			datetimebegin = #{datetimebegin},
+			datetimeend = #{datetimeend}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunning_outer_fee
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

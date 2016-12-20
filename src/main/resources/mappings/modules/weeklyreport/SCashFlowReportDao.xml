@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SCashFlowReportDao">
+    
+	<sql id="sCashFlowReportColumns">
+		a.id AS "id",
+		a.createtime AS "createtime",
+		a.payamount AS "payamount",
+		a.kdpayamount AS "kdpayamount",
+		a.payoffamount AS "payoffamount",
+		a.mo9payamount AS "mo9payamount",
+		a.diffamount AS "diffamount",
+		a.gpayamount AS "gpayamount"
+	</sql>
+	
+	<sql id="sCashFlowReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SCashFlowReport">
+		SELECT 
+			<include refid="sCashFlowReportColumns"/>
+		FROM s_cash_flow_report a
+		<include refid="sCashFlowReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SCashFlowReport">
+		SELECT 
+			<include refid="sCashFlowReportColumns"/>
+		FROM s_cash_flow_report a
+			<include refid="sCashFlowReportJoins"/>
+		<where>
+			<choose>
+				<when test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+					AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+				</when>
+				<otherwise>
+			     <![CDATA[
+			    	AND a.createtime <= date_format(now(),'%Y-%m-%d')
+			     ]]>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} a.createtime desc
+			</when>
+			<otherwise>
+			    ORDER BY  a.createtime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SCashFlowReport">
+		SELECT 
+			<include refid="sCashFlowReportColumns"/>
+		FROM s_cash_flow_report a
+		<include refid="sCashFlowReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} a.createtime desc
+			</when>
+			<otherwise>
+			     ORDER BY  a.createtime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_cash_flow_report(
+			createtime,
+			payamount,
+			kdpayamount,
+			payoffamount,
+			mo9payamount,
+			diffamount,
+			gpayamount
+		) VALUES (
+			#{createtime},
+			#{payamount},
+			#{kdpayamount},
+			#{payoffamount},
+			#{mo9payamount},
+			#{diffamount},
+			#{gpayamount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_cash_flow_report SET 	
+			createtime = #{createtime},
+			payamount = #{payamount},
+			kdpayamount = #{kdpayamount},
+			payoffamount = #{payoffamount},
+			mo9payamount = #{mo9payamount},
+			diffamount = #{diffamount},
+			gpayamount = #{gpayamount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_cash_flow_report
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

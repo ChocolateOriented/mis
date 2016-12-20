@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.VUserConversionReportMonthDao">
+    
+	<sql id="vUserConversionReportMonthColumns">
+		a.month AS "month",
+		a.newinstall AS "newinstall",
+		a.newinstallpercent AS "newinstallpercent",
+		a.registpercent AS "registpercent",
+		a.firstorderpercent AS "firstorderpercent",
+		a.artificialpercent AS "artificialpercent",
+		a.remitpercent AS "remitpercent",
+		a.waitingtimeavg01 AS "waitingtimeavg01",
+		a.waitingtimeavg02 AS "waitingtimeavg02",
+		a.newremituser AS "newremituser",
+		a.allremituser AS "allremituser",
+		a.validuserpercent AS "validuserpercent",
+		a.prioruserpercent AS "prioruserpercent",
+		a.activeuserpercent AS "activeuserpercent",
+		a.canceltodaypercent AS "canceltodaypercent",
+		a.canceltomorrowpercent AS "canceltomorrowpercent"
+	</sql>
+	
+	<sql id="vUserConversionReportMonthJoins">
+	</sql>
+    
+	<select id="get" resultType="VUserConversionReportMonth">
+		SELECT 
+			<include refid="vUserConversionReportMonthColumns"/>
+		FROM v_user_conversion_report_month a
+		<include refid="vUserConversionReportMonthJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VUserConversionReportMonth">
+		SELECT 
+			<include refid="vUserConversionReportMonthColumns"/>
+		FROM v_user_conversion_report_month a
+		<include refid="vUserConversionReportMonthJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VUserConversionReportMonth">
+		SELECT 
+			<include refid="vUserConversionReportMonthColumns"/>
+		FROM v_user_conversion_report_month a
+		<include refid="vUserConversionReportMonthJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO v_user_conversion_report_month(
+			month,
+			newinstall,
+			newinstallpercent,
+			registpercent,
+			firstorderpercent,
+			artificialpercent,
+			remitpercent,
+			waitingtimeavg01,
+			waitingtimeavg02,
+			newremituser,
+			allremituser,
+			validuserpercent,
+			prioruserpercent,
+			activeuserpercent,
+			canceltodaypercent,
+			canceltomorrowpercent
+		) VALUES (
+			#{month},
+			#{newinstall},
+			#{newinstallpercent},
+			#{registpercent},
+			#{firstorderpercent},
+			#{artificialpercent},
+			#{remitpercent},
+			#{waitingtimeavg01},
+			#{waitingtimeavg02},
+			#{newremituser},
+			#{allremituser},
+			#{validuserpercent},
+			#{prioruserpercent},
+			#{activeuserpercent},
+			#{canceltodaypercent},
+			#{canceltomorrowpercent}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE v_user_conversion_report_month SET 	
+			month = #{month},
+			newinstall = #{newinstall},
+			newinstallpercent = #{newinstallpercent},
+			registpercent = #{registpercent},
+			firstorderpercent = #{firstorderpercent},
+			artificialpercent = #{artificialpercent},
+			remitpercent = #{remitpercent},
+			waitingtimeavg01 = #{waitingtimeavg01},
+			waitingtimeavg02 = #{waitingtimeavg02},
+			newremituser = #{newremituser},
+			allremituser = #{allremituser},
+			validuserpercent = #{validuserpercent},
+			prioruserpercent = #{prioruserpercent},
+			activeuserpercent = #{activeuserpercent},
+			canceltodaypercent = #{canceltodaypercent},
+			canceltomorrowpercent = #{canceltomorrowpercent}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM v_user_conversion_report_month
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

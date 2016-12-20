@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao">
+    
+	
+	<sql id="tMisRemittanceConfirmColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.remittancename AS "remittancename",
+		a.remittancetime AS "remittancetime",
+		a.remittanceamount AS "remittanceamount",
+		a.remittancechannel AS "remittancechannel",
+		a.ReceivablesImg1 AS "ReceivablesImg1",
+		a.ReceivablesImg2 AS "ReceivablesImg2",
+		a.payamount AS "payamount",
+		a.paytype AS "paytype",
+		a.remark AS "remark",
+		a.financialremittancename AS "financialremittancename",
+		a.accounttime AS "accounttime",
+		a.accountamount AS "accountamount",
+		a.financialremittancechannel AS "financialremittancechannel",
+		a.FinancialImg1 AS "FinancialImg1",
+		a.FinancialImg2 AS "FinancialImg2",
+		a.financialremark AS "financialremark",
+		a.confirmstatus AS "confirmstatus",
+		a.dealcode AS "dealcode",
+		a.buyerId AS "buyerId",
+		a.name AS "name",
+		a.mobile AS "mobile",
+		a.createDate AS "createDate",
+		a.serialnumber AS "serialnumber",
+		a.financialserialnumber AS "financialserialnumber"
+	</sql>
+	
+	<sql id="tMisRemittanceConfirmJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisRemittanceConfirm">
+		SELECT 
+			<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+		<include refid="tMisRemittanceConfirmJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisRemittanceConfirm">
+		SELECT 
+			<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+<!-- 			<include refid="tMisRemittanceConfirmJoins"/> -->
+		<where>
+		   		a.Invalid = 't'
+			<if test="remittancename != null and remittancename != ''">
+			    AND a.remittancename LIKE concat('%',#{remittancename},'%')
+			</if>
+			<if test="remittancechannel != null and remittancechannel != ''">
+				AND a.remittancechannel = #{remittancechannel}
+			</if>
+			<if test="dealcode != null and dealcode != ''">
+				AND a.dealcode LIKE concat('%',#{dealcode},'%')
+			</if>
+			<if test="confirmstatus != null and confirmstatus != ''">
+				AND a.confirmstatus = #{confirmstatus}
+			</if>
+			<if test="beginupdatetime != null and endupdatetime != null and beginupdatetime != '' and endupdatetime != ''">
+                AND a.createDate BETWEEN #{beginupdatetime} AND #{endupdatetime}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                AND a.createBy = #{createBy.name}
+            </if>
+				
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} a.createDate desc
+			</when>
+			<otherwise>
+			    ORDER BY a.createDate desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisRemittanceConfirm">
+		SELECT 
+			<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+		<include refid="tMisRemittanceConfirmJoins"/>
+		<where>
+		    a.Invalid = 't'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} updateDate desc
+			</when>
+			<otherwise>
+			    ORDER BY updateDate desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findRemittanceConfirmColumnByDealcode" resultType="TMisRemittanceMessage">
+		SELECT 
+			<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+			WHERE a.dealcode = #{dealcode} and a.confirmstatus is not null
+		ORDER BY a.createdate DESC limit  1 
+	</select>
+	
+		
+	<insert id="insert">
+		INSERT INTO t_mis_remittance_confirm(
+			id,
+			remittancename,
+			remittancetime,
+			remittanceamount,
+			remittancechannel,
+			ReceivablesImg1,
+			ReceivablesImg2,
+			remark,
+			confirmstatus,
+			dealcode,
+			createby,
+			createdate,
+			buyerId,
+			name,
+			mobile,
+			updateby,
+			updatedate,
+			serialnumber
+		) VALUES (
+			#{id},
+			#{remittancename},
+			#{remittancetime},
+			#{remittanceamount},
+			#{remittancechannel},
+			#{ReceivablesImg1},
+			#{ReceivablesImg2},
+			#{remark},
+			#{confirmstatus},
+			#{dealcode},
+			#{createBy.name},
+			#{createDate},
+			#{buyerId},
+			#{name},
+			#{mobile},
+			#{updateBy.name},
+			#{updateDate},
+			#{serialnumber}
+		)
+	</insert>
+	
+	
+	<update id="remittanceUpdate">
+		UPDATE t_mis_remittance_confirm SET 	
+			remittancename = #{remittancename},
+			remittancetime = #{remittancetime},
+			remittanceamount = #{remittanceamount},
+			remittancechannel = #{remittancechannel},
+			ReceivablesImg1 = #{ReceivablesImg1},
+			ReceivablesImg2 = #{ReceivablesImg2},
+			remark = #{remark},
+			confirmstatus = #{confirmstatus},
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate},
+			serialnumber = #{serialnumber}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="confirmationUpdate">
+		UPDATE t_mis_remittance_confirm SET 	
+			payamount = #{payamount},
+			paytype = #{paytype},
+			confirmstatus = #{confirmstatus},
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
+			
+	
+	<update id="financialUpdate">
+		UPDATE t_mis_remittance_confirm SET 	
+			financialremittancename = #{financialremittancename},
+			accounttime = #{accounttime},
+			accountamount = #{accountamount},
+			financialremittancechannel = #{financialremittancechannel},
+			FinancialImg1 = #{FinancialImg1},
+			FinancialImg2 = #{FinancialImg2},
+			financialremark = #{financialremark},
+			confirmstatus = #{confirmstatus},
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate},
+			financialserialnumber = #{financialserialnumber}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="getResult" resultType="int">
+		SELECT
+			CASE 
+			WHEN IFNULL(COUNT(1),0) > 0 
+			THEN 1 
+			ELSE 0 
+			END AS Result
+			FROM t_risk_order AS o1
+			LEFT JOIN t_risk_order AS o2 ON o1.id = o2.root_order_id
+			WHERE o1.type = 'loan' AND o1.merchant_id = 7 AND o1.status = 'payment' 
+			AND o2.type = 'partial' AND o2.merchant_id = 7
+			AND o1.dealcode =#{dealcode}
+	</select>
+	
+	<select id="getSerialnumber" resultType="int">
+		SELECT
+			count(*)
+		FROM t_mis_remittance_confirm a
+		WHERE a.serialnumber = #{serialnumber}
+	</select>
+	
+	<select id="getFinancialserialnumber" resultType="int">
+		SELECT
+			count(*)
+		FROM t_mis_remittance_confirm a
+		WHERE a.financialserialnumber = #{financialserialnumber}
+	</select>
+	
+	
+	<update id="delete">
+		UPDATE t_mis_remittance_confirm SET 
+			Invalid = 'f'
+		WHERE id = #{id}
+	</update>
+	
+	
+</mapper>

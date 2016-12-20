@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisContantRecordDao">
+    
+	<sql id="tMisContantRecordColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.taskid AS "taskid",
+		a.dealcode AS "dealcode",
+		a.orderstatus AS "orderstatus",
+		a.overduedays AS "overduedays",
+		a.remark AS "remark",
+		a.dunningtime AS "dunningtime",
+		a.contanttype AS "contanttype",
+		a.contanttarget AS "contanttarget",
+		a.content AS "content",
+		a.contactstype AS "contactstype",
+		a.smstemp AS "smstemp",
+		a.telstatus AS "telstatus",
+		a.field1 AS "field1",
+		a.dunningpeoplename AS "dunningpeoplename",
+		a.repaymenttime AS "repaymenttime",
+		a.createby AS "createBy.name",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.name",
+		a.updatedate AS "updateDate"
+	</sql>
+	
+	<sql id="tMisContantRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisContantRecord">
+		SELECT 
+			<include refid="tMisContantRecordColumns"/>
+		FROM t_mis_contant_record a
+		<include refid="tMisContantRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisContantRecord">
+		SELECT 
+			a.dbid AS "dbid",
+			a.id AS "id",
+			a.taskid AS "taskid",
+			a.dealcode AS "dealcode",
+			a.orderstatus AS "orderstatus",
+			a.overduedays AS "overduedays",
+			a.remark AS "remark",
+			a.dunningtime AS "dunningtime",
+			a.contanttype AS "contanttype",
+			a.contanttarget AS "contanttarget",
+			a.content AS "content",
+			a.contactstype AS "contactstype",
+			a.smstemp AS "smstemp",
+			a.telstatus AS "telstatus",
+			a.field1 AS "field1",
+			a.dunningpeoplename AS "dunningpeoplename",
+			CASE WHEN p.Name = 'sys' THEN '' ELSE p.Name END AS "peoplename",
+			a.repaymenttime AS "repaymenttime",
+			a.createby AS "createBy.name",
+			a.createdate AS "createDate",
+			a.updateby AS "updateBy.name",
+			a.updatedate AS "updateDate"
+		FROM t_mis_contant_record a
+			LEFT JOIN t_mis_dunning_people p ON p.Id = a.dunningpeoplename
+		    LEFT JOIN t_risk_order o ON o.dealcode = a.dealcode
+			LEFT JOIN t_mis_dunning_task AS t ON a.TaskId = t.Id
+		WHERE t.dbid IS NOT NULL 
+			AND o.buyer_id = #{buyerid}
+		<where>
+<!-- 			<if test="taskid != null and taskid!= ''"> -->
+<!-- 				a.taskid = #{taskid} -->
+<!-- 			</if> -->
+<!-- 			<if test="dealcode != null and dealcode!= ''"> -->
+<!-- 				a.dealcode = #{dealcode} -->
+<!-- 			</if> -->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisContantRecord">
+		SELECT 
+			<include refid="tMisContantRecordColumns"/>
+		FROM t_mis_contant_record a
+		<include refid="tMisContantRecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findSmsNum" resultType="com.mo9.risk.modules.dunning.entity.TelNumberBean">
+		SELECT rs.ContantTarget as tel,COUNT(*) as count
+		 	from t_mis_contant_record rs 
+		where rs.ContantType='sms' 
+			AND rs.ContantTarget is not null
+			AND rs.Dealcode = #{dealcode}
+		GROUP BY rs.ContantTarget
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_contant_record(
+			id,
+			taskid,
+			dealcode,
+			orderstatus,
+			overduedays,
+			remark,
+			dunningtime,
+			contanttype,
+			contanttarget,
+			content,
+			contactstype,
+			telstatus,
+			smstemp,
+			field1,
+			dunningpeoplename,
+			repaymenttime,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{taskid},
+			#{dealcode},
+			#{orderstatus},
+			#{overduedays},
+			#{remark},
+			#{dunningtime},
+			#{contanttype},
+			#{contanttarget},
+			#{content},
+			#{contactstype},
+			#{telstatus},
+			#{smstemp},
+			#{field1},
+			#{dunningpeoplename},
+			#{repaymenttime},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_contant_record SET 	
+			taskid = #{taskid},
+			dealcode = #{dealcode},
+			orderstatus = #{orderstatus},
+			overduedays = #{overduedays},
+			remark = #{remark},
+			dunningtime = #{dunningtime},
+			contanttype = #{contanttype},
+			contanttarget = #{contanttarget},
+			content = #{content},
+			contactstype = #{contactstype},
+			telstatus = #{telstatus},
+			smstemp = #{smstemp},
+			field1 = #{field1},
+			dunningpeoplename = #{dunningpeoplename},
+			repaymenttime = #{repaymenttime},
+<!-- 			createby = #{createBy.name}, -->
+<!-- 			createdate = #{createdate}, -->
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findDetailByDealcodeandTel" resultType="TMisContantRecord">
+		SELECT 
+			a.createdate AS "createDate",
+			CASE WHEN p.Name = 'sys' THEN '' ELSE p.Name END AS "peoplename",
+			a.telstatus AS "telstatus",
+			a.remark AS "remark",
+			a.content AS "content"
+		FROM t_mis_contant_record a
+			LEFT JOIN t_mis_dunning_people p ON p.Id = a.dunningpeoplename
+ 		WHERE 
+	 		a.ContantType = #{contanttype}
+	 		and	ContantTarget = #{contanttarget}
+	 		and Dealcode = #{dealcode}
+	 	ORDER BY a.createdate desc	 
+	</select>
+	
+	
+	
+	
+	
+<!-- 	<update id="delete"> -->
+<!-- 		DELETE FROM t_mis_contant_record -->
+<!-- 		WHERE id = #{id} -->
+<!-- 	</update> -->
+	
+</mapper>

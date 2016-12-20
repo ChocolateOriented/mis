@@ -1,0 +1,328 @@
+package com.mo9.risk.modules.dunning.entity;
+
+import java.util.Date;
+import java.util.List;
+
+import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
+import com.thinkgem.jeesite.util.NumberUtil;
+
+public class DunningOrder  extends DataEntity<DunningOrder>{
+	
+	/**
+	 *  --------------------------催款任务状态----------------------------------------------
+	 */
+	public static final String STATUS_DUNNING = "dunning"; //代表催款任务正在催收中
+	public static final String STATUS_EXPIRED = "expired";  //代表催款任务超出催收周期并未催回
+	public static final String STATUS_FINISHED = "finished"; //代表催款任务的订单在催收周期内已还清
+	public static final String STATUS_TRANSFER = "transfer"; //代表催款任务在催收周期内转移给了另一个同周期催款用户
+	
+	/**
+	 *  --------------------------单状态 payoff 已还清 payment----------------------------------------------
+	 */
+	public static final String STATUS_PAYOFF = "payoff"; //已还清
+	public static final String STATUS_PAYMENT = "payment";  //未还清
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -133278239542076425L;
+	
+	private Integer buyerid;
+	private String realname;// # 姓名
+	private String dealcode;// # 订单编号
+	private String mobile;// # 手机号码
+	private Double amount;// # 欠款金额
+	private Double creditamount;// # 应催金额
+	private Date repaymenttime;// # 到期还款日期
+	private Integer overduedays;// # 逾期天数
+	private String status;// # 订单状态 payoff 已还清 payment
+	private String dunningpeoplename;// # 催收人
+	private Date payofftime;// # 还清日期
+	private String dunningtaskstatus;// # 任务状态
+	private Date beginPayofftime;		// 开始还清日期
+	private Date endPayofftime;		// 结束还清日期
+	private Date beginRepaymenttime;		// 开始到期还款日期
+	private Date endRepaymenttime;		// 结束到期还款日期
+	private String beginOverduedays;// # 逾期天数
+	private String endOverduedays;// # 逾期天数
+	private String dunningpeopleid;// # 催收人id
+//	private Integer dunningtaskdbid;   //任务id
+	private String dunningtaskdbid;   //任务id
+	private List<String> names;// # 催收人
+	private Date outerfiletime;  // 委外导出时间
+	private String telremark;   //电话记录
+	private Date deadline;/*催收留案功能-增加催收截止日字段 Patch 0001 by GQWU at 2016-11-8*/ 
+	private String dunningpeopletype;/*催收留案功能-用于条件验证 Patch 0001 by GQWU at 2016-11-23*/ 
+	
+	private Date beginOuterfiletime;		// 开始到期还款日期
+	private Date endOuterfiletime;		// 结束到期还款日期
+	
+	private Date dunningtime;
+	
+
+	public DunningOrder() {
+		super();
+	}
+
+	public DunningOrder(String id){
+		super(id);
+	}
+	
+	public DunningOrder(String dealcode, Double creditamount,
+			Integer overduedays) {
+		super();
+		this.dealcode = dealcode;
+		this.creditamount = creditamount;
+		this.overduedays = overduedays;
+	}
+
+	public Integer getBuyerid() {
+		return buyerid;
+	}
+
+	public void setBuyerid(Integer buyerid) {
+		this.buyerid = buyerid;
+	}
+
+	@ExcelField(title="姓名", type=1, align=2, sort=1)
+	public String getRealname() {
+		return realname;
+	}
+
+	public void setRealname(String realname) {
+		this.realname = realname;
+	}
+	@ExcelField(title="订单编号", type=1, align=2, sort=2)
+	public String getDealcode() {
+		return dealcode;
+	}
+
+	public void setDealcode(String dealcode) {
+		this.dealcode = dealcode;
+	}
+	@ExcelField(title="手机号码", type=1, align=2, sort=3)
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public Double getAmount() {
+		return amount;
+	}
+	@ExcelField(title="欠款金额", type=1, align=2, sort=4)
+	public String getAmountText() {
+		return null != this.amount ? NumberUtil.formatTosepara(this.amount) : "";
+	}
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+	
+	public Double getCreditamount() {
+		return creditamount;
+	}
+	@ExcelField(title="应催金额", type=1, align=2, sort=5)
+	public String getCreditamountText() {
+		return null != this.creditamount ? NumberUtil.formatTosepara(this.creditamount) : "";
+	}
+	public void setCreditamount(Double creditamount) {
+		this.creditamount = creditamount;
+	}
+	@ExcelField(title="到期还款日期", type=1, align=2, sort=6)
+	public Date getRepaymenttime() {
+		return repaymenttime;
+	}
+
+	public void setRepaymenttime(Date repaymenttime) {
+		this.repaymenttime = repaymenttime;
+	}
+	@ExcelField(title="逾期天数", type=1, align=2, sort=7)
+	public Integer getOverduedays() {
+		return overduedays;
+	}
+
+	public void setOverduedays(Integer overduedays) {
+		this.overduedays = overduedays;
+	}
+	public String getStatus() {
+		return status;
+	}
+	@ExcelField(title="订单状态", type=1, align=2, sort=8)
+	public String getStatusText() {
+//		return null != this.monthincreased ? NumberUtil.formatTosepara(this.monthincreased) + "%" : "";
+		return STATUS_PAYOFF.equals(this.status) ?  "已还清" : 
+				STATUS_PAYMENT.equals(this.status) ?  "未还清" : "";
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	@ExcelField(title="催收人", type=1, align=2, sort=9)
+	public String getDunningpeoplename() {
+		return dunningpeoplename;
+	}
+	public void setDunningpeoplename(String dunningpeoplename) {
+		this.dunningpeoplename = dunningpeoplename;
+	}
+
+	@ExcelField(title="还清日期", type=1, align=2, sort=10)
+	public Date getPayofftime() {
+		return payofftime;
+	}
+
+	public void setPayofftime(Date payofftime) {
+		this.payofftime = payofftime;
+	}
+
+	
+	public String getDunningtaskstatus() {
+		return dunningtaskstatus;
+	}
+	@ExcelField(title="任务状态", type=1, align=2, sort=11)
+	public String getDunningtaskstatusText() {
+		return STATUS_DUNNING.equals(this.dunningtaskstatus) ?  "正在催收" : 
+				STATUS_EXPIRED.equals(this.dunningtaskstatus) ?  "超出催收周期未催回" : 
+				STATUS_FINISHED.equals(this.dunningtaskstatus) ?  "催收周期内已还清" : 
+				STATUS_TRANSFER.equals(this.dunningtaskstatus) ?  "同期转移" : "";
+	}
+	public void setDunningtaskstatus(String dunningtaskstatus) {
+		this.dunningtaskstatus = dunningtaskstatus;
+	}
+
+	public Date getBeginPayofftime() {
+		return beginPayofftime;
+	}
+
+	public void setBeginPayofftime(Date beginPayofftime) {
+		this.beginPayofftime = beginPayofftime;
+	}
+
+	public Date getEndPayofftime() {
+		return endPayofftime;
+	}
+
+	public void setEndPayofftime(Date endPayofftime) {
+//		this.endPayofftime = endPayofftime;
+		this.endPayofftime =  null != endPayofftime ? DateUtils.endDate(endPayofftime) : endPayofftime;
+	}
+
+	
+	public Date getBeginRepaymenttime() {
+		return beginRepaymenttime;
+	}
+
+	public void setBeginRepaymenttime(Date beginRepaymenttime) {
+		this.beginRepaymenttime = beginRepaymenttime;
+	}
+
+	public Date getEndRepaymenttime() {
+		return endRepaymenttime;
+	}
+
+	public void setEndRepaymenttime(Date endRepaymenttime) {
+//		this.endRepaymenttime = endRepaymenttime;
+		this.endRepaymenttime =  null != endRepaymenttime ? DateUtils.endDate(endRepaymenttime) : endRepaymenttime;
+	}
+
+	public String getBeginOverduedays() {
+		return beginOverduedays;
+	}
+
+	public void setBeginOverduedays(String beginOverduedays) {
+		this.beginOverduedays = beginOverduedays;
+	}
+
+	public String getEndOverduedays() {
+		return endOverduedays;
+	}
+
+	public void setEndOverduedays(String endOverduedays) {
+		this.endOverduedays = endOverduedays;
+	}
+
+	public String getDunningpeopleid() {
+		return dunningpeopleid;
+	}
+
+	public void setDunningpeopleid(String dunningpeopleid) {
+		this.dunningpeopleid = dunningpeopleid;
+	}
+
+	public List<String> getNames() {
+		return names;
+	}
+
+	public void setNames(List<String> names) {
+		this.names = names;
+	}
+
+	public String getDunningtaskdbid() {
+		return dunningtaskdbid;
+	}
+
+	public void setDunningtaskdbid(String dunningtaskdbid) {
+		this.dunningtaskdbid = dunningtaskdbid;
+	}
+
+	public Date getOuterfiletime() {
+		return outerfiletime;
+	}
+
+	public void setOuterfiletime(Date outerfiletime) {
+		this.outerfiletime = outerfiletime;
+	}
+
+	public String getTelremark() {
+		return telremark;
+	}
+
+	public void setTelremark(String telremark) {
+		this.telremark = telremark;
+	}
+
+	public Date getBeginOuterfiletime() {
+		return beginOuterfiletime;
+	}
+
+	public void setBeginOuterfiletime(Date beginOuterfiletime) {
+		this.beginOuterfiletime = beginOuterfiletime;
+	}
+
+	public Date getEndOuterfiletime() {
+		return endOuterfiletime;
+	}
+
+	public void setEndOuterfiletime(Date endOuterfiletime) {
+//		this.endOuterfiletime = endOuterfiletime;
+		this.endOuterfiletime =  null != endOuterfiletime ? DateUtils.endDate(endOuterfiletime) : endOuterfiletime;
+	}
+
+	public Date getDunningtime() {
+		return dunningtime;
+	}
+
+	public void setDunningtime(Date dunningtime) {
+		this.dunningtime = dunningtime;
+	}
+
+	public Date getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(Date deadline) {
+		this.deadline = deadline;
+	}
+
+	public String getDunningpeopletype() {
+		return dunningpeopletype;
+	}
+
+	public void setDunningpeopletype(String dunningpeopletype) {
+		this.dunningpeopletype = dunningpeopletype;
+	}
+
+
+}

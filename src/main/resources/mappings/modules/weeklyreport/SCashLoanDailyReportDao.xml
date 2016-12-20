@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SCashLoanDailyReportDao">
+    
+	<sql id="sCashLoanDailyReportColumns">
+	    a.id AS "id",
+		a.createtime AS "createtime",
+		a.month AS "month",
+		a.week AS "week",
+		a.weekdesc AS "weekdesc",
+		a.remitamount AS "remitamount",
+		a.weekincreased AS "weekincreased",
+		a.monthincreased AS "monthincreased",
+		a.newuser AS "newuser",
+		a.neworder AS "neworder",
+		a.incomeamount AS "incomeamount",
+		a.incomeincreased AS "incomeincreased",
+		
+		a.monthincomeincreased AS "monthincomeincreased",
+		a.monthincomepercent AS "monthincomepercent",
+		
+		a.incomepercent AS "incomepercent",
+		a.loancost AS "loancost",
+		a.repaycost AS "repaycost",
+		a.creditsumcost AS "creditsumcost",
+<!-- 		a.creditavgcost AS "creditavgcost", -->
+		a.couponcost AS "couponcost",
+		a.mediacost AS "mediacost",
+		a.debatamount AS "debatamount",
+		a.weekdebatamount AS "weekdebatamount",
+		a.monthdebatamount AS "monthdebatamount",
+<!-- 		a.debatpercent AS "debatpercent", -->
+		a.entrustcommission AS "entrustcommission",
+		a.grossprofile AS "grossprofile"
+<!-- 		a.grossprofilepercent AS "grossprofilepercent" -->
+	</sql>
+	
+	<sql id="sCashLoanDailyReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SCashLoanDailyReport">
+		SELECT 
+			<include refid="sCashLoanDailyReportColumns"/>
+		FROM s_cash_loan_daily_report a
+		<include refid="sCashLoanDailyReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SCashLoanDailyReport">
+		SELECT 
+			<include refid="sCashLoanDailyReportColumns"/>
+		FROM s_cash_loan_daily_report a
+		<include refid="sCashLoanDailyReportJoins"/>
+		<where>
+			
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SCashLoanDailyReport">
+		SELECT 
+			<include refid="sCashLoanDailyReportColumns"/>
+		FROM s_cash_loan_daily_report a
+		<include refid="sCashLoanDailyReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findweekList" resultType="SCashLoanDailyReport">
+		SELECT 
+		    a.id AS "id",
+<!-- 			a.createtime AS "createtime", -->
+<!-- 			a.month AS "month", -->
+			a.week AS "week",
+			a.weekdesc AS "weekdesc",
+			sum(a.remitamount) AS "remitamount",
+			sum(a.weekincreased) AS "weekincreased",
+<!-- 			sum(a.monthincreased) AS "monthincreased", -->
+			sum(a.newuser) AS "newuser",
+			sum(a.neworder) AS "neworder",
+			sum(a.incomeamount) AS "incomeamount",
+			sum(a.incomeincreased) AS "incomeincreased",
+			sum(a.incomepercent) AS "incomepercent",
+			sum(a.loancost) AS "loancost",
+			sum(a.repaycost) AS "repaycost",
+			sum(a.creditsumcost) AS "creditsumcost",
+			sum(a.creditavgcost) AS "creditavgcost",
+			sum(a.couponcost) AS "couponcost",
+			sum(a.mediacost) AS "mediacost",
+			max(a.debatamount) AS "debatamount",
+			sum(a.weekdebatamount) AS "weekdebatamount",
+<!-- 			sum(a.monthdebatamount) AS "monthdebatamount", -->
+			sum(a.debatpercent) AS "debatpercent",
+<!-- 			sum(a.entrustcommission) AS "entrustcommission", -->
+			sum(a.grossprofile) AS "grossprofile",
+			sum(a.grossprofilepercent) AS "grossprofilepercent",
+			sum(a.weekrepayavgcost) AS "weekrepayavgcost",
+			sum(a.WeekSingleRemitAvgAmount) AS "WeekSingleRemitAvgAmount"
+		FROM s_cash_loan_daily_report a 
+		<where>
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+		</where>
+		GROUP BY a.week ORDER BY a.createtime DESC
+	</select>
+	
+	<select id="weekReportExportFile" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanWeekReportBean">
+		SELECT 
+		    a.id AS "id",
+			a.week AS "week",
+			a.weekdesc AS "weekdesc",
+			sum(a.remitamount) AS "remitamount",
+			sum(a.weekincreased) AS "weekincreased",
+			sum(a.newuser) AS "newuser",
+			sum(a.neworder) AS "neworder",
+			sum(a.incomeamount) AS "incomeamount",
+			sum(a.incomeincreased) AS "incomeincreased",
+			sum(a.incomepercent) AS "incomepercent",
+			sum(a.loancost) AS "loancost",
+			sum(a.repaycost) AS "repaycost",
+			sum(a.creditsumcost) AS "creditsumcost",
+			sum(a.creditavgcost) AS "creditavgcost",
+			sum(a.couponcost) AS "couponcost",
+			sum(a.mediacost) AS "mediacost",
+			max(a.debatamount) AS "debatamount",
+			sum(a.weekdebatamount) AS "weekdebatamount",
+			sum(a.debatpercent) AS "debatpercent",
+			sum(a.grossprofile) AS "grossprofile",
+			sum(a.grossprofilepercent) AS "grossprofilepercent",
+			sum(a.weekrepayavgcost) AS "weekrepayavgcost",
+			sum(a.WeekSingleRemitAvgAmount) AS "WeekSingleRemitAvgAmount"
+		FROM s_cash_loan_daily_report a 
+		<where>
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+		</where>
+		GROUP BY a.week ORDER BY a.createtime DESC
+	</select>
+	
+		<select id="findmonthList" resultType="SCashLoanDailyReport">
+		SELECT 
+			a.id AS "id",
+<!-- 			a.createtime AS "createtime", -->
+			a.month AS "month",
+<!-- 			a.week AS "week", -->
+<!-- 			a.weekdesc AS "weekdesc", -->
+			sum(a.remitamount) AS "remitamount",
+<!-- 			sum(a.weekincreased) AS "weekincreased", -->
+			sum(a.monthincreased) AS "monthincreased",
+			sum(a.newuser) AS "newuser",
+			sum(a.neworder) AS "neworder",
+			sum(a.incomeamount) AS "incomeamount",
+<!-- 			sum(a.incomeincreased) AS "incomeincreased", -->
+			sum(a.monthincomeincreased) AS "monthincomeincreased",
+<!-- 			sum(a.incomepercent) AS "incomepercent", -->
+			sum(a.monthincomepercent) AS "monthincomepercent",
+			sum(a.loancost) AS "loancost",
+			sum(a.repaycost) AS "repaycost",
+			sum(a.creditsumcost) AS "creditsumcost",
+			sum(a.MonthCreditAvgCost) AS "MonthCreditAvgCost",
+			sum(a.couponcost) AS "couponcost",
+			sum(a.mediacost) AS "mediacost",
+			max(a.debatamount) AS "debatamount",
+<!-- 			sum(a.weekdebatamount) AS "weekdebatamount", -->
+			sum(a.monthdebatamount) AS "monthdebatamount",
+			sum(a.monthdebatpercent) AS "monthdebatpercent",
+			sum(a.entrustcommission) AS "entrustcommission",
+			sum(a.grossprofile) AS "grossprofile",
+			sum(a.MonthGrossProfilePercent) AS "MonthGrossProfilePercent",
+			sum(a.monthrepayavgcost) AS "monthrepayavgcost",
+			sum(a.MonthSingleRemitAvgAmount) AS "MonthSingleRemitAvgAmount"
+		FROM s_cash_loan_daily_report a
+		<where>
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+		</where>
+		GROUP BY a.month ORDER BY a.createtime DESC
+	</select>
+	
+		<select id="monthReportExportFile" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanMonthReportBean">
+		SELECT 
+			a.id AS "id",
+			a.month AS "month",
+			sum(a.remitamount) AS "remitamount",
+			sum(a.monthincreased) AS "monthincreased",
+			sum(a.newuser) AS "newuser",
+			sum(a.neworder) AS "neworder",
+			sum(a.incomeamount) AS "incomeamount",
+			sum(a.monthincomeincreased) AS "monthincomeincreased",
+			sum(a.monthincomepercent) AS "monthincomepercent",
+			sum(a.loancost) AS "loancost",
+			sum(a.repaycost) AS "repaycost",
+			sum(a.creditsumcost) AS "creditsumcost",
+			sum(a.MonthCreditAvgCost) AS "MonthCreditAvgCost",
+			sum(a.couponcost) AS "couponcost",
+			sum(a.mediacost) AS "mediacost",
+			max(a.debatamount) AS "debatamount",
+			sum(a.monthdebatamount) AS "monthdebatamount",
+			sum(a.monthdebatpercent) AS "monthdebatpercent",
+			sum(a.entrustcommission) AS "entrustcommission",
+			sum(a.grossprofile) AS "grossprofile",
+			sum(a.MonthGrossProfilePercent) AS "MonthGrossProfilePercent",
+			sum(a.monthrepayavgcost) AS "monthrepayavgcost",
+			sum(a.MonthSingleRemitAvgAmount) AS "MonthSingleRemitAvgAmount"
+		FROM s_cash_loan_daily_report a
+		<where>
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND a.createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+		</where>
+		GROUP BY a.month ORDER BY a.createtime DESC
+	</select>
+	
+	
+	<update id="update">
+		UPDATE s_cash_loan_daily_report SET 	
+			creditsumcost = #{creditsumcost},
+			mediacost = #{mediacost},
+			entrustcommission = #{entrustcommission}
+		WHERE id = #{id}
+	</update>
+	
+<!-- 	<update id="delete"> -->
+<!-- 		DELETE FROM s_cash_loan_daily_report -->
+<!-- 		WHERE id = #{id} -->
+<!-- 	</update> -->
+
+<!-- 	<typeAlias alias="SCashLoanDailyReportOrderWeekBean" type="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportOrderWeekBean"/> -->
+<!-- 	<typeAlias alias="SCashLoanDailyReportOrderMonthBean" type="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportOrderMonthBean"/> -->
+<!-- 	<resultMap type="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportOrderWeekBean" id="onlineServer"> -->
+<!-- 		<result property="sev_id" column="SEV_ID"/> -->
+<!-- 	</resultMap> -->
+
+	<sql id="sCashLoanDailyReportOrderWeekColumns">
+		sw.week AS "week",
+		sw.weekdesc AS "weekdesc",
+		sw.remitorderamount AS "remitorderamount",
+		sw.remitorderamountpercent AS "remitorderamountpercent",
+		sw.delayedorderamount AS "delayedorderamount",
+		sw.delayedorderamountpercent AS "delayedorderamountpercent",
+		sw.newuserapp AS "newuserapp",
+		sw.newuserapppercent AS "newuserapppercent",
+		sw.newuserwechat AS "newuserwechat",
+		sw.newuserwechatpercent AS "newuserwechatpercent",
+<!-- 		sw.remitorder AS "remitorder", -->
+<!-- 		sw.remitorderpercent AS "remitorderpercent", -->
+<!-- 		sw.delayedorder AS "delayedorder", -->
+<!-- 		sw.delayedorderpercent AS "delayedorderpercent", -->
+		sw.costamount AS "costamount",
+		sw.costamountpercent AS "costamountpercent",
+		sw.delayedamount AS "delayedamount",
+		sw.delayedamountpercent AS "delayedamountpercent",
+		sw.overdueamount AS "overdueamount",
+		sw.overdueamountpercent AS "overdueamountpercent",
+		sw.couponamount AS "couponamount",
+		sw.pressamount AS "pressamount",
+		sw.waitingamount AS "waitingamount",
+	sw.NewUserNewOrders AS "NewUserNewOrders",
+	sw.NewUserNewOrdersPercent AS "NewUserNewOrdersPercent",
+	sw.OldUserNewOrders AS "OldUserNewOrders",
+	sw.OldUserNewOrdersPercent AS "OldUserNewOrdersPercent",
+	sw.OldUserDelayOrders AS "OldUserDelayOrders",
+	sw.OldUserDelayOrdersPercent AS "OldUserDelayOrdersPercent",
+	sw.500Order7DaysPercent AS "Order7DaysPercent500",
+	sw.1000Order7DaysPercent AS "Order7DaysPercent1000",
+	sw.1500Order7DaysPercent AS "Order7DaysPercent1500",
+	sw.500Order14DaysPercent AS "Order14DaysPercent500",
+	sw.1000Order14DaysPercent AS "Order14DaysPercent1000",
+	sw.1500Order14DaysPercent AS "Order14DaysPercent1500"
+		
+	</sql>
+	
+	<sql id="sCashLoanDailyReportOrderMonthColumns">
+		sm.Month AS "Month",
+		sm.remitorderamount AS "remitorderamount",
+		sm.remitorderamountpercent AS "remitorderamountpercent",
+		sm.delayedorderamount AS "delayedorderamount",
+		sm.delayedorderamountpercent AS "delayedorderamountpercent",
+		sm.newuserapp AS "newuserapp",
+		sm.newuserapppercent AS "newuserapppercent",
+		sm.newuserwechat AS "newuserwechat",
+		sm.newuserwechatpercent AS "newuserwechatpercent",
+<!-- 		sm.remitorder AS "remitorder", -->
+<!-- 		sm.remitorderpercent AS "remitorderpercent", -->
+<!-- 		sm.delayedorder AS "delayedorder", -->
+<!-- 		sm.delayedorderpercent AS "delayedorderpercent", -->
+		sm.costamount AS "costamount",
+		sm.costamountpercent AS "costamountpercent",
+		sm.delayedamount AS "delayedamount",
+		sm.delayedamountpercent AS "delayedamountpercent",
+		sm.overdueamount AS "overdueamount",
+		sm.overdueamountpercent AS "overdueamountpercent",
+		sm.couponamount AS "couponamount",
+		sm.pressamount AS "pressamount",
+		sm.waitingamount AS "waitingamount",
+	sm.NewUserNewOrders AS "NewUserNewOrders",
+	sm.NewUserNewOrdersPercent AS "NewUserNewOrdersPercent",
+	sm.OldUserNewOrders AS "OldUserNewOrders",
+	sm.OldUserNewOrdersPercent AS "OldUserNewOrdersPercent",
+	sm.OldUserDelayOrders AS "OldUserDelayOrders",
+	sm.OldUserDelayOrdersPercent AS "OldUserDelayOrdersPercent",
+	sm.500Order7DaysPercent AS "Order7DaysPercent500",
+	sm.1000Order7DaysPercent AS "Order7DaysPercent1000",
+	sm.1500Order7DaysPercent AS "Order7DaysPercent1500",
+	sm.500Order14DaysPercent AS "Order14DaysPercent500",
+	sm.1000Order14DaysPercent AS "Order14DaysPercent1000",
+	sm.1500Order14DaysPercent AS "Order14DaysPercent1500"
+		
+	</sql>
+	
+	<sql id="sCashLoanDailyReportRepayWeekColumns">
+<!-- 	  sw.`week`  AS "week", -->
+	  sw.`channelname`  AS "channelname",
+	  sw.`subchannelname` AS "subchannelname",
+	  sw.`feerate`  AS "feerate",
+	  sw.`repayamount`  AS "repayamount",
+	  sw.`repayamountpercent`  AS "repayamountpercent",
+	  sw.`repaycount`  AS "repaycount",
+	  sw.`repaycountpercent`  AS "repaycountpercent"
+	</sql>
+	
+	<sql id="sCashLoanDailyReportRepayMonthColumns">
+<!-- 	  sm.`month`  AS "month", -->
+	  sm.`channelname`  AS "channelname",
+	  sm.`subchannelname` AS "subchannelname",
+	  sm.`feerate`  AS "feerate",
+	  sm.`repayamount`  AS "repayamount",
+	  sm.`repayamountpercent`  AS "repayamountpercent",
+	  sm.`repaycount`  AS "repaycount",
+	  sm.`repaycountpercent`  AS "repaycountpercent"
+	</sql>
+
+	<!--  周报表详情   -->
+	<select id="findWeekDetails" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportOrderWeekBean" useCache="false">
+		SELECT 
+			<include refid="sCashLoanDailyReportOrderWeekColumns"/>
+		FROM s_cash_loan_daily_report_order_week sw
+			WHERE sw.week = #{week}
+	</select>
+	
+	<!--  月报表详情   -->
+	<select id="findMonthDetails" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportOrderMonthBean" useCache="false">
+		SELECT 
+			<include refid="sCashLoanDailyReportOrderMonthColumns"/>
+		FROM s_cash_loan_daily_report_order_month sm
+			WHERE sm.month = #{month}
+	</select>
+	
+	<!--  周还款成本  -->
+	<select id="findWeekRepayDetails" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportRepayWeekBean" useCache="false">
+		SELECT 
+			<include refid="sCashLoanDailyReportRepayWeekColumns"/>
+		FROM s_cash_loan_daily_report_repay_week sw
+			WHERE sw.week = #{week}
+	</select>
+	
+	<!--  月还款成本  -->
+	<select id="findMonthRepayDetails" resultType="com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanDailyReportRepayMonthBean" useCache="false">
+		SELECT 
+			<include refid="sCashLoanDailyReportRepayMonthColumns"/>
+		FROM s_cash_loan_daily_report_repay_month sm
+			WHERE sm.month = #{month}
+	</select>
+	
+	
+</mapper>

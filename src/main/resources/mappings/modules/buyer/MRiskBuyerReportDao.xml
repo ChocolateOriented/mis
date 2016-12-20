@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.buyer.dao.MRiskBuyerReportDao">
+    
+	<sql id="mRiskBuyerReportColumns">
+		a.id AS "id",
+		a.merchant_id AS "merchantId",
+		b.credit_merchant_name AS "merchantId.creditMerchantName",
+		a.count AS "count",
+		a.create_date AS "createDate"
+	</sql>
+	
+	<sql id="mRiskBuyerReportJoins">
+		LEFT JOIN t_risk_merchant b ON b.id = a.merchant_id
+	</sql>
+    
+	<select id="get" resultType="MRiskBuyerReport">
+		SELECT 
+			<include refid="mRiskBuyerReportColumns"/>
+		FROM m_risk_buyer_report a
+		<include refid="mRiskBuyerReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MRiskBuyerReport">
+		SELECT 
+			<include refid="mRiskBuyerReportColumns"/>
+		FROM m_risk_buyer_report a
+		<include refid="mRiskBuyerReportJoins"/>
+		<where>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="merchantId != null and merchantId.creditMerchantName != null and merchantId.creditMerchantName != ''">
+				AND b.credit_merchant_name = #{merchantId.creditMerchantName}
+			</if>
+			<if test="count != null and count != ''">
+				AND a.count = #{count}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MRiskBuyerReport">
+		SELECT 
+			<include refid="mRiskBuyerReportColumns"/>
+		FROM m_risk_buyer_report a
+		<include refid="mRiskBuyerReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO m_risk_buyer_report(
+			merchant_id,
+			count,
+			create_date
+		) VALUES (
+			#{merchantId.id},
+			#{count},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE m_risk_buyer_report SET 	
+			merchant_id = #{merchantId},
+			count = #{count}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM m_risk_buyer_report
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE merchant_id = #{merchantId}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.VRiskOrderAfterLoanPushingDao">
+    
+	<sql id="vRiskOrderAfterLoanPushingColumns">
+		a.datetime AS "datetime",
+		a.orderpayoffover7 AS "orderpayoffover7",
+		a.orderover7 AS "orderover7",
+		a.orderpayoffover14 AS "orderpayoffover14",
+		a.orderover14 AS "orderover14",
+		a.orderpayoffover21 AS "orderpayoffover21",
+		a.orderover21 AS "orderover21",
+		a.orderpayoffover35 AS "orderpayoffover35",
+		a.orderover35 AS "orderover35",
+		a.orderpayoffover36 AS "orderpayoffover36",
+		a.orderover36 AS "orderover36",
+		a.repaymentamount AS "repaymentamount"
+	</sql>
+	
+	<sql id="vRiskOrderAfterLoanPushingJoins">
+	</sql>
+    
+	<select id="get" resultType="VRiskOrderAfterLoanPushing">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanPushingColumns"/>
+		FROM v_risk_order_after_loan_pushing a
+		<include refid="vRiskOrderAfterLoanPushingJoins"/>
+		WHERE a.datetime = #{datetime}
+	</select>
+	
+	<select id="findList" resultType="VRiskOrderAfterLoanPushing">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanPushingColumns"/>
+		FROM v_risk_order_after_loan_pushing a
+		<include refid="vRiskOrderAfterLoanPushingJoins"/>
+		<where>
+			
+			<if test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''">
+				AND a.datetime BETWEEN #{beginDatetime} AND #{endDatetime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}  DESC
+			</when>
+			<otherwise>
+			     ORDER BY a.datetime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VRiskOrderAfterLoanPushing">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanPushingColumns"/>
+		FROM v_risk_order_after_loan_pushing a
+		<include refid="vRiskOrderAfterLoanPushingJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.datetime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO v_risk_order_after_loan_pushing(
+			datetime,
+			orderpayoffover7,
+			orderover7,
+			orderpayoffover14,
+			orderover14,
+			orderpayoffover21,
+			orderover21,
+			orderpayoffover35,
+			orderover35,
+			orderpayoffover36,
+			orderover36,
+			repaymentamount
+		) VALUES (
+			#{datetime},
+			#{orderpayoffover7},
+			#{orderover7},
+			#{orderpayoffover14},
+			#{orderover14},
+			#{orderpayoffover21},
+			#{orderover21},
+			#{orderpayoffover35},
+			#{orderover35},
+			#{orderpayoffover36},
+			#{orderover36},
+			#{repaymentamount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE v_risk_order_after_loan_pushing SET 	
+			datetime = #{datetime},
+			orderpayoffover7 = #{orderpayoffover7},
+			orderover7 = #{orderover7},
+			orderpayoffover14 = #{orderpayoffover14},
+			orderover14 = #{orderover14},
+			orderpayoffover21 = #{orderpayoffover21},
+			orderover21 = #{orderover21},
+			orderpayoffover35 = #{orderpayoffover35},
+			orderover35 = #{orderover35},
+			orderpayoffover36 = #{orderpayoffover36},
+			orderover36 = #{orderover36},
+			repaymentamount = #{repaymentamount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM v_risk_order_after_loan_pushing
+		WHERE id = #{id}
+	</update>
+	
+	
+	
+	<!-- 	调用存储过程 测试       -->
+	<resultMap type="java.util.Map" id="roalptBean">   
+	    <result column="namet" property="namet" jdbcType="VARCHAR" />  
+	    <result column="drCount" property="drCount" jdbcType="VARCHAR" />  
+	</resultMap> 
+	<select id="findPushingTotal" statementType="CALLABLE"  resultMap="roalptBean">
+         <![CDATA[ 
+  		     {call demo_in_parameter3(   
+     		    #{namet,jdbcType=VARCHAR, mode=IN},   
+     		    #{drCount,jdbcType=VARCHAR, mode=OUT}  
+    		        )}     
+     		      ]]>   
+	 </select>
+
+<!-- 	 <parameterMap type="java.util.Map" id="roalptBean">     -->
+<!-- 	    <parameter property="namet" jdbcType="VARCHAR" mode="IN"/>     -->
+<!-- 	   	<parameter property="drCount" jdbcType="VARCHAR" mode="OUT"/>     -->
+<!-- 	 </parameterMap>     -->
+<!--      <select id="findPushingTotal" statementType="CALLABLE"  parameterMap="roalptBean" > -->
+<!--          <![CDATA[  -->
+<!--       		     {call demo_in_parameter3(      -->
+<!--      		     ?,?      -->
+<!--     		     )}      -->
+<!--      		      ]]>     -->
+<!-- 	 </select> -->
+	
+	
+	
+	
+</mapper>

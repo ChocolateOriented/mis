@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.VRiskOrderAfterLoanDao">
+    
+	<sql id="vRiskOrderAfterLoanColumns">
+		a.datetime AS "datetime",
+		a.orderexpirenum AS "orderexpirenum",
+		a.orderexpireamount AS "orderexpireamount",
+		a.orderexpirebeforenum AS "orderexpirebeforenum",
+		a.orderexpirebeforeamount AS "orderexpirebeforeamount",
+		a.orderexpireontimenum AS "orderexpireontimenum",
+		a.orderexpireontimeamount AS "orderexpireontimeamount",
+		a.orderexpireoverduenum AS "orderexpireoverduenum",
+		a.orderexpireoverdueamount AS "orderexpireoverdueamount",
+		a.orderexpirenorepay AS "orderexpirenorepay",
+		a.orderremitnum AS "orderremitnum",
+		a.orderincomeamount AS "orderincomeamount",
+		a.orderremitbeforenum AS "orderremitbeforenum",
+		a.orderremitontimenum AS "orderremitontimenum",
+		a.orderremitoverduenum AS "orderremitoverduenum",
+		a.OrderUnrepayNum AS "OrderUnrepayNum"
+	</sql>
+	
+	<sql id="vRiskOrderAfterLoanJoins">
+	</sql>
+    
+	<select id="get" resultType="VRiskOrderAfterLoan">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanColumns"/>
+		FROM v_risk_order_after_loan a
+		<include refid="vRiskOrderAfterLoanJoins"/>
+		WHERE a.datetime = #{datetime}
+	</select>
+	
+	<select id="findList" resultType="VRiskOrderAfterLoan">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanColumns"/>
+		FROM v_risk_order_after_loan a
+		<include refid="vRiskOrderAfterLoanJoins"/>
+		<where>
+		    <choose>
+				<when test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''">
+					AND a.datetime BETWEEN #{beginDatetime} AND #{endDatetime} 
+				</when>
+				<otherwise>
+			     <![CDATA[
+			    	AND a.datetime >= date_format(now(),'%Y-%m-%d')
+			     ]]>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} 
+			</when>
+			<otherwise>
+			    ORDER BY a.datetime 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VRiskOrderAfterLoan">
+		SELECT 
+			<include refid="vRiskOrderAfterLoanColumns"/>
+		FROM v_risk_order_after_loan a
+		<include refid="vRiskOrderAfterLoanJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}  
+			</when>
+			<otherwise>
+			    ORDER BY a.datetime 
+			</otherwise>
+		</choose>
+	</select>
+	
+<!-- 	<insert id="insert"> -->
+<!-- 		INSERT INTO v_risk_order_after_loan( -->
+<!-- 			datetime, -->
+<!-- 			orderexpirenum, -->
+<!-- 			orderexpireamount, -->
+<!-- 			orderexpirebeforenum, -->
+<!-- 			orderexpirebeforeamount, -->
+<!-- 			orderexpireontimenum, -->
+<!-- 			orderexpireontimeamount, -->
+<!-- 			orderexpireoverduenum, -->
+<!-- 			orderexpireoverdueamount, -->
+<!-- 			orderremitnum, -->
+<!-- 			orderincomeamount, -->
+<!-- 			orderremitbeforenum, -->
+<!-- 			orderremitontimenum, -->
+<!-- 			orderremitoverduenum -->
+<!-- 		) VALUES ( -->
+<!-- 			#{datetime}, -->
+<!-- 			#{orderexpirenum}, -->
+<!-- 			#{orderexpireamount}, -->
+<!-- 			#{orderexpirebeforenum}, -->
+<!-- 			#{orderexpirebeforeamount}, -->
+<!-- 			#{orderexpireontimenum}, -->
+<!-- 			#{orderexpireontimeamount}, -->
+<!-- 			#{orderexpireoverduenum}, -->
+<!-- 			#{orderexpireoverdueamount}, -->
+<!-- 			#{orderremitnum}, -->
+<!-- 			#{orderincomeamount}, -->
+<!-- 			#{orderremitbeforenum}, -->
+<!-- 			#{orderremitontimenum}, -->
+<!-- 			#{orderremitoverduenum} -->
+<!-- 		) -->
+<!-- 	</insert> -->
+	
+<!-- 	<update id="update"> -->
+<!-- 		UPDATE v_risk_order_after_loan SET 	 -->
+<!-- 			datetime = #{datetime}, -->
+<!-- 			orderexpirenum = #{orderexpirenum}, -->
+<!-- 			orderexpireamount = #{orderexpireamount}, -->
+<!-- 			orderexpirebeforenum = #{orderexpirebeforenum}, -->
+<!-- 			orderexpirebeforeamount = #{orderexpirebeforeamount}, -->
+<!-- 			orderexpireontimenum = #{orderexpireontimenum}, -->
+<!-- 			orderexpireontimeamount = #{orderexpireontimeamount}, -->
+<!-- 			orderexpireoverduenum = #{orderexpireoverduenum}, -->
+<!-- 			orderexpireoverdueamount = #{orderexpireoverdueamount}, -->
+<!-- 			orderremitnum = #{orderremitnum}, -->
+<!-- 			orderincomeamount = #{orderincomeamount}, -->
+<!-- 			orderremitbeforenum = #{orderremitbeforenum}, -->
+<!-- 			orderremitontimenum = #{orderremitontimenum}, -->
+<!-- 			orderremitoverduenum = #{orderremitoverduenum} -->
+<!-- 		WHERE id = #{id} -->
+<!-- 	</update> -->
+	
+<!-- 	<update id="delete"> -->
+<!-- 		DELETE FROM v_risk_order_after_loan -->
+<!-- 		WHERE id = #{id} -->
+<!-- 	</update> -->
+	
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.SUserConversionReportDao">
+    
+	<sql id="sUserConversionReportColumns">
+		a.id AS "id",
+		a.createtime AS "createtime",
+		a.weekday AS "weekday",
+		a.week AS "week",
+		a.weekdesc AS "weekdesc",
+		a.month AS "month",
+		a.newapp AS "newapp",
+		a.newwechat AS "newwechat",
+		a.newregist AS "newregist",
+		a.firstorder AS "firstorder",
+		a.artificialorder AS "artificialorder",
+		a.remitorder01 AS "remitorder01",
+		a.remitorder02 AS "remitorder02",
+		a.difftime01 AS "difftime01",
+		a.difftime02 AS "difftime02",
+		a.canceltoday AS "canceltoday",
+		a.canceltomorrow AS "canceltomorrow",
+		a.newremituser AS "newremituser",
+		a.allremituser AS "allremituser",
+		a.validuser AS "validuser",
+		a.prioruser AS "prioruser",
+		a.activeuser AS "activeuser"
+	</sql>
+	
+	<sql id="sUserConversionReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SUserConversionReport">
+		SELECT 
+			<include refid="sUserConversionReportColumns"/>
+		FROM s_user_conversion_report a
+		<include refid="sUserConversionReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SUserConversionReport">
+		SELECT 
+			<include refid="sUserConversionReportColumns"/>
+		FROM s_user_conversion_report a
+		<include refid="sUserConversionReportJoins"/>
+		<where>
+			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
+				AND createtime BETWEEN #{beginCreatetime} AND #{endCreatetime}
+			</if>
+<!-- 			<if test="beginCreatetime != null and createtime != ''"> -->
+<!-- 				AND a.createtime LIKE '%${createtime}%' -->
+<!-- 					<if test="dbName == 'oracle'">'%'||#{createtime}||'%'</if> -->
+<!-- 					<if test="dbName == 'mssql'">'%'+#{createtime}+'%'</if> -->
+<!-- 					<if test="dbName == 'mysql'">concat('%',#{createtime},'%')</if> -->
+<!-- 			</if> -->
+<!-- 			<if test="newapp != null and newapp != ''"> -->
+<!-- 				AND a.newapp = #{newapp} -->
+<!-- 			</if> -->
+<!-- 			<if test="newwechat != null and newwechat != ''"> -->
+<!-- 				AND a.newwechat = #{newwechat} -->
+<!-- 			</if> -->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SUserConversionReport">
+		SELECT 
+			<include refid="sUserConversionReportColumns"/>
+		FROM s_user_conversion_report a
+		<include refid="sUserConversionReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO s_user_conversion_report(
+			createtime,
+			weekday,
+			week,
+			weekdesc,
+			month,
+			newapp,
+			newwechat,
+			newregist,
+			firstorder,
+			artificialorder,
+			remitorder01,
+			remitorder02,
+			difftime01,
+			difftime02,
+			canceltoday,
+			canceltomorrow,
+			newremituser,
+			allremituser,
+			validuser,
+			prioruser,
+			activeuser
+		) VALUES (
+			#{createtime},
+			#{weekday},
+			#{week},
+			#{weekdesc},
+			#{month},
+			#{newapp},
+			#{newwechat},
+			#{newregist},
+			#{firstorder},
+			#{artificialorder},
+			#{remitorder01},
+			#{remitorder02},
+			#{difftime01},
+			#{difftime02},
+			#{canceltoday},
+			#{canceltomorrow},
+			#{newremituser},
+			#{allremituser},
+			#{validuser},
+			#{prioruser},
+			#{activeuser}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE s_user_conversion_report SET 	
+			createtime = #{createtime},
+			weekday = #{weekday},
+			week = #{week},
+			weekdesc = #{weekdesc},
+			month = #{month},
+			newapp = #{newapp},
+			newwechat = #{newwechat},
+			newregist = #{newregist},
+			firstorder = #{firstorder},
+			artificialorder = #{artificialorder},
+			remitorder01 = #{remitorder01},
+			remitorder02 = #{remitorder02},
+			difftime01 = #{difftime01},
+			difftime02 = #{difftime02},
+			canceltoday = #{canceltoday},
+			canceltomorrow = #{canceltomorrow},
+			newremituser = #{newremituser},
+			allremituser = #{allremituser},
+			validuser = #{validuser},
+			prioruser = #{prioruser},
+			activeuser = #{activeuser}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM s_user_conversion_report
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

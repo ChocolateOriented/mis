@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao">
+    
+	<sql id="tMisReliefamountHistoryColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.dealcode AS "dealcode",
+		a.reliefamount AS "reliefamount",
+		a.createdate AS "createdate",
+		a.createby AS "createby"
+	</sql>
+	
+	<sql id="tMisReliefamountHistoryJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisReliefamountHistory">
+		SELECT 
+			<include refid="tMisReliefamountHistoryColumns"/>
+		FROM t_mis_reliefamount_history a
+		<include refid="tMisReliefamountHistoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisReliefamountHistory">
+		SELECT 
+			<include refid="tMisReliefamountHistoryColumns"/>
+		FROM t_mis_reliefamount_history a
+		<include refid="tMisReliefamountHistoryJoins"/>
+		<where>
+			<if test="dealcode != null and dealcode != ''">
+				AND a.dealcode = #{dealcode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisReliefamountHistory">
+		SELECT 
+			<include refid="tMisReliefamountHistoryColumns"/>
+		FROM t_mis_reliefamount_history a
+		<include refid="tMisReliefamountHistoryJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListByDealcode" resultType="TMisReliefamountHistory">
+		SELECT 
+			a.dbid AS "dbid",
+			a.id AS "id",
+			a.dealcode AS "dealcode",
+			a.reliefamount AS "reliefamount",
+			a.createdate AS "createdate",
+			a.createby AS "createBy.name"
+		FROM t_mis_reliefamount_history a
+			WHERE a.dealcode = #{dealcode}
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO t_mis_reliefamount_history(
+			id,
+			dealcode,
+			reliefamount,
+			createdate,
+			createby
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{reliefamount},
+			#{createDate},
+			#{createBy.name}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_reliefamount_history SET 	
+			dealcode = #{dealcode},
+			reliefamount = #{reliefamount},
+<!-- 			createdate = #{createdate}, -->
+<!-- 			createby = #{createby} -->
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_reliefamount_history
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

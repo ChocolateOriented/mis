@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weeklyreport.dao.VRiskOrderDailyReportDao">
+    
+	<sql id="vRiskOrderDailyReportColumns">
+		a.createtime AS "createtime",
+		a.newusernum AS "newusernum",
+		a.newuserordernum AS "newuserordernum",
+		a.olduserordernum AS "olduserordernum",
+		a.platformappnum AS "platformappnum",
+		a.platformwechatnum AS "platformwechatnum",
+		a.remitordernum AS "remitordernum",
+		a.expireordernum AS "expireordernum",
+		a.payoffordernum AS "payoffordernum",
+		a.amountincome AS "amountincome",
+		a.overdueincome AS "overdueincome",
+		a.pendingordernum AS "pendingordernum",
+		a.newuserwaitremitnum AS "newuserwaitremitnum"
+	</sql>
+	
+	<sql id="vRiskOrderDailyReportJoins">
+	</sql>
+    
+	<select id="get" resultType="VRiskOrderDailyReport">
+		SELECT 
+			<include refid="vRiskOrderDailyReportColumns"/>
+		FROM v_risk_order_daily_report a
+		<include refid="vRiskOrderDailyReportJoins"/>
+		WHERE a.createtime = #{id}
+	</select>
+	
+	<select id="findList" resultType="VRiskOrderDailyReport">
+		SELECT 
+			<include refid="vRiskOrderDailyReportColumns"/>
+		FROM v_risk_order_daily_report a
+		<include refid="vRiskOrderDailyReportJoins"/>
+		<where>
+<!-- 			<if test="createtime != null and createtime != ''"> -->
+<!--  				AND a.createtime LIKE '%${createtime}%' -->
+<!-- 				AND a.createtime = #{createtime} -->
+<!-- 			</if> -->
+			<if test="beginDatetime != null and endDatetime != null and beginDatetime != '' and endDatetime != ''">
+				AND a.createtime BETWEEN #{beginDatetime} AND #{endDatetime}
+			</if>
+<!-- 			<if test="newusernum != null and newusernum != ''"> -->
+<!-- 				AND a.newusernum = #{newusernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="newuserordernum != null and newuserordernum != ''"> -->
+<!-- 				AND a.newuserordernum = #{newuserordernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="olduserordernum != null and olduserordernum != ''"> -->
+<!-- 				AND a.olduserordernum = #{olduserordernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="platformappnum != null and platformappnum != ''"> -->
+<!-- 				AND a.platformappnum = #{platformappnum} -->
+<!-- 			</if> -->
+<!-- 			<if test="platformwechatnum != null and platformwechatnum != ''"> -->
+<!-- 				AND a.platformwechatnum = #{platformwechatnum} -->
+<!-- 			</if> -->
+<!-- 			<if test="remitordernum != null and remitordernum != ''"> -->
+<!-- 				AND a.remitordernum = #{remitordernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="expireordernum != null and expireordernum != ''"> -->
+<!-- 				AND a.expireordernum = #{expireordernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="payoffordernum != null and payoffordernum != ''"> -->
+<!-- 				AND a.payoffordernum = #{payoffordernum} -->
+<!-- 			</if> -->
+<!-- 			<if test="amountincome != null and amountincome != ''"> -->
+<!-- 				AND a.amountincome = #{amountincome} -->
+<!-- 			</if> -->
+<!-- 			<if test="overdueincome != null and overdueincome != ''"> -->
+<!-- 				AND a.overdueincome = #{overdueincome} -->
+<!-- 			</if> -->
+<!-- 			<if test="pendingordernum != null and pendingordernum != ''"> -->
+<!-- 				AND a.pendingordernum = #{pendingordernum} -->
+<!-- 			</if> -->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VRiskOrderDailyReport">
+		SELECT 
+			<include refid="vRiskOrderDailyReportColumns"/>
+		FROM v_risk_order_daily_report a
+		<include refid="vRiskOrderDailyReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} DESC
+			</when>
+			<otherwise>
+			    ORDER BY a.createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO v_risk_order_daily_report(
+			createtime,
+			newusernum,
+			newuserordernum,
+			olduserordernum,
+			platformappnum,
+			platformwechatnum,
+			remitordernum,
+			expireordernum,
+			payoffordernum,
+			amountincome,
+			overdueincome,
+			pendingordernum
+		) VALUES (
+			#{createtime},
+			#{newusernum},
+			#{newuserordernum},
+			#{olduserordernum},
+			#{platformappnum},
+			#{platformwechatnum},
+			#{remitordernum},
+			#{expireordernum},
+			#{payoffordernum},
+			#{amountincome},
+			#{overdueincome},
+			#{pendingordernum}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE v_risk_order_daily_report SET 	
+			createtime = #{createtime},
+			newusernum = #{newusernum},
+			newuserordernum = #{newuserordernum},
+			olduserordernum = #{olduserordernum},
+			platformappnum = #{platformappnum},
+			platformwechatnum = #{platformwechatnum},
+			remitordernum = #{remitordernum},
+			expireordernum = #{expireordernum},
+			payoffordernum = #{payoffordernum},
+			amountincome = #{amountincome},
+			overdueincome = #{overdueincome},
+			pendingordernum = #{pendingordernum}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM v_risk_order_daily_report
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

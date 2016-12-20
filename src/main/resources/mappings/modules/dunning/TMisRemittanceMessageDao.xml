@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao">
+    
+	<sql id="tMisRemittanceMessageColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.remittancename AS "remittancename",
+		a.remittancetime AS "remittancetime",
+		a.remittanceamount AS "remittanceamount",
+		a.remittancechannel AS "remittancechannel",
+		a.remittanceaccount AS "remittanceaccount",
+		a.financialuser AS "financialuser",
+		a.financialtime AS "financialtime",
+		a.remittanceimg AS "remittanceimg",
+		a.dealcode AS "dealcode",
+		a.remark AS "remark",
+		a.createdate AS "createDate"
+	</sql>
+	
+	<sql id="tMisRemittanceMessageJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisRemittanceMessage">
+		SELECT 
+			<include refid="tMisRemittanceMessageColumns"/>
+		FROM t_mis_remittance_message a
+		<include refid="tMisRemittanceMessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisRemittanceMessage">
+		SELECT 
+			<include refid="tMisRemittanceMessageColumns"/>
+		FROM t_mis_remittance_message a
+		<include refid="tMisRemittanceMessageJoins"/>
+		<where>
+			<if test="remittancename != null and remittancename != ''">
+				AND a.remittancename = #{remittancename}
+			</if>
+			<if test="remittancetime != null and remittancetime != ''">
+				AND a.remittancetime = #{remittancetime}
+			</if>
+			<if test="remittancechannel != null and remittancechannel != ''">
+				AND a.remittancechannel = #{remittancechannel}
+			</if>
+			<if test="financialuser != null and financialuser != ''">
+				AND a.financialuser = #{financialuser}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisRemittanceMessage">
+		SELECT 
+			<include refid="tMisRemittanceMessageColumns"/>
+		FROM t_mis_remittance_message a
+		<include refid="tMisRemittanceMessageJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findRemittanceMesListByDealcode" resultType="TMisRemittanceMessage">
+		SELECT 
+			<include refid="tMisRemittanceMessageColumns"/>
+		FROM t_mis_remittance_message a
+			WHERE a.dealcode = #{dealcode}
+		ORDER BY a.createdate DESC limit  1 
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO t_mis_remittance_message(
+			id,
+			remittancename,
+			remittancetime,
+			remittanceamount,
+			remittancechannel,
+			remittanceaccount,
+			financialuser,
+			financialtime,
+			remittanceimg,
+			dealcode,
+			remark,
+			createDate
+		) VALUES (
+			#{id},
+			#{remittancename},
+			#{remittancetime},
+			#{remittanceamount},
+			#{remittancechannel},
+			#{remittanceaccount},
+			#{financialuser},
+			#{financialtime},
+			#{remittanceimg},
+			#{dealcode},
+			#{remark},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_remittance_message SET 	
+			remittancename = #{remittancename},
+			remittancetime = #{remittancetime},
+			remittanceamount = #{remittanceamount},
+			remittancechannel = #{remittancechannel},
+			remittanceaccount = #{remittanceaccount},
+			financialuser = #{financialuser},
+			financialtime = #{financialtime},
+			remittanceimg = #{remittanceimg},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_remittance_message
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

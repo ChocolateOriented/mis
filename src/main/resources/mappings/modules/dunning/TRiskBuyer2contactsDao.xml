@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TRiskBuyer2contactsDao">
+    
+	<sql id="tRiskBuyer2contactsColumns">
+		a.id AS "id",
+		a.buyer_id AS "buyerId",
+		a.buyer_contact_id AS "buyerContactId",
+		a.create_time AS "createTime",
+		a.family_relation AS "familyRelation",
+		a.type AS "type",
+		b.name as "name",
+	    b.tel as "tel",
+	    b.addres as "addres",
+	    b.contact_type as "contactType",
+	    IFNULL(d.smsNum, 0) AS "smsNum",
+		IFNULL(d.telNum, 0) AS "telNum"
+	</sql>
+	
+	<sql id="tRiskBuyer2contactsJoins">
+        LEFT JOIN t_risk_contact b  ON a.buyer_contact_id = b.id
+        LEFT JOIN (
+				SELECT
+					ContantTarget AS tel,
+					SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum,
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+				FROM t_mis_contant_record
+				WHERE Dealcode = #{dealcode}
+				GROUP BY ContantTarget
+			) AS d on d.tel = b.tel
+	</sql>
+    
+	<select id="getContactsByBuyerId" resultType="TRiskBuyer2contacts">
+		SELECT 
+			<include refid="tRiskBuyer2contactsColumns"/>
+		FROM t_risk_buyer2contacts a
+		<include refid="tRiskBuyer2contactsJoins"/>
+		WHERE a.buyer_id = #{buyerId} 
+			and a.type is not NULL
+	</select>
+	
+	<select id = "getSendMsgByBuyerIdAndType" resultType = "TMisSendMsgInfo">	    
+		SELECT 
+			a.buyer_id AS "buyerId",
+			a.family_relation AS "relation",
+			b.name as "name",
+		    b.tel as "tel"
+		FROM t_risk_buyer2contacts a  
+		LEFT JOIN t_risk_contact b ON a.buyer_contact_id = b.id 
+		WHERE a.buyer_id = #{0} and a.family_relation =  #{1}
+	</select>
+	
+</mapper>

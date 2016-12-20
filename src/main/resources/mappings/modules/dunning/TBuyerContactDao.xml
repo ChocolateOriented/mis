@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TBuyerContactDao">
+    
+	<sql id="tBuyerContactColumns">
+		a.id AS "id",
+		a.contact_name AS "contactName",
+		a.contact_mobile AS "contactMobile",
+		a.buyer_id AS "buyerId",
+		a.create_time AS "createTime"
+	</sql>
+	
+	<sql id="tBuyerContactJoins">
+	</sql>
+	
+	
+	<select id="findList" resultType="TBuyerContact">
+		SELECT 
+				DISTINCT a.contact_mobile AS "contactMobile",
+				a.id AS "id",
+				a.contact_name AS contactName,
+				a.buyer_id AS "buyerId",
+				a.create_time AS "createTime",
+				b.family_relation AS "familyrelation",
+				IFNULL(d.smsNum, 0) AS "smsNum",
+				IFNULL(d.telNum, 0) AS "telNum",
+				c.name AS rcname
+		FROM t_buyer_contact a
+			LEFT JOIN t_risk_contact AS c on a.contact_mobile = c.tel
+			LEFT JOIN t_risk_buyer2contacts AS b 
+				ON b.buyer_id = a.buyer_id AND c.id = b.buyer_contact_id
+			LEFT JOIN (
+				SELECT
+					ContantTarget AS tel,
+					SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum,
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+				FROM t_mis_contant_record
+				WHERE Dealcode = #{dealcode}
+				GROUP BY ContantTarget
+			) AS d on d.tel = a.contact_mobile
+		<where>
+			<if test="buyerId != null and buyerId != ''">
+				AND a.buyer_id = #{buyerId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+
+	
+	<select id="getContactsByBuyerId" resultType = "TMisSendMsgInfo">
+	    SELECT 
+			a.buyer_id as "buyerId",
+			a.contact_name as "name",
+			a.contact_mobile as "tel",
+			'cantact' AS "relation"
+		FROM t_buyer_contact a  
+		WHERE a.buyer_id = #{buyerId}	    
+	</select>
+</mapper>
