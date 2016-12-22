@@ -13,7 +13,6 @@
 ## 技术选型
 
 1、后端
-
 * 核心框架：Spring Framework 4.0
 * 安全框架：Apache Shiro 1.2
 * 视图框架：Spring MVC 4.0
