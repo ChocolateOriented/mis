@@ -145,7 +145,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		}
 		tMisRemittanceConfirm.setCreateBy(UserUtils.getUser());
 		for (Role r : UserUtils.getUser().getRoleList()){
-			if(("财务专员").equals(r.getName())  || ("系统管理员").equals(r.getName())  || ("减免无上限").equals(r.getName()) ){
+			if(("财务专员").equals(r.getName())  || ("系统管理员").equals(r.getName())  || ("风控总监").equals(r.getName()) ){
 				tMisRemittanceConfirm.setCreateBy(null);
 				break;
 			}

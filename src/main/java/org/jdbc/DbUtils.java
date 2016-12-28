@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.thinkgem.jeesite.modules.buyer.entity.MRiskBuyerReport;
 
 //import org.apache.log4j.Logger;
@@ -130,7 +131,7 @@ public class DbUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	private Connection getConnection() throws Exception {
+	public Connection getConnection() throws Exception {
 		InitialContext cxt = new InitialContext();
 		DataSource ds = (DataSource) cxt.lookup(jndiName);
 		if ( ds == null ) {
@@ -140,7 +141,7 @@ public class DbUtils {
 		return ds.getConnection();
 	}
 	
-	private static PreparedStatement getPreparedStatement(Connection conn, String sql) throws Exception {
+	public static PreparedStatement getPreparedStatement(Connection conn, String sql) throws Exception {
 		if(conn == null || sql == null || sql.trim().equals("")) {
 			return null;
 		}
@@ -229,11 +230,59 @@ public class DbUtils {
 		}
 	}
 	
-	private String jndiName = "java:comp/env/jdbc/hostjeesite";
+	private String jndiName = "java:comp/env/jdbc/mo9jeesite";
 
 	public void setJndiName(String jndiName) {
 		this.jndiName = jndiName;
 	}
+	
+	
+	/*          
+	 *   ============================================               查询方法（临时）            ============================================        
+     */
+	
+	/**
+	 * 根据手机号码查询登录Log
+	 * @param mobile
+	 * @return
+	 * @throws Exception
+	 */
+	public List<AppLoginLog> getApploginlog(String mobile) throws Exception {
+		String sql = "SELECT id,mobile,localMobile,deviceModel,mo9ProductName,marketName,createTime from t_app_login_log where mobile = " + mobile +" ORDER BY createTime  DESC LIMIT 50";
+		if(sql == null || sql.trim().equals("")) {
+			//logger.info("parameter is valid!");
+			return null;
+		}
+		List<AppLoginLog> appLoginLogs = new ArrayList<AppLoginLog>();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection();
+			pstmt = DbUtils.getPreparedStatement(conn, sql);
+			rs = getResultSet(pstmt);
+			 while (rs.next()) {
+                 AppLoginLog appLoginLog = new AppLoginLog();
+                 appLoginLog.setDbid(rs.getInt("id"));
+                 appLoginLog.setMobile(rs.getString("mobile"));
+                 appLoginLog.setLocalMobile(rs.getString("localMobile"));
+                 appLoginLog.setDeviceModel(rs.getString("deviceModel"));
+                 appLoginLog.setMo9ProductName(rs.getString("mo9ProductName"));
+                 appLoginLog.setMarketName(rs.getString("marketName"));
+                 appLoginLog.setCreateTime(rs.getTimestamp("createTime"));
+                 appLoginLogs.add(appLoginLog);
+             }
+		} catch (RuntimeException e) {
+			System.out.println("parameter is valid!");
+			throw new Exception(e);
+		} finally {
+			closeResultSet(rs);
+			closeStatement(pstmt);
+			closeConn(conn);
+		}
+		return appLoginLogs;
+	}
+	
 	
 	/**
 	 * 测试方法

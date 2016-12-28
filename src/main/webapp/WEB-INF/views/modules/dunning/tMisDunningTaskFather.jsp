@@ -6,6 +6,8 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+// 			var s = window.frames["iframe_text"].document.getElementById("aaa").innerHTML;
+// 			$("#btnOk",document.frames("ifm").document).click();
 		});
 	</script>
 </head>
@@ -13,6 +15,7 @@
 	<h4>&nbsp;&nbsp; </h4>
 	<h4>&nbsp;&nbsp;个人信息 </h4>
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">
+		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />
 		<tbody>
 		<tr>
 			<td>手机号：${personalInfo.mobile}(${personalInfo.mobileCity})</td>
@@ -70,7 +73,7 @@
 		</tbody>
 	</table>
 <br/>
-<iframe src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}" frameborder="0"  style="width:100%;height:600px;">
+<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}" frameborder="0"  style="width:100%;height:600px;">
 </iframe> 
 </body>
 </html>

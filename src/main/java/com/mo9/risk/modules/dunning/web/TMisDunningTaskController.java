@@ -30,6 +30,7 @@ import org.activiti.engine.impl.util.json.JSONObject;
 import org.apache.commons.collections.MapUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +52,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
+import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -128,6 +130,8 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisRemittanceConfirmService tMisRemittanceConfirmService;
+	
+	
 	 
 	@ModelAttribute
 	public TMisDunningTask get(@RequestParam(required=false) String id) {
@@ -947,6 +951,46 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
 		return "modules/dunning/tMisDunningOrderHistoryList";
+	}
+	
+
+	
+	/**
+	 * 加载登录日志页面
+	 * @param tMisDunningTask
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "apploginlogList")
+	public String apploginlogList(String buyerId,String dealcode,boolean hasContact,String dunningtaskdbid,String mobile,HttpServletRequest request, HttpServletResponse response, Model model) {		
+		if(buyerId==null||dealcode==null||dunningtaskdbid==null||mobile==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)||"".equals(mobile)){
+			return "views/error/500";
+		}
+		try {
+			DbUtils dbUtils = new DbUtils();
+			List<AppLoginLog> appLoginLogs = dbUtils.getApploginlog(mobile);
+			model.addAttribute("appLoginLogs", appLoginLogs);
+			model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+			model.addAttribute("buyerId", buyerId);
+			model.addAttribute("dealcode", dealcode);
+			
+			Map<String,Object> params = new HashMap<String,Object>();
+			params.put("STATUS_DUNNING", "dunning");
+			params.put("DEALCODE", dealcode);
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			boolean ispayoff = false;
+			if(null != task){
+				ispayoff = task.getIspayoff();
+			}else{
+				ispayoff = true;
+			}
+			model.addAttribute("ispayoff", ispayoff);
+			model.addAttribute("hasContact", hasContact);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "modules/dunning/tAppLoginLogList";
 	}
 	
 	

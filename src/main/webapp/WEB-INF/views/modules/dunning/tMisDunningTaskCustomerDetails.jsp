@@ -6,6 +6,10 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			
+			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobile=" + $('#mobile', parent.document).val();
+			$("#applogiglog_a").attr("href",url);
+			
 			if("${ispayoff}" == "true"){
 // 				$('#btnSms').attr("disabled","disabled");
 // 				$('#btnTel').attr("disabled","disabled");
@@ -14,13 +18,14 @@
 // 				$('#btnConfirm').attr("disabled","disabled");
 				$("input[name='btnCollection']").attr("disabled","disabled");
 			}
+			
 		});
 		
 		function collectionfunction(obj){
 				var method = $(obj).attr("method");
 				var contactMobile = $(obj).attr("contactMobile");
 				var contactstype = $(obj).attr("contactstype");
-				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype ;
+				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype;
 // 				alert(url);
 				$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 400, {            
 	               buttons: {
@@ -69,10 +74,11 @@
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisContantRecord/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">催款历史</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/orderHistoryList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">历史借款信息</a></li></shiro:hasPermission>
 		<shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm"><li><a href="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">汇款信息</a></li></shiro:hasPermission> 
-<%-- 		<shiro:hasPermission name="dunning:tMisRemittanceMessage:view"><li><a href="${ctx}/dunning/tMisRemittanceMessage/form?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}">财务确认信息</a></li></shiro:hasPermission> --%>
+		<shiro:hasPermission name="dunning:tMisDunningTask:view">
+	        <li><a id="applogiglog_a" href="#" >登录日志</a></li>
+        </shiro:hasPermission>
 	</ul> 
 	<sys:message content="${message}"/>
-
 	<h4 >&nbsp;&nbsp;单位信息</h4>
 	<table  class="table table-striped table-bordered table-condensed">
 		<thead>

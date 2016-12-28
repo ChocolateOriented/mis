@@ -11,6 +11,7 @@ import java.util.*;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
+import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,6 +25,7 @@ import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
+import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
@@ -1123,6 +1125,23 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return dao.findDunningCount(dunningpeopleid);
 	}
 	
+	
+//	/**
+//	 * 根据手机号码查询登录Log
+//	 * @param mobile
+//	 * @return
+//	 */
+//	public List<AppLoginLog> getApploginlog(String mobile){
+//		try {
+//			return dbUtils.getApploginlog(mobile);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
+	
+	
+	
 //	public static final void main(String[] args)throws Exception
 //	{
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1132,4 +1151,5 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 ////		int days = daysBetween("2016-08-15 11:41:06","2016-08-17 16:24:00");
 //		System.out.println(days);
 //	}
+	
 }

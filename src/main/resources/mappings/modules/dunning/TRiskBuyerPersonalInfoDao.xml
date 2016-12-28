@@ -132,7 +132,12 @@
 		b.marital as "marital", 
 		c.real_name as "realName",
 		c.idCard as "idcard",
-		CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""),IFNULL(b.address, "")) as "livingAddr",
+<!-- 		CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""),IFNULL(b.address, "")) as "livingAddr", -->
+		CASE 
+			WHEN b.addr_province IS NOT NULL 
+			THEN CONCAT(IFNULL(b.addr_province, ""),IFNULL(b.addr_city, ""),IFNULL(b.addr_district, ""))
+			ELSE IFNULL(b.address, "")
+		END as "livingAddr",
 		c.ocr_addr as "ocrAddr",
 		o.days as "days",
 		o.payoff_time as payOffTime,
