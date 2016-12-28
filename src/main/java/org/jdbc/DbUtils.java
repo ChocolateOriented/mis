@@ -131,7 +131,7 @@ public class DbUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public Connection getConnection() throws Exception {
+	private Connection getConnection() throws Exception {
 		InitialContext cxt = new InitialContext();
 		DataSource ds = (DataSource) cxt.lookup(jndiName);
 		if ( ds == null ) {
@@ -141,7 +141,7 @@ public class DbUtils {
 		return ds.getConnection();
 	}
 	
-	public static PreparedStatement getPreparedStatement(Connection conn, String sql) throws Exception {
+	private static PreparedStatement getPreparedStatement(Connection conn, String sql) throws Exception {
 		if(conn == null || sql == null || sql.trim().equals("")) {
 			return null;
 		}
