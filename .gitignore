@@ -14,17 +14,6 @@
 /src/main/webapp/WEB-INF/classes/*
 /src/main/webapp/userfiles/*
 /target/
-
-.mymetadata
-.checkstyle
-.class
-.war
-.zip
-.rar
-indexes/
-src/main/webapp/WEB-INF/classes/
-src/main/webapp/userfiles/
-
 # 忽略svn的版本
 .svn/
 
@@ -36,16 +25,17 @@ src/main/webapp/userfiles/
 .project
 .classpath
 .settings/
+.metadata/
+Servers/
 
-# 忽略所有target lib/
+# 忽略所有target
 target/
-lib/
+
 # 生成的jar包全部忽略
 war/
 
 # 忽略war工程下的lib与class文件
-*/WebContent/WEB-INF/classes/
-*/WebContent/WEB-INF/lib/
-
+src/main/webapp/WEB-INF/lib/
+src/main/webapp/WEB-INF/classes
 
 
