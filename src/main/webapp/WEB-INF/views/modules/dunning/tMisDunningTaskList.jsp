@@ -287,7 +287,9 @@
 			<li><label>手机号</label>
 				<form:input path="mobile"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			
+			<li><label>催收备注</label>
+				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
+			</li>
 			
 			<li><label>订单状态</label>
 			<form:select  id="status" path="status" class="input-medium">
@@ -358,6 +360,7 @@
 <%-- 					</form:select> --%>
 				</li>
 				</shiro:hasPermission>
+				
 						
 				<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
 				<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>

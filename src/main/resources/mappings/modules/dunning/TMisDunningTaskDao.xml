@@ -745,6 +745,11 @@
                 <!-- 				AND realname = #{realname} -->
         </if>
         
+        <if test="telremark != null and telremark != ''">
+                <!-- 			     # 催收备注    -->
+                AND t.telremark  LIKE concat('%',#{telremark},'%') 
+        </if>
+        
         <!-- 只显示未删除的催收人员  -->
 <!--         AND p.Invalid = 't' -->
         ) AS d

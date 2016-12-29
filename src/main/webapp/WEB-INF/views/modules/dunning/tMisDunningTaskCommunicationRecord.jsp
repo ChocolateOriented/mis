@@ -105,6 +105,7 @@
 				<th>号码</th>
 				<th>所属地</th>
 				<th>累计通话时长</th>
+				<th>通话次数</th>
 				<th>历史记录</th>
 				<th>操作</th>
 			</tr>
@@ -113,7 +114,7 @@
 		<c:forEach items="${communicationsPage.list}" var="p" varStatus="vs">
 			<tr>
 				<td>
-					${(vs.index+1) + (page.pageNo-1) * page.pageSize} 
+					${(vs.index+1) + (communicationsPage.pageNo-1) * communicationsPage.pageSize} 
 				</td>
 				<td>${p.name}</td>
 				<td>
@@ -153,6 +154,9 @@
 				<td>${p.location}</td>
 				<td>
 					${p.times}
+				</td>
+				<td>
+					${p.number}
 				</td>
 				<td>					
 					短信

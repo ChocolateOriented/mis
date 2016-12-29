@@ -28,6 +28,7 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private String rcname;
 	private String contactType;		// contact_type
 	private String buyerId;		// buyer_id
+	private Integer number;
 	
 	
 	public TRiskBuyerContactRecords() {
@@ -131,6 +132,14 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 
 	public void setRcname(String rcname) {
 		this.rcname = rcname;
+	}
+
+	public Integer getNumber() {
+		return number;
+	}
+
+	public void setNumber(Integer number) {
+		this.number = number;
 	}
 	
 	
