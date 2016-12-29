@@ -6,9 +6,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 public class AppLoginLog extends DataEntity<DunningOrder>{
 
-	/**
-	 * 
-	 */
+ 
 	private static final long serialVersionUID = -593251729808506854L;
 	
 	private Integer dbid;
