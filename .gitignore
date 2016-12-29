@@ -35,11 +35,7 @@ target/
 war/
 
 # 忽略war工程下的lib与class文件
-riskadmin/src/main/webapp/WEB-INF/lib/
-riskadmin/src/main/webapp/WEB-INF/classes
-riskportal/src/main/webapp/WEB-INF/lib/
-riskportal/src/main/webapp/WEB-INF/classes
-fastloan/src/main/webapp/WEB-INF/lib/
-fastloan/src/main/webapp/WEB-INF/classes
+src/main/webapp/WEB-INF/lib/
+src/main/webapp/WEB-INF/classes
 
 
