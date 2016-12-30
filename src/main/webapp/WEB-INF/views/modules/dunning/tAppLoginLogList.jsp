@@ -76,10 +76,11 @@
 					${appLoginLog.deviceModel}
 				</td>
 				<td>
-					${appLoginLog.mo9ProductName}
+<%-- 					${appLoginLog.mo9ProductName} --%>
+					${fns:getDictLabel(appLoginLog.mo9ProductName, 'mo9ProductName', appLoginLog.mo9ProductName)}
 				</td>
 				<td>
-					${appLoginLog.marketName}
+					${fns:getDictLabel(appLoginLog.marketName, 'marketName', appLoginLog.marketName)}
 				</td>
 				<td>
 					<fmt:formatDate value="${appLoginLog.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>

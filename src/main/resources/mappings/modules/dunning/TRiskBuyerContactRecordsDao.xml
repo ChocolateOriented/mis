@@ -27,11 +27,11 @@
 			c.tel as "tel",
 			a.location as "location",
 			CONCAT(
-				FLOOR(a.times / 3600), '小时',
-				FLOOR(a.times % 3600 / 60), '分',
-				FLOOR(a.times % 60), '秒'
+				FLOOR(SUM(a.times) / 3600), '小时',
+				FLOOR(SUM(a.times) % 3600 / 60), '分',
+				FLOOR(SUM(a.times) % 60), '秒'
 			) as "times",
-			a.contact_number as "number",
+			SUM(a.contact_number) as "number",
 			IFNULL(r.smsNum,0) AS smsNum,
 			IFNULL(r.telNum,0) AS telNum,
 			a.contact_type as "contactType",
@@ -68,10 +68,10 @@
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy} a.times DESC
+				GROUP BY c.tel ORDER BY ${page.orderBy} a.times DESC
 			</when>
 			<otherwise>
-			    ORDER BY a.times DESC
+			    GROUP BY c.tel ORDER BY a.times DESC
 			</otherwise>
 		</choose>
 	</select>
