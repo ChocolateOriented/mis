@@ -59,6 +59,7 @@
 				<th>放款总额</th>
 				<th>口袋放款</th>
 				<th>mo9放款</th>
+				<th>人工放款</th>
 <!-- 				<th>江湖救急放款笔数</th> -->
 				<th>还款金额</th>
 <!-- 				<th>江湖救急还款笔数</th> -->
@@ -81,6 +82,9 @@
 				</td>
 				<td>
 					${sCashFlowReport.mo9payamount}
+				</td>
+				<td>
+					${sCashFlowReport.manualpayamount}
 				</td>
 <!-- 				<td> -->
 <%-- 					${sCashFlowReport.paynumbers} --%>
@@ -116,6 +120,9 @@
 				</td>
 				<td>
 					${sumCashFlowReport.mo9payamount}
+				</td>
+				<td>
+					${sumCashFlowReport.manualpayamount}
 				</td>
 <!-- 				<td> -->
 <%-- 					${sumCashFlowReport.paynumbers} --%>

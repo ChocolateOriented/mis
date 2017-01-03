@@ -24,6 +24,7 @@ public class SCashFlowReport extends DataEntity<SCashFlowReport> {
 	private Long gpayamount;		// 先玩后付充值金额
 	private Long kdpayamount;		//口袋理财放款金额
 	private Long mo9payamount;		//Mo9放款金额
+	private Long manualpayamount;	//人工放款金额
 	
 	private Date beginCreatetime;		// 开始 datetime
 	private Date endCreatetime;		// 结束 datetime
@@ -72,7 +73,16 @@ public class SCashFlowReport extends DataEntity<SCashFlowReport> {
 		this.mo9payamount = mo9payamount;
 	}
 	
-	@ExcelField(title="还款金额", type=1, align=2, sort=5)
+	
+	@ExcelField(title="人工放款", type=1, align=2, sort=5)
+	public Long getManualpayamount() {
+		return manualpayamount;
+	}
+	public void setManualpayamount(Long manualpayamount) {
+		this.manualpayamount = manualpayamount;
+	}
+	
+	@ExcelField(title="还款金额", type=1, align=2, sort=6)
 	public Long getPayoffamount() {
 		return payoffamount;
 	}
@@ -80,7 +90,7 @@ public class SCashFlowReport extends DataEntity<SCashFlowReport> {
 		this.payoffamount = payoffamount;
 	}
 	
-	@ExcelField(title="放还差额", type=1, align=2, sort=6)
+	@ExcelField(title="放还差额", type=1, align=2, sort=7)
 	public Long getDiffamount() {
 		return diffamount;
 	}
@@ -88,7 +98,7 @@ public class SCashFlowReport extends DataEntity<SCashFlowReport> {
 		this.diffamount = diffamount;
 	}
 	
-	@ExcelField(title="先玩后付充值金额", type=1, align=2, sort=7)
+	@ExcelField(title="先玩后付充值金额", type=1, align=2, sort=8)
 	public Long getGpayamount() {
 		return gpayamount;
 	}

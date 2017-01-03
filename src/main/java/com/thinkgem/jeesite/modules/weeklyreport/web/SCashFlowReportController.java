@@ -66,6 +66,7 @@ public class SCashFlowReportController extends BaseController {
 			sumCashFlowReport.setGpayamount((null != sumCashFlowReport.getGpayamount() ? sumCashFlowReport.getGpayamount():0) + (null != report.getGpayamount()? report.getGpayamount() : 0) );
 			sumCashFlowReport.setKdpayamount((null != sumCashFlowReport.getKdpayamount() ? sumCashFlowReport.getKdpayamount():0) + (null != report.getKdpayamount()? report.getKdpayamount() : 0) );
 			sumCashFlowReport.setMo9payamount((null != sumCashFlowReport.getMo9payamount() ? sumCashFlowReport.getMo9payamount():0) + (null != report.getMo9payamount()? report.getMo9payamount() : 0) );
+			sumCashFlowReport.setManualpayamount((null != sumCashFlowReport.getManualpayamount() ? sumCashFlowReport.getManualpayamount():0) + (null != report.getManualpayamount()? report.getManualpayamount() : 0) );
 		}
 		model.addAttribute("sumCashFlowReport", sumCashFlowReport);
 		return "modules/weeklyreport/sCashFlowReportList";

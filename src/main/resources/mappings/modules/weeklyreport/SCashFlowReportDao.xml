@@ -9,6 +9,7 @@
 		a.kdpayamount AS "kdpayamount",
 		a.payoffamount AS "payoffamount",
 		a.mo9payamount AS "mo9payamount",
+		a.manualpayamount AS "manualpayamount",
 		a.diffamount AS "diffamount",
 		a.gpayamount AS "gpayamount"
 	</sql>
