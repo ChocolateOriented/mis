@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -113,6 +115,16 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	public int getFinancialserialnumber(String number){
 		return misRemittanceConfirmDao.getFinancialserialnumber(number);
+	}
+	
+	
+	/**
+	 * 获取延期次数
+	 * @param orderid
+	 * @return
+	 */
+	public int getExistDelayNumber(Integer orderid){
+		return misRemittanceConfirmDao.getExistDelayNumber(orderid);
 	}
 	
 }

@@ -209,6 +209,14 @@
 			AND o1.dealcode =#{dealcode}
 	</select>
 	
+	<select id="getExistDelayNumber" resultType="int">
+		select count(1)
+			from t_risk_order o 
+		where o.is_delay = 1   
+			and o.root_order_id = #{orderid}  
+			AND o.`status` IN ('payoff', 'payment')
+	</select>
+	
 	<select id="getSerialnumber" resultType="int">
 		SELECT
 			count(*)

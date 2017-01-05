@@ -268,6 +268,21 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoDao;
 	
+	/**
+	* <pre>
+	* 500/1000元      1500元
+    * 第一次延期	40        80
+    * 第二次延期	80        160
+    * 第三次延期	120       240
+    * 以此类推 	    +40       +80
+    * </pre>
+	* @return 续期服务费
+	*/
+	public static BigDecimal getDefaultDelayAmount(TMisDunningOrder order, int existDelayNumber){
+		boolean amt1500 = order.getAmount().compareTo(new BigDecimal(1500)) >= 0? true : false;
+		int base = amt1500? 80 : 40;		
+		return new BigDecimal((existDelayNumber + 1) * base);		
+	}
 	
 	/**
 	 * 加载催收还款页面
@@ -323,12 +338,15 @@ public class TMisRemittanceConfirmController extends BaseController {
 					cpAmt = order.getAmount().subtract(order.getCreditAmount());
 				}
 				
-				BigDecimal defaultInterestAmount = TMisDunningTaskController.getDefaultDelayAmount(order);
+//				BigDecimal defaultInterestAmount = TMisDunningTaskController.getDefaultDelayAmount(order);
 				
 				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费
 //				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
 				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费  - 减免费用
-				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+//				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getId());
+//				delayAmount = getDefaultDelayAmount(order, existDelayNumber);
+				delayAmount = order.getOverdueAmount().add(getDefaultDelayAmount(order, existDelayNumber)).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
 			}
 		}
 		

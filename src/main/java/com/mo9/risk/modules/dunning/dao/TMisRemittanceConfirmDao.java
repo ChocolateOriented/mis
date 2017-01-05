@@ -60,4 +60,11 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 */
 	public int getFinancialserialnumber(String number);
 	
+	/**
+	 * 获取延期次数
+	 * @param orderid
+	 * @return
+	 */
+	public int getExistDelayNumber(Integer orderid);
+	
 }
