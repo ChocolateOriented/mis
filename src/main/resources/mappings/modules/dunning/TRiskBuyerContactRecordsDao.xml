@@ -68,10 +68,10 @@
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				GROUP BY c.tel ORDER BY ${page.orderBy} times DESC
+				GROUP BY c.tel ORDER BY ${page.orderBy} SUM(a.times) DESC
 			</when>
 			<otherwise>
-			    GROUP BY c.tel ORDER BY times DESC
+			    GROUP BY c.tel ORDER BY SUM(a.times) DESC
 			</otherwise>
 		</choose>
 	</select>
