@@ -346,7 +346,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 //				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
 				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getId());
 //				delayAmount = getDefaultDelayAmount(order, existDelayNumber);
-				delayAmount = order.getOverdueAmount().add(getDefaultDelayAmount(order, existDelayNumber)).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+				delayAmount = order.getCostAmount().add(getDefaultDelayAmount(order, existDelayNumber)).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
 			}
 		}
 		
