@@ -339,7 +339,6 @@ public class TMisRemittanceConfirmController extends BaseController {
 				}
 				
 //				BigDecimal defaultInterestAmount = TMisDunningTaskController.getDefaultDelayAmount(order);
-				
 				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费
 //				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
 				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费  - 减免费用
