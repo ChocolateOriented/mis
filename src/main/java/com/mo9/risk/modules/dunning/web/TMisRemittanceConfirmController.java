@@ -344,7 +344,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 //				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
 				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费  - 减免费用
 //				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
-				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getId());
+				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getRootorderid());
 //				delayAmount = getDefaultDelayAmount(order, existDelayNumber);
 				delayAmount = order.getCostAmount().add(getDefaultDelayAmount(order, existDelayNumber)).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
 			}

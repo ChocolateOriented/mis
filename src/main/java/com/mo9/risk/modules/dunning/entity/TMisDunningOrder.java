@@ -12,6 +12,10 @@ public class TMisDunningOrder {
 	 * id
 	 */
 	public Integer id;
+	/**
+	 * id
+	 */
+	public Integer rootorderid;
 
 	/**
 	 * 订单号
@@ -148,6 +152,12 @@ public class TMisDunningOrder {
 	}
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	public Integer getRootorderid() {
+		return rootorderid;
+	}
+	public void setRootorderid(Integer rootorderid) {
+		this.rootorderid = rootorderid;
 	}
 	
 
