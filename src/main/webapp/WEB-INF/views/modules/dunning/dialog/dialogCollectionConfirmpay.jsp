@@ -80,8 +80,7 @@
 						<td><fmt:formatDate value="${personalInfo.repaymentTime}" pattern="yyyy-MM-dd"/></td>
 						<td>逾期天数</td>
 						<td>
-							${personalInfo.overdueDays}天
-							<c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if>
+							${personalInfo.overdueDays}天 (续期操作:到期还款日之后的4-14天) 
 						</td>
 					</tr>
 				</tbody>
