@@ -63,6 +63,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@Autowired
 	private TMisRemittanceConfirmService tMisRemittanceConfirmService;
 	 
+	
 	@ModelAttribute
 	public TMisRemittanceConfirm get(@RequestParam(required=false) String id) {
 		TMisRemittanceConfirm entity = null;
