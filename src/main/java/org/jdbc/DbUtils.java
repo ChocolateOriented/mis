@@ -248,7 +248,7 @@ public class DbUtils {
 	 * @throws Exception
 	 */
 	public List<AppLoginLog> getApploginlog(String mobile) throws Exception {
-		String sql = "SELECT id,mobile,localMobile,deviceModel,mo9ProductName,marketName,createTime from t_app_login_log where mobile = " + mobile +" ORDER BY createTime  DESC LIMIT 50";
+		String sql = "SELECT id,mobile,localMobile,deviceModel,mo9ProductName,marketName,createTime from t_app_login_log where mobile = '" + mobile +"' ORDER BY createTime  DESC LIMIT 50";
 		if(sql == null || sql.trim().equals("")) {
 			//logger.info("parameter is valid!");
 			return null;
