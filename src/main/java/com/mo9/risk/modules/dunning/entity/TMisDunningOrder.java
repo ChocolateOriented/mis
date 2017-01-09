@@ -8,6 +8,8 @@ import java.util.Date;
  * Created by sun on 2016/7/21.
  */
 public class TMisDunningOrder {
+	
+	public String platform;
 	/**
 	 * id
 	 */
@@ -158,6 +160,12 @@ public class TMisDunningOrder {
 	}
 	public void setRootorderid(Integer rootorderid) {
 		this.rootorderid = rootorderid;
+	}
+	public String getPlatform() {
+		return platform;
+	}
+	public void setPlatform(String platform) {
+		this.platform = platform;
 	}
 	
 

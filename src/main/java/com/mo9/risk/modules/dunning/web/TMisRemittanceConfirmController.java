@@ -351,7 +351,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 				delayAmount = order.getCostAmount().add(getDefaultDelayAmount(order, existDelayNumber)).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
 			}
 		}
-		
+		model.addAttribute("platform", order.getPlatform());
 		model.addAttribute("tMisRemittanceConfirm", tMisRemittanceConfirm);
 		model.addAttribute("delayAmount", delayAmount);
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
@@ -368,7 +368,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@RequiresPermissions("dunning:tMisRemittanceConfirm:edit")
 	@RequestMapping(value = "confrimPayStatus")
 	@ResponseBody
-	public String confrimPayStatus(TMisPaid paid,String confirmid,String accountamount) {
+	public String confrimPayStatus(TMisPaid paid,String confirmid,String accountamount,String platform) {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
@@ -394,8 +394,15 @@ public class TMisRemittanceConfirmController extends BaseController {
 		if(order.status.equals("payoff")){
 			return "错误，订单已还清";
 		}
+		BigDecimal bd = new BigDecimal(paidAmount);
+		if(platform.equals("app")){
+			//do nothing			
+		}else{
+//			paidAmount = paidAmount.multiply(BigDecimal.valueOf(100));
+			bd = bd.multiply(BigDecimal.valueOf(100));
+		}
 		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paidType+ "/" +paidAmount+ "/" +delayDay;
+		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paidType+ "/" +bd.toString()+ "/" +delayDay;
 		logger.info("接口url：" + url);
 		String str = "";
 		try {

@@ -345,6 +345,8 @@
     </select>
 
     <resultMap type="com.mo9.risk.modules.dunning.entity.TMisDunningOrder" id="dunning_order">
+          <result property="rootorderid" column="root_order_id"/>
+          <result property="platform" column="platform"/>
         <result property="dealcode" column="dealcode"/>
         <result property="amount" column="amount"/>
         <result property="fee" column="cost_amount"/>
@@ -814,6 +816,53 @@
             </otherwise>
         </choose>
     </select>
+    
+    
+    
+<select id="findAllTaskList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+    SELECT  * FROM  (
+        SELECT
+	        o.buyer_id AS "buyerid",
+	        idc.real_name AS "realname",
+	        o.dealcode AS "dealcode",
+	        b.mobile AS "mobile",
+	        o.amount AS "amount",
+			IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+	        repayment_time AS "repaymenttime",
+	        CASE
+	        WHEN o.`status` = 'payoff' THEN
+	        DATEDIFF(
+	        o.payoff_time,
+	        o.repayment_time
+	        )
+	        WHEN o.`status` = 'payment' THEN
+	        DATEDIFF(CURDATE(), o.repayment_time)
+	        END AS overduedays,
+	        o.`status` AS status,
+	        p.`name` AS dunningpeoplename,
+	        p.DunningPeopleType AS DunningPeopleType,
+	        t.dunningtime AS "dunningtime",
+	        o.payoff_time AS payofftime,
+	        t.Deadline as deadline,
+	        t.dunningtaskstatus AS dunningtaskstatus,
+	        t.DunningPeopleId AS dunningpeopleid,
+	        t.id AS dunningtaskdbid,
+	        t.telremark AS telremark,
+	        o.outerfiletime AS outerfiletime
+	        FROM
+		        t_risk_order AS o
+		        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		        LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		        LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+		        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+	        WHERE
+		        o.type IN ('loan', 'partial' )
+		        AND o.merchant_id = 7
+		        AND o.`status` IN ('payoff', 'payment', 'partial' )
+		        AND t.dbid IS NOT NULL
+		        AND t.dunningtaskstatus IN ('dunning', 'finished' )
+        ) AS d
+      </select>
 
 
     <!--部分还款订单 -->

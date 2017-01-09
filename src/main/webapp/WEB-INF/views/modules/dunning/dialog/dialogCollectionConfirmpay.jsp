@@ -87,6 +87,7 @@
 		</table>
 		<br/>
 		<form:form id="inputForm" modelAttribute="TMisPaid"  class="form-horizontal">
+		<input id="platform" name="platform" type="hidden" value="${platform}" />
 			<div class="control-group">
 				<label class="control-label">还款类型：</label>
 					<div class="controls">
