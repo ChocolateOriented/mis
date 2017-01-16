@@ -7,7 +7,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			//如果逾期天数大于14则催收人员代付选项没有续期
-			if(parseInt(${personalInfo.overdueDays}) < parseInt(4) || parseInt(${personalInfo.overdueDays}) > parseInt(14) || ${result} > 0 ){
+			if(parseInt(${personalInfo.overdueDays}) > parseInt(14) || ${result} > 0 ){
 				var obj=document.getElementById('paidType');
 				obj.options.remove(2); 
 				$("#delaytr").hide();
@@ -80,7 +80,8 @@
 						<td><fmt:formatDate value="${personalInfo.repaymentTime}" pattern="yyyy-MM-dd"/></td>
 						<td>逾期天数</td>
 						<td>
-							${personalInfo.overdueDays}天 (续期操作:到期还款日之后的4-14天) 
+							${personalInfo.overdueDays}天
+							<c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if>
 						</td>
 					</tr>
 				</tbody>
