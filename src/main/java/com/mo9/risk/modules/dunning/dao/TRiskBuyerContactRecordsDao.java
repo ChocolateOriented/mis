@@ -5,11 +5,9 @@ package com.mo9.risk.modules.dunning.dao;
 
 import java.util.List;
 
-import com.thinkgem.jeesite.common.persistence.CrudDao;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
+import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 /**
  * 通话记录DAO接口
@@ -18,8 +16,23 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
  */
 @MyBatisDao
 public interface TRiskBuyerContactRecordsDao {
+	
 	public List<TRiskBuyerContactRecords> findList(TRiskBuyerContactRecords tRiskBuyerContactRecords);	
 
 	public List<TMisSendMsgInfo> getCommunicateByBuyerId (String buyerId);
+	
+	/**
+	 * 通话记录redis缓存查询
+	 * @param tRiskBuyerContactRecords
+	 * @return
+	 */
+	public List<TRiskBuyerContactRecords> findBuyerContactRecordsListByBuyerId(TRiskBuyerContactRecords tRiskBuyerContactRecords);	
+	
+	/**
+	 * 催收操作记录
+	 * @param tRiskBuyerContactRecords
+	 * @return
+	 */
+	public List<TRiskBuyerContactRecords> findContantNumberListBydealcode(TRiskBuyerContactRecords tRiskBuyerContactRecords);	
 
 }

@@ -29,6 +29,7 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private String contactType;		// contact_type
 	private String buyerId;		// buyer_id
 	private Integer number;
+	private Integer sumtime;
 	
 	
 	public TRiskBuyerContactRecords() {
@@ -140,6 +141,13 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 
 	public void setNumber(Integer number) {
 		this.number = number;
+	}
+
+	public Integer getSumtime() {
+		return sumtime;
+	}
+	public void setSumtime(Integer sumtime) {
+		this.sumtime = sumtime;
 	}
 	
 	

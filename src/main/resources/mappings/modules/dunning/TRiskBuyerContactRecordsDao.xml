@@ -90,4 +90,53 @@
 		WHERE a.buyer_id = #{buyerId}  
 	</select>
 	
+	<!--   通话记录redis缓存查询	  -->
+	<select id="findBuyerContactRecordsListByBuyerId" resultType="TRiskBuyerContactRecords">
+		SELECT 
+				CASE WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(通讯录)')
+					WHEN w.company_tel IS NOT NULL THEN ' 单位电话'
+					WHEN d.contact_name IS NULL AND c.name IS NOT NULL THEN c.name
+					ELSE '未知'
+				END as "name",
+				b.family_relation as "familyRelation", 
+				c.tel as "tel",
+				a.location as "location",
+				CONCAT(
+					FLOOR(SUM(a.times) / 3600), '小时',
+					FLOOR(SUM(a.times) % 3600 / 60), '分',
+					FLOOR(SUM(a.times) % 60), '秒'
+				) as "times",
+				SUM(a.contact_number) as "number",
+				a.contact_type as "contactType",
+				a.buyer_id as "buyerId",
+				c.name AS rcname,
+				SUM(a.times) AS sumtime
+			FROM (
+				SELECT
+					buyer_id,
+					contact_id,
+					contact_type,
+					location,
+					COUNT(1) AS contact_number,
+					SUM(times) AS times
+				FROM t_risk_buyer_contact_records
+				WHERE buyer_id =  #{buyerId}
+				GROUP BY buyer_id,contact_id,contact_type,location) a
+			LEFT JOIN t_risk_contact c on c.id  = a.contact_id
+			LEFT JOIN t_buyer_contact AS d ON d.buyer_id = a.buyer_id AND d.contact_mobile = c.tel
+			INNER JOIN t_risk_buyer2contacts  b  ON c.id = b.buyer_contact_id  AND a.buyer_id = b.buyer_id
+			LEFT JOIN t_risk_buyer_workinfo AS w  ON w.buyer_id = a.buyer_id AND REPLACE(w.company_tel, '-', '') = c.tel
+		WHERE a.buyer_id = #{buyerId}  GROUP BY c.tel ORDER BY SUM(a.times) DESC
+	</select>
+	
+	<!--   催收操作记录	  -->
+	<select id="findContantNumberListBydealcode" resultType="TRiskBuyerContactRecords">
+		SELECT 
+			ContantTarget AS tel,
+			SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum,
+			SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+		FROM t_mis_contant_record WHERE dealcode = #{dealcode}
+		GROUP by ContantTarget
+	</select>
+	
 </mapper>

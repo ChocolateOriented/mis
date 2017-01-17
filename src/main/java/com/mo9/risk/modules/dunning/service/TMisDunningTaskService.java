@@ -1126,6 +1126,34 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	
+	/**
+	 *  定时更新任务缓存
+	 */
+//	@Transactional(readOnly = false)
+	public void updateDunningTaskJedis(){
+//		String scheduledBut =  DictUtils.getDictValue("autoRepayment","Scheduled","");
+//		if(scheduledBut.equals("true")){e
+//			logger.info(MessageFormat.format("自动定时更新任务缓存", new Date()));
+//			List<DunningOrder>  dunningOrders = dao.findAllTaskList();
+//			int result = (int) (1+Math.random()*(10-1+1));
+//			JedisUtils.setObject("aaadddd", "成功放入缓存+" + String.valueOf(result), 0);
+//			JedisUtils.setObject("allTaskList", dunningOrders, 0);
+//			List<DunningOrder> s =  (List<DunningOrder>) JedisUtils.getObject("allTaskList");
+//			System.out.println(s.size());
+//			String aa =  (String) JedisUtils.getObject("aaadddd");
+//			System.out.println(aa);
+//			Map<String, Object> map = new HashMap<String, Object>();
+//			int i = 0;
+//			for(DunningOrder dunningOrder : dunningOrders){
+//				map.put(i + "", dunningOrder);
+//				i += 1;
+//			}
+//			JedisUtils.setObjectMap("hashList", map , 0);
+//			System.out.println("s");
+//		}
+	}
+	
+	
 //	/**
 //	 * 根据手机号码查询登录Log
 //	 * @param mobile

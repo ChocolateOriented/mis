@@ -771,6 +771,26 @@ public class JedisUtils {
 		Jedis jedis = null;
 		try {
 			jedis = jedisPool.getResource();
+//			jedis.select(Integer.parseInt("5"));
+//			logger.debug("getResource.", jedis);
+		} catch (JedisException e) {
+			logger.warn("getResource.", e);
+			returnBrokenResource(jedis);
+			throw e;
+		}
+		return jedis;
+	}
+	
+	/**
+	 * 获取资源
+	 * @return
+	 * @throws JedisException
+	 */
+	public static Jedis getResource2() throws JedisException {
+		Jedis jedis = null;
+		try {
+			jedis = jedisPool.getResource();
+//			jedis.select(Integer.parseInt("6"));
 //			logger.debug("getResource.", jedis);
 		} catch (JedisException e) {
 			logger.warn("getResource.", e);
@@ -832,5 +852,49 @@ public class JedisUtils {
 	public static Object toObject(byte[] bytes){
 		return ObjectUtils.unserialize(bytes);
 	}
+	
+//	===============================================================================================================================================================
+	
+	/**
+	 * 获取Map缓存
+	 * @param key 键
+	 * @return 值
+	 */
+	public static Map<Integer, Object> getObjectMap2(String key) {
+		Map<Integer, Object> value = null;
+		Jedis jedis = null;
+		try {
+			jedis = getResource();
+			if (jedis.exists(getBytesKey(key))) {
+				value = Maps.newHashMap();
+				Map<byte[], byte[]> map = jedis.hgetAll(getBytesKey(key));
+				for (Map.Entry<byte[], byte[]> e : map.entrySet()){
+					value.put(StringUtils.toInteger(e.getKey()), toObject(e.getValue()));
+				}
+				logger.debug("getObjectMap {} = {}", key, value);
+			}
+		} catch (Exception e) {
+			logger.warn("getObjectMap {} = {}", key, value, e);
+		} finally {
+			returnResource(jedis);
+		}
+		return value;
+	}
+	
+	/**
+	 * 删除redis缓存库
+	 */
+	public static void del() {
+		Jedis jedis = null;
+		try {
+			jedis = getResource();
+			jedis.flushDB();
+		} catch (Exception e) {
+			logger.warn("异常", e);
+		} finally {
+			returnResource(jedis);
+		}
+	}
+	
 
 }

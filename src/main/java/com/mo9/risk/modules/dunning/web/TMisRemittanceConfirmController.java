@@ -329,7 +329,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		
 		BigDecimal delayAmount = new BigDecimal(0l);
 		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
-			if(Integer.valueOf(personalInfo.getOverdueDays()) < 15){
+			if(Integer.valueOf(personalInfo.getOverdueDays()) <= Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14")) ){
 				
 				BigDecimal cpAmt = new BigDecimal(0L);
 				if(order.getCreditAmount() != null && 
