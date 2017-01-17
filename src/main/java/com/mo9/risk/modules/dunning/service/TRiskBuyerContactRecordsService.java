@@ -37,7 +37,7 @@ public class TRiskBuyerContactRecordsService {
 		return page;
 	}
 	
-	private static int cacheSeconds = 600;
+	private static int cacheSeconds = 1209600 ;
 	
 	/**
 	 * redis 分页缓存
