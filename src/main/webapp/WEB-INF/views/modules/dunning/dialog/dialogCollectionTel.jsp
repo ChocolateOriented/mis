@@ -37,7 +37,7 @@
 			telEmpty();
 			if($("#contactstype").val().toLowerCase()=="self" || $("#contactstype").val().toLowerCase()=="married" || $("#contactstype").val().toLowerCase()=="parent"
 				|| $("#contactstype").val().toLowerCase()=="children" || $("#contactstype").val().toLowerCase()=="relatives"
-				|| $("#contactstype").val().toLowerCase()=="workmate" || $("#contactstype").val().toLowerCase()=="worktel"){
+				|| $("#contactstype").val().toLowerCase()=="workmate" || $("#contactstype").val().toLowerCase()=="worktel"  || $("#contactstype").val().toLowerCase()=="friend"){
 				$.ajax({
 	                    type: 'POST',
 	                    url : "${ctx}/dunning/tMisContantRecord/getTelInfos",
