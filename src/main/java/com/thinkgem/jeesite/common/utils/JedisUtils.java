@@ -896,5 +896,26 @@ public class JedisUtils {
 		}
 	}
 	
+	
+	/**
+	 * 获取缓存
+	 * @param key 键
+	 * @return 值
+	 */
+	public static Set<String> getSets(String key) {
+		Set<String> value = null;
+		Jedis jedis = null;
+		try {
+			jedis = getResource();
+			value = jedis.keys(key);
+			logger.debug("getSets {} = {}", key, value);
+		} catch (Exception e) {
+			logger.warn("getSets {} = {}", key, value, e);
+		} finally {
+			returnResource(jedis);
+		}
+		return value;
+	}
+	
 
 }

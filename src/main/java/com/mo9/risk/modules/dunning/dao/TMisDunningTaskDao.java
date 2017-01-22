@@ -154,4 +154,10 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	public int updateOrderPartial(@Param("reliefamount")BigDecimal reliefamount,@Param("rootorderid")Integer rootorderid);
 	
 	
+	/**
+	 * 查询全部正在催收的task任务buyerid
+	 * @return
+	 */
+	public List<DunningOrder> findDunningBuyerid();
+	
 }

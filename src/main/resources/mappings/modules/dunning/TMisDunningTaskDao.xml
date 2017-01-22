@@ -1140,5 +1140,11 @@
         	and DunningPeopleId = #{dunningpeopleid}
     </select>
     
+     <select id="findDunningBuyerid" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+	    SELECT o.buyer_id AS "buyerid" 
+			from t_mis_dunning_task AS t
+			LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+			WHERE t.dunningtaskstatus = 'dunning' AND o.buyer_id is not null
+	</select>
 
 </mapper>

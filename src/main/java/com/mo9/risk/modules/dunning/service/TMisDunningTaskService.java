@@ -7,11 +7,19 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
-import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +33,6 @@ import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
-import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
@@ -36,6 +43,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -43,11 +51,11 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.util.MsfClient;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -1126,13 +1134,63 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	
+	public static void main(String[] args) {
+//		String s = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:277759_PageNo:1_PageSize:30";
+		String s = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_listSize_buyerId:277759";
+		System.out.println(s.substring(s.indexOf(":")+1).split("_")[0]);
+	}
+	
+	
 	/**
-	 *  定时更新任务缓存
+	 *  定时清理任务缓存
 	 */
-//	@Transactional(readOnly = false)
-	public void updateDunningTaskJedis(){
+	@Scheduled(cron = "0 10 5 * * ?")  //每天上午四点十分
+	@Transactional(readOnly = false)
+	public void delDunningTaskJedis(){
+		
+		String scheduledBut =  DictUtils.getDictValue("delDunningTaskJedis","Scheduled","false");
+		if(scheduledBut.equals("true")){
+			logger.info("redis开始清理已还清任务缓存:" + new Date());
+	//		String keys = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:*";
+			String keys = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_*";
+			
+			Map<String, String> mapAllBuyerid = new HashMap<String, String>(); // 缓存中全部的buyerid
+			try {
+				Set<String> redisAllKeys = JedisUtils.getSets(keys);
+				logger.info("redis缓存Keys数量:"+ redisAllKeys.size() + "");
+				for(String redisKeys : redisAllKeys){
+//					System.out.println(redisKeys.substring(redisKeys.indexOf(":")+1).split("_")[0]);
+					String buyerId = redisKeys.substring(redisKeys.indexOf(":")+1).split("_")[0];
+					mapAllBuyerid.put(buyerId, buyerId);
+				}
+				
+				Map<String, String> mapDunningBuyerid = new HashMap<String, String>(); // 缓存中正在催收的buyerid
+				List<DunningOrder> list = dao.findDunningBuyerid();
+				for(DunningOrder dunningOrder : list){
+					if(mapAllBuyerid.containsKey(dunningOrder.getBuyerid().toString())){
+						// 在催收中 task dunning
+						mapDunningBuyerid.put(dunningOrder.getBuyerid().toString(), dunningOrder.getBuyerid().toString());
+					}
+				}
+				
+				for(String redisKeys : redisAllKeys){
+					String buyerId = redisKeys.substring(redisKeys.indexOf(":")+1).split("_")[0];
+					if(!mapDunningBuyerid.containsKey(buyerId)){  // 不在催收的buyerid
+						logger.info("redis删除无用缓存Keys:"+ redisKeys+ "");
+						JedisUtils.del(redisKeys);
+					}
+				}
+				logger.info("redis清理完成:" + new Date());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.warn("异常", e);
+			}
+		}
+	}
+	
+//	public void delDunningTaskJedis(){
 //		String scheduledBut =  DictUtils.getDictValue("autoRepayment","Scheduled","");
-//		if(scheduledBut.equals("true")){e
+//		if(scheduledBut.equals("true")){
 //			logger.info(MessageFormat.format("自动定时更新任务缓存", new Date()));
 //			List<DunningOrder>  dunningOrders = dao.findAllTaskList();
 //			int result = (int) (1+Math.random()*(10-1+1));
@@ -1151,7 +1209,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //			JedisUtils.setObjectMap("hashList", map , 0);
 //			System.out.println("s");
 //		}
-	}
+//	}
 	
 	
 //	/**
