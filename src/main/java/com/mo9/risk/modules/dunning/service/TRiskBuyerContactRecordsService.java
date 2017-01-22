@@ -60,10 +60,17 @@ public class TRiskBuyerContactRecordsService {
 					if(index % page.getPageSize() == 0){
 						String key = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:"+ tRiskBuyerContactRecords.getBuyerId() + "_PageNo:" + PageNo + "_PageSize:" + page.getPageSize() ;
 						JedisUtils.setObjectMap( key , map2 , cacheSeconds);
+						map2 = new HashMap<String, Object>();
 						PageNo += 1;
 						index = 0;
 					}
 					index += 1;
+				}
+				// 最后一页
+				double lastpageNo =  Math.ceil((double)contactRecordsList.size() / (double)page.getPageSize()) + 1;
+				if(lastpageNo  > PageNo){
+					String key = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:"+ tRiskBuyerContactRecords.getBuyerId() + "_PageNo:" + PageNo + "_PageSize:" + page.getPageSize() ;
+					JedisUtils.setObjectMap( key , map2 , cacheSeconds);
 				}
 			}else{
 				map2.put("0", new TRiskBuyerContactRecords());

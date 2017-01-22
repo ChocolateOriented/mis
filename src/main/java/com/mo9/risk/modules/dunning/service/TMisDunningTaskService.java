@@ -1134,11 +1134,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
 //		String s = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:277759_PageNo:1_PageSize:30";
-		String s = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_listSize_buyerId:277759";
-		System.out.println(s.substring(s.indexOf(":")+1).split("_")[0]);
-	}
+//		String s = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_listSize_buyerId:277759";
+//		System.out.println(s.substring(s.indexOf(":")+1).split("_")[0]);
+//		double lastpageNo =  Math.ceil((double)15 / (double)30);
+//		System.out.println(lastpageNo);
+//	}
 	
 	
 	/**
