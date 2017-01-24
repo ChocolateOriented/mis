@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -376,37 +378,42 @@ public class TMisDunningTaskController extends BaseController {
 		int diffDay;
 		Date maxDeadline = addDate(dunningOrders.get(0).getDeadline(),62);
 		Date deadline = new Date ();
-		while(iterator.hasNext()){
-			dunningOrder = iterator.next();
-			if(dunningOrder.getDunningpeopletype().equals("inner")){
-				diffDay = dateDiff(dunningOrder.getRepaymenttime(), new Date());
-				if (diffDay < 30 || diffDay > 35){
-					message = "内催订单留案要求订单逾期天数在30~35天之间！";
-					model.addAttribute("message", message);
-					return "modules/dunning/dialog/dialogDeferDunningDeadline";
-				}
-				diffDay = dateDiff(dunningOrder.getRepaymenttime(), dunningOrder.getDeadline());
-				if (diffDay >= 42) {
+		try {
+			while(iterator.hasNext()){
+				dunningOrder = iterator.next();
+				if(dunningOrder.getDunningpeopletype().equals("inner")){
+					diffDay = dateDiff(dunningOrder.getRepaymenttime(), new Date());
+					if (diffDay < 30 || diffDay > 35){
+						message = "内催订单留案要求订单逾期天数在30~35天之间！";
+						model.addAttribute("message", message);
+						return "modules/dunning/dialog/dialogDeferDunningDeadline";
+					}
+					diffDay = dateDiff(dunningOrder.getRepaymenttime(), dunningOrder.getDeadline());
+					if (diffDay >= 42) {
+						message = "内催订单留案要求订单催收截止日期不超过应还款日期42天！";
+						model.addAttribute("message", message);
+						return "modules/dunning/dialog/dialogDeferDunningDeadline";
+					}
+					deadline = addDate(dunningOrder.getRepaymenttime(), 42);
+					if (maxDeadline.after(deadline)) {
+						maxDeadline = deadline;
+					}
+					
+				} else if (dunningOrder.getDunningpeopletype().equals("outer")){
+					deadline = addDate(dunningOrder.getDeadline(), 62);
+					if (maxDeadline.after(deadline)) {
+						maxDeadline = deadline;
+					}
+				} else {
 					message = "内催订单留案要求订单催收截止日期不超过应还款日期42天！";
 					model.addAttribute("message", message);
 					return "modules/dunning/dialog/dialogDeferDunningDeadline";
 				}
-				deadline = addDate(dunningOrder.getRepaymenttime(), 42);
-				if (maxDeadline.after(deadline)) {
-					maxDeadline = deadline;
-				}
-				
-			} else if (dunningOrder.getDunningpeopletype().equals("outer")){
-				deadline = addDate(dunningOrder.getDeadline(), 62);
-				if (maxDeadline.after(deadline)) {
-					maxDeadline = deadline;
-				}
-			} else {
-				message = "内催订单留案要求订单催收截止日期不超过应还款日期42天！";
-				model.addAttribute("message", message);
-				return "modules/dunning/dialog/dialogDeferDunningDeadline";
 			}
+		} catch (ParseException e) {
+			logger.warn("催收留案， 到期还款日或催收截止日日期格式错误。");
 		}
+		
 
 		model.addAttribute("maxDeadline", maxDeadline);
 		model.addAttribute("message", message);
@@ -418,8 +425,11 @@ public class TMisDunningTaskController extends BaseController {
 	
 	
 	//临时工具方法,应统一提取至工具类
-	private int dateDiff (Date startDate, Date endDate){
-		return new Long(endDate.getTime()/1000/3600/24 - startDate.getTime()/1000/3600/24).intValue();
+	private int dateDiff (Date startDate, Date endDate) throws ParseException{
+		SimpleDateFormat fmt = new SimpleDateFormat ("yyyyMMdd");
+		startDate = fmt.parse(fmt.format(startDate));
+		endDate = fmt.parse(fmt.format(endDate));
+		return new Long((endDate.getTime() - startDate.getTime())/1000/3600/24).intValue();
 	};
 	
 	private Date addDate (Date date, int segment) {
