@@ -61,6 +61,13 @@
 				<form:input path="entrustcommission" htmlEscape="false" class="input-xlarge  number"/>
 			</div>
 		</div>
+		
+		<div class="control-group">
+			<label class="control-label">资金成本 - 利息+手续费：</label>
+			<div class="controls">
+				<form:input path="cashcostamount" htmlEscape="false" class="input-xlarge  number"/>
+			</div>
+		</div>
 	
 		<div class="form-actions">
 			<shiro:hasPermission name="financdailyreport:sCashLoanDailyReport:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>

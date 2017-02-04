@@ -53,7 +53,9 @@
 				<th colspan="1" style="text-align:center;">征信成本</th>
 				<th colspan="2" style="text-align:center;">市场推广</th>
 				<th colspan="4" style="text-align:center;">坏账</th>
-				<th  colspan="2" style="text-align:center;"></th>
+				
+				<th  colspan="1" style="text-align:center;">资金成本</th>
+				<th  colspan="1" style="text-align:center;"></th>
 			</tr>
 		
 			<tr>
@@ -88,8 +90,9 @@
 <!-- 				<th>坏账率</th> -->
 				<th>委外佣金</th>
 				
-				<th>毛利</th>
+<!-- 				<th>毛利</th> -->
 <!-- 				<th>毛利率</th> -->
+				<th>利息+手续费</th>
 				
 				<shiro:hasPermission name="financdailyreport:sCashLoanDailyReport:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
@@ -173,14 +176,17 @@
 				<td>
 					${sCashLoanDailyReport.entrustcommissionText}
 				</td>
-				<td>
-					${sCashLoanDailyReport.grossprofileText}
-				</td>
+<!-- 				<td> -->
+<%-- 					${sCashLoanDailyReport.grossprofileText} --%>
+<!-- 				</td> -->
 <!-- 				<td> -->
 <%-- 					${sCashLoanDailyReport.grossprofilepercentText} --%>
 <!-- 				</td> -->
+				<td>
+					${sCashLoanDailyReport.cashcostamountText}
+				</td>
 				<shiro:hasPermission name="financdailyreport:sCashLoanDailyReport:edit"><td>
-    				<a href="${ctx}/financdailyreport/sCashLoanDailyReport/form?id=${sCashLoanDailyReport.createtime}">修改</a>
+    				<a href="${ctx}/financdailyreport/sCashLoanDailyReport/form?id=${sCashLoanDailyReport.id}">修改</a>
 				</td></shiro:hasPermission>
 			</tr>
 		</c:forEach>

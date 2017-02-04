@@ -71,6 +71,8 @@ public class SCashLoanDailyReport extends DataEntity<SCashLoanDailyReport> {
 	private Double WeekSingleRemitAvgAmount;
 	private Double MonthSingleRemitAvgAmount;
 	
+	private Double cashcostamount;  // 资金成本
+	
 	public SCashLoanDailyReport() {
 		super();
 	}
@@ -450,6 +452,18 @@ public class SCashLoanDailyReport extends DataEntity<SCashLoanDailyReport> {
 	public void setMonthSingleRemitAvgAmount(Double monthSingleRemitAvgAmount) {
 		MonthSingleRemitAvgAmount = monthSingleRemitAvgAmount;
 	}
+
+	
+	public Double getCashcostamount() {
+		return cashcostamount;
+	}
+	public String getCashcostamountText() {
+		return null != this.cashcostamount ? NumberUtil.formatToseparaInteger(this.cashcostamount) : "";
+	}
+	public void setCashcostamount(Double cashcostamount) {
+		this.cashcostamount = cashcostamount;
+	}
+
 
 
 

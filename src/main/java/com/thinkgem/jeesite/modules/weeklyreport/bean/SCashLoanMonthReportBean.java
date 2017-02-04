@@ -42,6 +42,9 @@ public class SCashLoanMonthReportBean extends DataEntity<SCashLoanMonthReportBea
 	private Double MonthGrossProfilePercent; // 毛利 - 毛利率 - 毛利率 = 毛利 / 收入		:::::Text formatTosepara + %
 	private Double monthrepayavgcost;     //  月平均还款费率
 	private Double MonthSingleRemitAvgAmount;
+	
+	
+	private Double cashcostamount;  // 资金成本
 	private Date beginCreatetime;		// 开始 createtime
 	private Date endCreatetime;		// 结束 createtime
 	
@@ -304,6 +307,17 @@ public class SCashLoanMonthReportBean extends DataEntity<SCashLoanMonthReportBea
 		MonthSingleRemitAvgAmount = monthSingleRemitAvgAmount;
 	}
 
+	
+	public Double getCashcostamount() {
+		return cashcostamount;
+	}
+	@ExcelField(title="资金成本 ", type=1, align=2, sort=23)
+	public String getCashcostamountText() {
+		return null != this.cashcostamount ? NumberUtil.formatToseparaInteger(this.cashcostamount) : "";
+	}
+	public void setCashcostamount(Double cashcostamount) {
+		this.cashcostamount = cashcostamount;
+	}
 
 	public Date getBeginCreatetime() {
 		return beginCreatetime;

@@ -70,48 +70,49 @@
 		<tr>
 				<th></th>
 				<th colspan="5" style="text-align:center;">交易总额</th>
-				
 				<th colspan="3" style="text-align:center;">收入</th>
-				<th colspan="3" style="text-align:center;">支付渠道费</th>
-				<th colspan="2" style="text-align:center;">征信成本</th>
-				<th colspan="2" style="text-align:center;">市场推广</th>
-				<th colspan="4" style="text-align:center;">坏账</th>
-				<th colspan="2" style="text-align:center;">毛利 </th>
+				<th colspan="2" style="text-align:center;">贷前征信成本</th>
+				<th colspan="5" style="text-align:center;">贷后催收成本</th>
+				<th colspan="3" style="text-align:center;">渠道成本</th>
+				<th colspan="2" style="text-align:center;">推广成本</th>
+<!-- 				<th colspan="2" style="text-align:center;">毛利 </th> -->
+				<th colspan="1" style="text-align:center;">资金成本</th>
 				<th></th>
 			</tr>
 		
 			<tr>
 				<th>日期</th>
 				<th title="本期累计(本次统计周期内, 累几放贷金额)">本期累计</th>
-<!-- 				<th>周增长率 增长率 = 本期累计交易总额 / 上期累计交易总额</th> -->
 				<th title="增长率 = 本期累计交易总额 / 上期累计交易总额">月增长率</th>
 				<th title="本次统计周期内, 新增的放款独立用户数">新增交易用户</th>
 				<th title="本次统计周期内, 新增的放贷笔数, 包括延期笔数">放贷笔数</th>
 				<th title="">平均单笔放贷金额</th>
 				
 				<th title="本次统计周期内, 实际收到的 信审收益 + 延期手续费 + 逾期费 + 委外(部分还款不计入)">本期收入</th>
-<!-- 				<th>周收入增长率 - 收入增长率 = (本期收入 - 上期收入) / 上期收入</th> -->
 				<th title="收入增长率 = (本期收入 - 上期收入) / 上期收入">月收入增长率</th>
-<!-- 				<th>周收入比 - 收入比 = 本期收入 / 上上周交易总额</th> -->
 				<th title="单笔收入 = 本期收入 / 本期成功还清笔数	">月单笔收入</th>
+				
+				<th title="本次统计周期内, 使用第三方征信数据所产生的费用总和">征信成本</th>
+				<th title="人均成本 = 本期总成本 / 本期新增交易用户数">人均成本</th>
+				
+				<th title="本期累计 = 本期目前累计坏账 -  上期目前累计坏账">本期累计</th>
+				<th title="">催收减免</th>
+				<th title="委外回款所扣除的佣金总金额, 佣金月结">委外佣金</th>
+				<th title="自产品上线之日起, 累计坏账">目前累计</th>
+				<th title="坏账率 = 目前累计 / 自产品上线之日起的累计交易总额">坏账率</th>
+				
 
 				<th title="放款成本 = 本期放贷笔数(不包括延期)">放款成本</th>
 				<th title="使用各支付渠道所产生的支付渠道费	">还款成本</th>
 				<th title="">平均还款费率</th>
 				
-				<th title="本次统计周期内, 使用第三方征信数据所产生的费用总和">本期总成本</th>
-				<th title="人均成本 = 本期总成本 / 本期新增交易用户数">人均成本</th>
+				<th title="本次统计周期内, 被消耗掉的免息券及其他抵扣金额的总和">优惠减免</th>
+				<th title="以我方收到的发票的日期为准">活动宣传</th>
 				
-				<th title="本次统计周期内, 被消耗掉的免息券及其他抵扣金额的总和">减免</th>
-				<th title="以我方收到的发票的日期为准">媒体宣传费</th>
 				
-				<th title="自产品上线之日起, 累计坏账">目前累计</th>
-				<th title="本期累计 = 本期目前累计坏账 -  上期目前累计坏账">月本期累计</th>
-				<th title="坏账率 = 目前累计 / 自产品上线之日起的累计交易总额">坏账率</th>
-				<th title="委外回款所扣除的佣金总金额, 佣金月结">委外佣金</th>
-				
-				<th title="毛利 = 收入 - 支付渠道费 - 征信成本 - 市场推广 - 坏账本期累计 - 委外佣金">毛利</th>
-				<th title="毛利率 = 毛利 / 收入">毛利率</th>
+<!-- 				<th title="毛利 = 收入 - 支付渠道费 - 征信成本 - 市场推广 - 坏账本期累计 - 委外佣金">毛利</th> -->
+<!-- 				<th title="毛利率 = 毛利 / 收入">毛利率</th> -->
+				<th title="利息 + 手续费">利息+手续费</th>
 				
 			</tr>
 		</thead>
@@ -121,11 +122,13 @@
 				<td>
 					${sCashLoanMonthReport.month}
 				</td>
+				
+				
+				
 				<td><a href="javascript:void(0)"  onclick="onClickMonthDetails(this)" aid="${sCashLoanMonthReport.id}" type="Remitamount">
 					${sCashLoanMonthReport.remitamountText}</a>
 				</td>
 				<td>
-<%-- 					${sCashLoanMonthReport.monthincreased} --%>
 					${sCashLoanMonthReport.monthincreasedText}
 				</td>
 				<td><a href="javascript:void(0)" onclick="onClickMonthDetails(this)" aid="${sCashLoanMonthReport.id}" type="Newuser">
@@ -138,17 +141,46 @@
 					${sCashLoanMonthReport.monthSingleRemitAvgAmountText}
 				</td>
 				
+				
+				
 				<td><a href="javascript:void(0)"  onclick="onClickMonthDetails(this)" aid="${sCashLoanMonthReport.id}" type="Incomeamount">
 					${sCashLoanMonthReport.incomeamountText}</a>
 				</td>
 				<td>
-<%-- 					${sCashLoanMonthReport.monthincomeincreased} --%>
 					${sCashLoanMonthReport.monthincomeincreasedText} 
 				</td>
 				<td>
-<%-- 					${sCashLoanMonthReport.monthincomepercent} --%>
 					${sCashLoanMonthReport.monthincomepercentText}
 				</td>
+				
+				
+				
+				<td>
+					${sCashLoanMonthReport.creditsumcostText}
+				</td>
+				<td>
+					${sCashLoanMonthReport.monthCreditAvgCostText} 
+				</td>
+				
+				
+				
+				<td>
+					${sCashLoanMonthReport.monthdebatamountText}
+				</td>
+				<td>
+				</td>
+				<td>
+					${sCashLoanMonthReport.entrustcommissionText}
+				</td>
+				<td>
+					${sCashLoanMonthReport.debatamountText}
+				</td>
+				<td>
+					${sCashLoanMonthReport.monthdebatpercentText} 
+				</td>
+				
+				
+				
 				
 				<td>
 					${sCashLoanMonthReport.loancostText}
@@ -159,12 +191,9 @@
 				<td>
 					${sCashLoanMonthReport.monthrepayavgcostText}
 				</td>
-				<td>
-					${sCashLoanMonthReport.creditsumcostText}
-				</td>
-				<td>
-					${sCashLoanMonthReport.monthCreditAvgCostText} 
-				</td>
+				
+				
+				
 				
 				<td><a href="javascript:void(0)"  onclick="onClickMonthDetails(this)" aid="${sCashLoanMonthReport.id}" type="Couponcost">
 					${sCashLoanMonthReport.couponcostText}</a>
@@ -173,24 +202,18 @@
 					${sCashLoanMonthReport.mediacostText}
 				</td>
 				
-				<td>
-					${sCashLoanMonthReport.debatamountText}
-				</td>
-				<td>
-					${sCashLoanMonthReport.monthdebatamountText}
-				</td>
-				<td>
-					${sCashLoanMonthReport.monthdebatpercentText} 
-				</td>
-				<td>
-					${sCashLoanMonthReport.entrustcommissionText}
-				</td>
 				
+				
+				
+				
+<!-- 				<td> -->
+<%-- 					${sCashLoanMonthReport.grossprofileText} --%>
+<!-- 				</td> -->
+<!-- 				<td> -->
+<%-- 					${sCashLoanMonthReport.monthGrossProfilePercentText} --%>
+<!-- 				</td> -->
 				<td>
-					${sCashLoanMonthReport.grossprofileText}
-				</td>
-				<td>
-					${sCashLoanMonthReport.monthGrossProfilePercentText}
+					${sCashLoanMonthReport.cashcostamountText}
 				</td>
 			</tr>
 		</c:forEach>
@@ -199,6 +222,8 @@
 				<td>
 					合计：
 				</td>
+				
+				
 				<td> 
 					${sumMonthReportBean.remitamountText} 
 				</td>
@@ -215,6 +240,8 @@
 <%-- 					${sumMonthReportBean.monthSingleRemitAvgAmountText} --%>
 				</td>
 				
+				
+				
 				<td> 
 					${sumMonthReportBean.incomeamountText} 
 				</td>
@@ -225,6 +252,34 @@
 <%-- 					${sumMonthReportBean.monthincomepercentText} --%>
 				</td>
 				
+				
+								
+				<td>
+					${sumMonthReportBean.creditsumcostText}
+				</td>
+				<td>
+<%-- 					${sumMonthReportBean.monthCreditAvgCostText}  --%>
+				</td>
+				
+				
+					
+				<td>
+					${sumMonthReportBean.monthdebatamountText}
+				</td>
+				<td>
+				</td>
+				<td>
+					${sumMonthReportBean.entrustcommissionText}
+				</td>
+				<td>
+					${sumMonthReportBean.debatamountText}
+				</td>
+				<td>
+					${sumMonthReportBean.monthdebatpercentText} 
+				</td>
+				
+				
+				
 				<td>
 					${sumMonthReportBean.loancostText}
 				</td>
@@ -234,12 +289,9 @@
 				<td>
 					${sumMonthReportBean.monthrepayavgcostText}
 				</td>
-				<td>
-					${sumMonthReportBean.creditsumcostText}
-				</td>
-				<td>
-<%-- 					${sumMonthReportBean.monthCreditAvgCostText}  --%>
-				</td>
+				
+				
+				
 				
 				<td> 
 					${sumMonthReportBean.couponcostText} 
@@ -248,24 +300,17 @@
 					${sumMonthReportBean.mediacostText}
 				</td>
 				
-				<td>
-					${sumMonthReportBean.debatamountText}
-				</td>
-				<td>
-					${sumMonthReportBean.monthdebatamountText}
-				</td>
-				<td>
-					${sumMonthReportBean.monthdebatpercentText} 
-				</td>
-				<td>
-					${sumMonthReportBean.entrustcommissionText}
-				</td>
 				
+			
+				
+<!-- 				<td> -->
+<%-- 					${sumMonthReportBean.grossprofileText} --%>
+<!-- 				</td> -->
+<!-- 				<td> -->
+<%-- 					${sumMonthReportBean.monthGrossProfilePercentText} --%>
+<!-- 				</td> -->
 				<td>
-					${sumMonthReportBean.grossprofileText}
-				</td>
-				<td>
-					${sumMonthReportBean.monthGrossProfilePercentText}
+					${sumMonthReportBean.cashcostamountText}
 				</td>
 			</tr>
 		</tbody>

@@ -42,6 +42,8 @@ public class SCashLoanWeekReportBean extends DataEntity<SCashLoanWeekReportBean>
 	private Double weekrepayavgcost;      //  周平均还款费率
 	private Double WeekSingleRemitAvgAmount;
 	
+	private Double cashcostamount;  // 资金成本
+	
 	private Date beginCreatetime;		// 开始 createtime
 	private Date endCreatetime;		// 结束 createtime
 	
@@ -314,7 +316,15 @@ public class SCashLoanWeekReportBean extends DataEntity<SCashLoanWeekReportBean>
 		WeekSingleRemitAvgAmount = weekSingleRemitAvgAmount;
 	}
 
-
-	
+	public Double getCashcostamount() {
+		return cashcostamount;
+	}
+	@ExcelField(title="资金成本 ", type=1, align=2, sort=22)
+	public String getCashcostamountText() {
+		return null != this.cashcostamount ? NumberUtil.formatToseparaInteger(this.cashcostamount) : "";
+	}
+	public void setCashcostamount(Double cashcostamount) {
+		this.cashcostamount = cashcostamount;
+	}
 		
 }

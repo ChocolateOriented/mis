@@ -155,6 +155,7 @@ public class SCashLoanDailyReportController extends BaseController {
 			sumWeekReportBean.setWeekSingleRemitAvgAmount((null != sumWeekReportBean.getWeekSingleRemitAvgAmount() ? sumWeekReportBean.getWeekSingleRemitAvgAmount():0)  +(null != bean.getWeekSingleRemitAvgAmount() ? bean.getWeekSingleRemitAvgAmount():0) );
 			sumWeekReportBean.setIncomepercent((null != sumWeekReportBean.getIncomepercent() ? sumWeekReportBean.getIncomepercent():0)  +(null != bean.getIncomepercent() ? bean.getIncomepercent():0) );
 			sumWeekReportBean.setCreditavgcost((null != sumWeekReportBean.getCreditavgcost() ? sumWeekReportBean.getCreditavgcost():0)  + (null != bean.getCreditavgcost() ? bean.getCreditavgcost():0));
+			sumWeekReportBean.setCashcostamount((null != sumWeekReportBean.getCashcostamount() ? sumWeekReportBean.getCashcostamount():0)  + (null != bean.getCashcostamount() ? bean.getCashcostamount():0));
 		}
 		model.addAttribute("sumWeekReportBean", sumWeekReportBean);
 		return "modules/weeklyreport/sCashLoanWeekReportList";
@@ -190,6 +191,7 @@ public class SCashLoanDailyReportController extends BaseController {
 			sumMonthReportBean.setMonthSingleRemitAvgAmount((null != sumMonthReportBean.getMonthSingleRemitAvgAmount() ? sumMonthReportBean.getMonthSingleRemitAvgAmount():0)  +(null != bean.getMonthSingleRemitAvgAmount() ? bean.getMonthSingleRemitAvgAmount():0) );
 			sumMonthReportBean.setMonthCreditAvgCost((null != sumMonthReportBean.getMonthCreditAvgCost() ? sumMonthReportBean.getMonthCreditAvgCost():0)  +(null != bean.getMonthCreditAvgCost() ? bean.getMonthCreditAvgCost():0) );
 			sumMonthReportBean.setEntrustcommission((null != sumMonthReportBean.getEntrustcommission() ? sumMonthReportBean.getEntrustcommission():0)  + (null != bean.getEntrustcommission() ? bean.getEntrustcommission():0));
+			sumMonthReportBean.setCashcostamount((null != sumMonthReportBean.getCashcostamount() ? sumMonthReportBean.getCashcostamount():0)  + (null != bean.getCashcostamount() ? bean.getCashcostamount():0));
 		}
 		model.addAttribute("sumMonthReportBean", sumMonthReportBean);
 		return "modules/weeklyreport/sCashLoanMonthReportList";
