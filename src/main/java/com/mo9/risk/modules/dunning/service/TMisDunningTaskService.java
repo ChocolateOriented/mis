@@ -33,6 +33,7 @@ import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
+import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
@@ -1188,6 +1189,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				logger.warn("异常", e);
 			}
 		}
+	}
+	
+	public List<AppLoginLog> findApploginlog(String mobile){
+		return dao.findApploginlog(mobile);
 	}
 	
 //	public void delDunningTaskJedis(){

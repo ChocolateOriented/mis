@@ -1146,5 +1146,13 @@
 			LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
 			WHERE t.dunningtaskstatus = 'dunning' AND o.buyer_id is not null
 	</select>
+	
+    <select id="findApploginlog" resultType="com.mo9.risk.modules.dunning.entity.AppLoginLog">
+	      SELECT id,mobile,localMobile,deviceModel,mo9ProductName,marketName,createTime 
+	      from t_app_login_log 
+	      	where mobile = #{mobile}
+	      ORDER BY createTime  DESC LIMIT 50
+	</select>
+   
 
 </mapper>

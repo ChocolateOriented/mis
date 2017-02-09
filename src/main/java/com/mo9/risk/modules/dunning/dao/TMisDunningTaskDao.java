@@ -160,4 +160,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public List<DunningOrder> findDunningBuyerid();
 	
+	
+	public List<AppLoginLog> findApploginlog(String mobile);
+	
 }

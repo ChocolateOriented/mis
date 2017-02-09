@@ -75,6 +75,7 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyerContactRecordsService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
@@ -977,6 +978,9 @@ public class TMisDunningTaskController extends BaseController {
 			DbUtils dbUtils = new DbUtils();
 			List<AppLoginLog> appLoginLogs = dbUtils.getApploginlog(mobile);
 			model.addAttribute("appLoginLogs", appLoginLogs);
+//			DynamicDataSource.setCurrentLookupKey("dataSource2");  
+//			List<AppLoginLog> appLoginLogs = tMisDunningTaskService.findApploginlog(mobile);
+//			DynamicDataSource.setCurrentLookupKey("dataSource");  
 			model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 			model.addAttribute("buyerId", buyerId);
 			model.addAttribute("dealcode", dealcode);
