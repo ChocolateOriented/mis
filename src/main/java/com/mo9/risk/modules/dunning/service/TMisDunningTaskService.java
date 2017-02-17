@@ -147,8 +147,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return tMisDunningTaskDao.findOrderByDealcode(dealcode);
 	}
 	
+	/**
+	 * 操作order表(切换数据源提取出update方法)
+	 */
 	@Transactional(readOnly = false)
-	public boolean savefreeCreditAmount(String dealcode,TMisDunningTask task,String amount) {
+	public boolean updateOrderModifyAmount(String dealcode,String amount) {
 		try {
 			/**
 			 *  根据订单号保存订单减免金额
@@ -157,6 +160,23 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			order.setReliefamount(new BigDecimal(amount));
 			tMisDunningTaskDao.updateOrder(order);
 			tMisDunningTaskDao.updateOrderPartial(new BigDecimal(amount), order.getId());
+			return true;
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	
+	@Transactional(readOnly = false)
+	public boolean savefreeCreditAmount(String dealcode,TMisDunningTask task,String amount) {
+		try {
+			/**
+			 *  根据订单号保存订单减免金额
+			 */
+//			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+//			order.setReliefamount(new BigDecimal(amount));
+//			tMisDunningTaskDao.updateOrder(order);
+//			tMisDunningTaskDao.updateOrderPartial(new BigDecimal(amount), order.getId());
 			/**
 			 *  保存此订单当前任务的减免金额
 			 */
@@ -913,17 +933,33 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	/**
+	 * 修改委外导出时间-order表(切换数据源提取出update方法)
+	 * @param order
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public boolean updateOuterfiletime(Date outerfiletime,List<String> dealcodes){
+		try {
+			dao.updateOuterfiletime(outerfiletime,dealcodes);
+			return true;
+		} catch (Exception e) {
+			logger.warn("切换updateOrderDataSource数据源更新order表异常，时间:"+ new Date());
+			throw new ServiceException(e);
+		}
+	}
+	
+	/**
 	 * 修改委外导出时间
 	 * @param order
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public boolean updateOuterfiletime(Date outerfiletime,List<String> dealcodes,List<DunningOuterFile> dunningOuterFiles){
+	public boolean savefileLog(Date outerfiletime,List<String> dealcodes,List<DunningOuterFile> dunningOuterFiles){
 		try {
-			/**
-			 * 修改委外导出时间
-			 */
-			dao.updateOuterfiletime(outerfiletime,dealcodes);
+//			/**
+//			 * 修改委外导出时间
+//			 */
+//			dao.updateOuterfiletime(outerfiletime,dealcodes);
 			List<DunningOuterFileLog> files = new ArrayList<DunningOuterFileLog>();
 			for(DunningOuterFile outerFile : dunningOuterFiles){
 				DunningOuterFileLog fileLog = new DunningOuterFileLog();
@@ -934,7 +970,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				fileLog.setCreatedate(outerfiletime);
 				files.add(fileLog);
 			}
-			
 			dao.batchInsert(files);
 			return true;
 		} catch (Exception e) {
