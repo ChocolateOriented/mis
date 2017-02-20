@@ -909,7 +909,7 @@ public class TMisDunningTaskController extends BaseController {
 		Page<TRiskBuyerContactRecords> communicationsPage = new Page<TRiskBuyerContactRecords>(request, response);		
 //		communicationsPage = tRiskBuyerContactRecordsService.findPage(communicationsPage, tRiskBuyerContactRecords);
 		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			DynamicDataSource.setCurrentLookupKey("temporaryDataSource");  
 			communicationsPage = tRiskBuyerContactRecordsService.findPageByRediscache(communicationsPage, tRiskBuyerContactRecords,buyerId);
 		} catch (Exception e) {
 			e.printStackTrace();
