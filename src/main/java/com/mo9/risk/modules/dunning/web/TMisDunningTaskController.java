@@ -728,16 +728,23 @@ public class TMisDunningTaskController extends BaseController {
             	for(DunningOuterFile dunningOuterFile : dunningOuterFiles){
             		dunningOuterFile.setName(map.get(dunningOuterFile.getDealcode()));
             	}
-            	tMisDunningTaskService.updateOuterfiletime(new Date(),orders,dunningOuterFiles);
+            	tMisDunningTaskService.savefileLog(new Date(),orders,dunningOuterFiles);
             	addMessage(redirectAttributes, "委外数据生成成功");
 //            	response.sendRedirect(adminPath +"/dunning/tMisDunningTask/findOrderPageList?repage");
             	new ExportExcel("委外数据", DunningOuterFile.class).setDataList(dunningOuterFiles).write(response, fileName).dispose();
+            	
+            	//  切换数据源更新order表
+            	DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+            	tMisDunningTaskService.updateOuterfiletime(new Date(),orders);
             	return null;
+            	
             }else{
             	addMessage(redirectAttributes, "未导出数据！");
             }
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findOrderPageList?repage";
     }
@@ -1165,6 +1172,18 @@ public class TMisDunningTaskController extends BaseController {
 			return "减免金额不能大于50元";
 		}
 		String dealcode = request.getParameter("dealcode");
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+//			List<AppLoginLog> appLoginLogs = tMisDunningTaskDao.findApploginlog("18616297272");
+//			System.out.println(appLoginLogs.size());
+			tMisDunningTaskService.updateOrderModifyAmount(dealcode, amount);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+			
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
 		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount);
 		return "OK";
 	}
