@@ -908,16 +908,7 @@ public class TMisDunningTaskController extends BaseController {
 		tRiskBuyerContactRecords.setDealcode(dealcode);
 		Page<TRiskBuyerContactRecords> communicationsPage = new Page<TRiskBuyerContactRecords>(request, response);		
 //		communicationsPage = tRiskBuyerContactRecordsService.findPage(communicationsPage, tRiskBuyerContactRecords);
-//		try {
-//			DynamicDataSource.setCurrentLookupKey("temporaryDataSource");  
-//			communicationsPage = tRiskBuyerContactRecordsService.findPageByRediscache(communicationsPage, tRiskBuyerContactRecords,buyerId);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return "error";
-//			
-//		} finally {
-//			DynamicDataSource.setCurrentLookupKey("dataSource");  
-//		}
+		communicationsPage = tRiskBuyerContactRecordsService.findPageByRediscache(communicationsPage, tRiskBuyerContactRecords,buyerId);
 //		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
 //		model.addAttribute("personalInfo", personalInfo);
 		model.addAttribute("communicationsPage", communicationsPage);

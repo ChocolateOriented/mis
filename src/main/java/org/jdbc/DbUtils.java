@@ -17,6 +17,7 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.thinkgem.jeesite.modules.buyer.entity.MRiskBuyerReport;
 
 //import org.apache.log4j.Logger;
@@ -237,6 +238,23 @@ public class DbUtils {
 	}
 	
 	
+	
+	private String jndiName2 = "java:comp/env/jdbc/jeesite3";
+
+	public void setJndiName2(String jndiName2) {
+		this.jndiName2 = jndiName2;
+	}
+	
+	private Connection getConnection2() throws Exception {
+		InitialContext cxt = new InitialContext();
+		DataSource ds = (DataSource) cxt.lookup(jndiName2);
+		if ( ds == null ) {
+		   throw new Exception("Data source2 not found!");
+		}
+		return ds.getConnection();
+	}
+	
+	
 	/*          
 	 *   ============================================               查询方法（临时）            ============================================        
      */
@@ -282,6 +300,94 @@ public class DbUtils {
 		}
 		return appLoginLogs;
 	}
+	
+	/**
+	 * 通话记录
+	 */
+	public List<TRiskBuyerContactRecords> findBuyerContactRecordsListByBuyerId(String buyerId) throws Exception {
+		String sql = "SELECT  " +
+				" CASE WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(通讯录)')" +
+				" WHEN w.company_tel IS NOT NULL THEN ' 单位电话'" +
+				" WHEN d.contact_name IS NULL AND c.name IS NOT NULL THEN c.name" +
+				" ELSE '未知'" +
+				" END as 'name'," +
+				" b.family_relation as 'familyRelation', " +
+				" c.tel as 'tel'," +
+				" a.location as 'location'," +
+				" CONCAT(" +
+				" FLOOR(SUM(a.times) / 3600), '小时'," +
+				" FLOOR(SUM(a.times) % 3600 / 60), '分'," +
+				" FLOOR(SUM(a.times) % 60), '秒'" +
+				" ) as 'times'," +
+				" SUM(a.contact_number) as 'number'," +
+				" a.contact_type as 'contactType'," +
+				" a.buyer_id as 'buyerId'," +
+				" c.name AS rcname," +
+				" SUM(a.times) AS sumtime" +
+				" FROM (" +
+				" SELECT" +
+				" buyer_id," +
+				" contact_id," +
+				" contact_type," +
+				" location," +
+				" COUNT(1) AS contact_number," +
+				" SUM(times) AS times" +
+				" FROM t_risk_buyer_contact_records" +
+				" WHERE buyer_id =  '" + buyerId + "'" +
+				" GROUP BY buyer_id,contact_id,contact_type,location) a" +
+				" LEFT JOIN t_risk_contact c on c.id  = a.contact_id" +
+				" LEFT JOIN t_buyer_contact AS d ON d.buyer_id = a.buyer_id AND d.contact_mobile = c.tel" +
+				" INNER JOIN t_risk_buyer2contacts  b  ON c.id = b.buyer_contact_id  AND a.buyer_id = b.buyer_id" +
+				" LEFT JOIN t_risk_buyer_workinfo AS w  ON w.buyer_id = a.buyer_id AND REPLACE(w.company_tel, '-', '') = c.tel" +
+				" WHERE a.buyer_id = '" + buyerId + "'  GROUP BY c.tel ORDER BY SUM(a.times) DESC  LIMIT 30 " ;
+		if(sql == null || sql.trim().equals("")) {
+			//logger.info("parameter is valid!");
+			return null;
+		}
+		List<TRiskBuyerContactRecords> buyerContactRecords = new ArrayList<TRiskBuyerContactRecords>();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection2();
+			pstmt = DbUtils.getPreparedStatement(conn, sql);
+			rs = getResultSet(pstmt);
+			 while (rs.next()) {
+				 TRiskBuyerContactRecords buyerContactRecord = new TRiskBuyerContactRecords();
+//					private String name;
+//					private String familyRelation;
+//					private String tel;
+//					private String location;		// location
+//					private String times;		// times
+//					private String rcname;
+//					private String contactType;		// contact_type
+//					private String buyerId;		// buyer_id
+//					private Integer number;
+//					private Integer sumtime;
+					buyerContactRecord.setName(rs.getString("name"));
+					buyerContactRecord.setFamilyRelation(rs.getString("familyRelation"));
+					buyerContactRecord.setTel(rs.getString("tel"));
+					buyerContactRecord.setLocation(rs.getString("location"));
+					buyerContactRecord.setTimes(rs.getString("times"));
+					buyerContactRecord.setRcname(rs.getString("rcname"));
+					buyerContactRecord.setContactType(rs.getString("contactType"));
+					buyerContactRecord.setBuyerId(rs.getString("buyerId"));
+					buyerContactRecord.setNumber(rs.getInt("number"));
+					buyerContactRecord.setSumtime(rs.getInt("sumtime"));
+                 buyerContactRecords.add(buyerContactRecord);
+             }
+		} catch (RuntimeException e) {
+			System.out.println("parameter is valid!");
+			throw new Exception(e);
+		} finally {
+			closeResultSet(rs);
+			closeStatement(pstmt);
+			closeConn(conn);
+		}
+		return buyerContactRecords;
+	}
+	
+
 	
 	
 	/**

@@ -126,7 +126,7 @@
 			LEFT JOIN t_buyer_contact AS d ON d.buyer_id = a.buyer_id AND d.contact_mobile = c.tel
 			INNER JOIN t_risk_buyer2contacts  b  ON c.id = b.buyer_contact_id  AND a.buyer_id = b.buyer_id
 			LEFT JOIN t_risk_buyer_workinfo AS w  ON w.buyer_id = a.buyer_id AND REPLACE(w.company_tel, '-', '') = c.tel
-		WHERE a.buyer_id = #{buyerId}  GROUP BY c.tel ORDER BY SUM(a.times) DESC
+		WHERE a.buyer_id = #{buyerId}  GROUP BY c.tel ORDER BY SUM(a.times) DESC LIMIT 30 
 	</select>
 	
 	<!--   催收操作记录	  -->

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,16 @@ public class TRiskBuyerContactRecordsService {
 			int index = 1;
 			int PageNo = 1;
 			Map<String, Object> map2 = new HashMap<String, Object>();
-			List<TRiskBuyerContactRecords> contactRecordsList = tRiskBuyerContactRecordsDao.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords);
+//			List<TRiskBuyerContactRecords> contactRecordsList = tRiskBuyerContactRecordsDao.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords);
+			DbUtils dbUtils = new DbUtils();
+			List<TRiskBuyerContactRecords> contactRecordsList = null;
+			try {
+				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords.getBuyerId());
+				System.out.println("通话记录读取条数："+contactRecordsList.size());
+			} catch (Exception e) {
+				System.out.println("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
+				e.printStackTrace();
+			}
 			if(!contactRecordsList.isEmpty()){
 				for(TRiskBuyerContactRecords records : contactRecordsList){
 					map2.put(String.valueOf(index), records);
