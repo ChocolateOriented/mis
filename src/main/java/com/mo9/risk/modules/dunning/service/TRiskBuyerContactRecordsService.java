@@ -54,16 +54,17 @@ public class TRiskBuyerContactRecordsService {
 			int index = 1;
 			int PageNo = 1;
 			Map<String, Object> map2 = new HashMap<String, Object>();
-//			List<TRiskBuyerContactRecords> contactRecordsList = tRiskBuyerContactRecordsDao.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords);
-			DbUtils dbUtils = new DbUtils();
-			List<TRiskBuyerContactRecords> contactRecordsList = null;
-			try {
-				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords.getBuyerId());
-				System.out.println("通话记录读取条数："+contactRecordsList.size());
-			} catch (Exception e) {
-				System.out.println("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
-				e.printStackTrace();
-			}
+			List<TRiskBuyerContactRecords> contactRecordsList = tRiskBuyerContactRecordsDao.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords);
+//			DbUtils dbUtils = new DbUtils();
+//			List<TRiskBuyerContactRecords> contactRecordsList = null;
+//			try {
+//				System.out.println("=====================进入切数据源查询=============================");
+//				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId("602889");
+//				System.out.println("通话记录读取条数："+contactRecordsList.size());
+//			} catch (Exception e) {
+//				System.out.println("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
+//				e.printStackTrace();
+//			}
 			if(!contactRecordsList.isEmpty()){
 				for(TRiskBuyerContactRecords records : contactRecordsList){
 					map2.put(String.valueOf(index), records);
