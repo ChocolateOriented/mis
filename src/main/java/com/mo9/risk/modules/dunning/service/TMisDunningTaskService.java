@@ -885,7 +885,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
 		}else{
-			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC ");
+			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
 		}
 		entity.setPage(page);
 		page.setList(dao.findOrderPageList(entity));
