@@ -72,12 +72,12 @@
 				<th colspan="5" style="text-align:center;">放贷</th>
 				<th colspan="3" style="text-align:center;">收入</th>
 				<th colspan="2" style="text-align:center;">贷前征信成本</th>
-				<th colspan="5" style="text-align:center;">贷后催收成本</th>
+				<th colspan="6" style="text-align:center;">贷后催收成本</th>
 				<th colspan="3" style="text-align:center;">渠道成本</th>
 				<th colspan="2" style="text-align:center;">推广成本</th>
 <!-- 				<th colspan="2" style="text-align:center;">毛利 </th> -->
 				<th colspan="1" style="text-align:center;">资金成本</th>
-				<th></th>
+<!-- 				<th></th> -->
 			</tr>
 		
 			<tr>
@@ -96,6 +96,7 @@
 				<th title="人均成本 = 本期总成本 / 本期新增交易用户数">人均成本</th>
 				
 				<th title="本期累计 = 本期目前累计坏账 -  上期目前累计坏账">坏账金额</th>
+				<th title="">坏账催回本金</th>
 				<th title="">催收减免</th>
 				<th title="委外回款所扣除的佣金总金额, 佣金月结">委外佣金</th>
 				<th title="自产品上线之日起, 累计坏账">历史累计坏账</th>
@@ -166,6 +167,9 @@
 				
 				<td>
 					${sCashLoanMonthReport.monthdebatamountText}
+				</td>
+				<td>
+					${sCashLoanMonthReport.debatreturnamountText}
 				</td>
 				<td>
 				</td>
@@ -265,6 +269,9 @@
 					
 				<td>
 					${sumMonthReportBean.monthdebatamountText}
+				</td>
+				<td>
+					${sumMonthReportBean.debatreturnamountText}
 				</td>
 				<td>
 				</td>

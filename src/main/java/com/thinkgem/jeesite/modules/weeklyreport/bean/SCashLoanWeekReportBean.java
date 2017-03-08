@@ -43,6 +43,7 @@ public class SCashLoanWeekReportBean extends DataEntity<SCashLoanWeekReportBean>
 	private Double WeekSingleRemitAvgAmount;
 	
 	private Double cashcostamount;  // 资金成本
+	private Double debatreturnamount;
 	
 	private Date beginCreatetime;		// 开始 createtime
 	private Date endCreatetime;		// 结束 createtime
@@ -326,5 +327,17 @@ public class SCashLoanWeekReportBean extends DataEntity<SCashLoanWeekReportBean>
 	public void setCashcostamount(Double cashcostamount) {
 		this.cashcostamount = cashcostamount;
 	}
+
+	public Double getDebatreturnamount() {
+		return debatreturnamount;
+	}
+	public String getDebatreturnamountText() {
+		return null != this.debatreturnamount ? NumberUtil.formatToseparaInteger(this.debatreturnamount) : "";
+	}
+	public void setDebatreturnamount(Double debatreturnamount) {
+		this.debatreturnamount = debatreturnamount;
+	}
+	
+	
 		
 }

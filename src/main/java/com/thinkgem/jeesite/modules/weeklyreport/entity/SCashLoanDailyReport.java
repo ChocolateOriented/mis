@@ -73,6 +73,8 @@ public class SCashLoanDailyReport extends DataEntity<SCashLoanDailyReport> {
 	
 	private Double cashcostamount;  // 资金成本
 	
+	private Double debatreturnamount;
+	
 	public SCashLoanDailyReport() {
 		super();
 	}
@@ -462,6 +464,16 @@ public class SCashLoanDailyReport extends DataEntity<SCashLoanDailyReport> {
 	}
 	public void setCashcostamount(Double cashcostamount) {
 		this.cashcostamount = cashcostamount;
+	}
+
+	public Double getDebatreturnamount() {
+		return debatreturnamount;
+	}
+	public String getDebatreturnamountText() {
+		return null != this.debatreturnamount ? NumberUtil.formatToseparaInteger(this.debatreturnamount) : "";
+	}
+	public void setDebatreturnamount(Double debatreturnamount) {
+		this.debatreturnamount = debatreturnamount;
 	}
 
 

@@ -156,6 +156,7 @@ public class SCashLoanDailyReportController extends BaseController {
 			sumWeekReportBean.setIncomepercent((null != sumWeekReportBean.getIncomepercent() ? sumWeekReportBean.getIncomepercent():0)  +(null != bean.getIncomepercent() ? bean.getIncomepercent():0) );
 			sumWeekReportBean.setCreditavgcost((null != sumWeekReportBean.getCreditavgcost() ? sumWeekReportBean.getCreditavgcost():0)  + (null != bean.getCreditavgcost() ? bean.getCreditavgcost():0));
 			sumWeekReportBean.setCashcostamount((null != sumWeekReportBean.getCashcostamount() ? sumWeekReportBean.getCashcostamount():0)  + (null != bean.getCashcostamount() ? bean.getCashcostamount():0));
+			sumWeekReportBean.setDebatreturnamount((null != sumWeekReportBean.getDebatreturnamount() ? sumWeekReportBean.getDebatreturnamount():0)  + (null != bean.getDebatreturnamount() ? bean.getDebatreturnamount():0));
 		}
 		model.addAttribute("sumWeekReportBean", sumWeekReportBean);
 		return "modules/weeklyreport/sCashLoanWeekReportList";
@@ -192,6 +193,7 @@ public class SCashLoanDailyReportController extends BaseController {
 			sumMonthReportBean.setMonthCreditAvgCost((null != sumMonthReportBean.getMonthCreditAvgCost() ? sumMonthReportBean.getMonthCreditAvgCost():0)  +(null != bean.getMonthCreditAvgCost() ? bean.getMonthCreditAvgCost():0) );
 			sumMonthReportBean.setEntrustcommission((null != sumMonthReportBean.getEntrustcommission() ? sumMonthReportBean.getEntrustcommission():0)  + (null != bean.getEntrustcommission() ? bean.getEntrustcommission():0));
 			sumMonthReportBean.setCashcostamount((null != sumMonthReportBean.getCashcostamount() ? sumMonthReportBean.getCashcostamount():0)  + (null != bean.getCashcostamount() ? bean.getCashcostamount():0));
+			sumMonthReportBean.setDebatreturnamount((null != sumMonthReportBean.getDebatreturnamount() ? sumMonthReportBean.getDebatreturnamount():0)  + (null != bean.getDebatreturnamount() ? bean.getDebatreturnamount():0));
 		}
 		model.addAttribute("sumMonthReportBean", sumMonthReportBean);
 		return "modules/weeklyreport/sCashLoanMonthReportList";

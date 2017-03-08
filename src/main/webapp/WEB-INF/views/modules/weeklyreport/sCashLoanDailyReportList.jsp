@@ -52,7 +52,7 @@
 				<th colspan="2" style="text-align:center;">支付渠道费</th>
 				<th colspan="1" style="text-align:center;">征信成本</th>
 				<th colspan="2" style="text-align:center;">市场推广</th>
-				<th colspan="4" style="text-align:center;">坏账</th>
+				<th colspan="5" style="text-align:center;">坏账</th>
 				
 				<th  colspan="1" style="text-align:center;">资金成本</th>
 				<th  colspan="1" style="text-align:center;"></th>
@@ -89,6 +89,7 @@
 				<th>月本期累计</th>
 <!-- 				<th>坏账率</th> -->
 				<th>委外佣金</th>
+				<th>坏账催回本金</th>
 				
 <!-- 				<th>毛利</th> -->
 <!-- 				<th>毛利率</th> -->
@@ -182,6 +183,9 @@
 <!-- 				<td> -->
 <%-- 					${sCashLoanDailyReport.grossprofilepercentText} --%>
 <!-- 				</td> -->
+				<td>
+					${sCashLoanDailyReport.debatreturnamountText}
+				</td>
 				<td>
 					${sCashLoanDailyReport.cashcostamountText}
 				</td>

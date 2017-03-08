@@ -32,7 +32,8 @@
 <!-- 		a.debatpercent AS "debatpercent", -->
 		a.entrustcommission AS "entrustcommission",
 		a.grossprofile AS "grossprofile",
-		a.cashcostamount AS "cashcostamount"
+		a.cashcostamount AS "cashcostamount",
+		a.debatreturnamount AS "debatreturnamount"
 <!-- 		a.grossprofilepercent AS "grossprofilepercent" -->
 	</sql>
 	
@@ -117,7 +118,8 @@
 			sum(a.grossprofilepercent) AS "grossprofilepercent",
 			sum(a.weekrepayavgcost) AS "weekrepayavgcost",
 			sum(a.WeekSingleRemitAvgAmount) AS "WeekSingleRemitAvgAmount",
-			sum(a.cashcostamount) AS "cashcostamount"
+			sum(a.cashcostamount) AS "cashcostamount",
+			sum(a.debatreturnamount) AS "debatreturnamount"
 		FROM s_cash_loan_daily_report a 
 		<where>
 			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">
@@ -194,7 +196,8 @@
 			sum(a.MonthGrossProfilePercent) AS "MonthGrossProfilePercent",
 			sum(a.monthrepayavgcost) AS "monthrepayavgcost",
 			sum(a.MonthSingleRemitAvgAmount) AS "MonthSingleRemitAvgAmount",
-			sum(a.cashcostamount) AS "cashcostamount"
+			sum(a.cashcostamount) AS "cashcostamount",
+			sum(a.debatreturnamount) AS "debatreturnamount"
 		FROM s_cash_loan_daily_report a
 		<where>
 			<if test="beginCreatetime != null and endCreatetime != null and beginCreatetime != '' and endCreatetime != ''">

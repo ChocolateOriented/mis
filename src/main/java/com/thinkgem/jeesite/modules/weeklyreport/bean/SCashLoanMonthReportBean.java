@@ -49,6 +49,8 @@ public class SCashLoanMonthReportBean extends DataEntity<SCashLoanMonthReportBea
 	private Date endCreatetime;		// 结束 createtime
 	
 	
+	private Double debatreturnamount;
+	
 	public SCashLoanMonthReportBean() {
 		super();
 	}
@@ -317,6 +319,16 @@ public class SCashLoanMonthReportBean extends DataEntity<SCashLoanMonthReportBea
 	}
 	public void setCashcostamount(Double cashcostamount) {
 		this.cashcostamount = cashcostamount;
+	}
+	
+	public Double getDebatreturnamount() {
+		return debatreturnamount;
+	}
+	public String getDebatreturnamountText() {
+		return null != this.debatreturnamount ? NumberUtil.formatToseparaInteger(this.debatreturnamount) : "";
+	}
+	public void setDebatreturnamount(Double debatreturnamount) {
+		this.debatreturnamount = debatreturnamount;
 	}
 
 	public Date getBeginCreatetime() {
