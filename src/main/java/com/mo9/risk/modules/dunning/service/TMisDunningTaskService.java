@@ -55,7 +55,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.util.MsfClient;
-import com.mysql.fabric.xmlrpc.base.Data;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -1268,14 +1267,14 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					dunningTask.setUpdateBy(new User("auto_admin"));
 					dunningTask.setDunningtaskstatus(TMisDunningTask.STATUS_FINISHED);
 					dunningTasks.add(dunningTask);
-					logger.info(taskLog.getDunningcycle() +"队列" +taskLog.getDunningpeoplename() + "催收人员的订单"+taskLog.getDealcode()+"状态为" +taskLog.getBehaviorstatus() + new Data());
+					logger.info(taskLog.getDunningcycle() +"队列" +taskLog.getDunningpeoplename() + "催收人员的订单"+taskLog.getDealcode()+"状态为" +taskLog.getBehaviorstatus() + new Date());
 				}
 				/**  更新完成的任务   */
 				tMisDunningTaskDao.batchUpdatePayoffTask(dunningTasks);
 				/**  保存完成的任务Log   */
 				tMisDunningTaskLogDao.batchInsertTaskLog(dunningTaskLogs);
 			}else{
-				logger.info("没有需要订单已还款更新任务"+ new Data());
+				logger.info("没有需要订单已还款更新任务"+ new Date());
 			}
 		} catch (Exception e) {
 			logger.warn("订单已还款更新任务失败"+ new Date());
@@ -1392,7 +1391,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					logger.warn(dict.getLabel() + "队列" +dict.getValue() + "周期异常,未分案"+ new Date());
 				}
 			}else{
-				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Data());
+				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Date());
 			}
 		}
 	}
