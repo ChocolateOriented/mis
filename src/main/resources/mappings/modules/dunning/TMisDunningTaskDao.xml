@@ -723,9 +723,11 @@
         LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
         LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
         WHERE
-        o.type IN ('loan', 'partial' )
+<!--         o.type IN ('loan', 'partial' ) -->
+		o.type = 'loan' 
         AND o.merchant_id = 7
-        AND o.`status` IN ('payoff', 'payment', 'partial' )
+<!--         AND o.`status` IN ('payoff', 'payment', 'partial' ) -->
+		AND o.`status` IN ('payoff', 'payment' )
         AND t.dbid IS NOT NULL
         <!-- 任务状态为正在催收的  -->
         AND t.dunningtaskstatus IN ('dunning', 'finished' )
@@ -1153,6 +1155,282 @@
 	      	where mobile = #{mobile}
 	      ORDER BY createTime  DESC LIMIT 50
 	</select>
+	
+    
+<!-- 														new自动分配 - begin								 	    -->
    
+   	<select id="newfindExpiredTask" resultType="TMisDunningTask">
+   	    <![CDATA[  
+		    select 
+				t.*,
+				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamountOnEnd"
+			from t_mis_dunning_task as t 
+				LEFT JOIN t_risk_order AS o ON  t.dealcode = o.dealcode
+			where  date(Deadline) <= date(now()) and DunningTaskStatus = 'dunning' ORDER BY dbid 
+	    ]]>
+	</select>
+	
+	
+
+	 <select id="newfindDelayTaskByDunningcycle" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
+		   	 SELECT 
+					o.dealcode as "dealcode",
+					o.default_interest_amount AS "delayamount",
+					o.delay_days AS "delaydays",
+<!-- 					IFNULL(o.default_interest_amount,0) AS "delayamount", -->
+					o.repayment_time as "repaymenttime",
+					b.mobile as "mobile",
+					c.real_name as "realName",
+					o.days as "days",
+					o.payoff_time as payofftime,
+					o.status as dealcodestatus,
+					CASE 
+						WHEN o.status = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+						ELSE 0
+					END as "overduedays",
+					(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
+					IFNULL(o.cost_amount, 0) * 100  as "costamout",
+					IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
+					CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+					(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+					t.id as "taskid",
+					t.DunningCycle as "dunningcycle",
+					p.id as "dunningpeopleid",
+					p.Name as "dunningpeoplename"
+			FROM t_mis_dunning_task t 
+					LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
+					LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
+					LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+					LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+			 <where>
+					t.DunningCycle is not null  
+					AND o.status = 'payment' 
+<!-- 					<if test="dunningcycle != null and dunningcycle != ''"> -->
+						AND  t.DunningCycle =  #{dunningcycle} 
+<!-- 			        </if> -->
+<!-- 			        <if test="dunningtaskstatus != null and dunningtaskstatus != ''"> -->
+						AND  t.dunningtaskstatus = #{dunningtaskstatus}
+<!-- 			        </if> -->
+<!-- 					<if test="sqlMap != null and sqlMap != ''"> -->
+<!-- 					    <![CDATA[ -->
+						AND DATEDIFF(curdate(), o.repayment_time) NOT BETWEEN #{begin} AND  #{end}
+<!--       			  		]]> -->
+<!-- 			        </if> -->
+			 </where>
+			ORDER BY corpusAmount DESC
+	</select>
+	
+	<select id="newfingDelayOrderByNotTask" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
+		SELECT
+				o.dealcode as "dealcode",
+				o.default_interest_amount AS "delayamount",
+				o.delay_days AS "delaydays",
+<!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
+				o.repayment_time as "repaymenttime",
+				b.mobile as "mobile",
+				c.real_name as "realname",
+				o.days as "days",
+				o.payoff_time as payofftime,
+				o.status as dealcodestatus,
+				CASE 
+					WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+					ELSE 0
+				END as "overduedays",
+				(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
+				IFNULL(o.cost_amount, 0) * 100  as "costamout",
+				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
+				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount"
+		FROM t_risk_order AS o
+			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+			LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+			LEFT JOIN t_mis_dunning_task AS t ON o.dealcode = t.dealcode 
+		 <where> 
+		    o.type = 'loan'
+       	 	AND o.merchant_id = 7
+			AND o.status = 'payment' 
+			AND t.dealcode is NULL
+<!-- 			<if test="day != null and day != ''"> -->
+<!-- 				<![CDATA[ -->
+				AND DATEDIFF(curdate(), o.repayment_time) >= #{day}
+<!-- 				]]> -->
+<!-- 			</if> -->
+		</where>
+		ORDER BY corpusAmount DESC
+	</select>
+
+	
+	<update id="batchUpdateExpiredTask"  >
+	     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+				UPDATE t_mis_dunning_task 
+				<set>
+				    updatedate = now(),
+				    updateby = #{item.updateBy.id},
+					dunningpeopleid = #{item.dunningpeopleid},
+					dunningpeoplename = #{item.dunningpeoplename},
+					dunningperiodbegin = #{item.dunningperiodbegin},
+					dunningperiodend = #{item.dunningperiodend},
+					dunningcycle = #{item.dunningcycle}
+				</set>
+				WHERE id = #{item.id}
+		 </foreach>
+    </update>
+    
+	<update id="batchUpdatePayoffTask"  >
+	     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+				UPDATE t_mis_dunning_task 
+				<set>
+				    updatedate = now(),
+				    updateby = #{updateBy.id},
+					end = now(),
+					dunningtaskstatus = #{item.dunningtaskstatus}
+				</set>
+				WHERE id = #{item.id}
+		 </foreach>
+    </update>
+	
+	<insert id="batchinsertTask">
+		INSERT INTO t_mis_dunning_task(
+			id,
+			dunningpeopleid,
+			dunningpeoplename,
+			dealcode,
+			capitalamount,
+			begin,
+			deadline,
+			end,
+			dunningperiodbegin,
+			dunningperiodend,
+			dunnedamount,
+			ispayoff,
+			reliefamount,
+			dunningtaskstatus,
+			amountonend,
+			field1,
+			repaymenttime,
+			createby,
+			createdate,
+			updateby,
+			updatedate,
+			dunningcycle
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+		 (
+			#{item.id},
+			#{item.dunningpeopleid},
+			#{item.dunningpeoplename},
+			#{item.dealcode},
+			#{item.capitalamount},
+			#{item.begin},
+			#{item.deadline},
+			#{item.end},
+			#{item.dunningperiodbegin},
+			#{item.dunningperiodend},
+			#{item.dunnedamount},
+			#{item.ispayoff},
+			#{item.reliefamount},
+			#{item.dunningtaskstatus},
+			#{item.dunningAmounOnEnd},
+			#{item.field1},
+			#{item.repaymentTime},
+			#{item.createBy.id},
+			#{item.createDate},
+			#{item.updateBy.id},
+			#{item.updateDate},
+			#{item.dunningcycle}
+		)
+		</foreach>
+	</insert>
+	
+	
+	<select id="newfingTaskByOrderStatusandTaskstatus" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
+		SELECT 
+				o.dealcode as "dealcode",
+				o.default_interest_amount AS "delayamount",
+				o.delay_days AS "delaydays",
+<!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
+				o.repayment_time as "repaymenttime",
+				b.mobile as "mobile",
+				c.real_name as "realname",
+				o.days as "days",
+				o.payoff_time as payofftime,
+				o.status as dealcodestatus,
+				CASE 
+					WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+					ELSE 0
+				END as "overduedays",
+				(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
+				IFNULL(o.cost_amount, 0) * 100  as "costamout",
+				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
+				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+				t.id as "taskid",
+				t.DunningCycle as "dunningcycle",
+				p.id as "dunningpeopleid",
+				p.Name as "dunningpeoplename"
+		FROM t_mis_dunning_task t 
+				LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
+				LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
+				LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+				LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+		<where> 
+<!-- 		    <if test="status != null and status != ''"> -->
+<!-- 		        payoff -->
+				 o.status = #{status}
+<!-- 			</if> -->
+<!-- 			<if test="dunningtaskstatus != null and dunningtaskstatus != ''"> -->
+<!-- 			    dunning -->
+				AND  t.dunningtaskstatus = #{dunningtaskstatus}
+<!-- 			</if> -->
+		</where>
+<!-- 		ORDER BY corpusAmount DESC -->
+	</select>
+	
+	<select id="newfingTaskByDealcode" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
+		SELECT 
+				o.dealcode as "dealcode",
+				o.default_interest_amount AS "delayamount",
+				o.delay_days AS "delaydays",
+<!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
+				o.repayment_time as "repaymenttime",
+				b.mobile as "mobile",
+				c.real_name as "realname",
+				o.days as "days",
+				o.payoff_time as payofftime,
+				o.status as dealcodestatus,
+				CASE 
+					WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+					ELSE 0
+				END as "overduedays",
+				(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
+				IFNULL(o.cost_amount, 0) * 100  as "costamout",
+				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
+				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+				t.id as "taskid",
+				t.DunningCycle as "dunningcycle",
+				p.id as "dunningpeopleid",
+				p.Name as "dunningpeoplename"
+		FROM t_mis_dunning_task t 
+				LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
+				LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
+				LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+				LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+		WHERE t.dealcode = #{dealcode}
+	</select>
+    
+<!--    <update id="batchUpdateExpiredTask"> -->
+<!-- 		UPDATE t_mis_dunning_task SET 	 -->
+<!-- 			end = now(), -->
+<!-- 			dunningtaskstatus = #{dunningtaskstatus}, -->
+<!-- 			amountonend = #{dunningAmounOnEnd} -->
+<!-- 		WHERE id in  -->
+<!-- 		<foreach item="item" index="index" collection="list" open="(" separator="," close=")"> -->
+<!--             #{item} -->
+<!--         </foreach> -->
+<!-- 	</update> -->
+   
+<!-- 	new自动分配 - end 	    -->
+
 
 </mapper>

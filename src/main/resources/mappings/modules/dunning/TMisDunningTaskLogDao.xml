@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao">
+    
+	<sql id="tMisDunningTaskLogColumns">
+		a.dbid AS "dbid",
+		a.dealcode AS "dealcode",
+		a.dunningpeopleid AS "dunningpeopleid",
+		a.dunningpeoplename AS "dunningpeoplename",
+		a.dunningcycle AS "dunningcycle",
+		a.behaviorstatus AS "behaviorstatus",
+		a.dealcodestatus AS "dealcodestatus",
+		a.payofftime AS "payofftime",
+		a.days AS "days",
+		a.realname AS "realname",
+		a.mobile AS "mobile",
+		a.repaymenttime AS "repaymenttime",
+		a.overduedays AS "overduedays",
+		a.corpusamount AS "corpusamount",
+		a.costamout AS "costamout",
+		a.creditamount AS "creditamount",
+		a.overdueamount AS "overdueamount",
+		a.modifyamount AS "modifyamount",
+		a.delayamount AS "delayamount",
+		a.createby AS "createby",
+		a.createdate AS "createdate",
+		a.updateby AS "updateby",
+		a.updatedate AS "updatedate",
+		a.delaydays AS "delaydays"
+	</sql>
+	
+	<sql id="tMisDunningTaskLogJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisDunningTaskLog">
+		SELECT 
+			<include refid="tMisDunningTaskLogColumns"/>
+		FROM t_mis_dunning_task_log a
+		<include refid="tMisDunningTaskLogJoins"/>
+		WHERE a.dbid = #{dbid}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningTaskLog">
+		SELECT 
+			<include refid="tMisDunningTaskLogColumns"/>
+		FROM t_mis_dunning_task_log a
+		<include refid="tMisDunningTaskLogJoins"/>
+		<where>
+			
+			<if test="dealcode != null and dealcode != ''">
+				AND a.dealcode LIKE 
+					<if test="dbName == 'oracle'">'%'||#{dealcode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{dealcode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{dealcode},'%')</if>
+			</if>
+			<if test="behaviorstatus != null and behaviorstatus != ''">
+				AND a.behaviorstatus = #{behaviorstatus}
+			</if>
+			<if test="dealcodestatus != null and dealcodestatus != ''">
+				AND a.dealcodestatus = #{dealcodestatus}
+			</if>
+			<if test="payofftime != null and payofftime != ''">
+				AND a.payofftime = #{payofftime}
+			</if>
+			<if test="realname != null and realname != ''">
+				AND a.realname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{realname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{realname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{realname},'%')</if>
+			</if>
+			<if test="mobile != null and mobile != ''">
+				AND a.mobile LIKE 
+					<if test="dbName == 'oracle'">'%'||#{mobile}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{mobile}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{mobile},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningTaskLog">
+		SELECT 
+			<include refid="tMisDunningTaskLogColumns"/>
+		FROM t_mis_dunning_task_log a
+		<include refid="tMisDunningTaskLogJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_task_log(
+			dealcode,
+			dunningpeopleid,
+			dunningpeoplename,
+			dunningcycle,
+			behaviorstatus,
+			dealcodestatus,
+			payofftime,
+			days,
+			realname,
+			mobile,
+			repaymenttime,
+			overduedays,
+			corpusamount,
+			costamout,
+			creditamount,
+			overdueamount,
+			modifyamount,
+			delayamount,
+			createby,
+			createdate,
+<!-- 			updateby, -->
+<!-- 			updatedate, -->
+			taskid,
+			delaydays
+		) VALUES (
+			#{dealcode},
+			#{dunningpeopleid},
+			#{dunningpeoplename},
+			#{dunningcycle},
+			#{behaviorstatus},
+			#{dealcodestatus},
+			#{payofftime},
+			#{days},
+			#{realname},
+			#{mobile},
+			#{repaymenttime},
+			#{overduedays},
+			#{corpusamount},
+			#{costamout},
+			#{creditamount},
+			#{overdueamount},
+			#{modifyamount},
+			#{delayamount},
+			#{createBy.id},
+			#{createDate},
+<!-- 			#{updateby}, -->
+<!-- 			#{updatedate}, -->
+			#{taskid},
+			#{delaydays}
+		)
+	</insert>
+	
+	
+	<insert id="batchInsertTaskLog">
+        INSERT INTO t_mis_dunning_task_log(
+			dealcode,
+			dunningpeopleid,
+			dunningpeoplename,
+			dunningcycle,
+			behaviorstatus,
+			dealcodestatus,
+			payofftime,
+			days,
+			realname,
+			mobile,
+			repaymenttime,
+			overduedays,
+			corpusamount,
+			costamout,
+			creditamount,
+			overdueamount,
+			modifyamount,
+			delayamount,
+			createby,
+			createdate,
+			taskid,
+			delaydays
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+              #{item.dealcode}
+            , #{item.dunningpeopleid}
+            , #{item.dunningpeoplename}
+            , #{item.dunningcycle} 
+            , #{item.behaviorstatus}
+            , #{item.dealcodestatus}
+            , #{item.payofftime}
+            , #{item.days}
+            , #{item.realname}
+            , #{item.mobile}
+            , #{item.repaymenttime}
+            , #{item.overduedays}
+            , #{item.corpusamount}
+            , #{item.costamout}
+            , #{item.creditamount}
+            , #{item.overdueamount}
+            , #{item.modifyamount}
+            , #{item.delayamount}
+            , #{item.createBy.id}
+            , #{item.createDate}
+            , #{item.taskid}
+            , #{item.delaydays}
+            )
+        </foreach>
+    </insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_task_log SET 	
+			dealcode = #{dealcode},
+			dunningpeopleid = #{dunningpeopleid},
+			dunningpeoplename = #{dunningpeoplename},
+			dunningcycle = #{dunningcycle},
+			behaviorstatus = #{behaviorstatus},
+			dealcodestatus = #{dealcodestatus},
+			payofftime = #{payofftime},
+			days = #{days},
+			realname = #{realname},
+			mobile = #{mobile},
+			repaymenttime = #{repaymenttime},
+			overduedays = #{overduedays},
+			corpusamount = #{corpusamount},
+			costamout = #{costamout},
+			creditamount = #{creditamount},
+			overdueamount = #{overdueamount},
+			modifyamount = #{modifyamount},
+			delayamount = #{delayamount},
+			createby = #{createby},
+			createdate = #{createdate},
+			updateby = #{updateby},
+			updatedate = #{updatedate},
+			delaydays = #{delaydays} 
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunning_task_log
+		WHERE dbid = #{dbid}
+	</update>
+	
+</mapper>

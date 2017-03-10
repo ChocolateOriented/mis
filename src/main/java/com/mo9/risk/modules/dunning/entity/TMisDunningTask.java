@@ -32,6 +32,7 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private static final long serialVersionUID = 1L;
 	private Integer dbid;		// dbid
 	private String dunningpeopleid;		// 催讨人员id
+	
 	private String dealcode;		// 贷款订单号
 	private Integer capitalamount;		// 贷款本金 单位 分
 	private Date begin;		// 任务起始时间
@@ -59,6 +60,13 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 //	private Date createdate;		// createdate
 //	private String updateby;		// updateby
 //	private Date updatedate;		// updatedate
+	
+	private Integer creditamountOnEnd;  // 任务结束时应催金额
+	
+// ======================================new==============================================================================
+	private String dunningpeoplename;		// 催收人姓名
+	private String dunningcycle;		// 催收周期(队列)
+	
 	
 	public TMisDunningTask() {
 		super();
@@ -232,6 +240,29 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 		this.telremark = telremark;
 	}
 	
+	public Integer getCreditamountOnEnd() {
+		return creditamountOnEnd;
+	}
+
+	public void setCreditamountOnEnd(Integer creditamountOnEnd) {
+		this.creditamountOnEnd = creditamountOnEnd;
+	}
+	
+	public String getDunningpeoplename() {
+		return dunningpeoplename;
+	}
+
+	public void setDunningpeoplename(String dunningpeoplename) {
+		this.dunningpeoplename = dunningpeoplename;
+	}
+
+	public String getDunningcycle() {
+		return dunningcycle;
+	}
+
+	public void setDunningcycle(String dunningcycle) {
+		this.dunningcycle = dunningcycle;
+	}
 	
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
 //	public String getCreateby() {

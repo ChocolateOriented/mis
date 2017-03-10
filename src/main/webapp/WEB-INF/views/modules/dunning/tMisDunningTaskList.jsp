@@ -185,6 +185,53 @@
 				
 			 });
 			
+			// 自动分配
+			 $("#qqq").click(function(){
+// 				 $("#qqq").attr('disabled',"true");
+				 $.ajax({
+	                  type: 'POST',
+	                  url : "${ctx}/dunning/tMisDunningTask/autoAssignNewOrder",
+	                  success : function(data) {
+	                      if (data == "OK") {
+	                          alert("分配成功");
+// 	                    	  $.jBox.tip("ok", 'info');
+	                      } else {
+	                          alert("分配失败:"+data.message);
+// 	                    	  $.jBox.tip("error", 'warning');
+	                      }
+// 	                      $("#automatic").removeAttr("disabled"); 
+	                  },
+	                  error : function(XMLHttpRequest, textStatus, errorThrown){
+	                     alert("保存失败:"+textStatus);
+	                  }
+	              });
+				
+			 });
+			
+			// 自动分配
+			 $("#autoRepayment").click(function(){
+// 				 $("#qqq").attr('disabled',"true");
+				 $.ajax({
+	                  type: 'POST',
+	                  url : "${ctx}/dunning/tMisDunningTask/autoRepayment",
+	                  success : function(data) {
+	                      if (data == "OK") {
+	                          alert("分配成功");
+// 	                    	  $.jBox.tip("ok", 'info');
+	                      } else {
+	                          alert("分配失败:"+data.message);
+// 	                    	  $.jBox.tip("error", 'warning');
+	                      }
+// 	                      $("#automatic").removeAttr("disabled"); 
+	                  },
+	                  error : function(XMLHttpRequest, textStatus, errorThrown){
+	                     alert("保存失败:"+textStatus);
+	                  }
+	              });
+				
+			 });
+			 
+			
 			
 			
 			 <!-- 催收留案功能-留案自检 Patch 0001 by GQWU at 2016-11-9 start-->
@@ -395,6 +442,8 @@
 	
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
+		<input id="qqq"  class="btn btn-primary" type="button" value="新订单任务"/>
+		<input id="autoRepayment"  class="btn btn-primary" type="button" value="扫描还款"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 

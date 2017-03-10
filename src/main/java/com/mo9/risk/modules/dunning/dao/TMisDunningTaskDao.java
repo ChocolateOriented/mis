@@ -4,10 +4,6 @@
 package com.mo9.risk.modules.dunning.dao;
 
 
-import com.mo9.risk.modules.dunning.entity.*;
-import com.thinkgem.jeesite.common.persistence.CrudDao;
-import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +11,21 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.mo9.risk.modules.dunning.entity.AppLoginLog;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
+import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
+import com.mo9.risk.modules.dunning.entity.DunningPeriod;
+import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
+import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PartialOrder;
+import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
+import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
+import com.thinkgem.jeesite.common.persistence.CrudDao;
+import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 /**
  * 催收任务DAO接口
@@ -162,5 +172,68 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	
 	
 	public List<AppLoginLog> findApploginlog(String mobile);
+	
+	
+	//===========================================新分案方法====================================================================================
+	
+	/**
+	 * 查询已过期的任务和到期时应催金额
+	 * @return
+	 */
+	public List<TMisDunningTask> newfindExpiredTask();
+	
+	
+	/**
+	 * 批量更新过期任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchUpdateExpiredTask(List<TMisDunningTask> dunningTasks);
+	
+	/**
+	 * 根据催收周期查询延期任务
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningTaskLog> newfindDelayTaskByDunningcycle(@Param("dunningtaskstatus")String dunningtaskstatus,@Param("dunningcycle")String dunningcycle,@Param("begin")String begin,@Param("end")String end );
+	
+	/**
+	 * 根据逾期天数查询未生成任务task的订单
+	 * @param day
+	 * @return
+	 */
+	public List<TMisDunningTaskLog> newfingDelayOrderByNotTask(@Param("day")String day);
+	
+	/**
+	 * 根据订单状态和任务状态查询订单任务Log
+	 * @param status
+	 * @param dunningtaskstatus
+	 * @return
+	 */
+	public List<TMisDunningTaskLog> newfingTaskByOrderStatusandTaskstatus(@Param("status")String status,@Param("dunningtaskstatus")String dunningtaskstatus);
+	
+	/**
+	 * 批量添加任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchinsertTask(List<TMisDunningTask> dunningTasks);
+
+	
+	/**
+	 * 批量更新完成的任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchUpdatePayoffTask(List<TMisDunningTask> dunningTasks);
+	
+	
+	/**
+	 * 根据订单号查询任务log
+	 * @param dealcode
+	 * @return
+	 */
+	public TMisDunningTaskLog newfingTaskByDealcode(String dealcode);
+	
 	
 }

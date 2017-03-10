@@ -16,7 +16,8 @@
 		a.updateby AS "updateBy.id",
 		a.updatedate AS "updateDate",
 		a.auto AS "auto",
-		a.Invalid AS Invalid
+		a.Invalid AS Invalid,
+		a.dunningcycle AS dunningcycle
 	</sql>
 	
 	<sql id="tMisDunningPeopleJoins">
@@ -190,6 +191,15 @@
 			AND a.begin = #{begin} AND  a.end = #{end}
 		</if>
 	</select>
+	
+	<select id="findPeopleByDunningcycle" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  and a.Invalid = 't' and a.auto = 't'
+<!-- 		AND a.DunningCycle LIKE concat('%',#{dunningcycle},'%') -->
+	</select>	
+	
 	
 	
 </mapper>

@@ -36,8 +36,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
@@ -48,6 +50,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -269,6 +272,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
 	@Autowired
+	private TMisDunningTaskLogDao dunningTaskLogDao;
+	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoDao;
 	
 	/**
@@ -359,6 +364,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 		return "modules/dunning/dialog/dialogCollectionConfirmpay";
 	}
 	
+	
+	
 	/**
 	 * 完成订单状态
 	 * @param tMisDunningTask
@@ -405,17 +412,31 @@ public class TMisRemittanceConfirmController extends BaseController {
 		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paidType+ "/" +bd.toString()+ "/" +delayDay;
 		logger.info("接口url：" + url);
 		String str = "";
+		String resultCode = "";
 		try {
 			String res =  java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String,String>()), "utf-8");
 //			res=(new String(res.getBytes("ISO-8859-1"),"gb2312")).trim();
 			logger.info("接口url返回参数" + res.getBytes("UTF-8"));
 			if(StringUtils.isNotBlank(res)){
 				JSONObject repJson = new JSONObject(res);
-				String resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
+				resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
 				if(StringUtils.isNotBlank(resultCode) && "200".equals(resultCode)){
 					str = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
 					tMisRemittanceConfirmService.confirmationUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM));
 					logger.info("返回成功" + str);
+					
+					/**
+					 * 部分还款，生成部分还款任务日志
+					 */
+					if("partial".equals(paidType)){
+						TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+						dunningTaskLog.setBehaviorstatus("partial");
+						dunningTaskLog.setCreateDate(new Date());
+						dunningTaskLog.setCreateBy(new User("auto_admin"));
+						dunningTaskLogDao.insert(dunningTaskLog);
+//						dunningTaskLog.setCreateDate(new Date());
+					}
+					
 					return "ok:" + str;
 				}else{
 					return repJson.has("datas") ? "error:" + String.valueOf(repJson.get("datas")) : "error";
@@ -423,6 +444,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.warn("接口resultCode：" + resultCode);
 		}
 		return "error";
 //				// 创建HttpClient实例     

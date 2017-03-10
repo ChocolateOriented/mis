@@ -680,6 +680,48 @@ public class TMisDunningTaskController extends BaseController {
 		return "OK";
 	}
 	
+	/**
+	 * 新订单任务
+	 * @param tMisDunningTask
+	 * @param model
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "autoAssignNewOrder")
+	@ResponseBody
+	public String autoAssignNewOrder( Model model, RedirectAttributes redirectAttributes) {
+		try {
+			tMisDunningTaskService.autoAssignNewOrder();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage().toString();
+		}
+		addMessage(redirectAttributes, "新订单任务");
+		return "OK";
+	}
+	
+	/**
+	 * 自动扫描还款
+	 * @param tMisDunningTask
+	 * @param model
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "autoRepayment")
+	@ResponseBody
+	public String autoRepayment( Model model, RedirectAttributes redirectAttributes) {
+		try {
+			tMisDunningTaskService.autoRepayment();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage().toString();
+		}
+		addMessage(redirectAttributes, "自动扫描还款");
+		return "OK";
+	}
+	
 	
 	/**
 	 * 导出催收任务数据

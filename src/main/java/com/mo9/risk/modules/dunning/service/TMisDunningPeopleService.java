@@ -128,4 +128,15 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		return tMisDunningPeopleDao.findPeopleBybeginEnd(dunningPeople);
 	}
 	
+	
+	/**
+	 * 根据周期查询催收人员
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningPeople> findPeopleByDunningcycle(String dunningcycle){
+		return tMisDunningPeopleDao.findPeopleByDunningcycle(dunningcycle);
+	}
+	
+	
 }

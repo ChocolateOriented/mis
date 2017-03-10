@@ -32,6 +32,8 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	private String field1;		// field1
 	
 	private String Invalid;
+	
+	private String dunningcycle;
 //	private String createby;		// createby
 //	private Date createdate;		// createdate
 //	private String updateby;		// updateby
@@ -126,6 +128,16 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setInvalid(String invalid) {
 		Invalid = invalid;
 	}
+
+	public String getDunningcycle() {
+		return dunningcycle;
+	}
+
+	public void setDunningcycle(String dunningcycle) {
+		this.dunningcycle = dunningcycle;
+	}
+
+
 	
 	
 //	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
