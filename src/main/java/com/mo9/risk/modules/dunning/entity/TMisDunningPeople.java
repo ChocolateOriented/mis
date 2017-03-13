@@ -3,11 +3,14 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
-import com.thinkgem.jeesite.common.persistence.DataEntity;
+import java.math.BigDecimal;
+import java.util.Arrays;
+
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import com.sun.tools.javac.util.List;
+import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 催收人员Entity
@@ -132,11 +135,18 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public String getDunningcycle() {
 		return dunningcycle;
 	}
-
+	public String getDunningcycleText() {
+		StringBuffer buffer = new StringBuffer("");
+		String[] str = dunningcycle.split(",");
+		for(String lable : Arrays.asList(str)){
+			String scheduledBut =  DictUtils.getDictDescription(lable,"dunningCycle1","");
+			buffer.append(scheduledBut).append(" ");
+		}
+		return buffer.toString();
+	}
 	public void setDunningcycle(String dunningcycle) {
 		this.dunningcycle = dunningcycle;
 	}
-
 
 	
 	

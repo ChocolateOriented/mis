@@ -5,6 +5,7 @@ package com.mo9.risk.modules.dunning.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,5 +139,15 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		return tMisDunningPeopleDao.findPeopleByDunningcycle(dunningcycle);
 	}
 	
+	
+	/**
+	 * 批量更新完成的任务
+	 * @param ids
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public int batchUpdateDunningcycle(List<String> pids,String userid,String dunningcycle){
+		return tMisDunningPeopleDao.batchUpdateDunningcycle(pids, userid, dunningcycle);
+	}
 	
 }

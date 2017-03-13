@@ -133,7 +133,8 @@
 			createby,
 			createdate,
 			updateby,
-			updatedate
+			updatedate,
+			dunningcycle 
 		) VALUES (
 			#{id},
 			#{name},
@@ -146,7 +147,8 @@
 			#{createBy.id},
 			#{createDate},
 			#{updateBy.id},
-			#{updateDate}
+			#{updateDate},
+			#{dunningcycle}
 		)
 	</insert>
 	
@@ -163,7 +165,8 @@
 			createby = #{createBy.id},
 			createdate = #{createDate},
 			updateby = #{updateBy.id},
-			updatedate = #{updateDate}
+			updatedate = #{updateDate},
+			dunningcycle = #{dunningcycle}
 		WHERE dbid = #{dbid}
 	</update>
 	
@@ -199,6 +202,17 @@
 		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  and a.Invalid = 't' and a.auto = 't'
 <!-- 		AND a.DunningCycle LIKE concat('%',#{dunningcycle},'%') -->
 	</select>	
+	
+	 <update id="batchUpdateDunningcycle">
+		UPDATE t_mis_dunning_people SET 	
+			updatedate = now(),
+			updateby = #{userid},
+			dunningcycle = #{dunningcycle}
+		WHERE id in 
+		<foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
 	
 	
 	

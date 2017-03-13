@@ -46,7 +46,7 @@
 		<div class="control-group">
 			<label class="control-label">催收人员名称：</label>
 			<div class="controls">
-					<form:select id="dunningPeopleid" path="id" class="input-medium" >
+					<form:select id="dunningPeopleid" path="id" class="input-medium  required" >
 						<form:option selected="selected" value="${tMisDunningPeople.id}" label="${tMisDunningPeople.name}"/>
 						<form:options  items="${users}" itemLabel="name" itemValue="id"  htmlEscape="false"/>
 					</form:select>
@@ -71,24 +71,40 @@
 			</form:select>
 			</div>
 		</div>
+		
+		<div class="control-group">
+			<label class="control-label">催收队列：</label>
+			<div class="controls">
+				<c:choose>
+					<c:when test = "${not empty tMisDunningPeople.id}">
+						${tMisDunningPeople.dunningcycleText}
+					</c:when>
+					<c:otherwise>
+						<form:checkboxes path="dunningcycle" items="${fns:getDictList('dunningCycle1')}" itemLabel="description" itemValue="label" htmlEscape="false" class="required"/>
+						<span class="help-inline"><font color="red">*</font> </span>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</div>
+		
 		<div class="control-group">
 			<label title="大于1为单笔固定费率，小于1大于0为单笔百分比费率" class="control-label">单笔费率 ：</label>
 			<div class="controls">
 				<form:input path="rate" htmlEscape="false" class="input-xlarge "/>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label">逾期周期起始：</label>
-			<div class="controls">
-				<form:input path="begin" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">逾期周期截至：</label>
-			<div class="controls">
-				<form:input path="end" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/>
-			</div>
-		</div>
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">逾期周期起始：</label> -->
+<!-- 			<div class="controls"> -->
+<%-- 				<form:input path="begin" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/> --%>
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">逾期周期截至：</label> -->
+<!-- 			<div class="controls"> -->
+<%-- 				<form:input path="end" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/> --%>
+<!-- 			</div> -->
+<!-- 		</div> -->
 		<div class="form-actions">
 			<shiro:hasPermission name="dunning:tMisDunningPeople:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>

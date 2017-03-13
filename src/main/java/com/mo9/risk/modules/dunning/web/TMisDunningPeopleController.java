@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,16 +16,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
  * 催收人员Controller
@@ -103,16 +106,17 @@ public class TMisDunningPeopleController extends BaseController {
 		if (!beanValidator(model, tMisDunningPeople)){
 			return form(tMisDunningPeople, model);
 		}
-		if(null != tMisDunningPeople.getDbid()){
-			TMisDunningPeople oldDunningPeople = get(tMisDunningPeople.getId());
-			if(!oldDunningPeople.getBegin().equals(tMisDunningPeople.getBegin()) || !oldDunningPeople.getEnd().equals(tMisDunningPeople.getEnd())){
-				int count = tMisDunningTaskService.findDunningCount(oldDunningPeople.getId());
-				if(count > 0){
-					addMessage(model, "请清空此催收人员的任务!");
-					return form(tMisDunningPeople, model);
-				}
-			}
-		}
+//		if(null != tMisDunningPeople.getDbid()){
+//			TMisDunningPeople oldDunningPeople = get(tMisDunningPeople.getId());
+//			if(!oldDunningPeople.getBegin().equals(tMisDunningPeople.getBegin()) || !oldDunningPeople.getEnd().equals(tMisDunningPeople.getEnd())){
+//			if(!oldDunningPeople.getDunningcycle().equals(tMisDunningPeople.getDunningcycle())){
+//				int count = tMisDunningTaskService.findDunningCount(oldDunningPeople.getId());
+//				if(count > 0){
+//					addMessage(model, "请清空此催收人员的任务!");
+//					return form(tMisDunningPeople, model);
+//				}
+//			}
+//		}
 		tMisDunningPeopleService.save(tMisDunningPeople);
 		addMessage(redirectAttributes, "保存催收人员成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
@@ -130,7 +134,7 @@ public class TMisDunningPeopleController extends BaseController {
 		if(null != tMisDunningPeople.getId()){
 			int count = tMisDunningTaskService.findDunningCount(tMisDunningPeople.getId());
 			if(count > 0){
-				addMessage(redirectAttributes, "请清空此催收人员的任务!");
+				addMessage(redirectAttributes, "必须先清空此催收人员的任务!");
 				return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
 			}
 		}
@@ -139,6 +143,49 @@ public class TMisDunningPeopleController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
 	}
 	
+	/**
+	 * 加载手动分配页面
+	 * @param tMisDunningTask
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "dialogDunningcycle")
+	public String dialogDunningcycle( Model model,String peopleids) {
+		try {
+			model.addAttribute("peopleids", peopleids);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "views/error/500";
+		}
+		return "modules/dunning/dialog/dialogDunningcycle";
+	}
+	
+	
+	/**
+	 * 手动分配
+	 * @param tMisDunningTask
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "distributioncycleSave")
+	@ResponseBody
+	public String distributioncycleSave(String[] peopleids,String dunningcycle, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+//		Set<String> set = new HashSet<String>(Arrays.asList(str));
+//		tMisDunningTaskService.findDunningCount(tMisDunningPeople.getId();
+		try {
+			List<String> ids = Arrays.asList(peopleids); 
+			if(ids.isEmpty()){
+				String mes = "请选择催收队列";
+				return mes;
+			}
+			tMisDunningPeopleService.batchUpdateDunningcycle(ids, UserUtils.getUser().getId(), dunningcycle);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "OK";
+	}
 	
 
 }

@@ -14,6 +14,8 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 /**
  * 催收人员DAO接口
  * @author 徐盛
@@ -40,5 +42,13 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public List<TMisDunningPeople> findPeopleByDunningcycle(String dunningcycle);
+	
+	/**
+	 * 批量更新完成的任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchUpdateDunningcycle(@Param("pids")List<String> pids,@Param("userid")String userid,@Param("dunningcycle")String dunningcycle);
+	
 
 }

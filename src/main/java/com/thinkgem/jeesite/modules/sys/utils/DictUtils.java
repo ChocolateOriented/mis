@@ -45,6 +45,26 @@ public class DictUtils {
 		return defaultValue;
 	}
 	
+	
+	/**
+	 * 根据标签和类型获取描述
+	 * @param label
+	 * @param type
+	 * @param defaultLabel
+	 * @return
+	 */
+	public static String getDictDescription(String label, String type, String defaultLabel){
+		if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)){
+			for (Dict dict : getDictList(type)){
+				if (type.equals(dict.getType()) && label.equals(dict.getLabel())){
+					return dict.getDescription();
+				}
+			}
+		}
+		return defaultLabel;
+	}
+	
+	
 	/**
 	 * 根据键值和类型获取标签列表
 	 * @param value
