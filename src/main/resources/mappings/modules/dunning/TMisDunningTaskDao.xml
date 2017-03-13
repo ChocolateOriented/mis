@@ -1281,7 +1281,7 @@
 				UPDATE t_mis_dunning_task 
 				<set>
 				    updatedate = now(),
-				    updateby = #{updateBy.id},
+				    updateby = #{item.updateBy.id},
 					end = now(),
 					dunningtaskstatus = #{item.dunningtaskstatus}
 				</set>
@@ -1355,10 +1355,13 @@
 				o.days as "days",
 				o.payoff_time as payofftime,
 				o.status as dealcodestatus,
-				CASE 
-					WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
-					ELSE 0
-				END as "overduedays",
+				
+<!-- 				CASE  -->
+<!-- 					WHEN o.`status` = 'payment' THEN DATEDIFF(curdate(), o.repayment_time)  -->
+<!-- 					ELSE 0 -->
+<!-- 				END as "overduedays", -->
+				DATEDIFF(curdate(), o.repayment_time) as "overduedays",
+				
 				(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
 				IFNULL(o.cost_amount, 0) * 100  as "costamout",
 				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
