@@ -1451,7 +1451,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 本次迁徙该移入的周期段
 					 */
-					Dict dict = this.getCycleDict(dunningTaskLog.getOverduedays());
+					Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
 					if(null == dict){
 						dunningTaskLog.setBehaviorstatus("out_error");
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
@@ -1570,7 +1570,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 本次迁徙该移入的周期段
 					 */
-					Dict dict = this.getCycleDict(dunningTaskLog.getOverduedays());
+					Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
 					if(null == dict){
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 						continue;
@@ -1658,35 +1658,35 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * @param current
 	 * @return
 	 */
-	public Dict getCycleDict(int current){
-		Dict cycleDict = null;
-		/**  选择催收周期段类型   */
-		String type = getDunningCycleType();
-		List<Dict> dicts = DictUtils.getDictList(type);
-		int cyclemax = 0;
-		for(Dict dict : dicts){
-			if(("dunningCycle2").equals(type) && dict.getLabel().equals(C_P1)){
-				continue;
-			}
-			int min = !("").equals(dict.getValue().split("_")[0]) ?  Integer.parseInt(dict.getValue().split("_")[0]) : 0 ;
-			int max = !("").equals(dict.getValue().split("_")[1]) ?  Integer.parseInt(dict.getValue().split("_")[1]) : 0 ;
-			if(rangeInDefined(current, min, max)){
-				cycleDict = dict;
-			}
-			if(max > cyclemax){
-				cyclemax = max;
-			}
-		}
-		/**  逾期天数大于全部周期段时放入Q5    */
-		if(null == cycleDict && current > cyclemax){
-			String val = DictUtils.getDictValue("Q5", type, "47_61");
-			cycleDict = new Dict();
-			cycleDict.setType(type);
-			cycleDict.setValue(val);
-			cycleDict.setLabel("Q5");
-		}
-		return cycleDict;
-	}
+//	public Dict getCycleDict(int current){
+//		Dict cycleDict = null;
+//		/**  选择催收周期段类型   */
+//		String type = getDunningCycleType();
+//		List<Dict> dicts = DictUtils.getDictList(type);
+//		int cyclemax = 0;
+//		for(Dict dict : dicts){
+//			if(("dunningCycle2").equals(type) && dict.getLabel().equals(C_P1)){
+//				continue;
+//			}
+//			int min = !("").equals(dict.getValue().split("_")[0]) ?  Integer.parseInt(dict.getValue().split("_")[0]) : 0 ;
+//			int max = !("").equals(dict.getValue().split("_")[1]) ?  Integer.parseInt(dict.getValue().split("_")[1]) : 0 ;
+//			if(rangeInDefined(current, min, max)){
+//				cycleDict = dict;
+//			}
+//			if(max > cyclemax){
+//				cyclemax = max;
+//			}
+//		}
+//		/**  逾期天数大于全部周期段时放入Q5    */
+//		if(null == cycleDict && current > cyclemax){
+//			String val = DictUtils.getDictValue("Q5", type, "47_61");
+//			cycleDict = new Dict();
+//			cycleDict.setType(type);
+//			cycleDict.setValue(val);
+//			cycleDict.setLabel("Q5");
+//		}
+//		return cycleDict;
+//	}
 	
 	/**
 	 * 查询Q0队列的周期区间
@@ -1721,8 +1721,14 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static String getDunningCycleType() {
 		switch (getDaysOfMonth(new Date())) {
 		case 30:
-			return "dunningCycle1";
-			
+			switch (getDays()) {
+			case 1:
+				return "dunningCycle1";
+			case 16:
+				return "dunningCycle1";
+			default:
+				return "dunningCycle1";
+			}
 		case 31:
 			switch (getDays()) {
 			case 1:
@@ -1741,6 +1747,63 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	}  
 	
+	/**
+	 * 根据逾期天数，返回该月该日的归属队列
+	 * @param current
+	 * @return
+	 */
+	public Dict getCycleDict2(int current){
+		Dict cycleDict = null;
+		/**  选择催收周期段类型   */
+		String type = getDunningCycleType();
+		List<Dict> dicts = DictUtils.getDictList(type);
+		int cyclemax = 0;
+		for(Dict dict : dicts){
+			if(("dunningCycle2").equals(type) && dict.getLabel().equals(C_P1)){
+				continue;
+			}		
+			int min = !("").equals(dict.getValue().split("_")[0]) ?  Integer.parseInt(dict.getValue().split("_")[0]) : 0 ;
+			int max = !("").equals(dict.getValue().split("_")[1]) ?  Integer.parseInt(dict.getValue().split("_")[1]) : 0 ;
+			
+			int day = 0;
+
+			if(("dunningCycle1").equals(type) && !dict.getLabel().equals(C0)){
+				switch (getDaysOfMonth(new Date())) {
+				case 30:
+					day = getDays() % 15 == 0 ? 15 - 1 : getDays() % 15 - 1;
+					break;
+				case 31:
+					day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
+					break;
+				case 28:
+					break;
+				default:
+					break;
+				}
+				if(("dunningCycle1").equals(type) && dict.getLabel().equals(C_P1)){
+					max += day;
+				}else{
+					min += day;
+					max += day;
+				}
+			}
+			if(rangeInDefined(current, min, max)){
+				cycleDict = dict;
+			}
+			if(max > cyclemax){
+				cyclemax = max;
+			}
+		}
+		/**  逾期天数大于全部周期段时放入Q5    */
+		if(null == cycleDict && current > cyclemax){
+			String val = DictUtils.getDictValue("Q5", type, "47_61");
+			cycleDict = new Dict();
+			cycleDict.setType(type);
+			cycleDict.setValue(val);
+			cycleDict.setLabel("Q5");
+		}
+		return cycleDict;
+	}
 	
 	/**
 	 * 创建任务
@@ -1862,31 +1925,38 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static void main(String[] args) {
 //		String type = getDunningCycleType();
 //		List<Dict> dicts = DictUtils.getDictList(type);
-		List<Dict> list = new ArrayList<Dict>();
-		Dict dict1 = new Dict();
-		dict1.setLabel("Q1");
-		Dict dict2 = new Dict();
-		dict2.setLabel("Q2");
-		Dict dict3 = new Dict();
-		dict3.setLabel("Q3");
-		Dict dict4 = new Dict();
-		dict4.setLabel("Q4");
-		Dict dict5 = new Dict();
-		dict5.setLabel("Q5");
-		list.add(dict1);
-		list.add(dict2);
-		list.add(dict3);
-		list.add(dict4);
-		list.add(dict5);
-		for(int i= 0 ; i < list.size() ; i++ ){  
-			Dict dict = (Dict)list.get(i);
-			System.out.println(dict.getLabel());
-			dict.setLabel("tt" + i);
+//		List<Dict> list = new ArrayList<Dict>();
+//		Dict dict1 = new Dict();
+//		dict1.setLabel("Q1");
+//		Dict dict2 = new Dict();
+//		dict2.setLabel("Q2");
+//		Dict dict3 = new Dict();
+//		dict3.setLabel("Q3");
+//		Dict dict4 = new Dict();
+//		dict4.setLabel("Q4");
+//		Dict dict5 = new Dict();
+//		dict5.setLabel("Q5");
+//		list.add(dict1);
+//		list.add(dict2);
+//		list.add(dict3);
+//		list.add(dict4);
+//		list.add(dict5);
+//		for(int i= 0 ; i < list.size() ; i++ ){  
+//			Dict dict = (Dict)list.get(i);
+//			System.out.println(dict.getLabel());
+//			dict.setLabel("tt" + i);
+//		}
+//		for (int i = 0; i < list.size(); i++) {
+//			Dict dict = (Dict)list.get(i);
+//			System.out.println(dict.getLabel());
+//		}
+//		int day = getDays() % 15 == 0 ? 15 - 1 : getDays()  % 15 - 1;
+		for(int i = 2; i <= 31 ; i ++){
+			System.out.print(i+"号");
+			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
+			System.out.println(s);
 		}
-		for (int i = 0; i < list.size(); i++) {
-			Dict dict = (Dict)list.get(i);
-			System.out.println(dict.getLabel());
-		}
+//		System.out.println(30 % 15 == 0 ? 15-1 :  );
 //		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
 //		sortList.sort(list, "label", "desc");  
 //		for(Dict dict : list){
