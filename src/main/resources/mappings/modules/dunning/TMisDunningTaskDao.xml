@@ -1175,7 +1175,8 @@
 	 <select id="newfindDelayTaskByDunningcycle" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
 		   	 SELECT 
 					o.dealcode as "dealcode",
-					o.default_interest_amount AS "delayamount",
+					IFNULL(o.default_interest_amount, 0) * 100  as "delayamount",
+<!-- 					   o.default_interest_amount AS "delayamount", -->
 					o.delay_days AS "delaydays",
 <!-- 					IFNULL(o.default_interest_amount,0) AS "delayamount", -->
 					o.repayment_time as "repaymenttime",
@@ -1223,7 +1224,8 @@
 	<select id="newfingDelayOrderByNotTask" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
 		SELECT
 				o.dealcode as "dealcode",
-				o.default_interest_amount AS "delayamount",
+				IFNULL(o.default_interest_amount, 0) * 100  as "delayamount",
+<!-- 				o.default_interest_amount AS "delayamount", -->
 				o.delay_days AS "delaydays",
 <!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
 				o.repayment_time as "repaymenttime",
@@ -1346,7 +1348,8 @@
 	<select id="newfingTaskByOrderStatusandTaskstatus" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
 		SELECT 
 				o.dealcode as "dealcode",
-				o.default_interest_amount AS "delayamount",
+				IFNULL(o.default_interest_amount, 0) * 100  as "delayamount",
+<!-- 				o.default_interest_amount AS "delayamount", -->
 				o.delay_days AS "delaydays",
 <!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
 				o.repayment_time as "repaymenttime",
@@ -1392,7 +1395,8 @@
 	<select id="newfingTaskByDealcode" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
 		SELECT 
 				o.dealcode as "dealcode",
-				o.default_interest_amount AS "delayamount",
+				IFNULL(o.default_interest_amount, 0) * 100  as "delayamount",
+<!-- 				o.default_interest_amount AS "delayamount", -->
 				o.delay_days AS "delaydays",
 <!-- 			IFNULL(o.default_interest_amount,0) AS "delayamount", -->
 				o.repayment_time as "repaymenttime",

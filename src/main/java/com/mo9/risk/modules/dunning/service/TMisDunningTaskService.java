@@ -1251,7 +1251,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				List<TMisDunningTask> dunningTasks = new ArrayList<TMisDunningTask>();
 				for(TMisDunningTaskLog taskLog : dunningTaskLogs){
 					//延期订单完成
-					if(null != taskLog.getDelaydays() && null != taskLog.getDelayamount()){
+					if(null != taskLog.getDelaydays() && null != taskLog.getDelayamount() &&  taskLog.getDelaydays() > 0 &&  taskLog.getDelayamount()  > 0){
 						taskLog.setBehaviorstatus("delay");
 						taskLog.setCreateDate(new Date());
 						taskLog.setCreateBy(new User("auto_admin"));

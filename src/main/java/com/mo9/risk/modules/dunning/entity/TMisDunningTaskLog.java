@@ -39,7 +39,7 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 	private Integer creditamount;		// 实际应还金额 (当前应催金额)
 	private Integer overdueamount;		// 逾期费
 	private Integer modifyamount;		// 催收减免金额
-		private String delayamount;		// 延期费
+		private Integer delayamount;		// 延期费
 		private Integer delaydays;		// 延期天数
 //	private String createby;		// 创建人
 //	private Date createdate;		// 创建时间
@@ -181,11 +181,11 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 	
 
 	
-	public String getDelayamount() {
+	public Integer getDelayamount() {
 		return delayamount;
 	}
 
-	public void setDelayamount(String delayamount) {
+	public void setDelayamount(Integer delayamount) {
 		this.delayamount = delayamount;
 	}
 
