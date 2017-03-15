@@ -278,92 +278,92 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Transactional(readOnly = false)
 	public boolean assign(String dealcode, String peopleId) {
 
-		TMisDunningPeople people = this.tMisDunningPeopleDao.get(peopleId);
-		if(people == null)
-		{
-			 logger.warn("催收人员不存在："+peopleId);
-			 return false;
-		}
-
-		TMisDunningOrder order = this.tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if(order == null)
-		{
-			logger.warn("分配订单不存在:"+dealcode);
-			return false;
-		}
-		if(!"payment".equalsIgnoreCase(order.status))
-		{
-			logger.warn("催款订单状态错误，状态："+order.status);
-			return false;
-		}
-	 
-		Date now = new Date();
-//		long overduedays = (toDate(now).getTime()-toDate(order.repaymentDate).getTime())/(24*60*60*1000);
-		long overduedays = TMisDunningTaskService.GetOverdueDay(order.repaymentDate);
-		logger.info(MessageFormat.format("订单逾期{0}天，催款人<{1}>负责催收{2}天到{3}天",overduedays,people.getName(),people.getBegin(),people.getEnd()));
-//		if(!(overduedays>=people.getBegin() && overduedays<=people.getEnd()))
+//		TMisDunningPeople people = this.tMisDunningPeopleDao.get(peopleId);
+//		if(people == null)
 //		{
-//			logger.warn(MessageFormat.format("订单的逾期周期不符合该用户的催款周期，订单逾期{0}天，催款人<{1}>负责催收{2}天到{3}天",overduedays,people.getName(),people.getBegin(),people.getEnd()));
+//			 logger.warn("催收人员不存在："+peopleId);
+//			 return false;
+//		}
+//
+//		TMisDunningOrder order = this.tMisDunningTaskDao.findOrderByDealcode(dealcode);
+//		if(order == null)
+//		{
+//			logger.warn("分配订单不存在:"+dealcode);
 //			return false;
 //		}
-
-		Map<String,Object> params = new HashMap<String, Object>();
-		params.put("STATUS_DUNNING",TMisDunningTask.STATUS_DUNNING);
-		params.put("DEALCODE",dealcode);
-		String beforeTaskId = null;
-		String beforePeopleId = null;
-		TMisDunningTask task = this.tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		
-//		if(TMisDunningTask.STATUS_TRANSFER.equals(task.getDunningtaskstatus())){
-//			logger.warn(MessageFormat.format("催款人<{0}>的订单任务状态为同期转移",people.getName()));
+//		if(!"payment".equalsIgnoreCase(order.status))
+//		{
+//			logger.warn("催款订单状态错误，状态："+order.status);
 //			return false;
 //		}
-		
-		if(task != null)
-		{
-			beforeTaskId = task.getId();
-			beforePeopleId = task.getDunningpeopleid();
-			String status = TMisDunningTask.STATUS_END;
-			if(task.getDunningpeopleid().equals(peopleId))
-			{
-				logger.warn("该任务已经被分配给该用户");
-				return false;
-			}
-			if(task.getDunningperiodbegin().equals(people.getBegin())
-					&& task.getDunningperiodend().equals(people.getEnd()))
-			{
-				status = TMisDunningTask.STATUS_TRANSFER;
-				logger.info(MessageFormat.format("催款任务:{0} 同期转移给催款人<{1}>",task.getId(),people.getName()));
-
-			}
-			logger.info(MessageFormat.format("催款任务:{0} 重新分配给催款人<{1}>,账期为{2}天到{3}天",task.getId(),people.getName(),people.getBegin(),people.getEnd()));
-	        task.setDunningtaskstatus(status);
-			task.setEnd(now);
-			task.setUpdateDate(now);
-			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-			if(personalInfo == null){
-				logger.info(MessageFormat.format("手动分配personalInfo为空，Dealcode:===>", dealcode));
-				return false;
-			}
-			task.setDunningAmounOnEnd((int)Double.valueOf(personalInfo.getCreditAmount()).doubleValue());
-			task.preUpdate();
-//			task.setDunningpeopleid(peopleId)
-			this.tMisDunningTaskDao.update(task);
-
-		}
-		else
-		{
-			logger.info(MessageFormat.format("订单:{0} 分配给催款人<{1}>,账期为{2}天到{3}天",order.dealcode,people.getName(),people.getBegin(),people.getEnd()));
-		}
-		DunningPeriod period = new DunningPeriod();
-		period.begin = people.getBegin();
-		period.end = people.getEnd();
-		try{
-			this.createDunningTask(people, order, period,beforeTaskId,beforePeopleId);
-			return true;
-		} catch (Exception e) {
-			logger.error(MessageFormat.format("分配订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
-		}
+//	 
+//		Date now = new Date();
+////		long overduedays = (toDate(now).getTime()-toDate(order.repaymentDate).getTime())/(24*60*60*1000);
+//		long overduedays = TMisDunningTaskService.GetOverdueDay(order.repaymentDate);
+//		logger.info(MessageFormat.format("订单逾期{0}天，催款人<{1}>负责催收{2}天到{3}天",overduedays,people.getName(),people.getBegin(),people.getEnd()));
+////		if(!(overduedays>=people.getBegin() && overduedays<=people.getEnd()))
+////		{
+////			logger.warn(MessageFormat.format("订单的逾期周期不符合该用户的催款周期，订单逾期{0}天，催款人<{1}>负责催收{2}天到{3}天",overduedays,people.getName(),people.getBegin(),people.getEnd()));
+////			return false;
+////		}
+//
+//		Map<String,Object> params = new HashMap<String, Object>();
+//		params.put("STATUS_DUNNING",TMisDunningTask.STATUS_DUNNING);
+//		params.put("DEALCODE",dealcode);
+//		String beforeTaskId = null;
+//		String beforePeopleId = null;
+//		TMisDunningTask task = this.tMisDunningTaskDao.findDunningTaskByDealcode(params);
+//		
+////		if(TMisDunningTask.STATUS_TRANSFER.equals(task.getDunningtaskstatus())){
+////			logger.warn(MessageFormat.format("催款人<{0}>的订单任务状态为同期转移",people.getName()));
+////			return false;
+////		}
+//		
+//		if(task != null)
+//		{
+//			beforeTaskId = task.getId();
+//			beforePeopleId = task.getDunningpeopleid();
+//			String status = TMisDunningTask.STATUS_END;
+//			if(task.getDunningpeopleid().equals(peopleId))
+//			{
+//				logger.warn("该任务已经被分配给该用户");
+//				return false;
+//			}
+//			if(task.getDunningperiodbegin().equals(people.getBegin())
+//					&& task.getDunningperiodend().equals(people.getEnd()))
+//			{
+//				status = TMisDunningTask.STATUS_TRANSFER;
+//				logger.info(MessageFormat.format("催款任务:{0} 同期转移给催款人<{1}>",task.getId(),people.getName()));
+//
+//			}
+//			logger.info(MessageFormat.format("催款任务:{0} 重新分配给催款人<{1}>,账期为{2}天到{3}天",task.getId(),people.getName(),people.getBegin(),people.getEnd()));
+//	        task.setDunningtaskstatus(status);
+//			task.setEnd(now);
+//			task.setUpdateDate(now);
+//			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+//			if(personalInfo == null){
+//				logger.info(MessageFormat.format("手动分配personalInfo为空，Dealcode:===>", dealcode));
+//				return false;
+//			}
+//			task.setDunningAmounOnEnd((int)Double.valueOf(personalInfo.getCreditAmount()).doubleValue());
+//			task.preUpdate();
+////			task.setDunningpeopleid(peopleId)
+//			this.tMisDunningTaskDao.update(task);
+//
+//		}
+//		else
+//		{
+//			logger.info(MessageFormat.format("订单:{0} 分配给催款人<{1}>,账期为{2}天到{3}天",order.dealcode,people.getName(),people.getBegin(),people.getEnd()));
+//		}
+//		DunningPeriod period = new DunningPeriod();
+//		period.begin = people.getBegin();
+//		period.end = people.getEnd();
+//		try{
+//			this.createDunningTask(people, order, period,beforeTaskId,beforePeopleId);
+//			return true;
+//		} catch (Exception e) {
+//			logger.error(MessageFormat.format("分配订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
+//		}
 		return false;
 	}
 
@@ -1286,7 +1286,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 *  定时自动扫描还款
 	 */
-//	@Scheduled(cron = "0 0/15 * * * ?") //每十五分钟执行一次
+	@Scheduled(cron = "0 0/15 * * * ?") //每十五分钟执行一次
 	@Transactional(readOnly = false)
 	public void autoRepayment(){
 		String scheduledBut =  DictUtils.getDictValue("autoRepayment","Scheduled","");
@@ -1302,7 +1302,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 *  新自动分案
 	 */
 	@Transactional(readOnly = false)
-	@Scheduled(cron = "0 0 2 * * ?") 
+	@Scheduled(cron = "0 5 2 * * ?") 
 	public void autoAssign() {
 		switch (getDaysOfMonth(new Date())) {
 			/**
@@ -1551,7 +1551,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 *  新增未生成催收任务(task)的订单
 	 */
 	@Transactional(readOnly = false)
-	@Scheduled(cron = "0 0 3 * * ?") 
+	@Scheduled(cron = "0 10 2 * * ?") 
 	public void autoAssignNewOrder() {
 		try {
 			/**

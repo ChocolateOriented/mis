@@ -128,27 +128,27 @@
 			 
 			// 手动分配
 			 $("#distribution").click(function(){
-				 var orders = new Array();
-				 var overduedays = new Array();
-					$("[name='orders']").each(function() {
-						if(this.checked){
-							orders.push($(this).attr("orders"));
-							overduedays.push($(this).attr("overDuedays"));
-						}
-					});
-					if(orders.length==0){
-						$.jBox.tip("请勾选分配订单", 'warning');
-						return;
-					}
-					var uniqueid = unique(overduedays);
+// 				 var orders = new Array();
+// 				 var overduedays = new Array();
+// 					$("[name='orders']").each(function() {
+// 						if(this.checked){
+// 							orders.push($(this).attr("orders"));
+// 							overduedays.push($(this).attr("overDuedays"));
+// 						}
+// 					});
+// 					if(orders.length==0){
+// 						$.jBox.tip("请勾选分配订单", 'warning');
+// 						return;
+// 					}
+// 					var uniqueid = unique(overduedays);
 
-					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&overduedays=" + uniqueid;
-					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
-			               buttons: {},
-			               loaded: function (h) {
-			                   $(".jbox-content", document).css("overflow-y", "hidden");
-			               }
-			         });
+// 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&overduedays=" + uniqueid;
+// 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+// 			               buttons: {},
+// 			               loaded: function (h) {
+// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
+// 			               }
+// 			         });
 			 });
 			
 			 function unique(arr) {
@@ -185,30 +185,30 @@
 				
 			 });
 			
-			// 自动分配
-			 $("#qqq").click(function(){
+			// 新任务添加
+			 $("#autoAssignNewOrder").click(function(){
 // 				 $("#qqq").attr('disabled',"true");
 				 $.ajax({
 	                  type: 'POST',
 	                  url : "${ctx}/dunning/tMisDunningTask/autoAssignNewOrder",
 	                  success : function(data) {
 	                      if (data == "OK") {
-	                          alert("分配成功");
+	                          alert("新任务添加成功");
 // 	                    	  $.jBox.tip("ok", 'info');
 	                      } else {
-	                          alert("分配失败:"+data.message);
+	                          alert("新任务添加失败:"+data.message);
 // 	                    	  $.jBox.tip("error", 'warning');
 	                      }
 // 	                      $("#automatic").removeAttr("disabled"); 
 	                  },
 	                  error : function(XMLHttpRequest, textStatus, errorThrown){
-	                     alert("保存失败:"+textStatus);
+	                     alert("新任务添加失败:"+textStatus);
 	                  }
 	              });
 				
 			 });
 			
-			// 自动分配
+			// 过期任务自动分配
 			 $("#autoRepayment").click(function(){
 // 				 $("#qqq").attr('disabled',"true");
 				 $.ajax({
@@ -216,10 +216,10 @@
 	                  url : "${ctx}/dunning/tMisDunningTask/autoRepayment",
 	                  success : function(data) {
 	                      if (data == "OK") {
-	                          alert("分配成功");
+	                          alert("过期任务自动分配成功");
 // 	                    	  $.jBox.tip("ok", 'info');
 	                      } else {
-	                          alert("分配失败:"+data.message);
+	                          alert("过期任务自动分配失败:"+data.message);
 // 	                    	  $.jBox.tip("error", 'warning');
 	                      }
 // 	                      $("#automatic").removeAttr("disabled"); 
@@ -234,57 +234,57 @@
 			
 			
 			
-			 <!-- 催收留案功能-留案自检 Patch 0001 by GQWU at 2016-11-9 start-->
+			// 催收留案功能-留案自检 Patch 0001 by GQWU at 2016-11-9 start-->
 			 $("#deferDunningDeadline").click(function(){
-				 var dealcodes = new Array();
+// 				 var dealcodes = new Array();
 				 
-				 $("[name='orders']").each(function() {
-					 if(this.checked){
-						 dealcodes.push($(this).attr("orders"));
-					 }
-				 });
+// 				 $("[name='orders']").each(function() {
+// 					 if(this.checked){
+// 						 dealcodes.push($(this).attr("orders"));
+// 					 }
+// 				 });
 				 
-				 if(dealcodes.length==0){
-						$.jBox.tip("请勾选留案订单", 'warning');
-						return;
-				 }
+// 				 if(dealcodes.length==0){
+// 						$.jBox.tip("请勾选留案订单", 'warning');
+// 						return;
+// 				 }
 					
-				 var url = "${ctx}/dunning/tMisDunningTask/dialogDeferDunningDeadline?dealcodes=" + dealcodes;
-				 $.jBox.open("iframe:" + url, "催收留案" , 600, 350, {            
-			               buttons: {},
-			               loaded: function (h) {
-			                   $(".jbox-content", document).css("overflow-y", "hidden");
-			               }
-			     });
+// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogDeferDunningDeadline?dealcodes=" + dealcodes;
+// 				 $.jBox.open("iframe:" + url, "催收留案" , 600, 350, {            
+// 			               buttons: {},
+// 			               loaded: function (h) {
+// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
+// 			               }
+// 			     });
 					
 			 });
-			 <!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
+			 // 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 			 
-			 <!-- 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 start-->
+			// 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 start-->
 			 $("#setOuterOrdersDeadline").click(function(){
-				 var dealcodes = new Array();
+// 				 var dealcodes = new Array();
 				 
-				 $("[name='orders']").each(function() {
-					 if(this.checked){
-						 dealcodes.push($(this).attr("orders"));
-					 }
-				 });
+// 				 $("[name='orders']").each(function() {
+// 					 if(this.checked){
+// 						 dealcodes.push($(this).attr("orders"));
+// 					 }
+// 				 });
 				 
-				 if(dealcodes.length==0){
-						$.jBox.tip("请勾选委外订单", 'warning');
-						return;
-				 }
+// 				 if(dealcodes.length==0){
+// 						$.jBox.tip("请勾选委外订单", 'warning');
+// 						return;
+// 				 }
 					
-				 var url = "${ctx}/dunning/tMisDunningTask/dialogSetOuterOrdersDeadline?dealcodes=" + dealcodes;
-				 $.jBox.open("iframe:" + url, "委外订单截止日期修改" , 600, 350, {            
-			               buttons: {},
-			               loaded: function (h) {
-			                   $(".jbox-content", document).css("overflow-y", "hidden");
-			               }
-			     });
+// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogSetOuterOrdersDeadline?dealcodes=" + dealcodes;
+// 				 $.jBox.open("iframe:" + url, "委外订单截止日期修改" , 600, 350, {            
+// 			               buttons: {},
+// 			               loaded: function (h) {
+// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
+// 			               }
+// 			     });
 					
 			 });
-			 <!-- 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 end-->
+			 // 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 end-->
 				
 		});
 		
@@ -426,23 +426,23 @@
 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配"/>
+		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" disabled="disabled"/>
 	</shiro:hasPermission>
 	
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"/>
+		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案" disabled="disabled"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 	
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 start-->
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"/>
+		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"  disabled="disabled"/>
 	</shiro:hasPermission>
 	
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
-		<input id="qqq"  class="btn btn-primary" type="button" value="新订单任务"/>
+		<input id="autoAssignNewOrder"  class="btn btn-primary" type="button" value="新订单任务"/>
 		<input id="autoRepayment"  class="btn btn-primary" type="button" value="扫描还款"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
