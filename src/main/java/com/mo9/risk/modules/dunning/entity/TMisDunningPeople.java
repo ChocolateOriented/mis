@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.sun.tools.javac.util.List;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
@@ -136,7 +135,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		return dunningcycle;
 	}
 	public String getDunningcycleText() {
-		StringBuffer buffer = new StringBuffer("");
+		StringBuffer buffer = new StringBuffer(" ");
 		String[] str = dunningcycle.split(",");
 		for(String lable : Arrays.asList(str)){
 			String scheduledBut =  DictUtils.getDictDescription(lable,"dunningCycle1","");
