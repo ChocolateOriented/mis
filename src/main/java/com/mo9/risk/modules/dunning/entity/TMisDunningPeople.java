@@ -136,7 +136,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	}
 	public String getDunningcycleText() {
 		StringBuffer buffer = new StringBuffer(" ");
-		String[] str = dunningcycle.split(",");
+		String[] str = this.dunningcycle.split(",");
 		for(String lable : Arrays.asList(str)){
 			String scheduledBut =  DictUtils.getDictDescription(lable,"dunningCycle1","");
 			buffer.append(scheduledBut).append(" ");
