@@ -60,7 +60,7 @@
 			<div class="controls ">
 				<c:forEach var="dc" items="${fns:getDictList('dunningCycle1')}" varStatus="s">
 					<input type="checkbox" name="dunningcycle" value="${dc.label}" />
-						${dc.description}
+						${dc.label}
 				</c:forEach>
 <%-- 				<form:checkboxes  name="dunningcycle" items="${fns:getDictList('dunningCycle1')}" itemLabel="description" itemValue="label" htmlEscape="false" class="required"/> --%>
 				<span class="help-inline"><font color="red">*</font> </span>

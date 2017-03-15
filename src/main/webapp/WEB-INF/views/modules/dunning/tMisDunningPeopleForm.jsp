@@ -77,10 +77,10 @@
 			<div class="controls">
 				<c:choose>
 					<c:when test = "${not empty tMisDunningPeople.id}">
-						${tMisDunningPeople.dunningcycleText}
+						${tMisDunningPeople.dunningcycle}
 					</c:when>
 					<c:otherwise>
-						<form:checkboxes path="dunningcycle" items="${fns:getDictList('dunningCycle1')}" itemLabel="description" itemValue="label" htmlEscape="false" class="required"/>
+						<form:checkboxes path="dunningcycle" items="${fns:getDictList('dunningCycle1')}" itemLabel="label" itemValue="label" htmlEscape="false" class="required"/>
 						<span class="help-inline"><font color="red">*</font> </span>
 					</c:otherwise>
 				</c:choose>
