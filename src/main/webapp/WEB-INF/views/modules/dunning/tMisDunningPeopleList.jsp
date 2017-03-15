@@ -105,7 +105,7 @@
 					${tMisDunningPeople.rate}
 				</td>
 				<td>
-					${tMisDunningPeople.dunningcycleText}
+					${tMisDunningPeople.dunningcycle}
 				</td>
 <!-- 				<td> -->
 <%-- 					${tMisDunningPeople.begin} --%>

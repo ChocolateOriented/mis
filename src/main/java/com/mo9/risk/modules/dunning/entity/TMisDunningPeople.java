@@ -134,15 +134,15 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public String getDunningcycle() {
 		return dunningcycle;
 	}
-	public String getDunningcycleText() {
-		StringBuffer buffer = new StringBuffer(" ");
-		String[] str = this.dunningcycle.split(",");
-		for(String lable : Arrays.asList(str)){
-			String scheduledBut =  DictUtils.getDictDescription(lable,"dunningCycle1","");
-			buffer.append(scheduledBut).append(" ");
-		}
-		return buffer.toString();
-	}
+//	public String getDunningcycleText() {
+//		StringBuffer buffer = new StringBuffer(" ");
+//		String[] str = this.dunningcycle.split(",");
+//		for(String lable : Arrays.asList(str)){
+//			String scheduledBut =  DictUtils.getDictDescription(lable,"dunningCycle1","");
+//			buffer.append(scheduledBut).append(" ");
+//		}
+//		return buffer.toString();
+//	}
 	public void setDunningcycle(String dunningcycle) {
 		this.dunningcycle = dunningcycle;
 	}
