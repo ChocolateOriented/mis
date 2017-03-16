@@ -1302,7 +1302,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 *  新自动分案
 	 */
 	@Transactional(readOnly = false)
-	@Scheduled(cron = "0 5 2 * * ?") 
+	@Scheduled(cron = "0 18 0 * * ?") 
 	public void autoAssign() {
 		switch (getDaysOfMonth(new Date())) {
 			/**
@@ -1551,7 +1551,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 *  新增未生成催收任务(task)的订单
 	 */
 	@Transactional(readOnly = false)
-	@Scheduled(cron = "0 10 2 * * ?") 
+	@Scheduled(cron = "0 22 0 * * ?") 
 	public void autoAssignNewOrder() {
 		try {
 			/**
