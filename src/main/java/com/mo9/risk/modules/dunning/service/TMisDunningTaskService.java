@@ -1551,7 +1551,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 *  新增未生成催收任务(task)的订单
 	 */
 	@Transactional(readOnly = false)
-	@Scheduled(cron = "0 22 0 * * ?") 
+	@Scheduled(cron = "0 10 2 * * ?") 
 	public void autoAssignNewOrder() {
 		try {
 			/**
