@@ -64,7 +64,8 @@
 		FROM t_mis_contant_record a
 			LEFT JOIN t_mis_dunning_people p ON p.Id = a.dunningpeoplename
 		    LEFT JOIN t_risk_order o ON o.dealcode = a.dealcode
-			LEFT JOIN t_mis_dunning_task AS t ON a.TaskId = t.Id
+		    LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = a.dealcode 
+<!-- 		LEFT JOIN t_mis_dunning_task AS t ON a.TaskId = t.Id -->
 		WHERE t.dbid IS NOT NULL 
 			AND o.buyer_id = #{buyerid}
 		<where>
