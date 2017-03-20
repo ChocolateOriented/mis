@@ -140,7 +140,7 @@ public class TMisContantRecordController extends BaseController {
 		}
 		
 		tMisContantRecord.setBuyerid(Integer.parseInt(buyerId));
-		Page<TMisContantRecord> page = tMisContantRecordService.findPage(new Page<TMisContantRecord>(request, response), tMisContantRecord); 
+		Page<TMisContantRecord> page = tMisContantRecordService.findPage(new Page<TMisContantRecord>(request, response, 50), tMisContantRecord); 
 		List<TMisContantRecord> t = page.getList();
 		for(TMisContantRecord record :t){
 			//操作类型汉字话

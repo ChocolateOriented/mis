@@ -10,6 +10,8 @@ import java.util.Date;
 public class TMisDunningOrder {
 	
 	public String platform;
+	
+	public String platformExt;
 	/**
 	 * id
 	 */
@@ -166,6 +168,12 @@ public class TMisDunningOrder {
 	}
 	public void setPlatform(String platform) {
 		this.platform = platform;
+	}
+	public String getPlatformExt() {
+		return platformExt;
+	}
+	public void setPlatformExt(String platformExt) {
+		this.platformExt = platformExt;
 	}
 	
 

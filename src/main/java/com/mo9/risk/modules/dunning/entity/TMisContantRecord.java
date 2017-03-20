@@ -33,12 +33,16 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private String contactstypestr;
 	private SmsTemp smstemp;		// 短信模板
 	private String smstempstr;
+	private Boolean iseffective;		//是否有效联络
 	private TelStatus telstatus;		//电话应答状态
 	private String telstatusstr;
 	private String field1;		// field1
 	private String dunningpeoplename;		//催收人员id
 	private String peoplename;  //催收人员
 	private Date repaymenttime; //应该还款日期
+	private Date promisepaydate;		//承诺还款日
+	private String contactsname;		//联系人姓名
+	private String conclusionid;		//电催结论id
 	
 	private Integer buyerid;
 	
@@ -62,7 +66,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
         BDQJ("客户离职 "),
         NOAS("无人应答 "),
         LMS("留口信"),
-        PTP("承诺还款"),
+        //PTP("承诺还款"),
         OPTP("他人代偿"),
         CAIN("客户回电"),
         STOP("暂缓催收"),
@@ -70,7 +74,18 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
         OFF("电话关机"),
         LDTX("来电提醒"),
         OTHER("其他"),
-        QT("其TA");
+        QT("其TA"),
+        //逾期催收增加催收结论流程及相关优化  变更枚举项
+        PTP("承诺还款（PTP）"),
+        RTP("拒绝还款（RTP）"),
+        WTP("有还款意愿"),
+        WTR("有代偿意愿"),
+        CMIN("沟通中"),
+        PYD("已还款"),
+        NSA("非本人接听"),
+        NSN("非本人号码"),
+        OOC("完全失联")
+        ;
         
         private String desc;
         TelStatus(String desc)
@@ -286,6 +301,14 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 		this.dunningpeoplename = dunningpeoplename;
 	}
 
+	public Boolean getIseffective() {
+		return iseffective;
+	}
+
+	public void setIseffective(Boolean iseffective) {
+		this.iseffective = iseffective;
+	}
+
 	//@Length(min=0, max=128, message="telstatus长度必须介于 0 和 128 之间")
 	public TelStatus getTelstatus() {
 		return telstatus;
@@ -342,6 +365,30 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 
 	public void setPeoplename(String peoplename) {
 		this.peoplename = peoplename;
+	}
+
+	public Date getPromisepaydate() {
+		return promisepaydate;
+	}
+
+	public void setPromisepaydate(Date promisepaydate) {
+		this.promisepaydate = promisepaydate;
+	}
+
+	public String getContactsname() {
+		return contactsname;
+	}
+
+	public void setContactsname(String contactsname) {
+		this.contactsname = contactsname;
+	}
+
+	public String getConclusionid() {
+		return conclusionid;
+	}
+
+	public void setConclusionid(String conclusionid) {
+		this.conclusionid = conclusionid;
 	}
 
 	public Integer getBuyerid() {

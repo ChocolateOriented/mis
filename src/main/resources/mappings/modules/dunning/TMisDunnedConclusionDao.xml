@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunnedConclusionDao">
+    
+	<sql id="tMisDunnedConclusionColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.taskid AS "taskid",
+		a.dealcode AS "dealcode",
+		a.orderstatus AS "orderstatus",
+		a.repaymenttime AS "repaymenttime",
+		a.iseffective AS "iseffective",
+		a.overduereason AS "overduereason",
+		a.resultcode AS "resultcode",
+		a.promisepaydate AS "promisepaydate",
+		a.nextfollowdate AS "nextfollowdate",
+		a.remark AS "remark",
+		a.dunningtime AS "dunningtime",
+		a.dunningpeopleid AS "dunningpeopleid",
+		a.dunningcycle AS "dunningcycle",
+		a.createby AS "createBy.name",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.name",
+		a.updatedate AS "updateDate"
+	</sql>
+    
+	<select id="get" resultType="TMisDunnedConclusion">
+		SELECT 
+			<include refid="tMisDunnedConclusionColumns"/>
+		FROM t_mis_dunned_conclusion a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunnedConclusion">
+		SELECT 
+			a.dbid AS "dbid",
+			a.id AS "id",
+			a.taskid AS "taskid",
+			a.dealcode AS "dealcode",
+			a.orderstatus AS "orderstatus",
+			a.repaymenttime AS "repaymenttime",
+			a.iseffective AS "iseffective",
+			a.overduereason AS "overduereason",
+			a.resultcode AS "resultcode",
+			a.promisepaydate AS "promisepaydate",
+			CASE 
+				WHEN a.dunningpeopleid = t.dunningpeopleid AND a.dunningcycle = t.dunningcycle THEN a.nextfollowdate 
+				ELSE NULL
+			END AS "nextfollowdate",
+			a.remark AS "remark",
+			a.dunningtime AS "dunningtime",
+			a.dunningpeopleid AS "dunningpeopleid",
+			CASE WHEN p.Name = 'sys' THEN '' ELSE p.Name END AS "dunningpeoplename",
+			a.createby AS "createBy.name",
+			a.createdate AS "createDate",
+			a.updateby AS "updateBy.name",
+			a.updatedate AS "updateDate"
+		FROM t_mis_dunned_conclusion a
+		    LEFT JOIN t_risk_order o ON o.dealcode = a.dealcode
+			LEFT JOIN t_mis_dunning_people p ON p.Id = a.dunningpeopleid
+			LEFT JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+		WHERE t.dbid IS NOT NULL 
+		AND o.buyer_id = #{buyerid}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunnedConclusion">
+		SELECT 
+			<include refid="tMisDunnedConclusionColumns"/>
+		FROM t_mis_dunned_conclusion a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunned_conclusion(
+			id,
+			taskid,
+			dealcode,
+			orderstatus,
+			repaymenttime,
+			iseffective,
+			overduereason,
+			resultcode,
+			promisepaydate,
+			nextfollowdate,
+			remark,
+			dunningtime,
+			dunningpeopleid,
+			dunningcycle,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{taskid},
+			#{dealcode},
+			#{orderstatus},
+			#{repaymenttime},
+			#{iseffective},
+			#{overduereason},
+			#{resultcode},
+			#{promisepaydate},
+			#{nextfollowdate},
+			#{remark},
+			#{dunningtime},
+			#{dunningpeopleid},
+			#{dunningcycle},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunned_conclusion SET 	
+			taskid = #{taskid},
+			dealcode = #{dealcode},
+			orderstatus = #{orderstatus},
+			repaymenttime = #{repaymenttime},
+			iseffective = #{iseffective},
+			overduereason = #{overduereason},
+			resultcode = #{resultcode},
+			promisepaydate = #{promisepaydate},
+			nextfollowdate = #{nextfollowdate},
+			remark = #{remark},
+			dunningtime = #{dunningtime},
+			dunningpeopleid = #{dunningpeopleid},
+			dunningcycle = #{dunningcycle},
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunned_conclusion
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findTelActionContacts" resultType="com.mo9.risk.modules.dunning.entity.TMisContantRecord">
+		SELECT 
+		    c.id as "id",
+		    c.ContactsType as "contactstype",
+		    c.ContantTarget as "contanttarget",
+		    ca.contactsname as "contactsname",
+		    c.TelStatus as "telstatus"
+		FROM
+		    (SELECT 
+		        c.ContantTarget, MAX(c.DunningTime) AS DunningTime
+		    FROM
+		        t_mis_contant_record c
+		    WHERE
+		        c.id IN
+				<foreach item="item" index="index" collection="actions" open="(" separator="," close=")">
+		            #{item}
+				</foreach>
+		    GROUP BY c.ContantTarget) t,
+			t_mis_contant_record c
+			LEFT JOIN
+		    (SELECT 
+		        bc.buyer_id,
+				bc.contact_name AS contactsname,
+				bc.contact_mobile AS tel
+		    FROM
+		        t_buyer_contact bc
+		    WHERE
+		        bc.buyer_id = #{buyerid}
+			UNION ALL
+		    SELECT 
+		        bcr.buyer_id, rc.name AS contactsname, rc.tel
+		    FROM
+		        t_risk_contact rc, t_risk_buyer_contact_records bcr
+		    WHERE
+		        rc.id = bcr.contact_id
+			AND bcr.buyer_id = #{buyerid}) ca ON c.ContantTarget = ca.tel
+		WHERE
+		    c.ContantTarget = t.ContantTarget
+		AND c.DunningTime = t.DunningTime
+		AND c.id IN
+		<foreach item="item" index="index" collection="actions" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+		limit 0, 21
+	</select>
+	
+	<update id="updateTelAction">
+		UPDATE t_mis_contant_record SET 	
+			conclusionid = #{id}
+		WHERE id IN
+		<foreach item="item" index="index" collection="actions" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+	</update>
+
+</mapper>

@@ -9,6 +9,22 @@
 // 			var s = window.frames["iframe_text"].document.getElementById("aaa").innerHTML;
 // 			$("#btnOk",document.frames("ifm").document).click();
 		});
+
+		function collectionfunction(obj, width, height){
+			var method = $(obj).attr("method");
+			var contactMobile = $(obj).attr("contactMobile");
+			var contactstype = $(obj).attr("contactstype");
+			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype;
+			$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
+				buttons: {//"确定": "ok", "取消": true
+            	},
+				submit: function (v, h, f) {
+				},
+				loaded: function (h) {
+				    $(".jbox-content", document).css("overflow-y", "hidden");
+				}
+			});
+		}
 	</script>
 </head>
 <body>
@@ -18,7 +34,10 @@
 		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />
 		<tbody>
 		<tr>
-			<td>手机号：${personalInfo.mobile}(${personalInfo.mobileCity})</td>
+			<td>手机号：${personalInfo.mobile}(${personalInfo.mobileCity})&nbsp;&nbsp;
+				<input id="btnTelTaskFather" class="btn btn-primary" type="button" value="电话" style="padding:0px 8px 0px 8px;font-size:13px;"
+					contactMobile="${personalInfo.mobile}" contactstype="SELF" onclick="collectionfunction(this, 650)" method="Tel"/>
+			</td>
 			<td>姓名：${personalInfo.realName}(${personalInfo.sex})(${not empty personalInfo.marital ? personalInfo.marital eq 'Y' ? "已婚" : "未婚" : "未获取"})</td>
 			<td>身份证：${personalInfo.idcard}</td>
 		</tr>

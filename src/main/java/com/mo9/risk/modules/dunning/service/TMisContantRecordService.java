@@ -126,7 +126,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	 */
 	@Transactional(readOnly = false)
 	public String smsGetTemp(TMisDunningTask task,TMisDunningOrder order, TMisContantRecord tMisContantRecord) {
-			return getDunningSmsTemplate(task, DunningSmsTemplate.valueOf(tMisContantRecord.getSmstemp().name()));
+			return getDunningSmsTemplate(task, order, DunningSmsTemplate.valueOf(tMisContantRecord.getSmstemp().name()));
 	}
 	/**
 	 * 送并记录短信或者手机催款记录
@@ -212,6 +212,12 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			//应该还款时间
 			dunning.setRepaymenttime(order.repaymentDate);
 			dunning.setRemark(tMisContantRecord.getRemark());
+			//是否有效联络
+			dunning.setIseffective(tMisContantRecord.getIseffective());
+			//承诺还款时间
+			dunning.setPromisepaydate(tMisContantRecord.getPromisepaydate());
+			//联系人姓名
+			dunning.setContactsname(tMisContantRecord.getContactsname());
 			save(dunning);
 			if(!"".equals(dunningtaskdbid) && null!=dunningtaskdbid){
 				dunningTaskDao.updatedunningtime(dunningtaskdbid);
@@ -242,7 +248,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	 * @param template
 	 * @return
 	 */
-	public String getDunningSmsTemplate(TMisDunningTask task,DunningSmsTemplate template)
+	public String getDunningSmsTemplate(TMisDunningTask task, TMisDunningOrder order, DunningSmsTemplate template)
 	{
 		List<String> args = new ArrayList<String>();
 		
@@ -251,7 +257,15 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		String duningAmount = decimalFormat.format((int)Double.valueOf(personalInfo.getCreditAmount()).doubleValue() / 100D);//应催金额
 		int overdueDays = task.getCurrentOverdueDays();
 		DunningUserInfo userInfo = this.tMisDunningTaskDao.findDunningUserInfo(task.getDealcode());
+		
+		String platformExt = order.getPlatformExt();
+		
+		String route = "【mo9】";
+		if (platformExt != null && platformExt.contains("feishudai")) {
+			route = "【飞鼠贷】";
+		}
 
+		args.add(route);
 		switch (template)
 		{
 			case ST_0:
@@ -291,12 +305,14 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	 * @param template
 	 * @return
 	 */
-	public String getDunningSmsTemplate(DunningOrder order,DunningSmsTemplate template)
+	public String getDunningSmsTemplate(String route, DunningOrder order,DunningSmsTemplate template)
 	{
 		List<String> args = new ArrayList<String>();
 		String duningAmount = decimalFormat.format(order.getCreditamount() / 100D);//应催金额
 		int overdueDays = order.getOverduedays();
 		DunningUserInfo userInfo = this.tMisDunningTaskDao.findDunningUserInfo(order.getDealcode());
+		
+		args.add(route);
 
 		switch (template)
 		{

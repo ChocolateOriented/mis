@@ -6,6 +6,20 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 	$(document).ready(function() {
+		var effective = [{value:"PTP", text:"承诺还款（PTP）"},
+		                 {value:"RTP", text:"拒绝还款（RTP）"},
+		                 {value:"WTP", text:"有还款意愿"},
+		                 {value:"WTR", text:"有代偿意愿"},
+		                 {value:"CAIN", text:"客户回电"},
+		                 {value:"CMIN", text:"沟通中"},
+		                 {value:"PYD", text:"已还款"},
+		                 {value:"OTHER", text:"其他"}
+		                 ];
+		var uneffective = [{value:"NSA", text:"非本人接听"},
+		                   {value:"NSN", text:"非本人号码"},
+		                   {value:"OOC", text:"完全失联"},
+		                   {value:"OTHER", text:"其他"}
+		                   ];
 		
 		$('#smsSave').click(function() {
 			 if($("#inputForm").valid()){
@@ -60,12 +74,17 @@
 	                           var iframeName = h.children(0).attr("name");
 	                           var iframeHtml = window.frames[iframeName];
 	                           check_val = [];
+	                           var check_name = [];
 	                           var sendMsgs = iframeHtml.document.getElementsByName("sendMsgInfo");
 	                           for(k in sendMsgs){
-		                       		if(sendMsgs[k].checked)
+		                       		if(sendMsgs[k].checked) {
 		                       			check_val.push(sendMsgs[k].value);
-		                       	}
+		                       			check_name.push(sendMsgs[k].attributes["namevalue"].value);
+		                       		}
+		                       }
 	                           $("#contanttarget").val(check_val);
+	                           $("#contactsname").val(check_name.toString() || "未知");
+	                           
 	                           return true;
 	                       }
 	                   },
@@ -79,7 +98,31 @@
 		$('#esc').click(function() {
 			window.parent.window.jBox.close();    
 		}); 
-				
+		
+		//是否有效联络选择事件
+		$("input[name=iseffective]").change(function() {
+			var checked = $("input[name=iseffective]:checked").val();
+			var resultCode = $("#telstatus");
+			resultCode.empty();
+			$("#s2id_telstatus span.select2-chosen").text("");
+			$("div[name='promisepaydateGroup']").css("display", "none");
+			$("#promisepaydate").val("");
+			var options = checked == "1" ? effective : uneffective;
+			resultCode.append($("<option></option>").val("").text(""));
+			for (var i = 0; i < options.length; i++) {
+				resultCode.append($("<option></option>").val(options[i].value).text(options[i].text));
+			}
+		});
+		
+		$("input[name=iseffective]").change();
+		
+		//结果代码选择事件
+		$("#telstatus").change(function() {
+			var selected = $("#telstatus").val();
+			var show = selected == "PTP" ? "block" : "none";
+			$("div[name='promisepaydateGroup']").css("display", show);
+			$("#promisepaydate").val("");
+		});
 	});
 	
 	function telEmpty(){
@@ -97,9 +140,11 @@
 <%-- 		<form:hidden path="id"/> --%>
 <%-- 		<sys:message content="${message}"/>		 --%>
 		<div class="control-group">
-			<label class="control-label">联系对象：</label>
-			<div class="controls">
-				<select path="" class="input-medium" id="contactstype" name="contactstype">
+			<div style="width:20%;display:inline-block;text-align:right;">
+				<label>联系对象：</label>
+			</div>
+			<div style="width:25%;display:inline-block;">
+				<select class="input-small" path="" id="contactstype" name="contactstype">
 					<option value=""></option>
 					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option>
 					<option value="MARRIED" <c:if test="${'MARRIED' eq contactstype}">selected</c:if> >夫妻 </option>
@@ -113,22 +158,40 @@
 					<option value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
 				</select>
 			</div>
+			<div style="width:18%;display:inline-block;text-align:right;">
+				<label>联系人姓名：</label>
+			</div>
+			<div style="width:35%;display:inline-block;">
+				<input class="input-small" path="" id="contactsname" name="contactsname" htmlEscape="false" maxlength="50"/>
+			</div>
 		</div>
-		
 		<div class="control-group">
-			<label class="control-label">电话号码：</label>
-			<div class="controls">
+			<div style="width:20%;display:inline-block;text-align:right;">
+				<label>电话号码：</label>
+			</div>
+			<div style="width:50%;display:inline-block;">
 <%-- 				<form:input path="" htmlEscape="false" maxlength="10" class="input-xlarge required digits"/> --%>
-				<input path="" id="contanttarget" name="contanttarget" htmlEscape="false"  class="input-xlarge required" value="${contactMobile}"/>
+				<input path="" id="contanttarget" name="contanttarget" htmlEscape="false"  class="input-small required" value="${contactMobile}"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		
 		<div class="control-group">
-			<label class="control-label">状态代码：</label>
-			<div class="controls">
-				<select path="" class="input-medium required" id="telstatus" name="telstatus">
-					<option value=""></option>
+			<div style="width:20%;display:inline-block;text-align:right;">
+				<label>是否有效联络：</label>
+			</div>
+			<div style="width:25%;display:inline-block;">
+				<div style="display:inline-block;">
+					<input path="" type="radio" name="iseffective" htmlEscape="false" value="1" checked/>是
+					<input path="" type="radio" name="iseffective" htmlEscape="false" value="0"/>否
+				</div>
+			</div>
+			<div style="width:18%;display:inline-block;text-align:right;">
+				<label>结果代码：</label>
+			</div>
+			<div style="width:35%;display:inline-block;">
+				<select path="" class="input-small required" id="telstatus" name="telstatus">
+					<!-- <option value=""></option>
 					<option value="TNIS">号码停机</option>
 					<option value="NOPK">手机拒接</option>
 					<option value="BUSY">电话忙音</option>
@@ -145,20 +208,31 @@
 					<option value="FEAD">费用调整</option>
 					<option value="OFF">电话关机</option>
 					<option value="LDTX">来电提醒</option>
-					<option value="OTHER">其他</option>
+					<option value="OTHER">其他</option> -->
 				</select>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
-		
-		<div class="control-group">
-			<label class="control-label">备注：</label>
-			<div class="controls">
-<%-- 				<form:input path="" htmlEscape="false" maxlength="10" class="input-xlarge required digits"/> --%>
-				<input path="" id="remark" name="remark" htmlEscape="false" maxlength="255" class="input-xlarge"/>
+		<div name="promisepaydateGroup" class="control-group" style="display:none;">
+			<div style="width:20%;display:inline-block;text-align:right;">
+				<label>用户承诺还款日：</label>
+			</div>
+			<div style="width:50%;display:inline-block;">
+				<input id="promisepaydate" name="promisepaydate" type="text" readonly="readonly" maxlength="20" class="Wdate required" style="width:150px"
+					value="<fmt:formatDate value="${TMisContantRecord.promisepaydate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,minDate:'%y-%M-%d'});"/>
+				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
-		
+		<div class="control-group">
+			<div style="width:20%;display:inline-block;text-align:right;">
+				<label>备注：</label>
+			</div>
+			<div style="width:75%;display:inline-block;">
+<%-- 				<form:input path="" htmlEscape="false" maxlength="10" class="input-xlarge required digits"/> --%>
+				<textarea style="height:80px;width:80%;" path="" id="remark" name="remark" htmlEscape="false" maxlength="255"></textarea>
+			</div>
+		</div>
 		<input style="display:none;" id="contanttype" name="contanttype" value="tel" />
 		<input style="display:none;" id="buyerId" name="buyerId" value="${buyerId}" />
 		<input style="display:none;" id="dealcode" name="dealcode" value="${dealcode}" />
@@ -167,9 +241,7 @@
 			<input id="smsSave" class="btn btn-primary" type="button" value="保 存"/>&nbsp;
 			<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
 		</div>
-		
 	</form:form>
-	
 </body>
 </html>
 

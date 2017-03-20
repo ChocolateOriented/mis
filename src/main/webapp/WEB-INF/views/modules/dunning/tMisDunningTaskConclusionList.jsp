@@ -5,8 +5,6 @@
 	<title>催收任务管理</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
-		var iseffective;
-		var resultcode;
 		$(document).ready(function() {
 			$('#btnPaid').attr("disabled","disabled");
 			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobile=" + $('#mobile', parent.document).val();
@@ -20,28 +18,15 @@
 				$('#btnConfirm').attr("disabled","disabled");
 				window.parent.$("#btnTelTaskFather").attr("disabled","disabled");
 			}
-			
-			$("#allAction").click(function() {
-				var checked = $("#allAction").prop('checked');
-				$("input[name='actions']:not(:disabled)").each(function() {
-					$(this).prop('checked', checked);
-				});
-			});
+
 		});
 		
-		function collectionfunction(obj, param, width, height){
+		function collectionfunction(obj){
 				var method = $(obj).attr("method");
 	// 			var aid = $(obj).attr("aid");
 				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}" ;
-				if (param) {
-					for (var name in param) {
-						if (typeof param[name] != "function") {
-							url = url + "&" + name + "=" + param[name] || "";
-						}
-					}
-				}
 // 				alert(url);
-				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
+				$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 430, {            
 	               buttons: {
 // 	            	   "确定": "ok", "取消": true
 	            	   },
@@ -66,43 +51,17 @@
 			$(".submitForm").submit();
         	return false;
         }
-		
-		function telAction(obj) {
-			var actions = [];
-			iseffective = "0";
-			resultcode = null;
-			$("input[name='actions']:checked").each(function() {
-				actions.push($(this).val());
-				if ($(this).attr("iseffective") == "true") {
-					iseffective = "1";
-				}
-				if ($(this).attr("telstatus") == "PTP") {
-					resultcode = "PTP"
-				}
-			});
-			if (actions.length == 0) {
-				$.jBox.tip("请勾选需总结的电催Action", "warning");
-				return;
-			}
-			collectionfunction(obj, {actions : actions}, 750);
-		}
 	</script>
 </head>
 <body>
-	<%-- <ul class="nav nav-tabs">
-		<li><a href="${ctx}/dunning/tMisDunningTask/">催收任务列表</a></li>
-		<li class="active">
-		<a>
-		催收信息</a></li>
-	</ul> --%>
 	<ul class="nav nav-tabs">
 		<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">单位&联系人</a></li></shiro:hasPermission>
 		<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">
 			${hasContact=='true' ? '通讯录' :  '通讯录(无)'}
 			</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationRecord?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">通话记录</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">电催结论记录</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li class="active"><a href="${ctx}/dunning/tMisContantRecord/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">催款历史</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li class="active"><a href="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">电催结论记录</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisContantRecord/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">催款历史</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/orderHistoryList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">历史借款信息</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm"><li><a href="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">汇款信息</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view">
@@ -120,99 +79,75 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th><input id="allAction" type="checkbox"/></th>
 				<th>序号</th>
 				<th>订单ID</th>
 				<th>还款到期日</th>
 				<th>订单状态</th>
-				<th>操作类型</th>
-				<th>短信类型</th>
-				<th>联系人类型</th>
-				<th>联系人电话</th>
 				<th>是否有效联络</th>
+				<th>逾期原因</th>
 				<th>结果代码</th>
+				<th>用户承诺还款日</th>
+				<th>下次跟进日期</th>
 				<th>备注</th>
 				<th>催收人</th>
 				<th>操作时间</th>
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
 			</tr>
 		</thead>
 		<tbody>
- 		<c:forEach items="${page.list}" var="tMisContantRecord" varStatus="vs"> 
-			<tr> 
-				<td>
-					<input type="checkbox" name="actions" value="${tMisContantRecord.id}" iseffective="${tMisContantRecord.iseffective}" telstatus="${tMisContantRecord.telstatus}"
-						<c:if test="${not empty tMisContantRecord.conclusionid || empty tMisContantRecord.iseffective || tMisContantRecord.dunningpeoplename != fns:getUser() || tMisContantRecord.contanttype == 'sms'}">disabled</c:if> />
-				</td>
+ 		<c:forEach items="${page.list}" var="tMisDunnedConclusion" varStatus="vs"> 
+			<tr>
 				<td>
 					${(vs.index+1) + (page.pageNo-1) * page.pageSize} 
 				</td>
 				<td>
-<%-- 				<a href="${ctx}/dunning/tMisDunningTask/form?id=${tMisDunningTask.id}"> --%>
-<%-- 				<a href="javascript:void(0)"  aid="${tMisDunningTask.id}" onclick="ckFunction(this)" > --%>
-					${tMisContantRecord.dealcode}
-<!-- 				</a> -->
+					${tMisDunnedConclusion.dealcode}
 				</td>
 				<td>
-					<fmt:formatDate value="${tMisContantRecord.repaymenttime}" pattern="yyyy-MM-dd"/>
+					<fmt:formatDate value="${tMisDunnedConclusion.repaymenttime}" pattern="yyyy-MM-dd"/>
 				</td>
 				<td>
 					<c:choose>
-						<c:when test = "${tMisContantRecord.orderstatus=='true'}">已还清</c:when>
-						<c:when test = "${tMisContantRecord.orderstatus=='false'}">未还清</c:when>
+						<c:when test = "${tMisDunnedConclusion.orderstatus=='true'}">已还清</c:when>
+						<c:when test = "${tMisDunnedConclusion.orderstatus=='false'}">未还清</c:when>
 						<c:otherwise>${tMisContantRecord.orderstatus}</c:otherwise>
 					</c:choose>
 				</td>
 				<td>
-					${tMisContantRecord.contanttypestr}
-				</td>
-				<td>
-					${tMisContantRecord.smstempstr}
-				</td>
-				<td>
-					${tMisContantRecord.contactstypestr}
-				</td>
-				<td title="${tMisContantRecord.contanttarget}">
-					<c:choose>  
-						<c:when test="${fn:length(tMisContantRecord.contanttarget) > 11}">  
-							<c:out value="${fn:substring(tMisContantRecord.contanttarget, 0, 11)}..." />
-						</c:when>
-						<c:otherwise>
-							<c:out value="${tMisContantRecord.contanttarget}" />
-						</c:otherwise>  
-					</c:choose>
-				</td>
-				<td>
 					<c:choose>
-						<c:when test = "${tMisContantRecord.iseffective==true}">是</c:when>
-						<c:when test = "${tMisContantRecord.iseffective==false}">否</c:when>
+						<c:when test = "${tMisDunnedConclusion.iseffective=='true'}">是</c:when>
+						<c:when test = "${tMisDunnedConclusion.iseffective=='false'}">否</c:when>
 						<c:otherwise></c:otherwise>
 					</c:choose>
 				</td>
 				<td>
-					${tMisContantRecord.telstatusstr}
+					${tMisDunnedConclusion.overduereasonstr}
 				</td>
 				<td>
-<%-- 					<c:choose>   --%>
-<%-- 						<c:when test="${fn:length(tMisContantRecord.remark) > 10}">   --%>
-<%-- 							<c:out value="${fn:substring(tMisContantRecord.remark, 0, 10)}..." /> --%>
-<%-- 						</c:when> --%>
-<%-- 						<c:otherwise> --%>
-<%-- 							<c:out value="${tMisContantRecord.remark}" /> --%>
-<%-- 						</c:otherwise>   --%>
-<%-- 					</c:choose> --%>
-     				${tMisContantRecord.remark}
+					${tMisDunnedConclusion.resultcodestr}
 				</td>
 				<td>
-					${tMisContantRecord.peoplename}
+					<fmt:formatDate value="${tMisDunnedConclusion.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
-					<fmt:formatDate value="${tMisContantRecord.dunningtime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<fmt:formatDate value="${tMisDunnedConclusion.nextfollowdate}" pattern="yyyy-MM-dd"/>
+					
 				</td>
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><td> --%>
-<%--     				<a href="${ctx}/dunning/tMisDunningTask/form?id=${tMisDunningTask.id}">修改</a> --%>
-<%-- 					<a href="${ctx}/dunning/tMisDunningTask/delete?id=${tMisDunningTask.id}" onclick="return confirmx('确认要删除该催收任务吗？', this.href)">删除</a> --%>
-<%-- 				</td></shiro:hasPermission> --%>
+				<td title="${tMisDunnedConclusion.remark}">
+					<c:choose>  
+						<c:when test="${fn:length(tMisDunnedConclusion.remark) > 50}">  
+							<c:out value="${fn:substring(tMisDunnedConclusion.remark, 0, 50)}..." />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${tMisDunnedConclusion.remark}" />
+						</c:otherwise>  
+					</c:choose>
+				</td>
+				<td>
+					${tMisDunnedConclusion.dunningpeoplename}
+				</td>
+				<td>
+					<fmt:formatDate value="${tMisDunnedConclusion.dunningtime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
 			</tr>
 			
 		</c:forEach> 
@@ -221,7 +156,7 @@
 	<div class="pagination">${page}</div>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary"  method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="telAction(this)" class="btn btn-primary" method="TelConclusion"  type="button" value="电催结论"/>
+	<input id="btnTel" name="btnCollection" class="btn btn-primary" method="TelConclusion"  type="button" value="电催结论" disabled/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />

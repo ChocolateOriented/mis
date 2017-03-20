@@ -105,10 +105,10 @@
 				
 				<th title="本期累计 = 本期目前累计坏账 - 上期目前累计坏账">坏账金额</th>
 				<th title="">坏账催回本金</th>
-				<th title="">催收减免</th>
 <!-- 				<th title="">委外佣金</th> -->
 				<th title="自产品上线之日起, 累计坏账">历史累计坏账</th>
 				<th title="坏账率 = 目前累计 / 自产品上线之日起的累计交易总额">总坏账率</th>
+				<th title="">催收减免</th>
 				
 
 				<th title="放款成本 = 本期放贷笔数(不包括延期)">放款成本</th>
@@ -177,8 +177,6 @@
 				<td>
 					${sCashLoanweekReport.debatreturnamountText}
 				</td>
-				<td>
-				</td>
 <!-- 				<td> -->
 <!-- 				</td> -->
 				<td>
@@ -186,6 +184,8 @@
 				</td>
 				<td>
 					${sCashLoanweekReport.debatpercentText}
+				</td>
+				<td>
 				</td>
 				
 				
@@ -276,8 +276,6 @@
 				<td>
 					${sumWeekReportBean.debatreturnamountText}
 				</td>
-				<td>
-				</td>
 <!-- 				<td> -->
 <!-- 				</td> -->
 				<td>
@@ -285,6 +283,8 @@
 				</td>
 				<td>
 					${sumWeekReportBean.debatpercentText}
+				</td>
+				<td>
 				</td>
 				
 				

@@ -16,13 +16,14 @@
 				$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
+				window.parent.$("#btnTelTaskFather").attr("disabled","disabled");
 			}
 		});
 		
 		function collectionfunction(obj){
 			var method = $(obj).attr("method");
 			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}" ;
-			$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 400, {            
+			$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 430, {            
                buttons: {
 //	            	   "确定": "ok", "取消": true
             	   },
@@ -45,6 +46,7 @@
 			${hasContact=='true' ? '通讯录' :  '通讯录(无)'}
 			</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationRecord?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">通话记录</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">电催结论记录</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisContantRecord/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">催款历史</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li class="active"><a href="${ctx}/dunning/tMisDunningTask/orderHistoryList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">历史借款信息</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm"><li><a href="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">汇款信息</a></li></shiro:hasPermission>
@@ -133,7 +135,7 @@
 	</table>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary"  method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="催收电话" />
+	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />

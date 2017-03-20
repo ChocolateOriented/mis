@@ -97,10 +97,10 @@
 				
 				<th title="本期累计 = 本期目前累计坏账 -  上期目前累计坏账">坏账金额</th>
 				<th title="">坏账催回本金</th>
-				<th title="">催收减免</th>
-				<th title="委外回款所扣除的佣金总金额, 佣金月结">委外佣金</th>
 				<th title="自产品上线之日起, 累计坏账">历史累计坏账</th>
 				<th title="坏账率 = 目前累计 / 自产品上线之日起的累计交易总额">总坏账率</th>
+				<th title="">催收减免</th>
+				<th title="委外回款所扣除的佣金总金额, 佣金月结">委外佣金</th>
 				
 
 				<th title="放款成本 = 本期放贷笔数(不包括延期)">放款成本</th>
@@ -172,15 +172,15 @@
 					${sCashLoanMonthReport.debatreturnamountText}
 				</td>
 				<td>
-				</td>
-				<td>
-					${sCashLoanMonthReport.entrustcommissionText}
-				</td>
-				<td>
 					${sCashLoanMonthReport.debatamountText}
 				</td>
 				<td>
 					${sCashLoanMonthReport.monthdebatpercentText} 
+				</td>
+				<td>
+				</td>
+				<td>
+					${sCashLoanMonthReport.entrustcommissionText}
 				</td>
 				
 				
@@ -274,15 +274,15 @@
 					${sumMonthReportBean.debatreturnamountText}
 				</td>
 				<td>
-				</td>
-				<td>
-					${sumMonthReportBean.entrustcommissionText}
-				</td>
-				<td>
 					${sumMonthReportBean.debatamountText}
 				</td>
 				<td>
 					${sumMonthReportBean.monthdebatpercentText} 
+				</td>
+				<td>
+				</td>
+				<td>
+					${sumMonthReportBean.entrustcommissionText}
 				</td>
 				
 				

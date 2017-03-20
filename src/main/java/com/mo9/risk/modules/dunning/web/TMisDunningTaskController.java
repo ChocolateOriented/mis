@@ -53,6 +53,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
+import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -65,6 +66,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
+import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
@@ -132,6 +134,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisRemittanceConfirmService tMisRemittanceConfirmService;
+	
+	@Autowired
+	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -208,7 +213,7 @@ public class TMisDunningTaskController extends BaseController {
 //								"".equals(strTemplate[1]) ?  Double.parseDouble(strTemplate[1]) : 0 , 
 //									"".equals(strTemplate[2]) ?  Integer.parseInt(strTemplate[2]) : 0 )
 //					,DunningSmsTemplate.valueOf(smsTemplate));
-			String message =  tMisContantRecordService.getDunningSmsTemplate(new DunningOrder("xxx", 0D, 0), DunningSmsTemplate.valueOf(smsTemplate));
+			String message =  tMisContantRecordService.getDunningSmsTemplate("【XXX】" ,new DunningOrder("xxx", 0D, 0), DunningSmsTemplate.valueOf(smsTemplate));
 			return message;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -234,8 +239,6 @@ public class TMisDunningTaskController extends BaseController {
 		while (it.hasNext()) {
 			String[] strTemplate = it.next().split("#");
 			if(!"".equals(strTemplate[0]) && !"".equals(strTemplate[1]) && !"".equals(strTemplate[2])){
-				String message =  tMisContantRecordService.getDunningSmsTemplate
-						(new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));
 //				strTemplate[3];   获取手机号码
 				
 				/**
@@ -254,6 +257,14 @@ public class TMisDunningTaskController extends BaseController {
 					logger.warn("订单不存在，订单号：" + dealcode);
 					continue;
 				}
+				
+				String platformExt = order.getPlatformExt();
+				String route = "【mo9】";
+				if (platformExt != null && platformExt.contains("feishudai")) {
+					route = "【飞鼠贷】";
+				}
+				String message =  tMisContantRecordService.getDunningSmsTemplate
+						(route, new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));
 				
 				Map<String,Object> parameter = new HashMap<String,Object>();
 				parameter.put("STATUS_DUNNING", "dunning");
@@ -1163,6 +1174,40 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		return "modules/dunning/dialog/dialogCollectionTel";
+	}
+	
+	/**
+	 * 加载电催结论页面
+	 * @param tMisDunningConclusion
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionTelConclusion")
+	public String collectionTelConclusion(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
+		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
+			return "views/error/500";
+		}
+		
+		String actions = request.getParameter("actions");
+		String[] actionsArr = actions.split(",");
+		
+		TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
+		
+		tMisDunnedConclusion.setActions(Arrays.asList(actionsArr));
+		tMisDunnedConclusion.setBuyerid(Integer.valueOf(buyerId));
+		
+		String remark = tMisDunnedConclusionService.getDefalutRemark(tMisDunnedConclusion);
+		
+		model.addAttribute("buyerId", buyerId);
+		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+		model.addAttribute("remark", remark);
+		model.addAttribute("actions", actionsArr);
+		return "modules/dunning/dialog/dialogCollectionTelConclusion";
 	}
 	
 	/**

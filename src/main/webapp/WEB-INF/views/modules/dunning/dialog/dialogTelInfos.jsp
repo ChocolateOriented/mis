@@ -59,11 +59,11 @@
 							<td>
 								<c:choose> 
 									<c:when test="${dialogType eq 'tel'}">
-										<input type="radio" name="sendMsgInfo" value="${sendMsgInfo.tel}" />
+										<input type="radio" name="sendMsgInfo" value="${sendMsgInfo.tel}" namevalue="${sendMsgInfo.name}"/>
 											${sendMsgInfo.tel}<span style="color:#3FABE9">(${not empty map[sendMsgInfo.tel] ?map[sendMsgInfo.tel]:0})</span>
 									</c:when>
 									<c:otherwise>
-										<input type="checkbox" name="sendMsgInfo" value="${sendMsgInfo.tel}" />
+										<input type="checkbox" name="sendMsgInfo" value="${sendMsgInfo.tel}" namevalue="${sendMsgInfo.name}" />
 											${sendMsgInfo.tel}<span style="color:#3FABE9">(${not empty map[sendMsgInfo.tel] ?map[sendMsgInfo.tel]:0})</span>
 									</c:otherwise>
 								</c:choose>
