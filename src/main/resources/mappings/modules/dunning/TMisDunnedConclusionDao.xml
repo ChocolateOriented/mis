@@ -156,7 +156,8 @@
 		    c.id as "id",
 		    c.ContactsType as "contactstype",
 		    c.ContantTarget as "contanttarget",
-		    ca.contactsname as "contactsname",
+		    <!-- ca.contactsname as "contactsname", -->
+		    c.contactsname as "contactsname",
 		    c.TelStatus as "telstatus"
 		FROM
 		    (SELECT 
@@ -170,23 +171,27 @@
 				</foreach>
 		    GROUP BY c.ContantTarget) t,
 			t_mis_contant_record c
-			LEFT JOIN
-		    (SELECT 
-		        bc.buyer_id,
-				bc.contact_name AS contactsname,
-				bc.contact_mobile AS tel
-		    FROM
-		        t_buyer_contact bc
-		    WHERE
-		        bc.buyer_id = #{buyerid}
-			UNION ALL
-		    SELECT 
-		        bcr.buyer_id, rc.name AS contactsname, rc.tel
-		    FROM
-		        t_risk_contact rc, t_risk_buyer_contact_records bcr
-		    WHERE
-		        rc.id = bcr.contact_id
-			AND bcr.buyer_id = #{buyerid}) ca ON c.ContantTarget = ca.tel
+			<!-- LEFT JOIN
+			(SELECT MAX(contactsname) as contactsname,
+					tel
+				FROM
+			    (SELECT 
+					bc.contact_name AS contactsname,
+					bc.contact_mobile AS tel
+			    FROM
+			        t_buyer_contact bc
+			    WHERE
+			        bc.buyer_id = #{buyerid}
+				UNION ALL
+			    SELECT 
+			        rc.name AS contactsname, rc.tel
+			    FROM
+			        t_risk_contact rc, t_risk_buyer_contact_records bcr
+			    WHERE
+			        rc.id = bcr.contact_id
+				AND bcr.buyer_id = #{buyerid}) tmp
+				GROUP BY tel
+			) ca ON c.ContantTarget = ca.tel -->
 		WHERE
 		    c.ContantTarget = t.ContantTarget
 		AND c.DunningTime = t.DunningTime

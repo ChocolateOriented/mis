@@ -28,13 +28,14 @@
         	return false;
         }
 		
-		function collectionfunction(obj){
+		function collectionfunction(obj, width, height){
 				var method = $(obj).attr("method");
 				var contactMobile = $(obj).attr("contactMobile");
 				var contactstype = $(obj).attr("contactstype");
+				var contactsname = $(obj).attr("contactsname") || "未知";
 				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype ;
 // 				alert(url);
-				$.jBox.open("iframe:" + url, $(obj).attr("value") ,  600, 430, {            
+				$.jBox.open("iframe:" + url, $(obj).attr("value"), width || 600, height || 430, {            
 	               buttons: {
 // 	            	   "确定": "ok", "取消": true
 	            	   },
@@ -49,6 +50,9 @@
 	                   },
 	               loaded: function (h) {
 	                   $(".jbox-content", document).css("overflow-y", "hidden");
+                        var iframeName = h.children(0).attr("name");
+                        var iframeHtml = window.frames[iframeName];               //获取子窗口的句柄
+                        iframeHtml.$("#contactsname").val(contactsname);
 	               }
 	         });
 		}
@@ -174,7 +178,7 @@
 				<td>
 				<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 					<input  name="btnCollection" contactMobile="${p.tel}" contactstype="COMMUNCATE" onclick="collectionfunction(this)"  class="btn btn-primary" method="Sms"  type="button" value="短信" />
-					<input  name="btnCollection" contactMobile="${p.tel}" contactstype="COMMUNCATE" onclick="collectionfunction(this)"  class="btn btn-primary" method="Tel"  type="button" value="电话" />
+					<input  name="btnCollection" contactMobile="${p.tel}" contactstype="COMMUNCATE" contactsname="${p.name}" onclick="collectionfunction(this, 650)"  class="btn btn-primary" method="Tel"  type="button" value="电话" />
 <%-- 					<input  name="btnCollection" contactMobile="${p.tel}" contactstype="COMMUNCATE" onclick="collectionfunction(this)"  class="btn btn-primary" method="Tel"  type="button" value="催收电话" /> --%>
 				</shiro:hasPermission>
 				</td>

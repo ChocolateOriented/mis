@@ -18,7 +18,7 @@
 			<tr>
 				<th>时间</th>
 				<th>催收人</th>
-				<th>应答状态</th>
+				<th>结果代码</th>
 				<th>备注</th>
 			</tr>
 		</thead>

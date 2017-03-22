@@ -128,6 +128,7 @@
 				<th>操作类型</th>
 				<th>短信类型</th>
 				<th>联系人类型</th>
+				<th>联系人姓名</th>
 				<th>联系人电话</th>
 				<th>是否有效联络</th>
 				<th>结果代码</th>
@@ -171,6 +172,9 @@
 				</td>
 				<td>
 					${tMisContantRecord.contactstypestr}
+				</td>
+				<td>
+					${tMisContantRecord.contactsname}
 				</td>
 				<td title="${tMisContantRecord.contanttarget}">
 					<c:choose>  
