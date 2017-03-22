@@ -123,10 +123,4 @@ public class TMisDunnedConclusionController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunnedConclusion/?repage";
 	}
 
-	@RequiresPermissions("dunning:tMisContantRecord:view")
-	@RequestMapping(value = "nextfollowdate")
-	@ResponseBody
-	public Map<String, String> getNextFollowDate(HttpServletRequest request, HttpServletResponse response) {
-		return tMisDunnedConclusionService.getFollowDateConfig();
-	}
 }

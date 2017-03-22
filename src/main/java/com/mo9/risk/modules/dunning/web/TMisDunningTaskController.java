@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
@@ -1201,12 +1202,14 @@ public class TMisDunningTaskController extends BaseController {
 		tMisDunnedConclusion.setBuyerid(Integer.valueOf(buyerId));
 		
 		String remark = tMisDunnedConclusionService.getDefalutRemark(tMisDunnedConclusion);
+		Map<String, String> next = tMisDunnedConclusionService.getFollowDateConfig();
 		
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("remark", remark);
 		model.addAttribute("actions", actionsArr);
+		model.addAttribute("nextdate", JSON.toJSONString(next));
 		return "modules/dunning/dialog/dialogCollectionTelConclusion";
 	}
 	

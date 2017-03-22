@@ -21,8 +21,8 @@
 		                   {value:"OTHER", text:"其他"}
 		                   ];
 		
-		var nextDate = {};
-        
+		var nextDate = ${nextdate};
+		
 		$('#save').click(function() {
 			if($("#inputForm").valid()){
 				$("#save").attr('disabled',"true");
@@ -83,6 +83,11 @@
 			$("div[name='overduereasonGruop']").css("display", show);
 		});
 
+		//根据勾选actions初始化是否有效联络
+		$("input[name=iseffective][value='" + window.parent.iseffective + "']").prop("checked", true);
+		
+		$("input[name=iseffective]").change();
+
 		//结果代码选择事件
 		$("#resultcode").change(function() {
 			var selected = $("#resultcode").val();
@@ -101,26 +106,15 @@
 			}
 			$("#nextfollowdate").val(followDate.getFullYear() + "-" + month + "-" + date);
 		});
+
+		//根据勾选actions初始化结果代码
+		if (window.parent.resultcode == "PTP") {
+			var resultcode = $("#resultcode");
+			resultcode.val(window.parent.resultcode);
+			$("#s2id_resultcode span.select2-chosen").text(resultcode.text());
+			resultcode.change();
+		}
 		
-        $.ajax({
-            type: 'POST',
-            url : "${ctx}/dunning/tMisDunnedConclusion/nextfollowdate",
-            success : function(data) {
-            	nextDate = data;
-            	
-        		//根据勾选actions初始化是否有效联络
-        		$("input[name=iseffective][value='" + window.parent.iseffective + "']").prop("checked", true);
-        		$("input[name=iseffective]").change();
-            	
-        		//根据勾选actions初始化结果代码
-        		if (window.parent.resultcode == "PTP") {
-        			var resultcode = $("#resultcode");
-        			resultcode.val(window.parent.resultcode);
-        			$("#s2id_resultcode span.select2-chosen").text(resultcode.text());
-        			resultcode.change();
-        		}
-            }
-        });
 	});
 
 	</script>
