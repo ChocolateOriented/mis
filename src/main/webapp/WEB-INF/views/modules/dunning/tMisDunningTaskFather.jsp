@@ -14,6 +14,7 @@
 			var method = $(obj).attr("method");
 			var contactMobile = $(obj).attr("contactMobile");
 			var contactstype = $(obj).attr("contactstype");
+			var contactsname = "${personalInfo.realName}";
 			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype;
 			$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
 				buttons: {//"确定": "ok", "取消": true
@@ -22,6 +23,9 @@
 				},
 				loaded: function (h) {
 				    $(".jbox-content", document).css("overflow-y", "hidden");
+                    var iframeName = h.children(0).attr("name");
+                    var iframeHtml = window.frames[iframeName];               //获取子窗口的句柄
+                    iframeHtml.$("#contactsname").val(contactsname);
 				}
 			});
 		}

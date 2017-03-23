@@ -115,29 +115,44 @@
 			$("div[name='overduereasonGruop']").css("display", show);
 		});
 
-		//根据勾选actions初始化是否有效联络
-		$("input[name=iseffective][value='" + window.parent.iseffective + "']").prop("checked", true);
-		
-		$("input[name=iseffective]").change();
-
 		//结果代码选择事件
 		$("#resultcode").change(function() {
 			var selected = $("#resultcode").val();
 			var show = selected == "PTP" ? "inline-block" : "none";
 			$("div[name='promisepaydateGroup']").css("display", show);
 			$("#promisepaydate").val("");
-			var day = nextDate[selected] || "";
-			$("#nextfollowdate").val(day);
+			var day = nextDate[selected] || 0;
+			var followDate = addDate(new Date(), day);
+			var month = followDate.getMonth() + 1;
+			if (month < 10) {
+				month = "0" + month.toString();
+			}
+			var date = followDate.getDate();
+			if (date < 10) {
+				date = "0" + date.toString();
+			}
+			$("#nextfollowdate").val(followDate.getFullYear() + "-" + month + "-" + date);
 		});
-
-		//根据勾选actions初始化结果代码
-		if (window.parent.resultcode == "PTP") {
-			var resultcode = $("#resultcode");
-			resultcode.val(window.parent.resultcode);
-			$("#s2id_resultcode span.select2-chosen").text(resultcode.text());
-			resultcode.change();
-		}
 		
+        $.ajax({
+            type: 'POST',
+            url : "${ctx}/dunning/tMisDunnedConclusion/nextfollowdate",
+            success : function(data) {
+            	nextDate = data;
+            	
+        		//根据勾选actions初始化是否有效联络
+        		$("input[name=iseffective][value='" + window.parent.iseffective + "']").prop("checked", true);
+        		$("input[name=iseffective]").change();
+            	
+        		//根据勾选actions初始化结果代码
+        		if (window.parent.resultcode == "PTP") {
+        			var resultcode = $("#resultcode");
+        			resultcode.val(window.parent.resultcode);
+        			$("#s2id_resultcode span.select2-chosen").text(resultcode.text());
+        			resultcode.change();
+        		}
+            }
+        });
 	});
 
 	</script>
