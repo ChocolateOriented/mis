@@ -3,6 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -131,8 +133,11 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 		List<Dict> rs = dictDao.findList(dict);
 		
 		Map<String, String> map = new HashMap<String, String>();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		for (Dict nextDay : rs) {
-			map.put(nextDay.getLabel(), nextDay.getValue());
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DATE, Integer.parseInt(nextDay.getValue()));
+			map.put(nextDay.getLabel(), format.format(c.getTime()));
 		}
 		return map;
 	}

@@ -7,6 +7,7 @@
 	<script type="text/javascript">
 		var iseffective;
 		var resultcode;
+		var target = [];
 		$(document).ready(function() {
 			$('#btnPaid').attr("disabled","disabled");
 			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobile=" + $('#mobile', parent.document).val();
@@ -69,14 +70,24 @@
 		
 		function telAction(obj) {
 			var actions = [];
+			target = [];
 			iseffective = "0";
 			resultcode = null;
 			$("input[name='actions']:checked").each(function() {
-				actions.push($(this).val());
-				if ($(this).attr("iseffective") == "true") {
+				var elem = $(this);
+				actions.push(elem.val());
+				var obj = {
+						contactstype : elem.attr("contactstypestr") || "",
+						contactsname : elem.attr("contactsname") || "",
+						contanttarget : elem.attr("contanttarget") || "",
+						resultcode : elem.attr("telstatusstr") || "",
+						dunningtime : elem.attr("dunningtime")
+				};
+				target.push(obj);
+				if (elem.attr("iseffective") == "true") {
 					iseffective = "1";
 				}
-				if ($(this).attr("telstatus") == "PTP") {
+				if (elem.attr("telstatus") == "PTP") {
 					resultcode = "PTP"
 				}
 			});
@@ -143,6 +154,8 @@
 			<tr> 
 				<td>
 					<input type="checkbox" name="actions" value="${tMisContantRecord.id}" iseffective="${tMisContantRecord.iseffective}" telstatus="${tMisContantRecord.telstatus}"
+						contactstypestr="${tMisContantRecord.contactstypestr}" contactsname="${tMisContantRecord.contactsname}" contanttarget="${tMisContantRecord.contanttarget}"
+						telstatusstr="${tMisContantRecord.telstatusstr}" dunningtime="${tMisContantRecord.dunningtime}"
 						<c:if test="${not empty tMisContantRecord.conclusionid || empty tMisContantRecord.iseffective || tMisContantRecord.dunningpeoplename != fns:getUser() || tMisContantRecord.contanttype == 'sms'}">disabled</c:if> />
 				</td>
 				<td>

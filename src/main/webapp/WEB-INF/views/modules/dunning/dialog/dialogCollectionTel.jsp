@@ -128,6 +128,7 @@
 	function telEmpty(){
 		$("#contanttarget").empty();
 		$("#contanttarget").val("");
+		$("#contactsname").val("");
 	}
 	</script>
 </head>

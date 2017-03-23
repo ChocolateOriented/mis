@@ -23,6 +23,38 @@
 		
 		var nextDate = ${nextdate};
 		
+		function initRemark() {
+			var targetArr = window.parent.window.target;
+			var cnt = 0;
+			var targetMap = {};
+			//根据电话号码去重
+			for (var i = 0; i < targetArr.length; i++) {
+				var o = targetArr[i];
+				if (targetMap[o.contanttarget]) {
+					if (o.dunningtime > targetMap[o.contanttarget].dunningtime) {
+						targetMap[o.contanttarget] = o;
+					}
+				} else {
+					if (++cnt > 20) {
+						break;
+					}
+					targetMap[o.contanttarget] = o;
+				}
+			}
+			
+			var remark = "";
+			for (var k in targetMap) {
+				remark = remark + targetMap[k].contactstype + (targetMap[k].contactsname ? "-" + targetMap[k].contactsname : "") + " " + targetMap[k].contanttarget + " " + targetMap[k].resultcode + "/";
+			}
+			remark = remark.substring(0, remark.length - 1);
+			if (cnt > 20) {
+				remark += "...";
+			}
+			$("#remark").val(remark);
+		}
+		
+		initRemark();
+		
 		$('#save').click(function() {
 			if($("#inputForm").valid()){
 				$("#save").attr('disabled',"true");
@@ -94,17 +126,8 @@
 			var show = selected == "PTP" ? "inline-block" : "none";
 			$("div[name='promisepaydateGroup']").css("display", show);
 			$("#promisepaydate").val("");
-			var day = nextDate[selected] || 0;
-			var followDate = addDate(new Date(), day);
-			var month = followDate.getMonth() + 1;
-			if (month < 10) {
-				month = "0" + month.toString();
-			}
-			var date = followDate.getDate();
-			if (date < 10) {
-				date = "0" + date.toString();
-			}
-			$("#nextfollowdate").val(followDate.getFullYear() + "-" + month + "-" + date);
+			var day = nextDate[selected] || "";
+			$("#nextfollowdate").val(day);
 		});
 
 		//根据勾选actions初始化结果代码
@@ -193,7 +216,7 @@
 				<label>备注：</label>
 			</div>
 			<div style="width:75%;display:inline-block;">
-				<textarea style="height:80px;width:85%;" path="" id="remark" name="remark" htmlEscape="false" maxlength="1000">${remark}</textarea>
+				<textarea style="height:80px;width:85%;" path="" id="remark" name="remark" htmlEscape="false" maxlength="1000"></textarea>
 			</div>
 		</div>
 		
