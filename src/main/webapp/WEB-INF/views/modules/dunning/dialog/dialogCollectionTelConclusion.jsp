@@ -21,7 +21,7 @@
 		                   {value:"OTHER", text:"其他"}
 		                   ];
 		
-		var nextDate = ${nextdate};
+		var nextDate = {};
 		
 		function initRemark() {
 			var targetArr = window.parent.window.target;
