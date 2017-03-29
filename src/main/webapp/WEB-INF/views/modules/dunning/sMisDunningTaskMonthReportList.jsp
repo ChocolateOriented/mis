@@ -73,6 +73,7 @@
 				<th>催回本金</th>
 				<th>应催金额</th>
 				<th>催回金额</th>
+				<th>绩效催回金额</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -107,6 +108,9 @@
 				</td>
 				<td>
 					${sMisDunningTaskMonthReport.creditamount}
+				</td>
+				<td>
+					${sMisDunningTaskMonthReport.finishedAndDelayAmount}
 				</td>
 			</tr>
 		</c:forEach>
