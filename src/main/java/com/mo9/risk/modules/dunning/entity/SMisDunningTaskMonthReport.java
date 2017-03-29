@@ -20,18 +20,18 @@ import com.thinkgem.jeesite.util.NumberUtil;
 public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthReport> {
 	
 	private static final long serialVersionUID = 1L;
-	private String month;		// 月份
-	private String dunningpeoplename;		// 催收人姓名
-	private String dunningperiod;		// 催收周期
-	private Integer dunningtasknum;		// 催收任务数
-	private Integer dunningtaskfinished;		// 完成催收任务数
-	private Double dunningtaskrate;		// 催回率
-	private Integer dunningtelnum;		// 电话数
-	private Integer dunningsmsnum;		// 短信数
-	private BigDecimal dunningrepaymentamount;		// 应催金额
-	private BigDecimal dunningpayoffamount;		// 催回金额
-	private BigDecimal dunningpayoffcapital;		// 催回本金
-	private BigDecimal dunningprofitamount;		// 催回利润
+	private String months;		// 月份
+	private String monthdesc;	// 
+	private String name;		// 催收人姓名
+	private String dunningcycle;   // 催收员队列
+	private String taskdunningcycle; // 案件队列
+	private Integer dunningordernumber;//应催订单数
+	private Integer finishedordernumber;//催回订单数
+	private BigDecimal dunningcorpusamount;//应催本金
+	private BigDecimal finishedcorpusamount;//催回本金
+	private BigDecimal finishedAndDelayAmount;//催回本金+延期收益
+	private BigDecimal amount;//应催金额
+	private BigDecimal creditamount;//催回金额
 	
 	private Date datetime; 
 	
@@ -43,115 +43,113 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		super(id);
 	}
 
-	@Length(min=0, max=10, message="月份长度必须介于 0 和 10 之间")
-	@ExcelField(title="日期", type=1, align=2, sort=1)
-	public String getMonth() {
-		return month;
+	@ExcelField(title="月份", type=1, align=2, sort=1)
+	public String getMonths() {
+		return months;
 	}
-	public void setMonth(String month) {
-		this.month = month;
-	}
-	
-	@Length(min=0, max=20, message="催收人姓名长度必须介于 0 和 20 之间")
-	@ExcelField(title="催收人姓名", type=1, align=2, sort=2)
-	public String getDunningpeoplename() {
-		return dunningpeoplename;
-	}
-	public void setDunningpeoplename(String dunningpeoplename) {
-		this.dunningpeoplename = dunningpeoplename;
+	public void setMonths(String months) {
+		this.months = months;
 	}
 	
-	@Length(min=0, max=20, message="催收周期长度必须介于 0 和 20 之间")
-	@ExcelField(title="催收周期", type=1, align=2, sort=3)
-	public String getDunningperiod() {
-		return dunningperiod;
+	@ExcelField(title="月份", type=1, align=2, sort=2)
+	public String getMonthdesc() {
+		return monthdesc;
 	}
-	public void setDunningperiod(String dunningperiod) {
-		this.dunningperiod = dunningperiod;
-	}
-	
-	@ExcelField(title="催收任务数", type=1, align=2, sort=4)
-	public Integer getDunningtasknum() {
-		return dunningtasknum;
-	}
-	public void setDunningtasknum(Integer dunningtasknum) {
-		this.dunningtasknum = dunningtasknum;
+	public void setMonthdesc(String monthdesc) {
+		this.monthdesc = monthdesc;
 	}
 	
-	@ExcelField(title="完成催收任务数", type=1, align=2, sort=5)
-	public Integer getDunningtaskfinished() {
-		return dunningtaskfinished;
+	@ExcelField(title="催收人姓名", type=1, align=2, sort=3)
+	public String getName() {
+		return name;
 	}
-	public void setDunningtaskfinished(Integer dunningtaskfinished) {
-		this.dunningtaskfinished = dunningtaskfinished;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
-	@ExcelField(title="催回率", type=1, align=2, sort=6)
-	public Double getDunningtaskrate() {
-		return dunningtaskrate;
+
+	@ExcelField(title="催收员队列", type=1, align=2, sort=4)
+	public String getDunningcycle() {
+		return dunningcycle;
 	}
-	public String getDunningtaskrateText() {
-		return null != this.dunningtaskrate ? NumberUtil.formatTosepara(this.dunningtaskrate) + "%" : "";
-	}
-	public void setDunningtaskrate(Double dunningtaskrate) {
-		this.dunningtaskrate = dunningtaskrate;
+	public void setDunningcycle(String dunningcycle) {
+		this.dunningcycle = dunningcycle;
 	}
 	
-	@ExcelField(title="电话数", type=1, align=2, sort=7)
-	public Integer getDunningtelnum() {
-		return dunningtelnum;
+	@ExcelField(title="案件队列", type=1, align=2, sort=5)
+	public String getTaskdunningcycle() {
+		return taskdunningcycle;
 	}
-	public void setDunningtelnum(Integer dunningtelnum) {
-		this.dunningtelnum = dunningtelnum;
+	public void setTaskdunningcycle(String taskdunningcycle) {
+		this.taskdunningcycle = taskdunningcycle;
 	}
-	
-	@ExcelField(title="短信数", type=1, align=2, sort=8)
-	public Integer getDunningsmsnum() {
-		return dunningsmsnum;
+
+	@ExcelField(title="应催订单数", type=1, align=2, sort=6)
+	public Integer getDunningordernumber() {
+		return dunningordernumber;
 	}
-	public void setDunningsmsnum(Integer dunningsmsnum) {
-		this.dunningsmsnum = dunningsmsnum;
-	}
-	
-	@ExcelField(title="应催金额", type=1, align=2, sort=9)
-	public BigDecimal getDunningrepaymentamount() {
-		return dunningrepaymentamount;
-	}
-	public void setDunningrepaymentamount(BigDecimal dunningrepaymentamount) {
-		this.dunningrepaymentamount = dunningrepaymentamount;
+	public void setDunningordernumber(Integer dunningordernumber) {
+		this.dunningordernumber = dunningordernumber;
 	}
 	
-	@ExcelField(title="催回金额", type=1, align=2, sort=10)
-	public BigDecimal getDunningpayoffamount() {
-		return dunningpayoffamount;
+	@ExcelField(title="催回订单数", type=1, align=2, sort=7)
+	public Integer getFinishedordernumber() {
+		return finishedordernumber;
 	}
-	public void setDunningpayoffamount(BigDecimal dunningpayoffamount) {
-		this.dunningpayoffamount = dunningpayoffamount;
+	public void setFinishedordernumber(Integer finishedordernumber) {
+		this.finishedordernumber = finishedordernumber;
+	}
+
+	@ExcelField(title="应催本金", type=1, align=2, sort=8)
+	public BigDecimal getDunningcorpusamount() {
+		return dunningcorpusamount;
+	}
+	public void setDunningcorpusamount(BigDecimal dunningcorpusamount) {
+		this.dunningcorpusamount = dunningcorpusamount;
+	}
+
+	@ExcelField(title="催回本金", type=1, align=2, sort=9)
+	public BigDecimal getFinishedcorpusamount() {
+		return finishedcorpusamount;
+	}
+	public void setFinishedcorpusamount(BigDecimal finishedcorpusamount) {
+		this.finishedcorpusamount = finishedcorpusamount;
 	}
 	
-	@ExcelField(title="催回本金", type=1, align=2, sort=11)
-	public BigDecimal getDunningpayoffcapital() {
-		return dunningpayoffcapital;
+	@ExcelField(title="催回本金+延期收益", type=1, align=2, sort=10)
+	public BigDecimal getFinishedAndDelayAmount() {
+		return finishedAndDelayAmount;
 	}
-	public void setDunningpayoffcapital(BigDecimal dunningpayoffcapital) {
-		this.dunningpayoffcapital = dunningpayoffcapital;
+
+	public void setFinishedAndDelayAmount(BigDecimal finishedAndDelayAmount) {
+		this.finishedAndDelayAmount = finishedAndDelayAmount;
 	}
-	
-	@ExcelField(title="催回利润", type=1, align=2, sort=12)
-	public BigDecimal getDunningprofitamount() {
-		return dunningprofitamount;
+
+	@ExcelField(title="应催金额", type=1, align=2, sort=11)
+	public BigDecimal getAmount() {
+		return amount;
 	}
-	public void setDunningprofitamount(BigDecimal dunningprofitamount) {
-		this.dunningprofitamount = dunningprofitamount;
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	@ExcelField(title="催回金额", type=1, align=2, sort=12)
+	public BigDecimal getCreditamount() {
+		return creditamount;
+	}
+	public void setCreditamount(BigDecimal creditamount) {
+		this.creditamount = creditamount;
+	}
+
+	public Date getDatetime() {
+		return datetime;
+	}
+
+	public void setDatetime(Date datetime) {
+		this.datetime = datetime;
 	}
 
 	
 	
-	public Date getDatetime() {
-		return datetime;
-	}
-	public void setDatetime(Date datetime) {
-		this.datetime = datetime;
-	}
+	
 	
 }

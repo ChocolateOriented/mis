@@ -34,16 +34,20 @@
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
 			<li><label>月份：</label>
-<%-- 				<form:input path="datetime" htmlEscape="false" maxlength="10" class="input-medium"/> --%>
+
 				<input name="datetime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${SMisDunningTaskMonthReport.datetime}" pattern="yyyy-MM"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM',isShowClear:false});"/>
+					
+				<form:select id="monthdesc"  path="monthdesc" class="input-medium" >
+					<form:option  selected="selected" value="" label="整月"/>
+					<form:option  value="上半月" label="上半月"/>
+					<form:option  value="下半月" label="下半月"/>
+				</form:select>
+					
 			</li>
-<!-- 			<li><label>催收人姓名：</label> -->
-<%-- 				<form:input path="dunningpeoplename" htmlEscape="false" maxlength="20" class="input-medium"/> --%>
-<!-- 			</li> -->
 			<li><label>催款员：</label>
-				<form:select id="dunningpeoplename"  path="dunningpeoplename" class="input-medium" >
+				<form:select id="name"  path="name" class="input-medium" >
 					<form:option selected="selected" value="" label="全部人员"/>
 					<form:options items="${dunningPeoples}" itemLabel="name" itemValue="name" htmlEscape="false" />
 				</form:select>
@@ -61,56 +65,48 @@
 			<tr>
 				<th>月份</th>
 				<th>催收人姓名</th>
-				<th>催收周期</th>
-				<th>催收任务数</th>
-				<th>完成催收任务数</th>
-				<th>催回率</th>
-				<th>电话数</th>
-				<th>短信数</th>
+				<th>催收员队列</th>
+				<th>案件队列</th>
+				<th>应催订单数</th>
+				<th>催回订单数</th>
+				<th>应催本金</th>
+				<th>催回本金</th>
 				<th>应催金额</th>
 				<th>催回金额</th>
-				<th>催回本金</th>
-				<th>催回利润</th>
 			</tr>
 		</thead>
 		<tbody>
 		<c:forEach items="${page.list}" var="sMisDunningTaskMonthReport">
 			<tr>
-				<td><a href="${ctx}/dunning/sMisDunningTaskMonthReport/form?id=${sMisDunningTaskMonthReport.id}">
-					${sMisDunningTaskMonthReport.month}
-				</a></td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningpeoplename}
+					${sMisDunningTaskMonthReport.months}-${sMisDunningTaskMonthReport.monthdesc}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningperiod}
+					${sMisDunningTaskMonthReport.name}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningtasknum}
+					${sMisDunningTaskMonthReport.dunningcycle}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningtaskfinished}
+					${sMisDunningTaskMonthReport.taskdunningcycle}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningtaskrate}
+					${sMisDunningTaskMonthReport.dunningordernumber}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningtelnum}
+					${sMisDunningTaskMonthReport.finishedordernumber}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningsmsnum}
+					${sMisDunningTaskMonthReport.dunningcorpusamount}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningrepaymentamount}
+					${sMisDunningTaskMonthReport.finishedcorpusamount}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningpayoffamount}
+					${sMisDunningTaskMonthReport.amount}
 				</td>
 				<td>
-					${sMisDunningTaskMonthReport.dunningpayoffcapital}
-				</td>
-				<td>
-					${sMisDunningTaskMonthReport.dunningprofitamount}
+					${sMisDunningTaskMonthReport.creditamount}
 				</td>
 			</tr>
 		</c:forEach>

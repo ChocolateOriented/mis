@@ -19,18 +19,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.common.utils.DateUtils;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
-import com.thinkgem.jeesite.modules.weeklyreport.entity.VRiskOrderAfterLoanPushing;
-import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.SMisDunningTaskMonthReportService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+import com.thinkgem.jeesite.common.web.BaseController;
 
 /**
  * 催收月绩效Controller
@@ -63,7 +61,7 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 	public String list(SMisDunningTaskMonthReport sMisDunningTaskMonthReport, HttpServletRequest request,TMisDunningPeople dunningPeople, HttpServletResponse response, Model model) {
 		
 		String month = DateUtils.formatDate(null == sMisDunningTaskMonthReport.getDatetime()  ? new Date() : sMisDunningTaskMonthReport.getDatetime() , "yyyyMM");
-		sMisDunningTaskMonthReport.setMonth(month);
+		sMisDunningTaskMonthReport.setMonths(month);
 		Page<SMisDunningTaskMonthReport> page = sMisDunningTaskMonthReportService.findPage(new Page<SMisDunningTaskMonthReport>(request, response), sMisDunningTaskMonthReport); 
 		model.addAttribute("page", page);
 		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
@@ -84,7 +82,7 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 		try {
             String fileName = "performanceMonthReport"+DateUtils.getDate("yyyy-MM-ddHHmmss")+".xlsx";
             String month = DateUtils.formatDate(null == newtest.getDatetime()  ? new Date() : newtest.getDatetime() , "yyyyMM");
-            newtest.setMonth(month);
+            newtest.setMonths(month);
             List<SMisDunningTaskMonthReport> page = sMisDunningTaskMonthReportService.findList(newtest);
     		new ExportExcel("月绩效报表", SMisDunningTaskMonthReport.class).setDataList(page).write(response, fileName).dispose();
     		return null;
