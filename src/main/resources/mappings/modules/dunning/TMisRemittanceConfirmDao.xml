@@ -178,6 +178,20 @@
 	</update>
 			
 	
+	<update id="confirmationMergeUpdate">
+		UPDATE t_mis_remittance_confirm SET 	
+			payamount = accountamount,
+			paytype = #{tMisRemittanceConfirm.paytype},
+			confirmstatus = #{tMisRemittanceConfirm.confirmstatus},
+			updateby = #{tMisRemittanceConfirm.updateBy.name},
+			updatedate = #{tMisRemittanceConfirm.updateDate}
+		WHERE id in
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+	</update>
+	
+	
 	<update id="financialUpdate">
 		UPDATE t_mis_remittance_confirm SET 	
 			financialremittancename = #{financialremittancename},
@@ -194,6 +208,13 @@
 		WHERE id = #{id}
 	</update>
 	
+	<update id="financialReturn">
+		UPDATE t_mis_remittance_confirm SET 	
+			confirmstatus = #{confirmstatus},
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
 	
 	<select id="getResult" resultType="int">
 		SELECT
@@ -238,5 +259,17 @@
 		WHERE id = #{id}
 	</update>
 	
-	
+	<select id="findRelatedList" resultType="TMisRemittanceConfirm">
+		SELECT 
+			<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+		<where>
+		   		a.Invalid = 't'
+			AND a.dealcode = #{dealcode}
+			<if test="confirmstatus != null and confirmstatus != ''">
+				AND a.confirmstatus = #{confirmstatus}
+			</if>
+		</where>
+		ORDER BY a.createDate desc
+	</select>
 </mapper>

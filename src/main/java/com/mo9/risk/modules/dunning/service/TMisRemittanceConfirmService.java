@@ -4,7 +4,9 @@
 package com.mo9.risk.modules.dunning.service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,6 +81,18 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	}
 	
 	/**
+	 * 财务打回到账数据
+	 * @param entity
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public int financialReturn(TMisRemittanceConfirm entity){
+		entity.preUpdate();
+		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CW_RETURN);
+		return misRemittanceConfirmDao.financialReturn(entity);
+	}
+	
+	/**
 	 * 催收确认还款数据
 	 * @param entity
 	 * @return
@@ -88,6 +102,23 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		entity.preUpdate();
 		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM);
 		return misRemittanceConfirmDao.confirmationUpdate(entity);
+	}
+	
+	/**
+	 * 催收确认合并还款数据
+	 * @param entity
+	 * @param relatedIds
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public int confirmationMergeUpdate(TMisRemittanceConfirm entity, List<String> relatedIds){
+		entity.preUpdate();
+		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM);
+		Map<String, Object> param = new HashMap<String, Object>();
+		relatedIds.add(entity.getId());
+		param.put("ids", relatedIds);
+		param.put("tMisRemittanceConfirm", entity);
+		return misRemittanceConfirmDao.confirmationMergeUpdate(param);
 	}
 	
 	/**
@@ -127,4 +158,12 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return misRemittanceConfirmDao.getExistDelayNumber(orderid);
 	}
 	
+	/**
+	 * 获取关联的汇款记录
+	 * @param tMisRemittanceConfirm
+	 * @return
+	 */
+	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm){
+		return misRemittanceConfirmDao.findRelatedList(tMisRemittanceConfirm);
+	}
 }

@@ -5,6 +5,10 @@ package com.mo9.risk.modules.dunning.dao;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
+
+import java.util.List;
+import java.util.Map;
+
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 
 /**
@@ -33,11 +37,25 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	public int confirmationUpdate(TMisRemittanceConfirm entity);
 	
 	/**
+	 * 催收更新合并还款数据
+	 * @param param
+	 * @return
+	 */
+	public int confirmationMergeUpdate(Map<String, Object> param);
+	
+	/**
 	 * 财务更新到账数据
 	 * @param entity
 	 * @return
 	 */
 	public int financialUpdate(TMisRemittanceConfirm entity);
+	
+	/**
+	 * 财务打回到账数据
+	 * @param entity
+	 * @return
+	 */
+	public int financialReturn(TMisRemittanceConfirm entity);
 	
 	/**
 	 * 返回是否是部分
@@ -66,5 +84,12 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return
 	 */
 	public int getExistDelayNumber(Integer orderid);
+	
+	/**
+	 * 获取关联的汇款记录
+	 * @param tMisRemittanceConfirm
+	 * @return
+	 */
+	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm);
 	
 }
