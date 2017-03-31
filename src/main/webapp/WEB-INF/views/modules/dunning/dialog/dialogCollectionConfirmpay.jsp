@@ -14,6 +14,13 @@
 			}
 			
 			$('#paid').click(function() {
+				 if ($("input[name='isMergeRepayment']:checked").val() == "1") {
+					if (parseFloat($("#remittanceamount").val()) != parseFloat($("#paidAmount").val())) {
+						$.jBox.tip("金额不匹配，请返回检查", "warning");
+						return;
+					}
+				 }
+				 
 	 			 if($("#inputForm").valid()){
 	 				$("#paid").attr('disabled',"true");
 	 				 $.ajax({
@@ -44,10 +51,23 @@
 					$("#delaytr").show();
 					$("#paidAmount").attr("readonly",true);
 				}else{
-					$("#delaytr").hide();
-					$("#paidAmount").attr("readonly",false);
+					if ($("input[name='isMergeRepayment']:checked").val() == "1") {
+						$("#paidAmount").attr("readonly", true);
+						$("#paidAmount").val($("#remittanceamount").val());
+					} else {
+						$("#delaytr").hide();
+						$("#paidAmount").attr("readonly",false);
+					}
 				}
 			});
+			
+			$("input[name='isMergeRepayment']").change(function() {
+				var show = $(this).val() == "1" ? "block" : "none";
+				$("#remittanceamountGroup").css("display", show);
+				$("#relatedRecord").css("display", show);
+				$('#paidType').change();
+			});
+			
 		});
 	</script>
 </head>
@@ -89,6 +109,19 @@
 		<br/>
 		<form:form id="inputForm" modelAttribute="TMisPaid"  class="form-horizontal">
 		<input id="platform" name="platform" type="hidden" value="${platform}" />
+			<div class="control-group"  <c:if test="${not hasRelatedRecord}">style="display:none;"</c:if>>
+				<label class="control-label">是否合并还款：</label>
+				<div class="controls">
+					<input name="isMergeRepayment" type="radio" value="1" <c:if test="${hasRelatedRecord}">checked</c:if>/>是
+					<input name="isMergeRepayment" type="radio" value="0" <c:if test="${not hasRelatedRecord}">checked</c:if>/>否
+				</div>
+			</div>
+			<div id="remittanceamountGroup" class="control-group" <c:if test="${not hasRelatedRecord}">style="display:none;"</c:if>>
+				<label class="control-label">汇款金额：</label>
+				<div class="controls">
+					<input style="width:180px;" type="tel" readonly="readonly" id="remittanceamount" name="remittanceamount" class="required number" value="${remittanceamount}"/>
+				</div>
+			</div>
 			<div class="control-group">
 				<label class="control-label">还款类型：</label>
 					<div class="controls">
@@ -120,9 +153,9 @@
 			<div class="control-group">
 				<label class="control-label">还款渠道：</label>
 				<div class="controls" style="margin-top:2px;">
-					<input type="radio" name="paychannel" value="bank" checked="checked"/>银行转账
-					<input type="radio" name="paychannel" value="alipay"/>支付宝
-					<input type="radio" name="paychannel" value="mo9" />先玩后付
+					<input type="radio" name="paychannel" value="alipay" <c:if test="${'支付宝' eq financialremittancechannel || empty financialremittancechannel}">checked</c:if>/>支付宝
+					<input type="radio" name="paychannel" value="bank" <c:if test="${'银行转账' eq financialremittancechannel}">checked</c:if>/>银行转账
+					<input type="radio" name="paychannel" value="mo9" <c:if test="${'先玩后付' eq financialremittancechannel}">checked</c:if>/>先玩后付
 				</div>
 			</div>
 			
@@ -133,11 +166,40 @@
 					<span class="help-inline"><font color="red">*</font> </span>
 				</div>
 			</div>
-			
+			<div id="relatedRecord" class="control-group" <c:if test="${not hasRelatedRecord}">style="display:none;"</c:if>>
+				<h4 style="margin-bottom:10px;">关联还款记录：</h4>
+				<table id="customerTable" class="table-condensed" style="padding-left:5px;padding-right:5px;width:100%">
+					<thead>
+						<tr style="text-align:left;">
+							<th>创建时间</th>
+							<th>订单号</th>
+							<th>汇款时间</th>
+							<th>到账时间</th>
+							<th>到账金额</th>
+							<th>汇款渠道</th>
+						</tr>
+					</thead>
+					<tbody>
+					<c:forEach items="${relatedList}" var="tMisRemittanceConfirm" varStatus="vs">
+						<tr>
+							<td><fmt:formatDate value="${tMisRemittanceConfirm.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+							<td>${tMisRemittanceConfirm.dealcode}</td>
+							<td><fmt:formatDate value="${tMisRemittanceConfirm.remittancetime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+							<td><fmt:formatDate value="${tMisRemittanceConfirm.accounttime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+							<td>${tMisRemittanceConfirm.accountamount}</td>
+							<td>${tMisRemittanceConfirm.financialremittancechannel}</td>
+						</tr>
+					</c:forEach>
+					</tbody>
+				</table>
+			</div>
 			<input style="display:none;" id="buyerId" name="buyerId" value="${buyerId}" />
 			<input style="display:none;" id="dealcode" name="dealcode" value="${dealcode}" />
 			<input type="hidden" id="confirmid" name="confirmid" value="${tMisRemittanceConfirm.id}" />
 			<input type="hidden" id="accountamount" name="accountamount" value="${tMisRemittanceConfirm.accountamount}" />
+			<c:forEach items="${relatedList}" var="tMisRemittanceConfirm" varStatus="vs">
+				<input name="relatedId" type="hidden" value="${tMisRemittanceConfirm.id}"/>
+			</c:forEach>
 			<div style= "padding:19px 180px 10px;" >
 				<input id="paid" class="btn btn-primary" type="button" value="确认付款"/>&nbsp;
 			</div>

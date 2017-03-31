@@ -38,6 +38,12 @@
 					}
 				}
 			});
+			
+			$("#btnReturn").click(function() {
+				var url = "${ctx}/dunning/tMisRemittanceConfirm/financialReturn?id=" + "${TMisRemittanceConfirm.id}";
+				confirmx("确认要打回改汇款信息吗？", url);
+
+			});
 		});
 		
 		function openDialog(obj){
@@ -138,6 +144,7 @@
 		<div class="form-actions">
 			<shiro:hasPermission name="dunning:tMisRemittanceConfirm:financialEdit">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="提交确认" />&nbsp;
+				<input id="btnReturn" class="btn btn-primary" type="button" value="打回" ${'ch_submit' eq tMisRemittanceConfirm.confirmstatus ? '' : 'disabled'}/>&nbsp;
 			</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>

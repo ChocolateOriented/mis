@@ -13,8 +13,11 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -269,6 +272,26 @@ public class TMisRemittanceConfirmController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisRemittanceConfirm/remittanceConfirmList?ro=ch_submit";
 	}
 	
+	/**
+	 * 财务打回汇款
+	 * @param tMisRemittanceConfirm
+	 * @param model
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisRemittanceConfirm:financialEdit")
+	@RequestMapping(value = "financialReturn")
+	public String financialReturn(TMisRemittanceConfirm tMisRemittanceConfirm, RedirectAttributes redirectAttributes) {
+		if (StringUtils.isNotBlank(tMisRemittanceConfirm.getId())) {
+			
+			tMisRemittanceConfirmService.financialReturn(tMisRemittanceConfirm);
+			addMessage(redirectAttributes, "汇款信息打回成功");
+		} else {
+			addMessage(redirectAttributes, "汇款信息打回失败");
+		}
+		return "redirect:" + Global.getAdminPath()+"/dunning/tMisRemittanceConfirm/remittanceConfirmList?ro=ch_submit";
+	}
+	
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
 	@Autowired
@@ -332,6 +355,25 @@ public class TMisRemittanceConfirmController extends BaseController {
 		
 		model.addAttribute("task", task);
 		
+		List<TMisRemittanceConfirm> relatedList = tMisRemittanceConfirmService.findRelatedList(tMisRemittanceConfirm);
+		boolean hasRelatedRecord = false;
+		double remittanceamount = 0;
+		String financialremittancechannel = "";
+		if (relatedList != null && relatedList.size() > 0) {
+			financialremittancechannel = relatedList.get(0).getFinancialremittancechannel();
+			
+			if (relatedList.size() > 1) {
+				hasRelatedRecord = true;
+				int index = 0;
+				for (int i = 0; i < relatedList.size(); i++) {
+					if (relatedList.get(i).getId().equals(tMisRemittanceConfirm.getId())) {
+						index = i;
+					}
+					remittanceamount += relatedList.get(i).getAccountamount();
+				}
+				relatedList.remove(index);
+			}
+		}
 		BigDecimal delayAmount = new BigDecimal(0l);
 		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
 			if(Integer.valueOf(personalInfo.getOverdueDays()) <= Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14")) ){
@@ -359,6 +401,10 @@ public class TMisRemittanceConfirmController extends BaseController {
 		model.addAttribute("platform", order.getPlatform());
 		model.addAttribute("tMisRemittanceConfirm", tMisRemittanceConfirm);
 		model.addAttribute("delayAmount", delayAmount);
+		model.addAttribute("hasRelatedRecord", hasRelatedRecord);
+		model.addAttribute("relatedList", relatedList);
+		model.addAttribute("remittanceamount", remittanceamount);
+		model.addAttribute("financialremittancechannel", financialremittancechannel);
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
 		model.addAttribute("result", result);
 		return "modules/dunning/dialog/dialogCollectionConfirmpay";
@@ -375,14 +421,14 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@RequiresPermissions("dunning:tMisRemittanceConfirm:edit")
 	@RequestMapping(value = "confrimPayStatus")
 	@ResponseBody
-	public String confrimPayStatus(TMisPaid paid,String confirmid,String accountamount,String platform) {
+	public String confrimPayStatus(TMisPaid paid,String confirmid,String accountamount,String platform, String isMergeRepayment, String[] relatedId) {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
 		String delayDay = paid.getDelayDay();
-		if(Double.parseDouble(paidAmount) > (null != accountamount && !"".equals(accountamount) ? Double.parseDouble(accountamount) : Double.parseDouble("0"))){
+		if(!"1".equals(isMergeRepayment) && Double.parseDouble(paidAmount) > (null != accountamount && !"".equals(accountamount) ? Double.parseDouble(accountamount) : Double.parseDouble("0"))){
 			return "还款金额不应该大于财务的到账金额";
 		}
 		if(StringUtils.isBlank(delayDay)){
@@ -422,7 +468,12 @@ public class TMisRemittanceConfirmController extends BaseController {
 				resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
 				if(StringUtils.isNotBlank(resultCode) && "200".equals(resultCode)){
 					str = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
-					tMisRemittanceConfirmService.confirmationUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM));
+					if ("1".equals(isMergeRepayment)) {
+						List<String> relatedIds = new ArrayList<String>(Arrays.asList(relatedId));
+						tMisRemittanceConfirmService.confirmationMergeUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM), relatedIds);
+					} else {
+						tMisRemittanceConfirmService.confirmationUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM));
+					}
 					logger.info("返回成功" + str);
 					
 					/**
