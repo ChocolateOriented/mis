@@ -152,7 +152,7 @@
 		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
 		IFNULL(o.balance, 0) * 100 as "balance",
 		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
-		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 END as "creditAmount",
 		IFNULL(r.Delay_Count, 0) As delayCount,
 		c.sex As sex,
 		IFNULL(q.bank_no,"") AS remitBankNo,

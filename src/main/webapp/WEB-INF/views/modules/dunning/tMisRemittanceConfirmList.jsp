@@ -35,7 +35,7 @@
 			var dealcode = $(obj).attr("dealcode");
 			var id = $(obj).attr("remittanceconfirmid");
 			var url = "${ctx}/dunning/tMisRemittanceConfirm/collection" + method + "?buyerId=" + buyerId +"&dealcode=" + dealcode + "&id="+id;
-			$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 500, {            
+			$.jBox.open("iframe:" + url, $(obj).attr("value") , 700, 600, {            
                buttons: {},
                submit: function (v, h, f) {},
                loaded: function (h) {
@@ -76,6 +76,7 @@
 					<form:option selected="selected" value="" label="全部状态"/>
 					<form:option  value="ch_submit" label="催收已提交"/>
 					<form:option  value="cw_submit" label="财务已确认"/>
+					<form:option  value="cw_return" label="财务已打回"/>
 					<form:option  value="ch_confirm" label="已完成"/>
 				</form:select>
 			</li>
@@ -173,16 +174,24 @@
 				<c:choose> 
 					<c:when test="${'ch_confirm' ne tMisRemittanceConfirm.confirmstatus}">
 					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:edit">
-						<input  id="btnch"  name="btnCollection" onclick="ckFunction('ch',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="编辑" />
+						<input  id="btnch" ${'cw_submit' eq tMisRemittanceConfirm.confirmstatus ? 'disabled' : ''}  name="btnCollection" onclick="ckFunction('ch',this)" class="btn btn-primary"
+							remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="编辑" />
 	    				<input  id="btnPaid" ${not empty tMisRemittanceConfirm.accountamount ? '' : 'disabled'}  name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"
 	    				 	remittanceconfirmid="${tMisRemittanceConfirm.id}"  buyerId="${tMisRemittanceConfirm.buyerId}" dealcode="${tMisRemittanceConfirm.dealcode}" method="Confirmpay"  type="button" value="还款" />
 <%-- 	    				 <a href="${ctx}/dunning/tMisRemittanceConfirm/delete?id=${tMisRemittanceConfirm.id}" onclick="return confirmx('确认要删除该汇款确认信息吗？', this.href)">删除</a> --%>
-	    				 <input    name="btnCollection" onclick="return confirmx('确认要删除该汇款确认信息吗？', '${ctx}/dunning/tMisRemittanceConfirm/delete?id=${tMisRemittanceConfirm.id}')" class="btn btn-primary"  type="button" value="删除" />
 					</shiro:hasPermission>
 					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:financialEdit">
-						<input  id="btncw"  name="btnCollection" onclick="ckFunction('cw',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  
-						type="button" value="${'cw_submit' eq tMisRemittanceConfirm.confirmstatus ? '编辑' : '审核'}" />
+						<c:if test="${'cw_return' ne tMisRemittanceConfirm.confirmstatus}">
+							<input  id="btncw"  name="btnCollection" onclick="ckFunction('cw',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  
+							type="button" value="${'cw_submit' eq tMisRemittanceConfirm.confirmstatus ? '编辑' : '审核'}" />
+						</c:if>
+						<c:if test="${'cw_return' eq tMisRemittanceConfirm.confirmstatus}">
+							<input  id="btnover"  name="btnCollection" onclick="ckFunction('over',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="查看" />
+						</c:if>
 	   				</shiro:hasPermission>
+	   				<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+	    				 <input    name="btnCollection" onclick="return confirmx('确认要删除该汇款确认信息吗？', '${ctx}/dunning/tMisRemittanceConfirm/delete?id=${tMisRemittanceConfirm.id}')" class="btn btn-primary"  type="button" value="删除" />
+	    			</shiro:hasPermission>
 					</c:when>
 					
 					<c:otherwise>

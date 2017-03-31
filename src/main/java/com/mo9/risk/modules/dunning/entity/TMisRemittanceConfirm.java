@@ -25,6 +25,10 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	 */
 	public static final String CONFIRMSTATUS_CW_SUBMIT = "cw_submit";  
 	/**
+	 *  代表财务已打回催收待重新提交
+	 */
+	public static final String CONFIRMSTATUS_CW_RETURN = "cw_return";
+	/**
 	 *  代表催收最终已确认
 	 */
 	public static final String CONFIRMSTATUS_CH_CONFIRM = "ch_confirm";    

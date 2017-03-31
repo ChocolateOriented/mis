@@ -692,7 +692,7 @@
         b.mobile AS "mobile",
         o.amount AS "amount",
 <!--    IFNULL(o.credit_amount, 0) - IFNULL(o.modify_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount, -->
-		IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END AS creditamount,
         repayment_time AS "repaymenttime",
         CASE
         WHEN o.`status` = 'payoff' THEN
