@@ -214,6 +214,15 @@
         </foreach>
 	</update>
 	
+	 <select id="findPeoplesByids" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		WHERE id in 
+		<foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</select>
 	
 	
 </mapper>

@@ -128,27 +128,37 @@
 			 
 			// 手动分配
 			 $("#distribution").click(function(){
-// 				 var orders = new Array();
-// 				 var overduedays = new Array();
-// 					$("[name='orders']").each(function() {
-// 						if(this.checked){
-// 							orders.push($(this).attr("orders"));
+				 var orders = new Array();
+				 var dunningcycle = new Array();
+					$("[name='orders']").each(function() {
+						if(this.checked){
+							if("" == $(this).attr("orders") || "" == $(this).attr("dunningcycle")){
+								$.jBox.tip("数据异常,需先将数据补充完整", 'warning');
+								return;
+							}
+							orders.push($(this).attr("orders"));
+							dunningcycle.push($(this).attr("dunningcycle"));
 // 							overduedays.push($(this).attr("overDuedays"));
-// 						}
-// 					});
-// 					if(orders.length==0){
-// 						$.jBox.tip("请勾选分配订单", 'warning');
-// 						return;
-// 					}
-// 					var uniqueid = unique(overduedays);
+						}
+					});
+					if(orders.length==0){
+						$.jBox.tip("请勾选分配订单", 'warning');
+						return;
+					}
+					var uniqueid = unique(dunningcycle);
+					if(uniqueid.length != 1 ){
+						$.jBox.tip("请勾选同一催收队列订单", 'warning');
+						return;
+					}
 
-// 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&overduedays=" + uniqueid;
-// 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
-// 			               buttons: {},
-// 			               loaded: function (h) {
-// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
-// 			               }
-// 			         });
+					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&dunningcycle=" + uniqueid;
+					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+			               buttons: {},
+			               loaded: function (h) {
+			                   $(".jbox-content", document).css("overflow-y", "hidden");
+			               }
+			         });
+					
 			 });
 			
 			 function unique(arr) {
@@ -426,7 +436,7 @@
 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" disabled="disabled"/>
+		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
 	</shiro:hasPermission>
 	
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
@@ -485,7 +495,7 @@
 		<c:forEach items="${page.list}" var="dunningOrder" varStatus="vs">
 			<tr>
 				<td>
-					<input type="checkbox" name="orders" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" outerOrders="${dunningOrder.dealcode}=${dunningOrder.dunningpeoplename}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
+					<input type="checkbox" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" outerOrders="${dunningOrder.dealcode}=${dunningOrder.dunningpeoplename}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
 				</td>
 				<td>
 					${ (vs.index+1) + (page.pageNo-1) * page.pageSize} 

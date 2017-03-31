@@ -58,6 +58,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
@@ -80,12 +81,14 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -559,27 +562,37 @@ public class TMisDunningTaskController extends BaseController {
 //	 * @param model
 //	 * @return
 //	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:leaderview")
+//	@RequiresPermissions("dunning:tMisDunningTask:directorview")
 //	@RequestMapping(value = "dialogDistribution")
-//	public String dialogDistribution( Model model,String orders,String[] peopleids) {
+//	public String dialogDistribution( Model model,String orders,String[] overduedays) {
 //		try {
-//			if(peopleids==null || peopleids.length == 0){
-//				model.addAttribute("mes", "订单原催收员为空");
+//			if(null==overduedays || overduedays.length == 0){
+//				model.addAttribute("mes", "订单逾期天数异常");
 //				return "modules/dunning/dialog/dialogDistribution";
 //			}
-//			List<TMisDunningPeople> counts = tMisDunningPeopleService.findDunningPeopleCycleByIds(Arrays.asList(peopleids));
-//			if(counts.isEmpty()){
+//			List<TMisDunningPeople> peopleGroupby = tMisDunningPeopleService.findDunningPeopleGroupby();
+//			Map<String, TMisDunningPeople> map = new HashMap<String,TMisDunningPeople>();
+//			Set<String> set = new HashSet<String>(Arrays.asList(overduedays));
+//			for(String string : set){
+//				Integer overdueday = Integer.parseInt(string);
+//				for(TMisDunningPeople dunningPeople : peopleGroupby){
+//					if(dunningPeople.getBegin() <= overdueday && dunningPeople.getEnd() >= overdueday){
+//						map.put(String.valueOf(dunningPeople.getBegin())+String.valueOf(dunningPeople.getEnd()), new TMisDunningPeople(dunningPeople.getBegin(), dunningPeople.getEnd()));
+//					}
+//				}
+//			}
+//			if(map.isEmpty()){
 //				model.addAttribute("mes", "催收人员周期不存在");
 //				return "modules/dunning/dialog/dialogDistribution";
 //			}
-//			if(counts.size() > 1){
+//			if(map.size() > 1){
 //				model.addAttribute("mes", "请选择是同一周期的订单");
 //				return "modules/dunning/dialog/dialogDistribution";
 //			}
-//			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(counts.get(0));
+//			List<String> mapKeyList = new ArrayList<String>(map.keySet());    
+//			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleBybeginEnd(map.get(mapKeyList.get(0)));
 //			model.addAttribute("dunningPeoples", dunningPeoples);
 //			model.addAttribute("orders", orders);
-//			model.addAttribute("peopleids", peopleids);
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //			return "views/error/500";
@@ -595,35 +608,12 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:directorview")
 	@RequestMapping(value = "dialogDistribution")
-	public String dialogDistribution( Model model,String orders,String[] overduedays) {
+	public String dialogDistribution( Model model,String orders,String dunningcycle) {
 		try {
-			if(null==overduedays || overduedays.length == 0){
-				model.addAttribute("mes", "订单逾期天数异常");
-				return "modules/dunning/dialog/dialogDistribution";
-			}
-			List<TMisDunningPeople> peopleGroupby = tMisDunningPeopleService.findDunningPeopleGroupby();
-			Map<String, TMisDunningPeople> map = new HashMap<String,TMisDunningPeople>();
-			Set<String> set = new HashSet<String>(Arrays.asList(overduedays));
-			for(String string : set){
-				Integer overdueday = Integer.parseInt(string);
-				for(TMisDunningPeople dunningPeople : peopleGroupby){
-					if(dunningPeople.getBegin() <= overdueday && dunningPeople.getEnd() >= overdueday){
-						map.put(String.valueOf(dunningPeople.getBegin())+String.valueOf(dunningPeople.getEnd()), new TMisDunningPeople(dunningPeople.getBegin(), dunningPeople.getEnd()));
-					}
-				}
-			}
-			if(map.isEmpty()){
-				model.addAttribute("mes", "催收人员周期不存在");
-				return "modules/dunning/dialog/dialogDistribution";
-			}
-			if(map.size() > 1){
-				model.addAttribute("mes", "请选择是同一周期的订单");
-				return "modules/dunning/dialog/dialogDistribution";
-			}
-			List<String> mapKeyList = new ArrayList<String>(map.keySet());    
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleBybeginEnd(map.get(mapKeyList.get(0)));
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("orders", orders);
+			model.addAttribute("dunningcycle", dunningcycle);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "views/error/500";
@@ -650,24 +640,50 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:directorview")
 	@RequestMapping(value = "distributionSave")
 	@ResponseBody
-	public String distributionSave(String orders, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		boolean f = false;
-		String mes = "";
-		String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
-		String[] str = orders.split(",");
-		Set<String> set = new HashSet<String>(Arrays.asList(str));
-		Iterator<String> it = set.iterator(); 
-		int i = 0;
-		while (it.hasNext()) {  
-			String dealcode = it.next();  
-			f = tMisDunningTaskService.assign(dealcode, newdunningpeopleids[i]);
-			mes += "订单:" + dealcode + ",";
-			i++;
-			if (i >= newdunningpeopleids.length) i = 0;
+	public String distributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		try {
+			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
+				return "订单或队列不能为空";
+			}
+//			String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
+			List<String> dealcodes =  Arrays.asList(orders.split(","));
+			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
+			tMisDunningTaskService.assign(dealcodes, dunningcycle,newdunningpeopleids);
+		} catch (Exception e) {
+			logger.warn("订单已还款更新任务失败"+ new Date());
+			return "分配异常，失败";
 		}
-		mes += "未分配?请核实";
-		return f ? "OK" : mes;
+		return  "OK" ;
 	}
+	
+//	/**
+//	 * 手动分配
+//	 * @param tMisDunningTask
+//	 * @param model
+//	 * @param redirectAttributes
+//	 * @return
+//	 */
+//	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+//	@RequestMapping(value = "distributionSave")
+//	@ResponseBody
+//	public String distributionSave(String orders, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+//		boolean f = false;
+//		String mes = "";
+//		String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
+//		String[] str = orders.split(",");
+//		Set<String> set = new HashSet<String>(Arrays.asList(str));
+//		Iterator<String> it = set.iterator(); 
+//		int i = 0;
+//		while (it.hasNext()) {  
+//			String dealcode = it.next();  
+//			f = tMisDunningTaskService.assign(dealcode, newdunningpeopleids[i]);
+//			mes += "订单:" + dealcode + ",";
+//			i++;
+//			if (i >= newdunningpeopleids.length) i = 0;
+//		}
+//		mes += "未分配?请核实";
+//		return f ? "OK" : mes;
+//	}
 	
 	
 	

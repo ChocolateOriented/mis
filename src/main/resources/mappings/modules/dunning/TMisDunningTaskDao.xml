@@ -716,7 +716,8 @@
         <!-- 					t.dbid AS dunningtaskdbid -->
         t.id AS dunningtaskdbid,
         t.telremark AS telremark,
-        o.outerfiletime AS outerfiletime
+        o.outerfiletime AS outerfiletime,
+        t.dunningcycle AS dunningcycle
         FROM
         t_risk_order AS o
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
@@ -1437,6 +1438,58 @@
 <!--             #{item} -->
 <!--         </foreach> -->
 <!-- 	</update> -->
+
+
+ 	<select id="newfingTasksByDealcodes" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog"> 
+		   	 SELECT 
+					o.dealcode as "dealcode",
+					IFNULL(o.default_interest_amount, 0) * 100  as "delayamount",
+					o.delay_days AS "delaydays",
+					o.repayment_time as "repaymenttime",
+					b.mobile as "mobile",
+					c.real_name as "realName",
+					o.days as "days",
+					o.payoff_time as payofftime,
+					o.status as dealcodestatus,
+					CASE 
+						WHEN o.status = 'payment' THEN DATEDIFF(curdate(), o.repayment_time) 
+						ELSE 0
+					END as "overduedays",
+					(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) * 100 as "corpusamount",
+					IFNULL(o.cost_amount, 0) * 100  as "costamout",
+					IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
+					CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+					(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+					t.id as "taskid",
+					t.DunningCycle as "dunningcycle",
+					p.id as "dunningpeopleid",
+					p.Name as "dunningpeoplename" 
+			FROM t_mis_dunning_task t   
+					LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
+					LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
+					LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+					LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+			WHERE t.dealcode in 
+			<foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">
+            	#{item}
+       		</foreach>
+			ORDER BY corpusAmount DESC
+	</select>
+	
+ 	
+ 	<update id="batchUpdateDistributionTask"  >
+	     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+				UPDATE t_mis_dunning_task 
+				<set>
+				    updatedate = now(),
+				    updateby = #{item.updateBy.id},
+					dunningpeopleid = #{item.dunningpeopleid},
+					dunningpeoplename = #{item.dunningpeoplename}
+				</set>
+				WHERE id = #{item.id}
+		 </foreach>
+    </update>
+
    
 <!-- 	new自动分配 - end 	    -->
 

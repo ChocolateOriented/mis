@@ -236,4 +236,19 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	public TMisDunningTaskLog newfingTaskByDealcode(String dealcode);
 	
 	
+	/**
+	 * 根据订单号查询任务log
+	 * @param dealcode
+	 * @return
+	 */
+	public List<TMisDunningTaskLog> newfingTasksByDealcodes(List<String> dealcodes);
+	
+	
+	/**
+	 * 批量更新手动分配任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchUpdateDistributionTask(List<TMisDunningTask> dunningTasks);
+	
 }

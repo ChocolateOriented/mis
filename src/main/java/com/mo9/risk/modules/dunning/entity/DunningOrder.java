@@ -61,6 +61,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private Date dunningtime;
 	
+	private String dunningcycle;		// 催收周期(队列)
+	
 
 	public DunningOrder() {
 		super();
@@ -324,5 +326,15 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.dunningpeopletype = dunningpeopletype;
 	}
 
+	public String getDunningcycle() {
+		return dunningcycle;
+	}
 
+	public void setDunningcycle(String dunningcycle) {
+		this.dunningcycle = dunningcycle;
+	}
+
+	
+	
+	
 }

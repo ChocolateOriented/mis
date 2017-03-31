@@ -275,9 +275,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * @param dealcode
 	 * @param peopleId
 	 */
-	@Transactional(readOnly = false)
-	public boolean assign(String dealcode, String peopleId) {
-
+//	@Transactional(readOnly = false)
+//	public boolean assign(String dealcode, String peopleId) {
 //		TMisDunningPeople people = this.tMisDunningPeopleDao.get(peopleId);
 //		if(people == null)
 //		{
@@ -364,8 +363,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //		} catch (Exception e) {
 //			logger.error(MessageFormat.format("分配订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
 //		}
-		return false;
-	}
+//		return false;
+//	}
 
 	/**
 	 * 催收还款
@@ -1867,7 +1866,73 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return datenum;
     }  
     
-    
+    /**
+     * 手动分配
+     * @param dealcode
+     * @param peopleId
+     */
+    @Transactional(readOnly = false)
+    public void assign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ){ 	
+    	try {
+			/**  查询手动分配订单任务Log   */
+			List<TMisDunningTaskLog>  outDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes);
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids);
+			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +outDunningTaskLogs.size()  + "条-"  + new Date());
+			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
+			List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+			if(!outDunningTaskLogs.isEmpty()){
+//				for(TMisDunningTaskLog dunningTaskLog : outDunningTaskLogs){
+				for(int i= 0 ; i < outDunningTaskLogs.size() ; i++ ){  
+					TMisDunningTaskLog dunningTaskLog = (TMisDunningTaskLog)outDunningTaskLogs.get(i);
+					/**
+					 * log 催收周期过期移出记录
+					 */
+					dunningTaskLog.setBehaviorstatus("out");
+					dunningTaskLog.setCreateDate(new Date());
+					dunningTaskLog.setCreateBy(UserUtils.getUser());
+					/**
+					 * 任务task修改
+					 */
+					int j = i % dunningPeoples.size();  
+					TMisDunningTask dunningTask = new TMisDunningTask();
+					dunningTask.setId(dunningTaskLog.getTaskid());
+					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
+					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
+					dunningTask.setUpdateBy(UserUtils.getUser());
+//					dunningTask.setDunningcycle(dict.getLabel());
+					/**
+					 * log 催收周期过期移入记录
+					 */
+					TMisDunningTaskLog indunningTaskLog = dunningTaskLog;
+					indunningTaskLog.setBehaviorstatus("in");
+					indunningTaskLog.setDunningpeopleid(dunningTask.getDunningpeopleid());
+					indunningTaskLog.setDunningpeoplename(dunningTask.getDunningpeoplename());
+					inDunningTaskLogs.add(indunningTaskLog);
+				}
+				/** 
+				 * 保存移出任务Log
+				 */
+				tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
+				/** 
+				 * 修改手动分配任务
+				 */
+				tMisDunningTaskDao.batchUpdateDistributionTask(tasks);
+				/** 
+				 * 保存移入任务Log
+				 */
+				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
+
+			}else{
+				logger.info(dunningcycle + "队列没有过期任务！" + new Date());
+			}
+		} catch (Exception e) {
+			logger.error(dunningcycle + "队列分配任务失败,全部事务回滚");
+			throw new ServiceException(e);
+		} finally {
+			logger.info(dunningcycle + "队列任务结束" + new Date());
+		}
+    	
+    }
 	
     
 //	/**

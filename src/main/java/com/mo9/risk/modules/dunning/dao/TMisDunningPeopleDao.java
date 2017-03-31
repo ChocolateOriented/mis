@@ -50,5 +50,14 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 */
 	public int batchUpdateDunningcycle(@Param("pids")List<String> pids,@Param("userid")String userid,@Param("dunningcycle")String dunningcycle);
 	
+	
+	/**
+	 * 根据id集合查询对象
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningPeople> findPeoplesByids(List<String> pids);
+	
+	
 
 }
