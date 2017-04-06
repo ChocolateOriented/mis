@@ -436,12 +436,12 @@
 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" disabled="disabled"/>
+		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
 	</shiro:hasPermission>
 	
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案" disabled="disabled"/>
+		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"  disabled="disabled"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 	
