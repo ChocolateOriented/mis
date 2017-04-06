@@ -265,7 +265,7 @@ public class TMisDunningTaskController extends BaseController {
 				String platformExt = order.getPlatformExt();
 				String route = "【mo9】";
 				if (platformExt != null && platformExt.contains("feishudai")) {
-					route = "【飞鼠贷】";
+					route = "[飞鼠贷]";
 				}
 				String message =  tMisContantRecordService.getDunningSmsTemplate
 						(route, new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));

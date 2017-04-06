@@ -262,7 +262,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		
 		String route = "【mo9】";
 		if (platformExt != null && platformExt.contains("feishudai")) {
-			route = "【飞鼠贷】";
+			route = "[飞鼠贷]";
 		}
 
 		args.add(route);
