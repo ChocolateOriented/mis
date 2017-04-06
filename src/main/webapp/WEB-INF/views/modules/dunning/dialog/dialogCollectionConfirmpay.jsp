@@ -53,7 +53,7 @@
 				}else{
 					if ($("input[name='isMergeRepayment']:checked").val() == "1") {
 						$("#paidAmount").attr("readonly", true);
-						$("#paidAmount").val($("#remittanceamount").val());
+						$("#paidAmount").val($("#paidType").val() ? $("#remittanceamount").val() : "");
 					} else {
 						$("#delaytr").hide();
 						$("#paidAmount").attr("readonly",false);
