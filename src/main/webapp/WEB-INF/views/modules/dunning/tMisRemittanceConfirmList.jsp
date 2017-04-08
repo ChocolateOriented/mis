@@ -174,7 +174,7 @@
 				<c:choose> 
 					<c:when test="${'ch_confirm' ne tMisRemittanceConfirm.confirmstatus}">
 					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:edit">
-						<input  id="btnch" ${'cw_submit' eq tMisRemittanceConfirm.confirmstatus ? 'disabled' : ''}  name="btnCollection" onclick="ckFunction('ch',this)" class="btn btn-primary"
+						<input  id="btnch"   name="btnCollection" onclick="ckFunction('ch',this)" class="btn btn-primary"
 							remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="编辑" />
 	    				<input  id="btnPaid" ${not empty tMisRemittanceConfirm.accountamount ? '' : 'disabled'}  name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"
 	    				 	remittanceconfirmid="${tMisRemittanceConfirm.id}"  buyerId="${tMisRemittanceConfirm.buyerId}" dealcode="${tMisRemittanceConfirm.dealcode}" method="Confirmpay"  type="button" value="还款" />
