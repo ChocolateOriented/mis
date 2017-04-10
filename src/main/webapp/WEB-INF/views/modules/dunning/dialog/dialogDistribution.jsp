@@ -52,7 +52,7 @@
 	<br/>
 	<form id="inputForm"  class="form-horizontal">
 		<input type="hidden" id="orders" name="orders" value="${orders}"/>
-		
+		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
 		<div class="control-group">
 			<label class="control-label">催收人员：</label>
 			<div class="controls">

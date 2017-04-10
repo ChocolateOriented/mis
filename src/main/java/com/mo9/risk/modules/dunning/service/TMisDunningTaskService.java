@@ -1277,6 +1277,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 		} catch (Exception e) {
 			logger.warn("订单已还款更新任务失败"+ new Date());
+			logger.error("错误信息"+e.getMessage());
 			throw new ServiceException(e);
 		}
 	}
@@ -1539,6 +1540,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 		} catch (Exception e) {
 			logger.error(dunningcycle + "队列分配任务失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
 			throw new ServiceException(e);
 		} finally {
 			logger.info(dunningcycle + "队列任务结束" + new Date());
@@ -1645,6 +1647,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 		} catch (Exception e) {
 			logger.error("新增未生成催收任务(task)的订单失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
 			throw new ServiceException(e);
 		} finally {
 			logger.info("新增未生成催收任务(task)的订单任务结束" + new Date());
@@ -1875,44 +1878,49 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     public void assign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  outDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes);
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids);
-			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +outDunningTaskLogs.size()  + "条-"  + new Date());
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
+			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
+			
 			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
 			List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
-			if(!outDunningTaskLogs.isEmpty()){
+			List<TMisDunningTaskLog> outDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+			
+			if(!assignDunningTaskLogs.isEmpty()){
 //				for(TMisDunningTaskLog dunningTaskLog : outDunningTaskLogs){
-				for(int i= 0 ; i < outDunningTaskLogs.size() ; i++ ){  
-					TMisDunningTaskLog dunningTaskLog = (TMisDunningTaskLog)outDunningTaskLogs.get(i);
-					/**
-					 * log 催收周期过期移出记录
-					 */
-					dunningTaskLog.setBehaviorstatus("out");
-					dunningTaskLog.setCreateDate(new Date());
-					dunningTaskLog.setCreateBy(UserUtils.getUser());
-					/**
-					 * 任务task修改
-					 */
-					int j = i % dunningPeoples.size();  
-					TMisDunningTask dunningTask = new TMisDunningTask();
-					dunningTask.setId(dunningTaskLog.getTaskid());
-					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
-					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
-					dunningTask.setUpdateBy(UserUtils.getUser());
-//					dunningTask.setDunningcycle(dict.getLabel());
-					/**
-					 * log 催收周期过期移入记录
-					 */
-					TMisDunningTaskLog indunningTaskLog = dunningTaskLog;
-					indunningTaskLog.setBehaviorstatus("in");
-					indunningTaskLog.setDunningpeopleid(dunningTask.getDunningpeopleid());
-					indunningTaskLog.setDunningpeoplename(dunningTask.getDunningpeoplename());
-					inDunningTaskLogs.add(indunningTaskLog);
+				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){  
+					TMisDunningTaskLog outdunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
+					outdunningTaskLog.setBehaviorstatus("out");
+					outdunningTaskLog.setCreateDate(new Date());
+					outdunningTaskLog.setCreateBy(UserUtils.getUser());
+					outDunningTaskLogs.add(outdunningTaskLog);
 				}
 				/** 
 				 * 保存移出任务Log
 				 */
 				tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
+				
+				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){  
+					TMisDunningTaskLog indunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
+					/**
+					 * 任务task修改
+					 */
+					int j = i % dunningPeoples.size();  
+					TMisDunningTask dunningTask = new TMisDunningTask();
+					dunningTask.setId(indunningTaskLog.getTaskid());
+					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
+					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
+					dunningTask.setUpdateBy(UserUtils.getUser());
+					dunningTask.setDunningcycle(dunningcycle);
+					tasks.add(dunningTask);
+					/**
+					 * log 催收周期过期移入记录
+					 */
+					indunningTaskLog.setBehaviorstatus("in");
+					indunningTaskLog.setDunningpeopleid(dunningTask.getDunningpeopleid());
+					indunningTaskLog.setDunningpeoplename(dunningTask.getDunningpeoplename());
+					inDunningTaskLogs.add(indunningTaskLog);
+				}	
 				/** 
 				 * 修改手动分配任务
 				 */
@@ -1923,13 +1931,14 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
 
 			}else{
-				logger.info(dunningcycle + "队列没有过期任务！" + new Date());
+				logger.info(dunningcycle + "队列没有手动分配任务！" + new Date());
 			}
 		} catch (Exception e) {
-			logger.error(dunningcycle + "队列分配任务失败,全部事务回滚");
+			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
 			throw new ServiceException(e);
 		} finally {
-			logger.info(dunningcycle + "队列任务结束" + new Date());
+			logger.info(dunningcycle + "队列手动分配任务结束" + new Date());
 		}
     	
     }
@@ -2016,12 +2025,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //			System.out.println(dict.getLabel());
 //		}
 //		int day = getDays() % 15 == 0 ? 15 - 1 : getDays()  % 15 - 1;
-		for(int i = 2; i <= 31 ; i ++){
+//		for(int i = 2; i <= 31 ; i ++){
+//			System.out.print(i+"号");
+//			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
+//			System.out.println(s);
+//		}
+		for(int i = 1; i <= 30 ; i ++){
 			System.out.print(i+"号");
-			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
+			int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
 			System.out.println(s);
 		}
-//		System.out.println(30 % 15 == 0 ? 15-1 :  );
 //		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
 //		sortList.sort(list, "label", "desc");  
 //		for(Dict dict : list){

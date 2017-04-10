@@ -241,7 +241,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dealcode
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfingTasksByDealcodes(List<String> dealcodes);
+	public List<TMisDunningTaskLog> newfingTasksByDealcodes(@Param("dealcodes")List<String> dealcodes,@Param("dunningcycle")String dunningcycle);
 	
 	
 	/**

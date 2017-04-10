@@ -56,7 +56,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @param dunningcycle
 	 * @return
 	 */
-	public List<TMisDunningPeople> findPeoplesByids(List<String> pids);
+	public List<TMisDunningPeople> findPeoplesByids(@Param("pids")List<String> pids,@Param("dunningcycle")String dunningcycle);
 	
 	
 
