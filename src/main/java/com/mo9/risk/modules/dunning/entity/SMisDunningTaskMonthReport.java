@@ -32,7 +32,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 	private BigDecimal finishedAndDelayAmount;//催回本金+延期收益
 	private BigDecimal amount;//应催金额
 	private BigDecimal creditamount;//催回金额
-	
+	private BigDecimal finishedanddelaycorpusamount; //催回本金（含续期）
 	private Date datetime; 
 	
 	public SMisDunningTaskMonthReport() {
@@ -138,6 +138,15 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 	}
 	public void setCreditamount(BigDecimal creditamount) {
 		this.creditamount = creditamount;
+	}
+	
+	@ExcelField(title="催回本金(含续期)", type=1, align=2, sort=13)
+	public BigDecimal getFinishedanddelaycorpusamount() {
+		return finishedanddelaycorpusamount;
+	}
+	public void setFinishedanddelaycorpusamount(
+			BigDecimal finishedanddelaycorpusamount) {
+		this.finishedanddelaycorpusamount = finishedanddelaycorpusamount;
 	}
 
 	public Date getDatetime() {

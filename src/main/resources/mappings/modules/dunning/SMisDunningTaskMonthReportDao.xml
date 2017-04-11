@@ -14,6 +14,7 @@
 		a.dunningcorpusamount AS "dunningcorpusamount",
 		a.finishedcorpusamount AS "finishedcorpusamount",
 		a.finishedAndDelayAmount AS "finishedAndDelayAmount",
+		a.finishedanddelaycorpusamount AS "finishedanddelaycorpusamount",
 		a.amount AS "amount",
 		a.creditamount AS "creditamount"
 	</sql>
