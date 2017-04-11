@@ -217,11 +217,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //	@Scheduled(cron = "0 0 9 * * ?")  //每天上午八点执行
 	@Transactional
 	public void autoSmsSend() {
-		logger.info("系统自动发送催收短信开始，应还日期为今天"+new Date());
-		
-		this.sendSms();
-		
-		logger.info("系统自动发送催收短信结束，应还日期为今天"+new Date());
+//		logger.info("系统自动发送催收短信开始，应还日期为今天"+new Date());
+//		this.sendSms();
+//		logger.info("系统自动发送催收短信结束，应还日期为今天"+new Date());
 	}
 	
 	
@@ -378,48 +376,48 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * @param task
 	 */
 
-	@Transactional(readOnly = false)
-	public boolean repayment(TMisDunningTask task) {
-
-		task = this.tMisDunningTaskDao.get(task.getId());
-		if(task == null)
-		{
-			logger.warn("任务不存在,id:"+task.getId());
-			return false;
-		}
-		String dealcode = task.getDealcode();
-		TMisDunningOrder order = this.tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if(order == null)
-		{
-			logger.warn("还款订单不存在，订单号："+dealcode);
-			return false;
-		}
-		if(!"payoff".equalsIgnoreCase(order.status))
-		{
-			logger.warn("订单状态错误，状态:"+order.status+" 订单号："+dealcode);
-			return false;
-		}
-		Date now = new Date();
-		//新建催回记录
-		TMisDunnedHistory history = new TMisDunnedHistory();
-		history.preInsert();
-		history.setTaskid(task.getId());
-		history.setAmount((order.amount.add(order.overdueAmount).subtract(order.reliefamount)).multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-		history.setDunnedtime(now);
-		history.setIspayoff(true);
-//		history.setOverduedays((int)(toDate(now).getTime() - toDate(order.repaymentDate).getTime()) / (24 * 60 * 60 * 1000));
-		history.setOverduedays((int)TMisDunningTaskService.GetOverdueDay(order.repaymentDate));
-		history.setReliefamount(order.reliefamount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-		this.tMisDunnedHistoryDao.insert(history);
-
-		task.preUpdate();
-		task.setDunningtaskstatus(TMisDunningTask.STATUS_FINISHED);
-		task.setDunnedamount(history.getAmount());
-		task.setIspayoff(true);
-		task.setEnd(now);
-		this.tMisDunningTaskDao.update(task);
-		return true;
-	}
+//	@Transactional(readOnly = false)
+//	public boolean repayment(TMisDunningTask task) {
+//
+//		task = this.tMisDunningTaskDao.get(task.getId());
+//		if(task == null)
+//		{
+//			logger.warn("任务不存在,id:"+task.getId());
+//			return false;
+//		}
+//		String dealcode = task.getDealcode();
+//		TMisDunningOrder order = this.tMisDunningTaskDao.findOrderByDealcode(dealcode);
+//		if(order == null)
+//		{
+//			logger.warn("还款订单不存在，订单号："+dealcode);
+//			return false;
+//		}
+//		if(!"payoff".equalsIgnoreCase(order.status))
+//		{
+//			logger.warn("订单状态错误，状态:"+order.status+" 订单号："+dealcode);
+//			return false;
+//		}
+//		Date now = new Date();
+//		//新建催回记录
+//		TMisDunnedHistory history = new TMisDunnedHistory();
+//		history.preInsert();
+//		history.setTaskid(task.getId());
+//		history.setAmount((order.amount.add(order.overdueAmount).subtract(order.reliefamount)).multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+//		history.setDunnedtime(now);
+//		history.setIspayoff(true);
+////		history.setOverduedays((int)(toDate(now).getTime() - toDate(order.repaymentDate).getTime()) / (24 * 60 * 60 * 1000));
+//		history.setOverduedays((int)TMisDunningTaskService.GetOverdueDay(order.repaymentDate));
+//		history.setReliefamount(order.reliefamount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+//		this.tMisDunnedHistoryDao.insert(history);
+//
+//		task.preUpdate();
+//		task.setDunningtaskstatus(TMisDunningTask.STATUS_FINISHED);
+//		task.setDunnedamount(history.getAmount());
+//		task.setIspayoff(true);
+//		task.setEnd(now);
+//		this.tMisDunningTaskDao.update(task);
+//		return true;
+//	}
 
 //	/**
 //	 *  定时自动扫描还款
@@ -438,33 +436,33 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * 检索已经还清的催收任务（关联的贷款订单已还，还款时间在任务的起始时间和截至时间或结束时间内 且任务状态为还款中）
 	 * 将符合条件的催款任务设置为结束
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	private void updatePayoffTask() {
-		//分页处理，单页处理100条
-		Page<TMisDunningTask> page = new Page<TMisDunningTask>(1, 100);
-		int pageNo = 1; //页码
-		do {
-			page.setPageNo(pageNo);
-			page = this.findPayoffDunningTask(page);
-			logger.info(MessageFormat.format("检索已还清催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
-			int i = 1;
-			for (TMisDunningTask task : page.getList()) {
-				logger.info(MessageFormat.format("正在處理第幾條===>{0}", i++ ) );
-				boolean result = this.repayment(task);
-				if (!result) {
-					//如果处理还款不成功，日志记录
-					logger.info("批量更新已还催款任务错误，任务号：" + task.getId());
-				} else {
-					logger.info("批量更新已还催款任务成功，任务号：" + task.getId());
-				}
-
-			}
-			pageNo++; //翻页
-			page.setList(null);
-		}
-		while (page != null && !page.isLastPage());
-
-	}
+//	@Transactional(propagation = Propagation.REQUIRES_NEW)
+//	private void updatePayoffTask() {
+//		//分页处理，单页处理100条
+//		Page<TMisDunningTask> page = new Page<TMisDunningTask>(1, 100);
+//		int pageNo = 1; //页码
+//		do {
+//			page.setPageNo(pageNo);
+//			page = this.findPayoffDunningTask(page);
+//			logger.info(MessageFormat.format("检索已还清催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
+//			int i = 1;
+//			for (TMisDunningTask task : page.getList()) {
+//				logger.info(MessageFormat.format("正在處理第幾條===>{0}", i++ ) );
+//				boolean result = this.repayment(task);
+//				if (!result) {
+//					//如果处理还款不成功，日志记录
+//					logger.info("批量更新已还催款任务错误，任务号：" + task.getId());
+//				} else {
+//					logger.info("批量更新已还催款任务成功，任务号：" + task.getId());
+//				}
+//
+//			}
+//			pageNo++; //翻页
+//			page.setList(null);
+//		}
+//		while (page != null && !page.isLastPage());
+//
+//	}
 	
 	
 	
@@ -1361,7 +1359,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	
 	/**
-	 *  Q1-Q4分案-小月
+	 *  Q1-Q4分案 
 	 */
 	public void autoAssign_Q1_Q4(){
 	    /**
@@ -1400,24 +1398,33 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 *  Q1-Q4分案-大月 (1号Q1不分案)
 	 */
-//	public void autoAssign31Day_Q1_Q4(){
+//	public void autoAssign_Q0_W3(){
+//		/**
+//	     * 选择催收周期段type
+//	     */
 //		String type = getDunningCycleType();
 //		List<Dict> dicts = DictUtils.getDictList(type);
 //		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
-//		sortList.sort(dicts, "label", "desc");  
+//		sortList.sort(dicts, "label", "desc"); 
+//		/**
+//	     * 获取委外w1队列区间
+//	     */
+//		String w1 = DictUtils.getDictValue("", "", "");
+//		
 //		for(Dict dict : dicts){
-//			if(("dunningCycle2").equals(type) && dict.getLabel().equals(C_P1)){
-//				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Data());
-//			}else if(!dict.getLabel().equals(P4_P5)){
+//			if(w1.equals(dict.getValue())){
 //				String begin = dict.getValue().split("_")[0];
 //				String end = dict.getValue().split("_")[1];
 //				if(!("").equals(begin) && !("").equals(end)){
-//					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,dict.getLabel(),"NOT BETWEEN "+begin+" AND  "+end);
+//					/**
+//					 * 逾期分配
+//					 */
+//					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,dict.getLabel(),begin,end);
 //				}else{
 //					logger.warn(dict.getLabel() + "队列" +dict.getValue() + "周期异常,未分案"+ new Date());
 //				}
 //			}else{
-//				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Data());
+//				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Date());
 //			}
 //		}
 //	}

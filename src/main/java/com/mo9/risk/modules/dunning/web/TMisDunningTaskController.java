@@ -891,12 +891,10 @@ public class TMisDunningTaskController extends BaseController {
 		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		boolean ispayoff = false;
 		if(null != task){
-			tMisDunningTaskService.repayment(task);
 			ispayoff = task.getIspayoff();
 		}else{
 			ispayoff = true;
 		}
-//		model.addAttribute("personalInfo", personalInfo);
 		model.addAttribute("workInfo", workinfo);
 		model.addAttribute("contacts", buyer2Contacts);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
