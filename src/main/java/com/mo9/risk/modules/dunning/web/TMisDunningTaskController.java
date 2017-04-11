@@ -841,11 +841,20 @@ public class TMisDunningTaskController extends BaseController {
 			return "views/error/500";
 		}
 		
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
+		
+		boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
+		
 		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 		model.addAttribute("personalInfo", personalInfo);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
+		model.addAttribute("isDelayable", isDelayable);
 		
 		TBuyerContact tBuyerContact = new TBuyerContact();
 		tBuyerContact.setBuyerId(buyerId);

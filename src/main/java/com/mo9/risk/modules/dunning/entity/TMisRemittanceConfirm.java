@@ -233,7 +233,8 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	public String getConfirmstatusText() {
 		return CONFIRMSTATUS_CH_SUBMIT.equals(this.confirmstatus) ?  "催收已提交" : 
 				  CONFIRMSTATUS_CW_SUBMIT.equals(this.confirmstatus) ?  "财务已确认" :
-					 CONFIRMSTATUS_CH_CONFIRM.equals(this.confirmstatus) ?  "已完成" :"";
+					 CONFIRMSTATUS_CW_RETURN.equals(this.confirmstatus) ?  "财务已打回" :
+						CONFIRMSTATUS_CH_CONFIRM.equals(this.confirmstatus) ?  "已完成" :"";
 	}
 	public void setConfirmstatus(String confirmstatus) {
 		this.confirmstatus = confirmstatus;

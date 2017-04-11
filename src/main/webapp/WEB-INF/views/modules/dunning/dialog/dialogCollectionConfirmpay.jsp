@@ -6,8 +6,8 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			//如果逾期天数大于14则催收人员代付选项没有续期
-			if(parseInt(${personalInfo.overdueDays}) > parseInt(${fns:getDictValue('overdueday', 'overdueday', 14)}) || ${result} > 0 ){
+			//如果逾期天数大于14则催收人员代付选项没有续期  限制特定资方订单续期相关操作
+			if(parseInt(${personalInfo.overdueDays}) > parseInt(${fns:getDictValue('overdueday', 'overdueday', 14)}) || ${result} > 0 || ${!isDelayable}){
 				var obj=document.getElementById('paidType');
 				obj.options.remove(2); 
 				$("#delaytr").hide();

@@ -361,6 +361,7 @@
         <result property="subCostAmount" column="sub_cost_amount"/>
         <result property="defaultInterestAmount" column="default_interest_amount"/>
         <result property="platformExt" column="platform_ext"/>
+        <result property="payCode" column="pay_code"/>
     </resultMap>
 
     <!--查找需要催款的订单-->

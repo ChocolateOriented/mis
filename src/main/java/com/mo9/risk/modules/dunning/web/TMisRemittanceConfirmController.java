@@ -347,6 +347,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 			return "views/error/500";
 		}
 		
+		boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
+		
 		Map<String,Object> maps = new HashMap<String,Object>();
 		maps.put("buyerId",buyerId);
 		
@@ -405,6 +407,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		model.addAttribute("relatedList", relatedList);
 		model.addAttribute("remittanceamount", remittanceamount);
 		model.addAttribute("financialremittancechannel", financialremittancechannel);
+		model.addAttribute("isDelayable", isDelayable);
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
 		model.addAttribute("result", result);
 		return "modules/dunning/dialog/dialogCollectionConfirmpay";

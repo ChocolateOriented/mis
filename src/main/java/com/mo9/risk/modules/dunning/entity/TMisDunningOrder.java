@@ -9,6 +9,8 @@ import java.util.Date;
  */
 public class TMisDunningOrder {
 	
+	public static String CHANNEL_KAOLA = "kaola"; //表示放款资方为考拉
+	
 	public String platform;
 	
 	public String platformExt;
@@ -66,6 +68,8 @@ public class TMisDunningOrder {
 	public BigDecimal subCostAmount = BigDecimal.ZERO;//减免费用总金额
 	
 	public BigDecimal defaultInterestAmount;//订单续期产生罚息金额和手续费
+	
+	public String payCode;//订单放款渠道
 	
 	public String getDealcode() {
 		return dealcode;
@@ -174,6 +178,12 @@ public class TMisDunningOrder {
 	}
 	public void setPlatformExt(String platformExt) {
 		this.platformExt = platformExt;
+	}
+	public String getPayCode() {
+		return payCode;
+	}
+	public void setPayCode(String payCode) {
+		this.payCode = payCode;
 	}
 	
 
