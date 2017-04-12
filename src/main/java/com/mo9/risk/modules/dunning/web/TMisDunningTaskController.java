@@ -641,9 +641,8 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = "distributionSave")
 	@ResponseBody
 	public String distributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		String mes = "";
 		try {
-			System.out.println(dunningcycle+"==================================");
-			System.out.println(orders+"==================================");
 			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
 				return "订单或队列不能为空";
 			}
@@ -651,11 +650,13 @@ public class TMisDunningTaskController extends BaseController {
 			List<String> dealcodes =  Arrays.asList(orders.split(","));
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
 			tMisDunningTaskService.assign(dealcodes, dunningcycle,newdunningpeopleids);
+			mes = "OK,手动均分"+dealcodes.size()+"条订单成功";
 		} catch (Exception e) {
+			logger.warn(e.getMessage());
 			logger.warn("订单已还款更新任务失败"+ new Date());
 			return "分配异常，失败";
 		}
-		return  "OK" ;
+		return  mes;
 	}
 	
 //	/**

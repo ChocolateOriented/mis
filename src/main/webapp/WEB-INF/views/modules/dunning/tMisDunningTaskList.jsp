@@ -145,13 +145,15 @@
 						$.jBox.tip("请勾选分配订单", 'warning');
 						return;
 					}
+					if(orders.length>300){
+						$.jBox.tip("请小于300条分配订单", 'warning');
+						return;
+					}
 					var uniqueid = unique(dunningcycle);
 					if(uniqueid.length != 1 ){
 						$.jBox.tip("请勾选同一催收队列订单", 'warning');
 						return;
 					}
-					alert(orders);
-					alert(uniqueid);
 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&dunningcycle=" + uniqueid;
 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
 			               buttons: {},
