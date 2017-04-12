@@ -142,16 +142,16 @@
 						}
 					});
 					if(orders.length==0){
-						$.jBox.tip("请勾选分配订单", 'warning');
+						$.jBox.tip("请选择需要移动的案件", 'warning');
 						return;
 					}
 					if(orders.length>300){
-						$.jBox.tip("请小于300条分配订单", 'warning');
+						$.jBox.tip("请选择小于300条分配订单", 'warning');
 						return;
 					}
 					var uniqueid = unique(dunningcycle);
 					if(uniqueid.length != 1 ){
-						$.jBox.tip("请勾选同一催收队列订单", 'warning');
+						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&dunningcycle=" + uniqueid;
