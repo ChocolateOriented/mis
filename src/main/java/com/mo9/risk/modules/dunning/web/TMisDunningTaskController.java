@@ -642,6 +642,8 @@ public class TMisDunningTaskController extends BaseController {
 	@ResponseBody
 	public String distributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
 		try {
+			System.out.println(dunningcycle+"==================================");
+			System.out.println(orders+"==================================");
 			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
 				return "订单或队列不能为空";
 			}

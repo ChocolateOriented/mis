@@ -150,7 +150,8 @@
 						$.jBox.tip("请勾选同一催收队列订单", 'warning');
 						return;
 					}
-
+					alert(orders);
+					alert(uniqueid);
 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&dunningcycle=" + uniqueid;
 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
 			               buttons: {},
