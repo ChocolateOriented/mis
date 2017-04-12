@@ -70,7 +70,7 @@
 				<td style="color:red;">当前应催金额：${personalInfo.creditAmount/100}元</td>
 			</tr>
 			<tr>
-				<td>还款总额：${personalInfo.repaymentAmount/100  - personalInfo.creditAmount/100}元</td>
+				<td>还款总额：${personalInfo.balance/100}元</td>
 				<td colspan="4">还清日期：<fmt:formatDate value="${personalInfo.payOffTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 			</tr>
 		</tbody>
