@@ -217,9 +217,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //	@Scheduled(cron = "0 0 9 * * ?")  //每天上午八点执行
 	@Transactional
 	public void autoSmsSend() {
-//		logger.info("系统自动发送催收短信开始，应还日期为今天"+new Date());
+		logger.info("系统自动发送催收短信开始，应还日期为今天"+new Date());
 //		this.sendSms();
-//		logger.info("系统自动发送催收短信结束，应还日期为今天"+new Date());
+		logger.info("系统自动发送催收短信结束，应还日期为今天"+new Date());
 	}
 	
 	
