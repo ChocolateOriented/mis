@@ -15,7 +15,7 @@
 			
 			$('#paid').click(function() {
 				 if ($("input[name='isMergeRepayment']:checked").val() == "1") {
-					if (parseFloat($("#remittanceamount").val()) != parseFloat($("#paidAmount").val())) {
+					if (parseFloat($("#remittanceamount").val()) < parseFloat($("#paidAmount").val())) {
 						$.jBox.tip("金额不匹配，请返回检查", "warning");
 						return;
 					}
