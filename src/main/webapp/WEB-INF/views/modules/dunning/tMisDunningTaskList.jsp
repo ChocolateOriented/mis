@@ -146,7 +146,7 @@
 						return;
 					}
 					if(orders.length>300){
-						$.jBox.tip("请选择小于300条分配订单", 'warning');
+						$.jBox.tip("请选择小于300条分配订单 ", 'warning');
 						return;
 					}
 					var uniqueid = unique(dunningcycle);

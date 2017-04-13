@@ -1398,21 +1398,34 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 *  Q1-Q4分案-大月 (1号Q1不分案)
 	 */
-//	public void autoAssign_Q0_W3(){
-//		/**
-//	     * 选择催收周期段type
-//	     */
-//		String type = getDunningCycleType();
-//		List<Dict> dicts = DictUtils.getDictList(type);
-//		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
-//		sortList.sort(dicts, "label", "desc"); 
+	@Transactional(readOnly = false)
+	public void autoAssign_Q0_W3(){
+		/**
+	     * 选择催收周期段type
+	     */
+		String type = getDunningCycleType();
+		List<Dict> dicts = DictUtils.getDictList(type);
+		for(Dict dict : dicts){
+			System.out.println(dict.getLabel());
+			dict.getValue();
+//			if(){
+//				
+//			}
+		}
+		
+		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
+		sortList.sort(dicts, "label", "desc"); 
+		
+		
 //		/**
 //	     * 获取委外w1队列区间
 //	     */
 //		String w1 = DictUtils.getDictValue("", "", "");
 //		
 //		for(Dict dict : dicts){
+//			
 //			if(w1.equals(dict.getValue())){
+//				
 //				String begin = dict.getValue().split("_")[0];
 //				String end = dict.getValue().split("_")[1];
 //				if(!("").equals(begin) && !("").equals(end)){
@@ -1423,11 +1436,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //				}else{
 //					logger.warn(dict.getLabel() + "队列" +dict.getValue() + "周期异常,未分案"+ new Date());
 //				}
+//				
 //			}else{
+//				
 //				logger.info(dict.getLabel() +"队列" +dict.getValue() + "周期不做分案操作-"+ new Date());
+//				
 //			}
+//			
 //		}
-//	}
+	}
 	
 	
 	/**
@@ -2027,27 +2044,46 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //			System.out.println(dict.getLabel());
 //			dict.setLabel("tt" + i);
 //		}
-//		for (int i = 0; i < list.size(); i++) {
-//			Dict dict = (Dict)list.get(i);
-//			System.out.println(dict.getLabel());
-//		}
 //		int day = getDays() % 15 == 0 ? 15 - 1 : getDays()  % 15 - 1;
 //		for(int i = 2; i <= 31 ; i ++){
 //			System.out.print(i+"号");
 //			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
 //			System.out.println(s);
 //		}
-		for(int i = 1; i <= 30 ; i ++){
-			System.out.print(i+"号");
-			int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-			System.out.println(s);
-		}
+//		for(int i = 1; i <= 30 ; i ++){
+//			System.out.print(i+"号");
+//			int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+//			System.out.println(s);
+//		}
+		
+		
+		Calendar calendar = Calendar.getInstance();  
+        int year = 2017;  
+        int month = Calendar.MAY;  
+        int date = 1;  
+        calendar.set(year, month, date);  
+        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);  
+        System.out.println("Max Day: " + maxDay);  
+        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);  
+        System.out.println("Min Day: " + minDay);  
+  
+        for (int i = minDay +1; i <= maxDay; i++) {  
+            calendar.set(year, month, i);  
+            System.out.println("Day: " + calendar.getTime().toLocaleString());  
+//        	int datenum = calendar.get(Calendar.DATE);
+//        	System.out.println(datenum);
+            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
+//        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+        	System.out.println(s);
+        }  
+//      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
+		
 //		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
 //		sortList.sort(list, "label", "desc");  
 //		for(Dict dict : list){
 //			System.out.println(dict.getLabel());
 //		}
-//	if(actinMap.containsKey("UP")){
+//		if(actinMap.containsKey("UP")){
 		//	actinMap.get("UP").add(vo);
 		//}else{
 		//	List<PlatViewVO> tList = new ArrayList<PlatViewVO>();
