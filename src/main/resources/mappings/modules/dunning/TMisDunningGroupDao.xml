@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao">
+
+	<sql id="tMisDunningGroupColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.name AS "name",
+		a.type AS "type",
+		a.leaderId AS "leader.id",
+		a.capitalamount AS "capitalamount",
+		a.createby AS "createBy.id",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.id",
+		a.updatedate AS "updateDate",
+		a.delFlag AS "delFlag"
+	</sql>
+
+	<sql id="tMisDunningGroupJoins">
+		LEFT JOIN sys_user u on u.id = a.leaderId
+	</sql>
+
+	<select id="get" resultType="TMisDunningGroup">
+		SELECT
+		<include refid="tMisDunningGroupColumns" />
+		FROM t_mis_dunning_group a
+		<include refid="tMisDunningGroupJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="TMisDunningGroup">
+		SELECT
+		<include refid="tMisDunningGroupColumns" />
+		FROM t_mis_dunning_group a
+		<include refid="tMisDunningGroupJoins" />
+		<where>
+			<if test="delFlag != null and delFlag != ''">
+				AND a.delFlag = #{delFlag}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="leader != null and leader.name != null and leader.name != ''">
+				AND u.name LIKE concat('%', #{leader.name},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+    <insert id="insert">
+		INSERT INTO t_mis_dunning_group(
+			id,
+			name,
+			type,
+			leaderId,
+			createby,
+			createdate,
+			updateby,
+			updatedate,
+			delFlag
+		) VALUES (
+			#{id},
+			#{name},
+			#{type},
+			#{leader.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+    <update id="update">
+		UPDATE t_mis_dunning_group SET 	
+			name = #{name},
+			type = #{type},
+			leaderId = #{leader.id},
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+			delFlag = #{delFlag}
+		WHERE id = #{id}
+	</update>	
+</mapper>
