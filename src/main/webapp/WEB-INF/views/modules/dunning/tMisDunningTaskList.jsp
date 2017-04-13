@@ -142,7 +142,7 @@
 						}
 					});
 					if(orders.length==0){
-						$.jBox.tip("请选择需要移动的案件", 'warning');
+						$.jBox.tip("请选择需要移动的案件 ", 'warning');
 						return;
 					}
 					if(orders.length>300){
