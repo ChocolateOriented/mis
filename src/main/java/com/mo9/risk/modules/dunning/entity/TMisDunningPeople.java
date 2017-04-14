@@ -9,6 +9,7 @@ import java.util.Arrays;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
@@ -23,10 +24,10 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public static final String PEOPLE_TYPE_INNER = "inner";  //内部催收人员
 	public static final String PEOPLE_TYPE_OUTER = "outer"; //委外公司
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	private Integer dbid;		// dbid
 	private String name;		// 催收人员名称
-	private String dunningpeopletype;		// 人员类型
+	private String dunningpeopletype;		// 人员类型,已经添加组类型 , 此字段以后删除
 	private BigDecimal rate;		// 单笔费率 ,大于1为单笔固定费率，小于1大于0为单笔百分比费率
 	private Integer begin;		// 逾期周期起始
 	private Integer end;		// 逾期周期截至
@@ -34,12 +35,11 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	private String field1;		// field1
 	
 	private String Invalid;
-	
 	private String dunningcycle;
-//	private String createby;		// createby
-//	private Date createdate;		// createdate
-//	private String updateby;		// updateby
-//	private Date updatedate;		// updatedate
+	
+	private TMisDunningGroup group ;
+	private String nickname ;
+	private User user ;
 	
 	public TMisDunningPeople() {
 		super();
@@ -70,14 +70,17 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.name = name;
 	}
 	
+	@Deprecated
 	@Length(min=0, max=32, message="人员类型长度必须介于 0 和 32 之间")
 	public String getDunningpeopletype() {
 		return dunningpeopletype;
 	}
+	@Deprecated
 	public String getDunningpeopletypeText() {
 		return PEOPLE_TYPE_INNER.equals(this.dunningpeopletype) ?  "内部催收" : 
 			PEOPLE_TYPE_OUTER.equals(this.dunningpeopletype) ?  "委外公司" : "";
 	}
+	@Deprecated
 	public void setDunningpeopletype(String dunningpeopletype) {
 		this.dunningpeopletype = dunningpeopletype;
 	}
@@ -147,42 +150,29 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.dunningcycle = dunningcycle;
 	}
 
+	public TMisDunningGroup getGroup() {
+		return group;
+	}
+
+	public void setGroup(TMisDunningGroup group) {
+		this.group = group;
+	}
 	
-	
-//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
-//	public String getCreateby() {
-//		return createby;
-//	}
-//
-//	public void setCreateby(String createby) {
-//		this.createby = createby;
-//	}
-//	
-//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//	public Date getCreatedate() {
-//		return createdate;
-//	}
-//
-//	public void setCreatedate(Date createdate) {
-//		this.createdate = createdate;
-//	}
-//	
-//	@Length(min=0, max=64, message="updateby长度必须介于 0 和 64 之间")
-//	public String getUpdateby() {
-//		return updateby;
-//	}
-//
-//	public void setUpdateby(String updateby) {
-//		this.updateby = updateby;
-//	}
-//	
-//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//	public Date getUpdatedate() {
-//		return updatedate;
-//	}
-//
-//	public void setUpdatedate(Date updatedate) {
-//		this.updatedate = updatedate;
-//	}
+	@Length(min=0, max=64, message="花名长度必须介于 0 和 64 之间")
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 	
 }

@@ -17,10 +17,15 @@
 		a.updatedate AS "updateDate",
 		a.auto AS "auto",
 		a.Invalid AS Invalid,
-		a.dunningcycle AS dunningcycle
+		a.dunningcycle AS dunningcycle,
+		a.nickname AS nickname,
+		a.groupId AS group.id,
+		g.type AS group.type,
+		g.name AS group.name
 	</sql>
 	
 	<sql id="tMisDunningPeopleJoins">
+		LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
 	</sql>
     
 	<select id="get" resultType="TMisDunningPeople">
@@ -34,8 +39,10 @@
 	<select id="findList" resultType="TMisDunningPeople">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
+			, u.login_name as user.loginName
 		FROM t_mis_dunning_people a
 			<include refid="tMisDunningPeopleJoins"/>
+			LEFT JOIN sys_user u on u.id = a.id
 		<where>
 		    <!-- 只显示未删除的催收人员  -->
 		    	a.Invalid = 't'

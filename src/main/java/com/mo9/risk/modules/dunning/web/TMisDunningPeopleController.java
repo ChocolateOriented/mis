@@ -4,7 +4,9 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
@@ -59,6 +62,18 @@ public class TMisDunningPeopleController extends BaseController {
 			entity = new TMisDunningPeople();
 		}
 		return entity;
+	}
+	
+	/**
+	 * @Description: 催收小组集合
+	 */
+	@ModelAttribute
+	public void groupType(Model model) {
+		Map<String, String> groupTypes = new HashMap<String, String>();
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_SELF,"自营");
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_SEAT,"外包坐席");
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION,"委外佣金");
+		model.addAttribute("groupTypes", groupTypes) ;
 	}
 	
 	/**

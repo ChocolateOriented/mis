@@ -11,11 +11,11 @@ import com.thinkgem.jeesite.common.service.CrudService;
 @Service
 @Transactional(readOnly = true)
 public class TMisDunningGroupService extends CrudService<TMisDunningGroupDao,TMisDunningGroup> {
-	@Transactional(readOnly=false)
-	public void delete(String id) {
-		TMisDunningGroup entity = new TMisDunningGroup();
-		entity.setId(id);
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(TMisDunningGroup entity) {
 		entity.setDelFlag(BaseEntity.DEL_FLAG_DELETE);
-		dao.update(entity );
+		entity.preUpdate();
+		super.delete(entity);
 	}
 }

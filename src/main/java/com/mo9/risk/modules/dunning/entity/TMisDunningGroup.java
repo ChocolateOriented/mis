@@ -23,6 +23,12 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 	private String name; //组名
 	private String type; //组类型
 	private User leader; //组长
+	
+	public TMisDunningGroup(String id) {
+		super(id) ;
+	}
+	public TMisDunningGroup() {
+	}
 
 	public Integer getDbid() {
 		return dbid;

@@ -8,12 +8,12 @@
 		a.name AS "name",
 		a.type AS "type",
 		a.leaderId AS "leader.id",
-		a.capitalamount AS "capitalamount",
 		a.createby AS "createBy.id",
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.id",
 		a.updatedate AS "updateDate",
-		a.delFlag AS "delFlag"
+		a.delFlag AS "delFlag",
+		u.name AS "leader.name"
 	</sql>
 
 	<sql id="tMisDunningGroupJoins">
@@ -86,7 +86,15 @@
 			type = #{type},
 			leaderId = #{leader.id},
 			updateby = #{updateBy.id},
-			updatedate = #{updateDate}
+			updatedate = #{updateDate},
+			delFlag = #{delFlag}
+		WHERE id = #{id}
+	</update>	
+	
+    <update id="delete">
+		UPDATE t_mis_dunning_group SET 	
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate},
 			delFlag = #{delFlag}
 		WHERE id = #{id}
 	</update>	

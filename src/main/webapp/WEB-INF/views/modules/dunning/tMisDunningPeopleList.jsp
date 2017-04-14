@@ -66,9 +66,6 @@
 			<li><label>催收人：</label>
 				<form:input path="name" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
-<!-- 			<li><label>人员类型：</label> -->
-<%-- 				<form:input path="dunningpeopletype" htmlEscape="false" maxlength="32" class="input-medium"/> --%>
-<!-- 			</li> -->
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="btns"><input id="btnDunningcycle" class="btn btn-primary" type="button" value="分配队列"/></li>
 			<li class="clearfix"></li>
@@ -79,13 +76,14 @@
 		<thead>
 			<tr>
 				<th><input type="checkbox" id="allorder" /></th>
-				<th>催收人员名称</th>
-				<th>人员类型</th>
-				<th title="大于1为单笔固定费率，小于1大于0为单笔百分比费率">单笔费率</th>
+				<th>催收人员账号</th>
+				<th>催收人员花名</th>
+				<th>所属组</th>
+				<th>组类型</th>
 				<th>催收队列</th>
-<!-- 				<th>逾期周期起始</th> -->
-<!-- 				<th>逾期周期截至</th> -->
 				<th>自动分配</th>
+<!-- 				<th>人员类型</th> -->
+<!-- 				<th title="大于1为单笔固定费率，小于1大于0为单笔百分比费率">单笔费率</th> -->
 				<shiro:hasPermission name="dunning:tMisDunningPeople:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
 		</thead>
@@ -96,40 +94,28 @@
 					<input type="checkbox" name="peopleids" value="${tMisDunningPeople.id}"/>
 				</td>
 				<td><a href="${ctx}/dunning/tMisDunningPeople/form?id=${tMisDunningPeople.id}">
-					${tMisDunningPeople.name}
+					${tMisDunningPeople.user.loginName}
 				</a></td>
 				<td>
-					${tMisDunningPeople.dunningpeopletypeText}
+					${tMisDunningPeople.nickname}
 				</td>
 				<td>
-					${tMisDunningPeople.rate}
+					${tMisDunningPeople.group.name}
+				</td>
+				<td>
+					${groupTypes[tMisDunningPeople.group.type]}
 				</td>
 				<td>
 					${tMisDunningPeople.dunningcycle}
 				</td>
-<!-- 				<td> -->
-<%-- 					${tMisDunningPeople.begin} --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					${tMisDunningPeople.end} --%>
-<!-- 				</td> -->
 				<td>
 					${'t' eq tMisDunningPeople.auto ? '启用' : '停止'} 
 				</td>
 <!-- 				<td> -->
-<%-- 					${tMisDunningPeople.field1} --%>
+<%-- 					${tMisDunningPeople.dunningpeopletypeText} --%>
 <!-- 				</td> -->
 <!-- 				<td> -->
-<%-- 					${tMisDunningPeople.createby} --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					<fmt:formatDate value="${tMisDunningPeople.createdate}" pattern="yyyy-MM-dd HH:mm:ss"/> --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					${tMisDunningPeople.updateby} --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					<fmt:formatDate value="${tMisDunningPeople.updatedate}" pattern="yyyy-MM-dd HH:mm:ss"/> --%>
+<%-- 					${tMisDunningPeople.rate} --%>
 <!-- 				</td> -->
 				<shiro:hasPermission name="dunning:tMisDunningPeople:edit"><td>
     				<a href="${ctx}/dunning/tMisDunningPeople/form?id=${tMisDunningPeople.id}">修改</a>
