@@ -221,7 +221,7 @@
 		WHERE
 		a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
 		AND a.Invalid = 't' 
-		AND a.auto = 't'
+<!-- 		AND a.auto = 't' -->
 		AND id in 
 		<foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
             #{item}
