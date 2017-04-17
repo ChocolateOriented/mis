@@ -1313,17 +1313,17 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					this.autoAssign_Q1_Q4();
 					/**  0-0提醒分案  */
 //					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,"> 0");
-					break;
+					return;
 				case 16:
 					/**  Q0,Q1-Q4分案  */
 					this.autoAssign_Q1_Q4();
 					/**  0-0提醒分案  */
 //					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,"> 0");
-					break;
+					return;
 				default:
 //					String sqlMap = "NOT BETWEEN "+ this.getCycleDict_Q0().get("begin") + " AND  " + this.getCycleDict_Q0().get("end");
 					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,this.getCycleDict_Q0().get("begin"),this.getCycleDict_Q0().get("end"));
-					break;
+					return;
 				}
 			/**
 			 *  大月分案规则		`
@@ -1335,25 +1335,25 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					this.autoAssign_Q1_Q4();
 					/**  0-0提醒分案 */
 //					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,"> 0");
-					break;
+					return;
 				case 17:
 					/**  Q0,Q1-Q4分案 */
 					this.autoAssign_Q1_Q4();
 					/**  0-0提醒分案	*/
 //					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,"> 0");
-					break;
+					return;
 				default:
 //					String sqlMap = "NOT BETWEEN "+ this.getCycleDict_Q0().get("begin") + " AND  " + this.getCycleDict_Q0().get("end");
 					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,this.getCycleDict_Q0().get("begin"),this.getCycleDict_Q0().get("end"));
-					break;
+					return;
 				}
 			/**
 			 *  二月分案规则
 			 */
 			case 28:
-				break;
+				return;
 			default:
-				break;
+				return;
 		}
 	}
 	
