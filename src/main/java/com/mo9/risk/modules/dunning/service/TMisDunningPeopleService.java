@@ -150,4 +150,13 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		return tMisDunningPeopleDao.batchUpdateDunningcycle(pids, userid, dunningcycle);
 	}
 	
+	/**
+	 * 根据周期查询催收人员-手动分配
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningPeople> findPeopleByDistributionDunningcycle(String dunningcycle){
+		return tMisDunningPeopleDao.findPeopleByDistributionDunningcycle(dunningcycle);
+	}
+	
 }

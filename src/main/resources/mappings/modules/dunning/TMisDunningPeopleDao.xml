@@ -203,6 +203,15 @@
 <!-- 		AND a.DunningCycle LIKE concat('%',#{dunningcycle},'%') -->
 	</select>	
 	
+	<select id="findPeopleByDistributionDunningcycle" resultType="TMisDunningPeople">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		WHERE 
+		a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
+		AND a.Invalid = 't' 
+	</select>	
+	
 	 <update id="batchUpdateDunningcycle">
 		UPDATE t_mis_dunning_people SET 	
 			updatedate = now(),

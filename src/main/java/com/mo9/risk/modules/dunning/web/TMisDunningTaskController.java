@@ -610,7 +610,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = "dialogDistribution")
 	public String dialogDistribution( Model model,String orders,String dunningcycle) {
 		try {
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDunningcycle(dunningcycle);
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("orders", orders);
 			model.addAttribute("dunningcycle", dunningcycle);
