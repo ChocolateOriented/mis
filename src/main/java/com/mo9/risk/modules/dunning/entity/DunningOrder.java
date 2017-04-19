@@ -1,7 +1,6 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import java.util.Date;
-import java.util.List;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
@@ -38,7 +37,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date repaymenttime;// # 到期还款日期
 	private Integer overduedays;// # 逾期天数
 	private String status;// # 订单状态 payoff 已还清 payment
-	private String dunningpeoplename;// # 催收人
+	private String dunningpeoplename;// # 催收人  改用催收人花名
 	private Date payofftime;// # 还清日期
 	private String dunningtaskstatus;// # 任务状态
 	private Date beginPayofftime;		// 开始还清日期
@@ -48,9 +47,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private String beginOverduedays;// # 逾期天数
 	private String endOverduedays;// # 逾期天数
 	private String dunningpeopleid;// # 催收人id
-//	private Integer dunningtaskdbid;   //任务id
 	private String dunningtaskdbid;   //任务id
-	private List<String> names;// # 催收人
+//	private List<String> names;// # 催收人 催收任务查询使用 , 改用id查询
 	private Date outerfiletime;  // 委外导出时间
 	private String telremark;   //电话记录
 	private Date deadline;/*催收留案功能-增加催收截止日字段 Patch 0001 by GQWU at 2016-11-8*/ 
@@ -63,6 +61,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private String dunningcycle;		// 催收周期(队列)
 	
+	private TMisDunningPeople dunningPeople ;
 
 	public DunningOrder() {
 		super();
@@ -253,13 +252,13 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.dunningpeopleid = dunningpeopleid;
 	}
 
-	public List<String> getNames() {
-		return names;
-	}
-
-	public void setNames(List<String> names) {
-		this.names = names;
-	}
+//	public List<String> getNames() {
+//		return names;
+//	}
+//
+//	public void setNames(List<String> names) {
+//		this.names = names;
+//	}
 
 	public String getDunningtaskdbid() {
 		return dunningtaskdbid;
@@ -334,7 +333,12 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.dunningcycle = dunningcycle;
 	}
 
-	
-	
+	public TMisDunningPeople getDunningPeople() {
+		return dunningPeople;
+	}
+
+	public void setDunningPeople(TMisDunningPeople dunningPeople) {
+		this.dunningPeople = dunningPeople;
+	}
 	
 }

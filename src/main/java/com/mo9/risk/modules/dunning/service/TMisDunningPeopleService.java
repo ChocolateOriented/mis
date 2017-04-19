@@ -3,14 +3,17 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -28,10 +31,6 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
-	
-	public TMisDunningPeople get(String id) {
-		return super.get(id);
-	}
 	
 	public List<TMisDunningPeople> findList(TMisDunningPeople tMisDunningPeople) {
 		return super.findList(this.getDunningPeople(tMisDunningPeople));
@@ -52,16 +51,23 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	
 	@Transactional(readOnly = false)
 	public void save(TMisDunningPeople tMisDunningPeople) {
+		
 		if(null == tMisDunningPeople.getDbid()){
+			//因为要是用User的ID,所以不调用父类save生成新id
+			User user = UserUtils.getUser();
+			if (StringUtils.isNotBlank(user.getId())){
+				tMisDunningPeople.setUpdateBy(user);
+				tMisDunningPeople.setCreateBy(user);
+			}
+			Date now = new Date();
+			tMisDunningPeople.setUpdateDate(now);
+			tMisDunningPeople.setCreateDate(now);
+			
 			dao.insert(tMisDunningPeople);
 		}else{
+			tMisDunningPeople.preUpdate();
 			dao.update(tMisDunningPeople);
 		}
-	}
-	
-	@Transactional(readOnly = false)
-	public void delete(TMisDunningPeople tMisDunningPeople) {
-		super.delete(tMisDunningPeople);
 	}
 	
 	/**
@@ -88,15 +94,27 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 */
 	public TMisDunningPeople getDunningPeople(TMisDunningPeople tMisDunningPeople){
 		int permissions = TMisDunningTaskService.getPermissions();
-//		if(TMisDunningTaskService.DUNNING_ALL_PERMISSIONS == permissions){
-//			tMisDunningPeople.setDunningpeopletype("");
-//		}
+		TMisDunningGroup dunningGroup = tMisDunningPeople.getGroup() ;
+		if (dunningGroup == null) {
+			dunningGroup = new TMisDunningGroup() ;
+			tMisDunningPeople.setGroup(dunningGroup);
+		}
+		List<String> queryTypes = dunningGroup.getQueryTypes() ;
+		if (queryTypes == null) {
+			queryTypes = new ArrayList<String>() ;
+			dunningGroup.setQueryTypes(queryTypes);
+		}
+		
+		//内部催收主管可查看自营
 		if(TMisDunningTaskService.DUNNING_INNER_PERMISSIONS == permissions){
-			tMisDunningPeople.setDunningpeopletype("inner");
+			queryTypes.add(TMisDunningGroup.GROUP_TYPE_SELF);
 		}
+		//外部催收主管可查看外包坐席及委外佣金
 		if(TMisDunningTaskService.DUNNING_OUTER_PERMISSIONS == permissions){
-			tMisDunningPeople.setDunningpeopletype("outer");
+			queryTypes.add(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION);
+			queryTypes.add(TMisDunningGroup.GROUP_TYPE_OUT_SEAT);
 		}
+		//催收专员只能查看自己
 		if(TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS == permissions){
 			tMisDunningPeople.setId(UserUtils.getUser().getId());
 		}
@@ -148,6 +166,16 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	@Transactional(readOnly = false)
 	public int batchUpdateDunningcycle(List<String> pids,String userid,String dunningcycle){
 		return tMisDunningPeopleDao.batchUpdateDunningcycle(pids, userid, dunningcycle);
+	}
+
+	/**
+	 * @Description: 查询用户花名及Id列表 , 支持通过GroupId与nickname查询
+	 * @param tMisDunningPeople
+	 * @return
+	 * @return: List<TMisDunningPeople>
+	 */
+	public List<TMisDunningPeople> findOptionList(TMisDunningPeople tMisDunningPeople) {
+		return tMisDunningPeopleDao.findOptionList(tMisDunningPeople);
 	}
 	
 	/**

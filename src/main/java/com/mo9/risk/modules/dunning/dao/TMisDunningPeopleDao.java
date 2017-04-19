@@ -57,6 +57,14 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public List<TMisDunningPeople> findPeoplesByids(@Param("pids")List<String> pids,@Param("dunningcycle")String dunningcycle);
+
+	/**
+	 * @Description: 查询用户花名及Id列表 , 支持通过GroupId与nickname查询
+	 * @param tMisDunningPeople
+	 * @return
+	 * @return: List<TMisDunningPeople>
+	 */
+	public List<TMisDunningPeople> findOptionList(TMisDunningPeople tMisDunningPeople);
 	
 	
 	
