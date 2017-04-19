@@ -37,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -48,6 +47,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceConfirmService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
+import com.mo9.risk.util.GetRequest;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
