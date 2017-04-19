@@ -16,12 +16,12 @@
 		a.updateby AS "updateBy.id",
 		a.updatedate AS "updateDate",
 		a.auto AS "auto",
-		a.Invalid AS Invalid,
-		a.dunningcycle AS dunningcycle,
-		a.nickname AS nickname,
-		a.groupId AS group.id,
-		g.type AS group.type,
-		g.name AS group.name
+		a.Invalid AS "Invalid",
+		a.dunningcycle AS "dunningcycle",
+		a.nickname AS "nickname",
+		a.groupId AS "group.id" ,
+		g.`type` AS "group.type",
+		g.`name` AS "group.name"
 	</sql>
 	
 	<sql id="tMisDunningPeopleJoins">
@@ -39,10 +39,8 @@
 	<select id="findList" resultType="TMisDunningPeople">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
-			, u.login_name as user.loginName
-		FROM t_mis_dunning_people a
+			FROM t_mis_dunning_people a
 			<include refid="tMisDunningPeopleJoins"/>
-			LEFT JOIN sys_user u on u.id = a.id
 		<where>
 		    <!-- 只显示未删除的催收人员  -->
 		    	a.Invalid = 't'
@@ -61,6 +59,15 @@
 			<if test="begin != null and end != null and begin != '' and end != ''">
 				AND a.begin = #{begin} AND  a.end = #{end}
 			</if>
+			<if test="group != null and group.id != null and group.id !='' ">
+				AND a.`groupId` = #{group.id}
+			</if>
+			<if test="group != null and group.queryTypes != null and group.queryTypes.size != 0 ">
+				AND g.type in 
+				<foreach item="item" index="index" collection="group.queryTypes" open="(" separator="," close=")">
+	                #{item}
+	            </foreach>
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -70,6 +77,21 @@
 			    ORDER BY a.begin desc
 			</otherwise>
 		</choose>
+	</select>
+	
+	<select id="findOptionList" resultType="TMisDunningPeople">
+		SELECT
+			a.`nickname` ,
+			a.`id`
+		FROM t_mis_dunning_people a
+		WHERE 
+			a.Invalid = 't'
+		<if test="group != null and group.id != null and group.id !='' ">
+			AND a.`groupId` = #{group.id}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			AND a.nickname LIKE concat('%',#{nickname},'%')
+		</if>
 	</select>
 	
 	<select id="findAllList" resultType="TMisDunningPeople">
@@ -131,7 +153,7 @@
 		INSERT INTO t_mis_dunning_people(
 			id,
 			name,
-			dunningpeopletype,
+<!-- 			dunningpeopletype, -->
 			rate,
 			begin,
 			end,
@@ -141,11 +163,13 @@
 			createdate,
 			updateby,
 			updatedate,
-			dunningcycle 
+			dunningcycle,
+			nickname,
+			groupId
 		) VALUES (
 			#{id},
 			#{name},
-			#{dunningpeopletype},
+<!-- 			#{dunningpeopletype}, -->
 			#{rate},
 			#{begin},
 			#{end},
@@ -155,25 +179,26 @@
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
-			#{dunningcycle}
+			#{dunningcycle},
+			#{nickname},
+			#{group.id}
 		)
 	</insert>
 	
 	<update id="update">
 		UPDATE t_mis_dunning_people SET 
-			id = #{id},	
-			name = #{name},
-			dunningpeopletype = #{dunningpeopletype},
+<!-- 			dunningpeopletype = #{dunningpeopletype}, -->
 			rate = #{rate},
 			begin = #{begin},
 			end = #{end},
 			field1 = #{field1},
 			auto = #{auto},
-			createby = #{createBy.id},
-			createdate = #{createDate},
 			updateby = #{updateBy.id},
 			updatedate = #{updateDate},
-			dunningcycle = #{dunningcycle}
+<!-- 			催收队列添加后只能在列表中手动修改 -->
+<!-- 			dunningcycle = #{dunningcycle}, -->
+			nickname = #{nickname},
+			groupId = #{group.id}
 		WHERE dbid = #{dbid}
 	</update>
 	
@@ -234,6 +259,5 @@
             #{item}
         </foreach>
 	</select>
-	
 	
 </mapper>

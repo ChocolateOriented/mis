@@ -50,7 +50,7 @@
 			a.remark AS "remark",
 			a.dunningtime AS "dunningtime",
 			a.dunningpeopleid AS "dunningpeopleid",
-			CASE WHEN p.Name = 'sys' THEN '' ELSE p.Name END AS "dunningpeoplename",
+			CASE WHEN p.Name = 'sys' THEN '' ELSE p.nickname END AS "dunningpeoplename",
 			a.createby AS "createBy.name",
 			a.createdate AS "createDate",
 			a.updateby AS "updateBy.name",

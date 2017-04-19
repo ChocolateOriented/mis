@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
@@ -58,7 +57,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
@@ -81,14 +79,12 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -171,10 +167,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = {"findOrderPageList", ""})
-	public String findOrderPageList(DunningOrder dunningOrder,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<DunningOrder> page = tMisDunningTaskService.findOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
-		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
-//		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findAllList(dunningPeople);
+		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findOptionList(new TMisDunningPeople());
 		model.addAttribute("dunningPeoples", dunningPeoples);
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisDunningTaskList";

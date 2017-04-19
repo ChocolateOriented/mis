@@ -1,5 +1,9 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
@@ -18,16 +22,28 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 	public static final String GROUP_TYPE_SELF = "selfSupport"; //自营
 	public static final String GROUP_TYPE_OUT_SEAT = "outsourceSeat"; //外包坐席
 	public static final String GROUP_TYPE_OUT_COMMISSION = "outsourceCommission"; //委外佣金
+	
+	public static final Map<String, String> groupTypes ;
+	static{
+		groupTypes = new HashMap<String, String>();
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_SELF,"自营");
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_SEAT,"外包坐席");
+		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION,"委外佣金");
+	}
 
 	private Integer dbid;
 	private String name; //组名
 	private String type; //组类型
 	private User leader; //组长
 	
+	private List<String> queryTypes ;
+	
 	public TMisDunningGroup(String id) {
 		super(id) ;
 	}
+	
 	public TMisDunningGroup() {
+		super();
 	}
 
 	public Integer getDbid() {
@@ -65,6 +81,14 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 		this.leader = leader;
 	}
 
+	public List<String> getQueryTypes() {
+		return queryTypes;
+	}
+	
+	public void setQueryTypes(List<String> queryTypes) {
+		this.queryTypes = queryTypes;
+	}
+	
 	@Override
 	public String toString() {
 		return "TMisDunningGroup [dbid=" + dbid + ", name=" + name + ", type=" + type + ", leader=" + leader + "]";

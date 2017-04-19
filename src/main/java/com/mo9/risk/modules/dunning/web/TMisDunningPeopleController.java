@@ -4,15 +4,14 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.config.Global;
@@ -43,6 +43,9 @@ public class TMisDunningPeopleController extends BaseController {
 
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
+	
+	@Autowired
+	private TMisDunningGroupService tMisDunningGroupService;
 	
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
@@ -68,12 +71,10 @@ public class TMisDunningPeopleController extends BaseController {
 	 * @Description: 催收小组集合
 	 */
 	@ModelAttribute
-	public void groupType(Model model) {
-		Map<String, String> groupTypes = new HashMap<String, String>();
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_SELF,"自营");
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_SEAT,"外包坐席");
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION,"委外佣金");
-		model.addAttribute("groupTypes", groupTypes) ;
+	public void groupList(Model model) {
+		//催收小组列表
+		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 	}
 	
 	/**
@@ -91,7 +92,16 @@ public class TMisDunningPeopleController extends BaseController {
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisDunningPeopleList";
 	}
-
+	
+	/**
+	 * 催收人员选择列表	
+	 */
+	@RequestMapping(value="optionList",produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<TMisDunningPeople> optionList(TMisDunningPeople tMisDunningPeople) {
+		return tMisDunningPeopleService.findOptionList(tMisDunningPeople);
+	}
+	
 	/**
 	 * 加载编辑催收人员页面
 	 * @param tMisDunningPeople

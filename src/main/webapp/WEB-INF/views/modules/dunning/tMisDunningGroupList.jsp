@@ -2,17 +2,21 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title>催收人员管理</title>
-	<meta name="decorator" content="default"/>
-	<script type="text/javascript">
-	</script>
+<title>催收小组管理</title>
+<meta name="decorator" content="default"/>
+<script type="text/javascript">
+	function page(n,s){
+		$("#pageNo").val(n);
+		$("#pageSize").val(s);
+		$("#searchForm").submit();
+		return false;
+	}
+</script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisDunningGroup/">催收小组列表</a></li>
-		<shiro:hasPermission name="dunning:TMisDunningGroup:edit"> 
-			<li><a href="${ctx}/dunning/tMisDunningGroup/form">催收小组添加</a></li>
-		</shiro:hasPermission>
+		<li><a href="${ctx}/dunning/tMisDunningGroup/form">催收小组编辑</a></li>		
 	</ul>
 	
 	<form:form id="searchForm" modelAttribute="TMisDunningGroup" action="${ctx}/dunning/tMisDunningGroup/" method="post" class="breadcrumb form-search">
@@ -45,8 +49,9 @@
 				<th>组名</th>
 				<th>组长名</th>
 				<th>组类型</th>
-				<th>组员列表</th>
+				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<th>操作</th>
+				</shiro:hasPermission>
 			</tr>
 		</thead>
 		<tbody>
@@ -60,11 +65,6 @@
 				</td>
 				<td>
 					${groupTypes[tMisDunningGroup.type]}
-				</td>
-				<td>
-					<a href="${ctx}/dunning/tMisDunningGroup/form?id=${tMisDunningGroup.id}">
-					组员列表
-					</a>
 				</td>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<td>

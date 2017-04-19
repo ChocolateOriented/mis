@@ -410,8 +410,8 @@
 				</li>
 				<li>
 					<label >催款人</label>
-					<form:select id="names"  path="names" multiple="multiple"   style="width: 375px ;">
-						<form:options items="${dunningPeoples}" itemLabel="name" itemValue="name" htmlEscape="false" />
+					<form:select id="names"  path="dunningPeople.queryIds" multiple="multiple"   style="width: 375px ;">
+						<form:options items="${dunningPeoples}" itemLabel="nickname" itemValue="id" htmlEscape="false" />
 					</form:select>
 	<!-- 				<div class='multi_select' style="width:180px !important;"></div> -->
 <%-- 					<form:select id="dunningpeoplename"  path="dunningpeoplename" class="input-medium"> --%>
@@ -539,7 +539,7 @@
 				</td>
 				
 				<td>
-					${dunningOrder.dunningpeoplename}
+					${dunningOrder.dunningPeople.nickname}
 				</td>
 				
 				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->

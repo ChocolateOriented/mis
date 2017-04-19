@@ -1,8 +1,5 @@
 package com.mo9.risk.modules.dunning.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -33,20 +29,17 @@ import com.thinkgem.jeesite.common.web.BaseController;
 public class TMisDunningGroupController extends BaseController {
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService ;
-	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
 	
+	/**
+	 * @Description: 催收小组集合
+	 */
 	@ModelAttribute
 	public void groupType(Model model) {
-		Map<String, String> groupTypes = new HashMap<String, String>();
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_SELF,"自营");
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_SEAT,"外包坐席");
-		groupTypes.put(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION,"委外佣金");
-		model.addAttribute("groupTypes", groupTypes) ;
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 	}
 	
 	/**
-	 * 小组列表
+	 * @Description: 小组列表
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:view")
 	@RequestMapping(value={"list",""})
@@ -57,7 +50,7 @@ public class TMisDunningGroupController extends BaseController {
 	}
 	
 	/**
-	 * 修改小组
+	 * @Description: 修改小组
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "edit")
@@ -74,19 +67,19 @@ public class TMisDunningGroupController extends BaseController {
 	}
 	
 	/**
-	 * 加载编辑催收小组页面
+	 * @Description: 加载编辑催收小组页面
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "form")
 	public String form(TMisDunningGroup tMisDunningGroup , Model model) {
 		logger.debug("加载编辑催收小组页面");
-		model.addAttribute("users", tMisDunningPeopleService.findUserList()) ;
+		model.addAttribute("users", tMisDunningGroupService.findUserList()) ;
 		return "modules/dunning/tMisDunningGroupForm";
 	}
 	
 	
 	/**
-	 * 保存或编辑催收小组
+	 * @Description: 保存或编辑催收小组
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "save")
@@ -102,7 +95,7 @@ public class TMisDunningGroupController extends BaseController {
 	}
 	
 	/**
-	 * 删除催收小组
+	 * @Description: 删除催收小组
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "delete")
