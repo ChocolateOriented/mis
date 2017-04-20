@@ -24,7 +24,7 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	private Date repaymentTime; // 订单应还款时间
 	private String buyerId; // 借款人id
 	private String mobile; // 借款人手机
-	private String realName; // 借款人姓名
+	private String realName;            // 借款人姓名
 	private String idcard; // 借款人身份证号
 	private String days; // 借款周期
 	private String overdueDays; // 逾期天数
@@ -38,7 +38,7 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	private String creditAmount; // 实际应还金额
 	private String delayCount; // 续期次数
 	private Date payOffTime; // 还清时间
-	private String sex;
+	private String sex; //性别
 	private String mobileCity; // 手机归属地
 	private String marital; // 婚姻状况
 	private String livingAddr; // 居住地址
@@ -46,6 +46,26 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	private String remitBankNo; // 放款银行卡号
 	private String remitBankName; // 放款银行名
 	private String repaymentAmount; // 还款总额
+	
+	private String finProduct;//借款的金融产品
+	private Integer rpayStatus;//还款日期；1表示还款前一天，0表示还款当天。
+	
+	
+	public String getFinProduct() {
+		return finProduct;
+	}
+
+	public void setFinProduct(String finProduct) {
+		this.finProduct = finProduct;
+	}
+
+	public Integer getRpayStatus() {
+		return rpayStatus;
+	}
+
+	public void setRpayStatus(Integer rpayStatus) {
+		this.rpayStatus = rpayStatus;
+	}
 
 	public TRiskBuyerPersonalInfo() {
 		super();
