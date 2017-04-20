@@ -113,6 +113,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
 	
+	
 	public TMisDunningTask get(String id) {
 		return super.get(id);
 	}
@@ -2111,7 +2112,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 ////		int days = daysBetween("2016-08-15 11:41:06","2016-08-17 16:24:00");
 //		System.out.println(days);
 //	}
-	
 	/**
 	 * 自动发送短信提醒，还款的前一天和当天9点
 	 */
@@ -2119,10 +2119,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoSendMessageBefore(){
 		
 		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
-		String route = "";
-		String msg="";
-		String sex="";
 		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+			String route = "";
+			String msg="";
+			String sex="";
 			try{
 				
 				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
@@ -2194,10 +2194,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoSendMessageNow(){
 		
 		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
-		String route = "";
-		String msg="";
-		String sex="";
 		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+			String route = "";
+			String msg="";
+			String sex="";
 			if(tAuto.getRpayStatus()==0){
 			try{
 				
