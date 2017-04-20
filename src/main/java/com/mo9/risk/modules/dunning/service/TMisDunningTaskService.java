@@ -2254,13 +2254,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	  }
 	}
-	@Scheduled(cron = "0 0/1 * * * ?")  
+	@Scheduled(cron = "0 0 9 * * ?")  
 	@Transactional
    public void autoMessageBefore(){
 		this.autoSendMessageBefore();
 	}
 
-	@Scheduled(cron = "0 0/1 * * * ?")  
+	@Scheduled(cron = "0 0 13 * * ?")  
 	@Transactional
    public void autoMessageNow(){
 		this.autoSendMessageNow();
