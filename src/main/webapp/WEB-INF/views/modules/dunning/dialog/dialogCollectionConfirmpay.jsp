@@ -7,11 +7,12 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			//如果逾期天数大于14则催收人员代付选项没有续期  限制特定资方订单续期相关操作
-			if(parseInt(${personalInfo.overdueDays}) > parseInt(${fns:getDictValue('overdueday', 'overdueday', 14)}) || ${result} > 0 || ${!isDelayable}){
+			//关闭续期功能
+			/* if(parseInt(${personalInfo.overdueDays}) > parseInt(${fns:getDictValue('overdueday', 'overdueday', 14)}) || ${result} > 0 || ${!isDelayable}){
 				var obj=document.getElementById('paidType');
 				obj.options.remove(2); 
 				$("#delaytr").hide();
-			}
+			} */
 			
 			$('#paid').click(function() {
 				 if ($("input[name='isMergeRepayment']:checked").val() == "1") {
@@ -47,7 +48,7 @@
 					$("#delaytr").hide();
 					$("#paidAmount").attr("readonly",true);
 				}else if($("#paidType").val() == "delay"){
-					$("#paidAmount").val(${delayAmount});
+					$("#paidAmount").val("${delayAmount}");
 					$("#delaytr").show();
 					$("#paidAmount").attr("readonly",true);
 				}else{
@@ -101,7 +102,7 @@
 						<td>逾期天数</td>
 						<td>
 							${personalInfo.overdueDays}天
-							<c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if>
+							<%-- <c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if> --%>
 						</td>
 					</tr>
 				</tbody>
@@ -128,7 +129,7 @@
 						<select  class="input-medium required" id="paidType" name="paidType" style="width:195px;">
 							<option value=""></option>
 							<option value="loan">还清</option>
-							<option value="delay">续期</option>
+							<!-- <option value="delay">续期</option> -->
 							<option value="partial">部分还款</option>
 						</select>
 					</div>

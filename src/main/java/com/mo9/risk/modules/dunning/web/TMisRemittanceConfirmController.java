@@ -347,7 +347,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			return "views/error/500";
 		}
 		
-		boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
+		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
 		
 		Map<String,Object> maps = new HashMap<String,Object>();
 		maps.put("buyerId",buyerId);
@@ -376,38 +376,38 @@ public class TMisRemittanceConfirmController extends BaseController {
 				relatedList.remove(index);
 			}
 		}
-		BigDecimal delayAmount = new BigDecimal(0l);
-		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
-			if(Integer.valueOf(personalInfo.getOverdueDays()) <= Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14")) ){
-				
-				BigDecimal cpAmt = new BigDecimal(0L);
-				if(order.getCreditAmount() != null && 
-					(
-						(order.getCouponId() != null && order.getCouponId() > 0)
-						||(order.getSubCostAmount()!=null&&order.getSubCostAmount().compareTo(BigDecimal.ZERO)>0)
-					)
-				){
-					cpAmt = order.getAmount().subtract(order.getCreditAmount());
-				}
-				
-//				BigDecimal defaultInterestAmount = TMisDunningTaskController.getDefaultDelayAmount(order);
-				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费
-//				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
-				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费  - 减免费用
-//				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
-				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getRootorderid());
-//				delayAmount = getDefaultDelayAmount(order, existDelayNumber);
-				delayAmount = order.getCostAmount().add(getDefaultDelayAmount(order, existDelayNumber)).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
-			}
-		}
+//		BigDecimal delayAmount = new BigDecimal(0l);
+//		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
+//			if(Integer.valueOf(personalInfo.getOverdueDays()) <= Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14")) ){
+//				
+//				BigDecimal cpAmt = new BigDecimal(0L);
+//				if(order.getCreditAmount() != null && 
+//					(
+//						(order.getCouponId() != null && order.getCouponId() > 0)
+//						||(order.getSubCostAmount()!=null&&order.getSubCostAmount().compareTo(BigDecimal.ZERO)>0)
+//					)
+//				){
+//					cpAmt = order.getAmount().subtract(order.getCreditAmount());
+//				}
+//				
+////				BigDecimal defaultInterestAmount = TMisDunningTaskController.getDefaultDelayAmount(order);
+//				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费
+////				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
+//				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费  - 减免费用
+////				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+//				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getRootorderid());
+////				delayAmount = getDefaultDelayAmount(order, existDelayNumber);
+//				delayAmount = order.getCostAmount().add(getDefaultDelayAmount(order, existDelayNumber)).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+//			}
+//		}
 		model.addAttribute("platform", order.getPlatform());
 		model.addAttribute("tMisRemittanceConfirm", tMisRemittanceConfirm);
-		model.addAttribute("delayAmount", delayAmount);
+		//model.addAttribute("delayAmount", delayAmount);
 		model.addAttribute("hasRelatedRecord", hasRelatedRecord);
 		model.addAttribute("relatedList", relatedList);
 		model.addAttribute("remittanceamount", remittanceamount);
 		model.addAttribute("financialremittancechannel", financialremittancechannel);
-		model.addAttribute("isDelayable", isDelayable);
+		//model.addAttribute("isDelayable", isDelayable);
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
 		model.addAttribute("result", result);
 		return "modules/dunning/dialog/dialogCollectionConfirmpay";
