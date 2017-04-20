@@ -19,7 +19,7 @@
 		a.Invalid AS "Invalid",
 		a.dunningcycle AS "dunningcycle",
 		a.nickname AS "nickname",
-		a.groupId AS "group.id" ,
+		a.groupId AS "group.id"
 	</sql>
 	
 	<sql id="peopleJoinsColumns">
