@@ -8,11 +8,11 @@
 		$(document).ready(function() {
 			
 			//如果逾期天数大于14则催收人员代付选项没有续期
-			if(parseInt(${personalInfo.overdueDays}) > parseInt(14)){
+			/* if(parseInt(${personalInfo.overdueDays}) > parseInt(14)){
 				var obj=document.getElementById('paidType');
 				obj.options.remove(2); 
 				$("#delaytr").hide();
-			}
+			} */
 			
 			$('#paid').click(function() {
 	 			 if($("#inputForm").valid()){
@@ -96,7 +96,7 @@
 						<td>逾期天数</td>
 						<td>
 							${personalInfo.overdueDays}天
-							<c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if>
+							<%-- <c:if test="${personalInfo.overdueDays gt 14}" >(续期操作逾期时间不能大于14天)</c:if> --%>
 						</td>
 					</tr>
 				</tbody>
@@ -109,7 +109,7 @@
 						<select  class="input-medium required" id="paidType" name="paidType">
 							<option value=""></option>
 							<option value="loan">还款</option>
-							<option value="delay">续期</option>
+							<!-- <option value="delay">续期</option> -->
 							<option value="partial">部分还款</option>
 						</select>
 					</div>
