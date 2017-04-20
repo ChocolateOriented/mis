@@ -34,6 +34,7 @@ import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
+import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -109,6 +110,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TMisReliefamountHistoryDao tMisReliefamountHistoryDao;
 
+	@Autowired
+	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
+	
+	
 	public TMisDunningTask get(String id) {
 		return super.get(id);
 	}
@@ -2107,5 +2112,158 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 ////		int days = daysBetween("2016-08-15 11:41:06","2016-08-17 16:24:00");
 //		System.out.println(days);
 //	}
+	/**
+	 * 自动发送短信提醒，还款的前一天和当天9点
+	 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void autoSendMessageBefore(){
+		
+		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+			String route = "";
+			String msg="";
+			String sex="";
+			try{
+				
+				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
+					if("男".equals(tAuto.getSex())){
+						 sex=tAuto.getRealName().substring(0, 1)+"先生";
+					}
+					if("女".equals(tAuto.getSex()))	{
+						sex=tAuto.getRealName().substring(0, 1)+"女士";
+					}
+				}
+				
+				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
+				  if(tAuto.getFinProduct().contains("feishudai")){
+						route="飞鼠袋";
+				  }else{
+					  route = "mo9信用钱包";
+				  }
+				}	
+				
+		
+		String name=tAuto.getRealName();
+		
+		Double amount = new Double(0);
+		amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String repaymentTime = sdf.format(tAuto.getRepaymentTime());
+		
+		if(tAuto.getRpayStatus()==1){
+		 msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期所需还款金额为{3}元，请您最晚于{4}请做好财务规划，及时还款哦。",name,sex,route,amount,repaymentTime);
+		}
+		if(tAuto.getRpayStatus()==0){
+			msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+		}
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("mobile", tAuto.getMobile());
+		params.put("message",msg);
+		MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
+		logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
+		}catch (Exception e) {
+			logger.info("发送短信失败:"+e);
+			logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
+		}	
+		TMisContantRecord dunning = new TMisContantRecord();
+		dunning.setTaskid(null);
+		dunning.setDealcode(tAuto.getDealcode());
+		dunning.setOrderstatus(false);
+		dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
+		dunning.setDunningtime(new Date());
+		dunning.setContanttype(ContantType.sms);
+		dunning.setContanttarget(tAuto.getMobile());
+		//短信内容
+		dunning.setContent(msg);
+		dunning.setSmstemp(SmsTemp.ST_0);
+		dunning.setTelstatus(null);
+		dunning.setContactstype(ContactsType.SELF);
+		dunning.setDunningpeoplename("sys");
+		dunning.setRepaymenttime(tAuto.getRepaymentTime());
+		dunning.setRemark(null);
+		
+		tMisContantRecordService.save(dunning);
+	}
+			
+  }
 	
+	/**
+	 * 自动发送短信提醒，还款当天的13点
+	 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void autoSendMessageNow(){
+		
+		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+			String route = "";
+			String msg="";
+			String sex="";
+			if(tAuto.getRpayStatus()==0){
+			try{
+				
+				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
+					if("男".equals(tAuto.getSex())){
+						 sex=tAuto.getRealName().substring(0, 1)+"先生";
+					}
+					if("女".equals(tAuto.getSex()))	{
+						sex=tAuto.getRealName().substring(0, 1)+"女士";
+					}
+				}
+				
+				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
+				  if(tAuto.getFinProduct().contains("feishudai")){
+						route="飞鼠袋";
+				  }else{
+					  route = "mo9信用钱包";
+				  }
+				}	
+				
+				String name=tAuto.getRealName();
+				Double amount = new Double(0);
+				amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				String repaymentTime = sdf.format(tAuto.getRepaymentTime());
+				msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+				Map<String,String> params = new HashMap<String,String>();
+				params.put("mobile", tAuto.getMobile());
+				params.put("message",msg);
+				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
+				logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
+			}catch (Exception e) {
+				logger.info("发送短信失败:"+e);
+				logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
+			}	
+			TMisContantRecord dunning = new TMisContantRecord();
+			dunning.setTaskid(null);
+			dunning.setDealcode(tAuto.getDealcode());
+			dunning.setOrderstatus(false);
+			dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
+			dunning.setDunningtime(new Date());
+			dunning.setContanttype(ContantType.sms);
+			dunning.setContanttarget(tAuto.getMobile());
+			//短信内容
+			dunning.setContent(msg);
+			dunning.setSmstemp(SmsTemp.ST_0);
+			dunning.setTelstatus(null);
+			dunning.setContactstype(ContactsType.SELF);
+			dunning.setDunningpeoplename("sys");
+			dunning.setRepaymenttime(tAuto.getRepaymentTime());
+			dunning.setRemark(null);
+			
+			tMisContantRecordService.save(dunning);
+		}
+	  }
+	}
+	@Scheduled(cron = "0 0 9 * * ?")  
+	@Transactional
+   public void autoMessageBefore(){
+		this.autoSendMessageBefore();
+	}
+
+	@Scheduled(cron = "0 0 13 * * ?")  
+	@Transactional
+   public void autoMessageNow(){
+		this.autoSendMessageNow();
+	}
+
 }

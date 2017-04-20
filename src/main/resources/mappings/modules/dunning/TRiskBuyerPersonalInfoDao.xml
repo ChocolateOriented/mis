@@ -178,4 +178,25 @@
 	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status in ('payment', 'payoff') and o.dealcode = #{dealcode}
 	</select>
 	
+	<select  id="getMessgeByRepaymentTime" resultType="TRiskBuyerPersonalInfo">
+	 SELECT
+	 o.dealcode as "dealcode",
+	 b.mobile AS "mobile",
+	 idc.real_name AS "realName",
+	 idc.sex AS "sex",
+	 DATEDIFF(curdate(), o.repayment_time) as "overdueDays",
+	 o.platform_ext AS "finProduct",
+	CASE WHEN o.`status` = 'payment' THEN (IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0)) * 100 END AS "creditAmount",
+	 o.repayment_time AS "repaymentTime",
+	CASE WHEN   DATEDIFF( o.repayment_time,CURDATE())=1 THEN 1 
+	     WHEN DATEDIFF( o.repayment_time,CURDATE())=0 THEN 0 END AS "rpayStatus"
+	 FROM
+	 t_risk_order AS o
+	    LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        LEFT JOIN t_risk_buyer_idcard AS idc ON  o.buyer_id=idc.buyer_id 
+       
+      WHERE
+     o.status = 'payment' and
+      DATEDIFF( o.repayment_time,CURDATE()) in(1,0)
+</select>
 </mapper>
