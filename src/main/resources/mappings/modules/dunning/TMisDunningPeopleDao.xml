@@ -198,7 +198,7 @@
 			rate = #{rate},
 			begin = #{begin},
 			end = #{end},
-			field1 = #{field1},
+<!-- 			field1 = #{field1}, -->
 			auto = #{auto},
 			updateby = #{updateBy.id},
 			updatedate = #{updateDate},
