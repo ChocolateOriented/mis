@@ -8,6 +8,28 @@
 $(document).ready(function() {
 	//$("#name").focus();
 	$("#inputForm").validate({
+		rules:{
+			nickname:{
+				remote: {
+				    url: "${ctx}/dunning/tMisDunningPeople/isUniqueNickname",     //后台处理程序
+				    type: "post",               //数据发送方式
+				    dataType: "json",           //接受数据格式   
+				    data: {                     //要传递的数据
+				    	nickname: function() {
+				            return $("#nickname").val();
+				        },
+				    	id: function() {
+				            return $("#dunningPeopleid").val();
+				        }
+				    }
+				}
+			}
+		},
+		messages:{
+			nickname:{
+				remote:"该花名已被占用"
+			}
+		},
 		submitHandler: function(form){
 			loading('正在提交，请稍等...');
 			form.submit();
@@ -54,26 +76,26 @@ function changGroupType(){
 		<div class="control-group">
 			<label class="control-label">催收人账号：</label>
 			<div class="controls">
-			<c:choose>
-				<c:when test="${not empty TMisDunningPeople.dbid}">
-					<form:select id="dunningPeopleid" path="id" class="input-medium  required" disabled="true">
-						<form:option value="${TMisDunningPeople.id}">${TMisDunningPeople.name}</form:option>
-					</form:select>
-				</c:when>
-				<c:otherwise>
-					<form:select id="dunningPeopleid" path="id" class="input-medium  required">
-						<form:option value="">请选择</form:option>
-						<form:options items="${users}" itemLabel="name" itemValue="id"/>
-					</form:select>
-				</c:otherwise>
-			</c:choose>
+				<c:choose>
+					<c:when test="${not empty TMisDunningPeople.dbid}">
+						<form:select id="dunningPeopleid" path="id" class="input-medium  required" disabled="true">
+							<form:option value="${TMisDunningPeople.id}">${TMisDunningPeople.name}</form:option>
+						</form:select>
+					</c:when>
+					<c:otherwise>
+						<form:select id="dunningPeopleid" path="id" class="input-medium  required">
+							<form:option value="">请选择</form:option>
+							<form:options items="${users}" itemLabel="name" itemValue="id" />
+						</form:select>
+					</c:otherwise>
+				</c:choose>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">催收人花名：</label>
 			<div class="controls">
-				<form:input path="nickname" htmlEscape="false" maxlength="64" class="input-medium required"/>
+				<form:input path="nickname" htmlEscape="false" maxlength="64" class="input-medium required" />
 				<span class="help-inline"><font color="red">*</font></span>
 			</div>
 		</div>
@@ -101,7 +123,7 @@ function changGroupType(){
 			<div class="controls">
 				<select id="groupType" class="input-medium" disabled="disabled">
 					<c:forEach items="${groupTypes}" var="type">
-						<option value="${type.key}"<c:if test="${tMisDunningPeople.group.type == type.key }">selected="selected"</c:if>>${type.value}</option>
+						<option value="${type.key}" <c:if test="${tMisDunningPeople.group.type == type.key }">selected="selected"</c:if>>${type.value}</option>
 					</c:forEach>
 				</select>
 			</div>

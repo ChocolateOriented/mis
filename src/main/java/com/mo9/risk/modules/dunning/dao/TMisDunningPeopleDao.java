@@ -74,7 +74,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public List<TMisDunningPeople> findPeopleByDistributionDunningcycle(String dunningcycle);
-	
-	
+
+	public Boolean checkNicknameUnique(TMisDunningPeople queryPeople);
 
 }

@@ -12,10 +12,13 @@
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.id",
 		a.updatedate AS "updateDate",
-		a.delFlag AS "delFlag",
-		u.name AS "leader.name"
+		a.delFlag AS "delFlag"
 	</sql>
 
+	<sql id="tMisDunningGroupJoinsColumns">
+		,
+		u.name AS "leader.name"
+	</sql>
 	<sql id="tMisDunningGroupJoins">
 		LEFT JOIN sys_user u on u.id = a.leaderId
 	</sql>
@@ -23,6 +26,7 @@
 	<select id="get" resultType="TMisDunningGroup">
 		SELECT
 		<include refid="tMisDunningGroupColumns" />
+		<include refid="tMisDunningGroupJoinsColumns" />
 		FROM t_mis_dunning_group a
 		<include refid="tMisDunningGroupJoins" />
 		WHERE a.id = #{id}
@@ -31,6 +35,7 @@
 	<select id="findList" resultType="TMisDunningGroup">
 		SELECT
 		<include refid="tMisDunningGroupColumns" />
+		<include refid="tMisDunningGroupJoinsColumns" />
 		FROM t_mis_dunning_group a
 		<include refid="tMisDunningGroupJoins" />
 		<where>

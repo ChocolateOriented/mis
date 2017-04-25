@@ -276,4 +276,16 @@
         </foreach>
 	</select>
 	
+	 <select id="checkNicknameUnique" resultType="Boolean">
+		SELECT 
+			IF(COUNT(*)=0,TRUE,FALSE)AS result
+		FROM t_mis_dunning_people a
+		WHERE
+		a.Nickname = #{nickname}
+		AND a.Invalid = 't' 
+		<if test="id != null and id != ''">
+			AND a.id != #{id}
+		</if>
+	</select>
+	
 </mapper>

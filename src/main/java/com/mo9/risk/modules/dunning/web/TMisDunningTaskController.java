@@ -54,6 +54,7 @@ import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -68,6 +69,7 @@ import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
+import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
@@ -137,6 +139,8 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisDunnedConclusionService tMisDunnedConclusionService;
+	@Autowired
+	private TMisDunningGroupService tMisDunningGroupService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -169,8 +173,9 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = {"findOrderPageList", ""})
 	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<DunningOrder> page = tMisDunningTaskService.findOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
-		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findOptionList(new TMisDunningPeople());
-		model.addAttribute("dunningPeoples", dunningPeoples);
+		//催收小组列表
+		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisDunningTaskList";
 	}

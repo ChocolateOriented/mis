@@ -740,7 +740,7 @@
                 <!-- 			     # 催收人过滤    -->
                 AND t.DunningPeopleId = #{dunningpeopleid}
         </if>
-        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds != ''">
+        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
             AND t.`DunningPeopleId` in
             <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
                 #{item}
