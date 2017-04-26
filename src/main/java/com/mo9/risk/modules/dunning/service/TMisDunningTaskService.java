@@ -2127,10 +2127,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				
 				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
 					if("男".equals(tAuto.getSex())){
-						 sex=tAuto.getRealName().substring(0, 1)+"先生";
+						 sex="先生";
 					}
 					if("女".equals(tAuto.getSex()))	{
-						sex=tAuto.getRealName().substring(0, 1)+"女士";
+						sex="女士";
 					}
 				}
 				
@@ -2151,10 +2151,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		String repaymentTime = sdf.format(tAuto.getRepaymentTime());
 		
 		if(tAuto.getRpayStatus()==1){
-		 msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期所需还款金额为{3}元，请您最晚于{4}请做好财务规划，及时还款哦。",name,sex,route,amount,repaymentTime);
+		 msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期所需还款金额为{3}元，请您最晚于{4}请做好财务规划，及时还款哦。",name,sex,route,amount,repaymentTime);
 		}
 		if(tAuto.getRpayStatus()==0){
-			msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+			msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
 		}
 		Map<String,String> params = new HashMap<String,String>();
 		params.put("mobile", tAuto.getMobile());
@@ -2203,10 +2203,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				
 				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
 					if("男".equals(tAuto.getSex())){
-						 sex=tAuto.getRealName().substring(0, 1)+"先生";
+						 sex="先生";
 					}
 					if("女".equals(tAuto.getSex()))	{
-						sex=tAuto.getRealName().substring(0, 1)+"女士";
+						sex="女士";
 					}
 				}
 				
@@ -2223,7 +2223,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				String repaymentTime = sdf.format(tAuto.getRepaymentTime());
-				msg = MessageFormat.format("【mo9】{0},{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+				msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
 				Map<String,String> params = new HashMap<String,String>();
 				params.put("mobile", tAuto.getMobile());
 				params.put("message",msg);
