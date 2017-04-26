@@ -607,7 +607,7 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
-			model.addAttribute("orders", orders);
+//			model.addAttribute("orders", orders);
 			model.addAttribute("dunningcycle", dunningcycle);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -642,7 +642,13 @@ public class TMisDunningTaskController extends BaseController {
 				return "订单或队列不能为空";
 			}
 //			String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
-			List<String> dealcodes =  Arrays.asList(orders.split(","));
+			List<String> dealcodes = new ArrayList<String>();
+			for(String string :Arrays.asList(orders.split(","))){
+				if(!"".equals(string.split("#")[0])){
+					dealcodes.add(string.split("#")[0]);
+				}
+			}
+//			List<String> dealcodes =  Arrays.asList(orders.split(","));
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
 			tMisDunningTaskService.assign(dealcodes, dunningcycle,newdunningpeopleids);
 			mes = "OK,手动均分"+dealcodes.size()+"条订单成功";

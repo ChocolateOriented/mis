@@ -145,16 +145,16 @@
 						$.jBox.tip("请选择需要移动的案件", 'warning');
 						return;
 					}
-					if(orders.length>300){
-						$.jBox.tip("请选择小于300条分配订单", 'warning');
-						return;
-					}
+// 					if(orders.length>300){
+// 						$.jBox.tip("请选择小于300条分配订单", 'warning');
+// 						return;
+// 					}
 					var uniqueid = unique(dunningcycle);
 					if(uniqueid.length != 1 ){
 						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
-					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?orders=" + orders + "&dunningcycle=" + uniqueid;
+					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid;
 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
 			               buttons: {},
 			               loaded: function (h) {
@@ -498,7 +498,7 @@
 		<c:forEach items="${page.list}" var="dunningOrder" varStatus="vs">
 			<tr>
 				<td>
-					<input type="checkbox" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" outerOrders="${dunningOrder.dealcode}=${dunningOrder.dunningpeoplename}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
+					<input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" outerOrders="${dunningOrder.dealcode}=${dunningOrder.dunningpeoplename}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
 				</td>
 				<td>
 					${ (vs.index+1) + (page.pageNo-1) * page.pageSize} 

@@ -102,6 +102,23 @@ public class DictUtils {
 		return defaultLabel;
 	}
 	
+	/**
+	 * 根据标签和类型获取键值
+	 * @param label
+	 * @param type
+	 * @param defaultLabel
+	 * @return
+	 */
+	public static Dict getDict(String label, String type, Dict defaultDict){
+		if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)){
+			for (Dict dict : getDictList(type)){
+				if (type.equals(dict.getType()) && label.equals(dict.getLabel())){
+					return dict;
+				}
+			}
+		}
+		return defaultDict;
+	}
 	
 	/**
 	 * 获取字典集合

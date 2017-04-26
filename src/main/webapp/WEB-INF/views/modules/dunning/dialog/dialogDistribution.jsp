@@ -6,12 +6,24 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			var mes = "${mes}";
-			if("" != mes){
-				alert(mes);
-// 				window.parent.page();
-                window.parent.window.jBox.close();
-			}
+// 			var mes = "${mes}";
+// 			if("" != mes){
+// 				alert(mes);
+// // 				window.parent.page();
+//                 window.parent.window.jBox.close();
+// 			}
+			
+			check_orders = [];
+			var orders = window.parent.document.getElementsByName("orders");
+			for(k in orders){
+            	if(orders[k].checked){
+            		check_orders.push(orders[k].id);
+//             		alert(orders[k].id);
+            	}
+            }
+// 			alert(check_orders.length);
+			$("#orders").val(check_orders);
+			
 			
 			$('#distributionSave').click(function() {
  			 if($("#inputForm").valid()){
@@ -51,7 +63,7 @@
 <%-- 	<input type="text" id="sss" name="ss" value="${mes}"/> --%>
 	<br/>
 	<form id="inputForm"  class="form-horizontal">
-		<input type="hidden" id="orders" name="orders" value="${orders}"/>
+		<input type="hidden" id="orders" name="orders" />
 		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
 		<div class="control-group">
 			<label class="control-label">催收人员：</label>
