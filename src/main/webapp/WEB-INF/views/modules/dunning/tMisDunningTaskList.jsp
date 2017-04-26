@@ -403,6 +403,9 @@
 			<li><label>手机号</label>
 				<form:input path="mobile"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
+			<li><label>订单号</label>
+				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
+			</li>
 			<li><label>催收备注</label>
 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
