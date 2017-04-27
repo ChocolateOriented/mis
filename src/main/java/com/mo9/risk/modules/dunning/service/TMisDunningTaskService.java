@@ -1971,6 +1971,81 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
     	
     }
+    
+    /**
+     * 委外手动分配
+     * @param dealcode
+     * @param peopleId
+     */
+    @Transactional(readOnly = false)
+    public void outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
+    	try {
+			/**  查询手动分配订单任务Log   */
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
+			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
+			
+			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
+			List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+			List<TMisDunningTaskLog> outDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+			
+			if(!assignDunningTaskLogs.isEmpty()){
+				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){  
+					TMisDunningTaskLog outdunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
+					outdunningTaskLog.setBehaviorstatus("out");
+					outdunningTaskLog.setCreateDate(new Date());
+					outdunningTaskLog.setCreateBy(UserUtils.getUser());
+					outDunningTaskLogs.add(outdunningTaskLog);
+				}
+				/** 
+				 * 保存移出任务Log
+				 */
+				tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
+				
+				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){  
+					TMisDunningTaskLog indunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
+					/**
+					 * 任务task修改
+					 */
+					int j = i % dunningPeoples.size();  
+					TMisDunningTask dunningTask = new TMisDunningTask();
+					dunningTask.setId(indunningTaskLog.getTaskid());
+					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
+					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
+					dunningTask.setUpdateBy(UserUtils.getUser());
+					dunningTask.setDunningcycle(dunningcycle);
+					dunningTask.setOutsourcingbegindate(new Date());
+					dunningTask.setOutsourcingenddate(outsourcingenddate);
+					tasks.add(dunningTask);
+					/**
+					 * log 催收周期过期移入记录
+					 */
+					indunningTaskLog.setBehaviorstatus("in");
+					indunningTaskLog.setDunningpeopleid(dunningTask.getDunningpeopleid());
+					indunningTaskLog.setDunningpeoplename(dunningTask.getDunningpeoplename());
+					inDunningTaskLogs.add(indunningTaskLog);
+				}	
+				/** 
+				 * 修改手动分配任务
+				 */
+				tMisDunningTaskDao.batchUpdateOutDistributionTask(tasks);
+				/** 
+				 * 保存移入任务Log
+				 */
+				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
+
+			}else{
+				logger.info(dunningcycle + "队列没有手动分配任务！" + new Date());
+			}
+		} catch (Exception e) {
+			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
+			throw new ServiceException(e);
+		} finally {
+			logger.info(dunningcycle + "队列手动分配任务结束" + new Date());
+		}
+    	
+    }
 	
     
 //	/**

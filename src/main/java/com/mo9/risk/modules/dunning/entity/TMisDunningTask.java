@@ -67,6 +67,8 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private String dunningpeoplename;		// 催收人姓名
 	private String dunningcycle;		// 催收周期(队列)
 	
+	private Date outsourcingbegindate;		// 委外手分时间
+	private Date outsourcingenddate;		// 委外截止时间
 	
 	public TMisDunningTask() {
 		super();
@@ -262,6 +264,22 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 
 	public void setDunningcycle(String dunningcycle) {
 		this.dunningcycle = dunningcycle;
+	}
+
+	public Date getOutsourcingbegindate() {
+		return outsourcingbegindate;
+	}
+
+	public void setOutsourcingbegindate(Date outsourcingbegindate) {
+		this.outsourcingbegindate = outsourcingbegindate;
+	}
+
+	public Date getOutsourcingenddate() {
+		return outsourcingenddate;
+	}
+
+	public void setOutsourcingenddate(Date outsourcingenddate) {
+		this.outsourcingenddate = outsourcingenddate;
 	}
 	
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")

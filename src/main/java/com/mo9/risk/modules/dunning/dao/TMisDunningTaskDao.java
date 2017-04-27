@@ -251,4 +251,13 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public int batchUpdateDistributionTask(List<TMisDunningTask> dunningTasks);
 	
+	
+	/**
+	 * 批量更新委外手动分配任务
+	 * @param ids
+	 * @return
+	 */
+	public int batchUpdateOutDistributionTask(List<TMisDunningTask> dunningTasks);
+	
+	
 }

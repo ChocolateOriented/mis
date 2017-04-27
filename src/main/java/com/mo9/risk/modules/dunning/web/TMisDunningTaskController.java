@@ -1799,4 +1799,58 @@ public class TMisDunningTaskController extends BaseController {
     }
 	
 
+	/**
+	 * 加载委外手动分配页面
+	 * @param tMisDunningTask
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequestMapping(value = "dialogOutDistribution")
+	public String dialogOutDistribution( Model model,String orders,String dunningcycle) {
+		try {
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+			model.addAttribute("dunningPeoples", dunningPeoples);
+			model.addAttribute("dunningcycle", dunningcycle);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "views/error/500";
+		}
+		return "modules/dunning/dialog/dialogOutDistribution";
+	}
+	
+	
+	/**
+	 * 委外手动分配
+	 * @param tMisDunningTask
+	 * @param model
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequestMapping(value = "outDistributionSave")
+	@ResponseBody
+	public String outDistributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request,Date outsourcingenddate) {
+		String mes = "";
+		try {
+			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
+				return "订单或队列不能为空";
+			}
+			List<String> dealcodes = new ArrayList<String>();
+			for(String string :Arrays.asList(orders.split(","))){
+				if(!"".equals(string.split("#")[0])){
+					dealcodes.add(string.split("#")[0]);
+				}
+			}
+			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
+			tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
+			mes = "OK,手动均分"+dealcodes.size()+"条订单成功";
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			logger.warn("订单已还款更新任务失败"+ new Date());
+			return "分配异常，失败";
+		}
+		return  mes;
+	}
+	
 }

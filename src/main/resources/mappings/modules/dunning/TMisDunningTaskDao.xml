@@ -1500,6 +1500,20 @@
 		 </foreach>
     </update>
 
+ 	 <update id="batchUpdateOutDistributionTask"  >
+	     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+				UPDATE t_mis_dunning_task 
+				<set>
+				    updatedate = now(),
+				    updateby = #{item.updateBy.id},
+					dunningpeopleid = #{item.dunningpeopleid},
+					dunningpeoplename = #{item.dunningpeoplename},
+					outsourcingbegindate = #{item.outsourcingbegindate},
+					outsourcingenddate = #{item.outsourcingenddate}
+				</set>
+				WHERE id = #{item.id}
+		 </foreach>
+    </update>
    
 <!-- 	new自动分配 - end 	    -->
 
