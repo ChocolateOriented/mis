@@ -16,7 +16,55 @@
 // 				 $('#searchForm')[0].reset();  
         		 window.location.href="${ctx}/dunning/tMisDunningTask/findOrderPageList";
 			 }); 
-			 
+				
+			//组与花名联动查询
+			$("#groupList").on("change",function(){
+				$("#peopleList").select2("val", null);
+			});
+			$("#peopleList").select2({//
+			    ajax: {
+			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
+			        dataType: 'json',
+			        quietMillis: 250,
+			        data: function (term, page) {//查询参数 ,term为输入字符
+			        	var groupId=$("#groupList").val(); 
+		            	return {'group.id': groupId , nickname:term};
+			        },
+			        results: function (data, page) {//选择要显示的数据
+			        	return { results: data };
+			        },
+			        cache: true
+			    },
+		        multiple: true,
+		        initSelection: function(element, callback) {//回显
+		            var ids=$(element).val();
+		            if (ids!=="") {
+		            	//根据组查询选项
+		                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+		                    data: function(){
+		                    	var groupId = $("#groupList").val();     	
+	                    		return {groupId:groupId}             	
+		                    },
+		                    dataType: "json"
+		                }).done(function(data) {
+		                	var backData = [];
+		                	var index = 0 ;
+		                	for ( var item in data) {
+		                		//若回显ids里包含选项则选中
+								if (ids.indexOf(data[item].id) > -1 ) {
+									backData[index] = data[item] ;
+									index++;
+								}
+							}
+		                	callback(backData)
+		                });
+		            }
+		        },
+			    formatResult:formatPeopleList, //选择显示字段
+			    formatSelection:formatPeopleList, //选择选中后填写字段
+		        width:300
+			});
+			
 			 // 普通导出功能
 			 $("#dunningExport").click(function(){
 				top.$.jBox.confirm("确认要导出列表数据吗？","系统提示",function(v,h,f){
@@ -325,6 +373,14 @@
 //         	window.location.href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId="+ buyerId + "&dealcode="+ dealcode;
         }
 		
+		//格式化peopleList选项
+		function formatPeopleList( item ){
+			var nickname = item.nickname ;
+			if(nickname == null || nickname ==''){
+				nickname = "空" ;
+			}
+			return nickname ;
+		}
 	</script>
 	
 </head>
@@ -346,6 +402,9 @@
 			</li>
 			<li><label>手机号</label>
 				<form:input path="mobile"  htmlEscape="false" maxlength="128" class="input-medium"/>
+			</li>
+			<li><label>订单号</label>
+				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			<li><label>催收备注</label>
 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
@@ -409,15 +468,25 @@
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 				</li>
 				<li>
+					<label>催收小组：</label>
+					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
+					<form:option value="">全部</form:option>
+						<!-- 添加组类型为optgroup -->
+						<c:forEach items="${groupTypes}" var="type">
+							<optgroup label="${type.value}">
+								<!-- 添加类型对应的小组 -->
+								<c:forEach items="${groupList}" var="item">
+									<c:if test="${item.type == type.key}">
+										<option value="${item.id}" groupType="${item.type}" <c:if test="${dunningOrder.dunningPeople.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
+									</c:if>
+								</c:forEach>
+							</optgroup>
+						</c:forEach>
+					</form:select></li>
+				<li>
+				<li>
 					<label >催款人</label>
-					<form:select id="names"  path="dunningPeople.queryIds" multiple="multiple"   style="width: 375px ;">
-						<form:options items="${dunningPeoples}" itemLabel="nickname" itemValue="id" htmlEscape="false" />
-					</form:select>
-	<!-- 				<div class='multi_select' style="width:180px !important;"></div> -->
-<%-- 					<form:select id="dunningpeoplename"  path="dunningpeoplename" class="input-medium"> --%>
-<%-- 						<form:option selected="selected" value="" label="全部人员"/> --%>
-<%-- 						<form:options items="${dunningPeoples}" itemLabel="name" itemValue="name" htmlEscape="false"/> --%>
-<%-- 					</form:select> --%>
+					<input id="peopleList" name="dunningPeople.queryIds" value="${dunningOrder.dunningPeople.queryIds}" type="hidden" />
 				</li>
 				</shiro:hasPermission>
 				

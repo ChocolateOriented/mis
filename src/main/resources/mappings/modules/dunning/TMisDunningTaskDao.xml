@@ -736,11 +736,14 @@
         <!-- 任务状态为正在催收的  -->
         AND t.dunningtaskstatus IN ('dunning', 'finished' )
         
+        <if test="dealcode != null and dealcode != ''">
+                AND o.dealcode = #{dealcode}
+        </if>
         <if test="dunningpeopleid != null and dunningpeopleid != ''">
                 <!-- 			     # 催收人过滤    -->
                 AND t.DunningPeopleId = #{dunningpeopleid}
         </if>
-        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds != ''">
+        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
             AND t.`DunningPeopleId` in
             <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
                 #{item}

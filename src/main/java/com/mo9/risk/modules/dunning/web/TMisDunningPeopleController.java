@@ -212,5 +212,18 @@ public class TMisDunningPeopleController extends BaseController {
 		return "OK";
 	}
 	
+	/**
+	 * @Description: 检测花名是否唯一
+	 * @param nickname
+	 * @param id
+	 * @return
+	 * @return: Boolean
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:view")
+	@RequestMapping(value = "isUniqueNickname")
+	@ResponseBody
+	public Boolean isUniqueNickname(String nickname,String id){
+		return tMisDunningPeopleService.checkNicknameUnique(nickname,id);
+	}
 
 }

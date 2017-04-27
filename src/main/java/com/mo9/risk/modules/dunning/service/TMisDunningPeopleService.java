@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup.GroupType;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -93,7 +94,6 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 * @return
 	 */
 	public TMisDunningPeople getDunningPeople(TMisDunningPeople tMisDunningPeople){
-		int permissions = TMisDunningTaskService.getPermissions();
 		TMisDunningGroup dunningGroup = tMisDunningPeople.getGroup() ;
 		if (dunningGroup == null) {
 			dunningGroup = new TMisDunningGroup() ;
@@ -105,14 +105,15 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 			dunningGroup.setQueryTypes(queryTypes);
 		}
 		
+		int permissions = TMisDunningTaskService.getPermissions();
 		//内部催收主管可查看自营
 		if(TMisDunningTaskService.DUNNING_INNER_PERMISSIONS == permissions){
-			queryTypes.add(TMisDunningGroup.GROUP_TYPE_SELF);
+			queryTypes.add(GroupType.SELF.code);
 		}
 		//外部催收主管可查看外包坐席及委外佣金
 		if(TMisDunningTaskService.DUNNING_OUTER_PERMISSIONS == permissions){
-			queryTypes.add(TMisDunningGroup.GROUP_TYPE_OUT_COMMISSION);
-			queryTypes.add(TMisDunningGroup.GROUP_TYPE_OUT_SEAT);
+			queryTypes.add(GroupType.OUT_COMMISSION.code);
+			queryTypes.add(GroupType.OUT_SEAT.code);
 		}
 		//催收专员只能查看自己
 		if(TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS == permissions){
@@ -185,6 +186,23 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 */
 	public List<TMisDunningPeople> findPeopleByDistributionDunningcycle(String dunningcycle){
 		return tMisDunningPeopleDao.findPeopleByDistributionDunningcycle(dunningcycle);
+	}
+
+	/**
+	 * @Description: 检查花名唯一性
+	 * @param nickname
+	 * @param id
+	 * @return
+	 * @return: Boolean
+	 */
+	public Boolean checkNicknameUnique(String nickname, String id) {
+		if (StringUtils.isBlank(nickname)) {
+			return false ;
+		}
+		TMisDunningPeople queryPeople = new TMisDunningPeople() ;
+		queryPeople.setId(id);
+		queryPeople.setNickname(nickname);
+		return dao.checkNicknameUnique(queryPeople);
 	}
 	
 }

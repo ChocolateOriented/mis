@@ -27,7 +27,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	private static final long serialVersionUID = 2L;
 	private Integer dbid; // dbid
-	private String name; // 催收人员名称 , 催收项目中不记录人员真名,由花名替代 ,此字段以后删除
+	private String name; // 催收人员名称
 	@Deprecated
 	private String dunningpeopletype; // 人员类型,已经添加组类型 , 此字段以后删除
 	private BigDecimal rate; // 单笔费率 ,大于1为单笔固定费率，小于1大于0为单笔百分比费率
