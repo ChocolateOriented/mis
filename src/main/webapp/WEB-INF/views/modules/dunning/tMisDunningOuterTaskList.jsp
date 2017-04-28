@@ -203,7 +203,7 @@
 						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
-					var url = "${ctx}/dunning/tMisDunningOuterTask/dialogDistribution?dunningcycle=" + uniqueid;
+					var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid;
 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
 			               buttons: {},
 			               loaded: function (h) {
@@ -434,6 +434,22 @@
 			
 <!-- 			</ul> -->
 <!-- 			<ul class="ul-form"> -->
+			<li><label>分案日期</label>
+				<input name="beginOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+			<li><label>催收截止</label>
+				<input name="beginOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
 			<li><label>还清日期</label>
 				<input name="beginPayofftime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${dunningOrder.beginPayofftime}" pattern="yyyy-MM-dd"/>"
@@ -448,22 +464,6 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
 				<input name="endRepaymenttime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${dunningOrder.endRepaymenttime}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
-			</li>
-			<li><label>委外开始</label>
-				<input name="beginOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-				<input name="endOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.endOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
-			</li>
-			<li><label>委外截止</label>
-				<input name="beginOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-				<input name="endOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.endOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			
@@ -535,13 +535,12 @@
 				<th>订单状态</th>
 <!-- 				<th>催收备注</th> -->
 				<th>催收人</th>
+				<th>分案日期</th>
 				<th>催收截止日期</th>
-<!-- 				<th>最近催收</th> -->
+				<th>最近催收</th>
 				<th>还清日期</th>
 				<th>订单编号</th>
 <!-- 				<th>导出批次</th> -->
-				<th>委外开始时间</th>
-				<th>委外截止时间</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -591,14 +590,16 @@
 				<td>
 					${dunningOrder.dunningPeople.nickname}
 				</td>
-				
 				<td>
-					<fmt:formatDate value="${dunningOrder.deadline}" pattern="yyyy-MM-dd"/>
+					<fmt:formatDate value="${dunningOrder.outsourcingBeginDate}" pattern="yyyy-MM-dd"/>
+				</td>
+				<td>
+					<fmt:formatDate value="${dunningOrder.outsourcingEndDate}" pattern="yyyy-MM-dd"/>
 				</td>
 				
-<!-- 				<td> -->
-<%-- 					<fmt:formatDate value="${dunningOrder.dunningtime}" pattern="yyyy-MM-dd HH:mm"/> --%>
-<!-- 				</td> -->
+				<td>
+					<fmt:formatDate value="${dunningOrder.dunningtime}" pattern="yyyy-MM-dd HH:mm"/>
+				</td>
 				
 				<td>
 					<fmt:formatDate value="${dunningOrder.payofftime}" pattern="yyyy-MM-dd HH:mm"/>
@@ -609,12 +610,6 @@
 <!-- 				<td> -->
 <%-- 					<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd HH:mm:ss"/> --%>
 <!-- 				</td> -->
-				<td>
-					<fmt:formatDate value="${dunningOrder.outsourcingBeginDate}" pattern="yyyy-MM-dd"/>
-				</td>
-				<td>
-					<fmt:formatDate value="${dunningOrder.outsourcingEndDate}" pattern="yyyy-MM-dd"/>
-				</td>
 			</tr>
 		</c:forEach>
 		</tbody>
