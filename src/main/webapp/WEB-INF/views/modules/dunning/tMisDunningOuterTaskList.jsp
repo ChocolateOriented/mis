@@ -39,27 +39,29 @@
 		        multiple: true,
 		        initSelection: function(element, callback) {//回显
 		            var ids=$(element).val();
-		            if (ids!=="") {
-		            	//根据组查询选项
-		                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
-		                    data: function(){
-		                    	var groupId = $("#groupList").val();     	
-	                    		return {groupId:groupId}             	
-		                    },
-		                    dataType: "json"
-		                }).done(function(data) {
-		                	var backData = [];
-		                	var index = 0 ;
-		                	for ( var item in data) {
-		                		//若回显ids里包含选项则选中
-								if (ids.indexOf(data[item].id) > -1 ) {
-									backData[index] = data[item] ;
-									index++;
-								}
-							}
-		                	callback(backData)
-		                });
+		            if (ids=="") {
+		            	return;
 		            }
+	            	//根据组查询选项
+	                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+	                    data: function(){
+	                    	var groupId = $("#groupList").val();     	
+                    		return {groupId:groupId}             	
+	                    },
+	                    dataType: "json"
+	                }).done(function(data) {
+	                	
+	                	var backData = [];
+	                	var index = 0 ;
+	                	for ( var item in data) {
+	                		//若回显ids里包含选项则选中
+							if (ids.indexOf(data[item].id) > -1 ) {
+								backData[index] = data[item] ;
+								index++;
+							}
+						}
+	                	callback(backData)
+	                });
 		        },
 			    formatResult:formatPeopleList, //选择显示字段
 			    formatSelection:formatPeopleList, //选择选中后填写字段
@@ -458,14 +460,14 @@
 					value="<fmt:formatDate value="${dunningOrder.endPayofftime}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
-			<li><label>到期还款</label>
-				<input name="beginRepaymenttime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.beginRepaymenttime}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-				<input name="endRepaymenttime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${dunningOrder.endRepaymenttime}" pattern="yyyy-MM-dd"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
-			</li>
+<!-- 			<li><label>到期还款</label> -->
+<!-- 				<input name="beginRepaymenttime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
+<%-- 					value="<fmt:formatDate value="${dunningOrder.beginRepaymenttime}" pattern="yyyy-MM-dd"/>" --%>
+<!-- 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至  -->
+<!-- 				<input name="endRepaymenttime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
+<%-- 					value="<fmt:formatDate value="${dunningOrder.endRepaymenttime}" pattern="yyyy-MM-dd"/>" --%>
+<!-- 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> -->
+<!-- 			</li> -->
 			
 <!-- 				<li> -->
 <!-- 				<label >导出批次</label> -->
@@ -507,7 +509,7 @@
 				<li>
 					<label >催款人</label>
 					<input id="peopleList" name="dunningPeople.queryIds" 
-					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0} ">
+					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0}">
 						value="${dunningOrder.dunningPeople.queryIds}"
 					</c:if>
 					type="hidden" />
@@ -538,7 +540,7 @@
 				<th>催收人</th>
 				<th>分案日期</th>
 				<th>催收截止日期</th>
-				<th>最近催收</th>
+				<th>最近催收时间</th>
 				<th>还清日期</th>
 				<th>订单编号</th>
 <!-- 				<th>导出批次</th> -->

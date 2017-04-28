@@ -71,7 +71,7 @@
 			<label class="control-label">委外截止日期：</label>
 			<div class="controls">
 				<input name="outsourcingenddate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate required"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false,minDate:'%y-%M-%d'});"/>
 			</div>
 		</div>
 		
