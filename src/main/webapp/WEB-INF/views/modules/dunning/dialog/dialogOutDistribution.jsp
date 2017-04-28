@@ -22,7 +22,7 @@
  				 $("#distributionSave").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
- 	                    url : "${ctx}/dunning/tMisDunningTask/outDistributionSave",
+ 	                    url : "${ctx}/dunning/tMisDunningOuterTask/outDistributionSave",
  	                    data: $('#inputForm').serialize(),             //获取表单数据
  	                    success : function(data) {
  	                        if (data == "OK") {
