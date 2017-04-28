@@ -515,9 +515,9 @@
 				
 				<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
 				<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
-					<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" />
-					<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>
-				<li class="clearfix"></li>
+<!-- 					<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" /> -->
+<!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li> -->
+<!-- 				<li class="clearfix"></li> -->
 			</ul>
 	</form:form>
 	<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
