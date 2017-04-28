@@ -62,6 +62,62 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private String dunningcycle;		// 催收周期(队列)
 	
 	private TMisDunningPeople dunningPeople ;
+	
+	private Date outsourcingBeginDate ; //委外开始时间
+	private Date beginOutsourcingBeginDate ; //查询开始-委外开始时间
+	private Date endOutsourcingBeginDate ; //查询结束-委外开始时间
+	
+	private Date outsourcingEndDate ; //委外截止时间
+	private Date beginOutsourcingEndDate ; //查询开始-委外截止时间
+	private Date endOutsourcingEndDate ; //查询结束-委外截止时间
+
+	public Date getBeginOutsourcingBeginDate() {
+		return beginOutsourcingBeginDate;
+	}
+
+	public void setBeginOutsourcingBeginDate(Date beginOutsourcingBeginDate) {
+		this.beginOutsourcingBeginDate = beginOutsourcingBeginDate;
+	}
+
+	public Date getEndOutsourcingBeginDate() {
+		return endOutsourcingBeginDate;
+	}
+
+	public void setEndOutsourcingBeginDate(Date endOutsourcingBeginDate) {
+		this.endOutsourcingBeginDate = endOutsourcingBeginDate;
+	}
+
+	public Date getBeginOutsourcingEndDate() {
+		return beginOutsourcingEndDate;
+	}
+
+	public void setBeginOutsourcingEndDate(Date beginOutsourcingEndDate) {
+		this.beginOutsourcingEndDate = beginOutsourcingEndDate;
+	}
+
+	public Date getEndOutsourcingEndDate() {
+		return endOutsourcingEndDate;
+	}
+
+	public void setEndOutsourcingEndDate(Date endOutsourcingEndDate) {
+		this.endOutsourcingEndDate = endOutsourcingEndDate;
+	}
+
+	public Date getOutsourcingBeginDate() {
+		return outsourcingBeginDate;
+	}
+
+	public void setOutsourcingBeginDate(Date outsourcingBeginDate) {
+		this.outsourcingBeginDate = outsourcingBeginDate;
+	}
+
+	public Date getOutsourcingEndDate() {
+		return outsourcingEndDate;
+	}
+
+	public void setOutsourcingEndDate(Date outsourcingEndDate) {
+		this.outsourcingEndDate = outsourcingEndDate;
+	}
 
 	public DunningOrder() {
 		super();

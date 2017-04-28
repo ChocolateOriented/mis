@@ -2341,4 +2341,26 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		this.autoSendMessageNow();
 	}
 
+	/**
+	 * @Description: 委外任务列表
+	 * @param page
+	 * @param dunningOrder
+	 * @return
+	 * @return: Page<DunningOrder>
+	 */
+	public Page<DunningOrder> findOuterOrderPageList(Page<DunningOrder> page, DunningOrder entity) {
+		if (entity == null) {
+			entity = new DunningOrder();
+		}
+		
+		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
+			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
+		}else{
+			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
+		}
+		entity.setPage(page);
+		page.setList(dao.findOuterOrderPageList(entity));
+		return page;
+	}
+
 }

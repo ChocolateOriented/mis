@@ -828,6 +828,168 @@
             </otherwise>
         </choose>
     </select>
+
+    <!-- 委外催收列表 list -->
+    <select id="findOuterOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        o.buyer_id AS "buyerid",
+        idc.real_name AS "realname",
+        o.dealcode AS "dealcode",
+        b.mobile AS "mobile",
+        o.amount AS "amount",
+<!--    IFNULL(o.credit_amount, 0) - IFNULL(o.modify_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount, -->
+		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END AS creditamount,
+        repayment_time AS "repaymenttime",
+        CASE
+        WHEN o.`status` = 'payoff' THEN
+        DATEDIFF(
+        o.payoff_time,
+        o.repayment_time
+        )
+        WHEN o.`status` = 'payment' THEN
+        DATEDIFF(CURDATE(), o.repayment_time)
+        END AS overduedays,
+        o.`status` AS status,
+        p.`nickname` AS `dunningPeople.nickname`,
+        p.`name` AS dunningpeoplename,
+<!--         p.DunningPeopleType AS DunningPeopleType, -->
+        t.dunningtime AS "dunningtime",
+        o.payoff_time AS payofftime,
+        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
+        t.Deadline as deadline,
+        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
+        t.dunningtaskstatus AS dunningtaskstatus,
+        t.DunningPeopleId AS dunningpeopleid,
+        <!-- 					t.dbid AS dunningtaskdbid -->
+        t.id AS dunningtaskdbid,
+        t.telremark AS telremark,
+        o.outerfiletime AS outerfiletime,
+        t.dunningcycle AS dunningcycle,
+        t.outsourcingBeginDate AS outsourcingBeginDate,
+        t.outsourcingEndDate AS outsourcingEndDate
+        FROM
+        t_risk_order AS o
+        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+        LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+        WHERE
+<!--         o.type IN ('loan', 'partial' ) -->
+		o.type = 'loan' 
+        AND o.merchant_id = 7
+<!--         AND o.`status` IN ('payoff', 'payment', 'partial' ) -->
+		AND o.`status` IN ('payoff', 'payment' )
+        AND t.dbid IS NOT NULL
+        <!-- 任务状态为正在催收的  -->
+        AND t.dunningtaskstatus IN ('dunning', 'finished' )
+<!--         只允许看Q4Q5 -->
+        AND t.dunningcycle IN ('Q4','Q5')
+        <if test="dunningcycle != null and dunningcycle != ''">
+                AND t.dunningcycle = #{dunningcycle}
+        </if>
+        <if test="dealcode != null and dealcode != ''">
+                AND o.dealcode = #{dealcode}
+        </if>
+        <if test="dunningpeopleid != null and dunningpeopleid != ''">
+                <!-- 			     # 催收人过滤    -->
+                AND t.DunningPeopleId = #{dunningpeopleid}
+        </if>
+        <if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
+			AND p.groupId = #{dunningPeople.group.id}
+		</if>
+        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
+            AND t.`DunningPeopleId` in
+            <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        
+        <if test="mobile != null and mobile != ''">
+                <!-- 			     # 手机号码 -->
+                AND b.mobile LIKE concat('%',#{mobile},'%')
+                <!-- 				AND mobile = #{mobile} -->
+        </if>
+        
+        <if test="realname != null and realname != ''">
+                <!-- 			    # 姓名 -->
+                AND idc.real_name LIKE concat('%',#{realname},'%')
+                <!-- 				AND realname = #{realname} -->
+        </if>
+        
+        <if test="telremark != null and telremark != ''">
+                <!-- 			     # 催收备注    -->
+                AND t.telremark  LIKE concat('%',#{telremark},'%') 
+        </if>
+                 <!-- 			    # 分案开始时间-->
+        <if test="beginOutsourcingBeginDate != null and endOutsourcingBeginDate != null and beginOutsourcingBeginDate != '' and endOutsourcingBeginDate != ''">
+            AND t.outsourcingBeginDate BETWEEN #{beginOutsourcingBeginDate} AND #{endOutsourcingBeginDate}
+        </if>
+            <!-- 			    # 分案结束时间-->
+        <if test="beginOutsourcingEndDate != null and endOutsourcingEndDate != null and beginOutsourcingEndDate != '' and endOutsourcingEndDate != ''">
+            AND t.outsourcingEndDate BETWEEN #{beginOutsourcingEndDate} AND #{endOutsourcingEndDate}
+        </if>
+        
+        <!-- 只显示未删除的催收人员  -->
+<!--         AND p.Invalid = 't' -->
+        ) AS d
+        <where>
+	        
+            <if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
+                <!-- 			    # 逾期天数 -->
+                <!-- 				AND overduedays BETWEEN #{beginOverduedays} AND #{endOverduedays} -->
+                <![CDATA[
+    					AND  overduedays >= #{beginOverduedays} AND overduedays <= #{endOverduedays}   
+      			  ]]>
+            </if>
+            <if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
+                <!-- 			    # 到期还款日期-->
+                AND repaymenttime BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
+            </if>
+            <if test="beginPayofftime != null and endPayofftime != null and beginPayofftime != '' and endPayofftime != ''">
+                <!-- 			    # 还清日期-->
+                AND payofftime BETWEEN #{beginPayofftime} AND #{endPayofftime}
+            </if>
+            <if test="status != null and status != ''">
+                <!-- 			    # 订单状态 payoff 已还清 payment  -->
+                AND status = #{status}
+            </if>
+            <!-- 			# 任务状态  -->
+            <if test="dunningtaskstatus != null and dunningtaskstatus != ''">
+                AND dunningtaskstatus = #{dunningtaskstatus}
+            </if>
+            
+            <!-- 			# 导出批次号时间  -->
+            <if test="beginOuterfiletime != null and endOuterfiletime != null and beginOuterfiletime != '' and endOuterfiletime != ''">
+                AND outerfiletime BETWEEN #{beginOuterfiletime} AND #{endOuterfiletime}
+            </if>
+<!--             <if test="outerfiletime != null and outerfiletime != ''"> -->
+<!-- 				AND DATE_FORMAT(outerfiletime, '%Y-%m-%d') = DATE_FORMAT(#{outerfiletime}, '%Y-%m-%d') -->
+<!--                 <![CDATA[ -->
+<!-- 					AND outerfiletime >= #{outerfiletime} AND outerfiletime < DATE_ADD(#{outerfiletime},INTERVAL 1 DAY) -->
+<!-- 				]]> -->
+<!--             </if> -->
+            
+<!--             <if test="overduedays != null and overduedays != ''"> -->
+                <!-- 			    # 委外主管过滤 -->
+<!--                 ${sqlMap.overdueday} #{overduedays} -->
+<!--             </if> -->
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                <!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+                ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
+            </when>
+            <otherwise>
+                <!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+                ORDER BY ${sqlMap.orderbyMap}
+            </otherwise>
+        </choose>
+    </select>
     
     
     

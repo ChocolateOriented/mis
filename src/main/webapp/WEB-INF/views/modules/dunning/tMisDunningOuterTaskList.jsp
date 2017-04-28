@@ -15,7 +15,7 @@
 			// 清空查询功能
 			 $("#empty").click(function(){
 // 				 $('#searchForm')[0].reset();  
-        		 window.location.href="${ctx}/dunning/tMisDunningTask/findOrderPageList";
+        		 window.location.href="${ctx}/dunning/tMisDunningOuterTask/findOrderPageList";
 			 }); 
 				
 			//组与花名联动查询
@@ -70,7 +70,7 @@
 			 $("#dunningExport").click(function(){
 				top.$.jBox.confirm("确认要导出列表数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/exportFile");
+						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningOuterTask/exportFile");
 						$("#searchForm").submit();
 					}
 				},
@@ -94,7 +94,7 @@
 				$("#outerOrders").val(outerOrders);
 				top.$.jBox.confirm("确认要导出列表数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/exportOuterFile");
+						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningOuterTask/exportOuterFile");
 		// 				loading('正在提交导出shuju');
 						$("#searchForm").submit();
 					}
@@ -158,7 +158,7 @@
 						$.jBox.tip("请勾选发送短信的催收订单", 'warning');
 						return;
 					}
-					var url = "${ctx}/dunning/tMisDunningTask/collectionGroupSms";
+					var url = "${ctx}/dunning/tMisDunningOuterTask/collectionGroupSms";
 								$.jBox.open("iframe:" + url, "群发短信" , 600, 350, {            
 					               buttons: {},
 //		 			                   submit: function (v, h, f) {
@@ -203,7 +203,7 @@
 						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
-					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid;
+					var url = "${ctx}/dunning/tMisDunningOuterTask/dialogDistribution?dunningcycle=" + uniqueid;
 					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
 			               buttons: {},
 			               loaded: function (h) {
@@ -229,7 +229,7 @@
 				 $("#automatic").attr('disabled',"true");
 				 $.ajax({
 	                  type: 'POST',
-	                  url : "${ctx}/dunning/tMisDunningTask/autoAssign",
+	                  url : "${ctx}/dunning/tMisDunningOuterTask/autoAssign",
 	                  success : function(data) {
 	                      if (data == "OK") {
 	                          alert("分配成功");
@@ -252,7 +252,7 @@
 // 				 $("#qqq").attr('disabled',"true");
 				 $.ajax({
 	                  type: 'POST',
-	                  url : "${ctx}/dunning/tMisDunningTask/autoAssignNewOrder",
+	                  url : "${ctx}/dunning/tMisDunningOuterTask/autoAssignNewOrder",
 	                  success : function(data) {
 	                      if (data == "OK") {
 	                          alert("新任务添加成功");
@@ -275,7 +275,7 @@
 // 				 $("#qqq").attr('disabled',"true");
 				 $.ajax({
 	                  type: 'POST',
-	                  url : "${ctx}/dunning/tMisDunningTask/autoRepayment",
+	                  url : "${ctx}/dunning/tMisDunningOuterTask/autoRepayment",
 	                  success : function(data) {
 	                      if (data == "OK") {
 	                          alert("过期任务自动分配成功");
@@ -311,7 +311,7 @@
 // 						return;
 // 				 }
 					
-// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogDeferDunningDeadline?dealcodes=" + dealcodes;
+// 				 var url = "${ctx}/dunning/tMisDunningOuterTask/dialogDeferDunningDeadline?dealcodes=" + dealcodes;
 // 				 $.jBox.open("iframe:" + url, "催收留案" , 600, 350, {            
 // 			               buttons: {},
 // 			               loaded: function (h) {
@@ -337,7 +337,7 @@
 // 						return;
 // 				 }
 					
-// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogSetOuterOrdersDeadline?dealcodes=" + dealcodes;
+// 				 var url = "${ctx}/dunning/tMisDunningOuterTask/dialogSetOuterOrdersDeadline?dealcodes=" + dealcodes;
 // 				 $.jBox.open("iframe:" + url, "委外订单截止日期修改" , 600, 350, {            
 // 			               buttons: {},
 // 			               loaded: function (h) {
@@ -359,7 +359,7 @@
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
 			if(s) $("#pageSize").val(s);
-			$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/findOrderPageList");
+			$("#searchForm").attr("action","${ctx}/dunning/tMisDunningOuterTask/findOrderPageList");
 			$("#searchForm").submit();
         	return false;
         }
@@ -371,7 +371,7 @@
 // 			backgroudcolor=Red;
 // 			var buyerId = $(obj).attr("buyerid");
 // 			var dealcode = $(obj).attr("dealcode");
-//         	window.location.href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId="+ buyerId + "&dealcode="+ dealcode;
+//         	window.location.href="${ctx}/dunning/tMisDunningOuterTask/customerDetails?buyerId="+ buyerId + "&dealcode="+ dealcode;
         }
 		
 		//格式化peopleList选项
@@ -387,15 +387,13 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisDunningTask/findOrderPageList">催收任务列表</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisDunningOuterTask/findOrderPageList">催收任务列表</a></li>
 	</ul>
 
 	<sys:message content="${message}"/>
-	<form:form id="searchForm" modelAttribute="dunningOrder" action="${ctx}/dunning/tMisDunningTask/findOrderPageList" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="dunningOrder" action="${ctx}/dunning/tMisDunningOuterTask/findOrderPageList" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
-<%-- 		<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview"> --%>
-<%-- 		</shiro:lacksPermission> --%>
 
 		<ul class="ul-form">
 			<li><label>姓名</label>
@@ -407,9 +405,9 @@
 			<li><label>订单号</label>
 				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			<li><label>催收备注</label>
-				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
-			</li>
+<!-- 			<li><label>催收备注</label> -->
+<%-- 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/> --%>
+<!-- 			</li> -->
 			
 			<li><label>订单状态</label>
 			<form:select  id="status" path="status" class="input-medium">
@@ -452,22 +450,35 @@
 					value="<fmt:formatDate value="${dunningOrder.endRepaymenttime}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
+			<li><label>委外开始</label>
+				<input name="beginOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+			<li><label>委外截止</label>
+				<input name="beginOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endOutsourcingEndDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
 			
-<!-- 			</ul> -->
-<!-- 			<ul class="ul-form"> -->
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-				<li>
-				<label >导出批次</label>
+<!-- 				<li> -->
+<!-- 				<label >导出批次</label> -->
 <!-- 				<input name="outerfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
 <%-- 					value="<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd"/>" --%>
 <!-- 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> -->
-					<input name="beginOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-						value="<fmt:formatDate value="${dunningOrder.beginOuterfiletime}" pattern="yyyy-MM-dd"/>"
-						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-					<input name="endOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-						value="<fmt:formatDate value="${dunningOrder.endOuterfiletime}" pattern="yyyy-MM-dd"/>"
-						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
-				</li>
+<!-- 					<input name="beginOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
+<%-- 						value="<fmt:formatDate value="${dunningOrder.beginOuterfiletime}" pattern="yyyy-MM-dd"/>" --%>
+<!-- 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至  -->
+<!-- 					<input name="endOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
+<%-- 						value="<fmt:formatDate value="${dunningOrder.endOuterfiletime}" pattern="yyyy-MM-dd"/>" --%>
+<!-- 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> -->
+<!-- 				</li> -->
 				<li>
 					<label>催收小组：</label>
 					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
@@ -486,6 +497,14 @@
 					</form:select></li>
 				<li>
 				<li>
+					<label>催收队列：</label>
+					<form:select path="dunningcycle" class="input-medium">
+						<form:option value="">全部</form:option>
+						<form:option value="Q4">Q4</form:option>
+						<form:option value="Q5">Q5</form:option>
+					</form:select></li>
+				<li>
+				<li>
 					<label >催款人</label>
 					<input id="peopleList" name="dunningPeople.queryIds" 
 					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0} ">
@@ -493,53 +512,15 @@
 					</c:if>
 					type="hidden" />
 				</li>
-				</shiro:hasPermission>
 				
-						
 				<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
 				<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">  --%>
-<!-- 					<li class="btns"><input id="dunningExport" class="btn btn-primary" type="button" value="导出列表" /></li> -->
-<%-- 				</shiro:hasPermission>  --%>
-				<shiro:hasPermission name="dunning:tMisDunningTask:exportFile"> 
-					<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" />
-					<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>
-				</shiro:hasPermission> 
-				<li class="clearfix"></li>
+<!-- 					<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" /> -->
+<!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li> -->
+<!-- 				<li class="clearfix"></li> -->
 			</ul>
 	</form:form>
-	
-	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
-		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/>
-	</shiro:hasPermission>
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
-	</shiro:hasPermission>
-	
-	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"  disabled="disabled"/>
-	</shiro:hasPermission>
-	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
-	
-	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"  disabled="disabled"/>
-	</shiro:hasPermission>
-	
-	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
-		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
-		<input id="autoAssignNewOrder"  class="btn btn-primary" type="button" value="新订单任务"/>
-		<input id="autoRepayment"  class="btn btn-primary" type="button" value="扫描还款"/>
-	</shiro:hasPermission>
-	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
-
-<%-- 		<form id="searchForm"  action="${ctx}/dunning/tMisDunningTask/exportOuterFile" method="post"> --%>
-<%-- 			<shiro:hasPermission name="dunning:tMisDunningTask:exportFile">  --%>
-<!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="委外导出" /> -->
-<%-- 			</shiro:hasPermission>  --%>
-<!-- 		</form> -->
-		
+	<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
@@ -552,20 +533,15 @@
 				<th>到期还款日期</th>
 				<th>逾期天数</th>
 				<th>订单状态</th>
-				<th>催收备注</th>
+<!-- 				<th>催收备注</th> -->
 				<th>催收人</th>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
 				<th>催收截止日期</th>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
-				<th>最近催收</th>
+<!-- 				<th>最近催收</th> -->
 				<th>还清日期</th>
 				<th>订单编号</th>
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-					<th>导出批次</th>
-				</shiro:hasPermission>
-<!-- 				<th>任务状态</th> -->
-<!-- 				<th>操作</th> -->
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
+<!-- 				<th>导出批次</th> -->
+				<th>委外开始时间</th>
+				<th>委外截止时间</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -578,9 +554,9 @@
 					${ (vs.index+1) + (page.pageNo-1) * page.pageSize} 
 				</td>
 				<td>
-					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank" > --%>
-					<a href="${ctx}/dunning/tMisDunningTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank" >
+					<a href="${ctx}/dunning/tMisDunningOuterTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank" >
 					${dunningOrder.realname}
+					</a>
 				</td>
 				
 				<td>
@@ -601,52 +577,44 @@
 				<td>
 					${dunningOrder.statusText}
 				</td>
-				<td title="${dunningOrder.telremark}">
-					<c:choose>  
-						<c:when test="${fn:length(dunningOrder.telremark) > 15}">  
-							<c:out value="${fn:substring(dunningOrder.telremark, 0, 15)}..." />
-						</c:when>
-						<c:otherwise>
-							<c:out value="${dunningOrder.telremark}" />
-						</c:otherwise>  
-					</c:choose>
-				</td>
+<%-- 				<td title="${dunningOrder.telremark}"> --%>
+<%-- 					<c:choose>   --%>
+<%-- 						<c:when test="${fn:length(dunningOrder.telremark) > 15}">   --%>
+<%-- 							<c:out value="${fn:substring(dunningOrder.telremark, 0, 15)}..." /> --%>
+<%-- 						</c:when> --%>
+<%-- 						<c:otherwise> --%>
+<%-- 							<c:out value="${dunningOrder.telremark}" /> --%>
+<%-- 						</c:otherwise>   --%>
+<%-- 					</c:choose> --%>
+<!-- 				</td> -->
 				
 				<td>
 					${dunningOrder.dunningPeople.nickname}
 				</td>
 				
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
 				<td>
 					<fmt:formatDate value="${dunningOrder.deadline}" pattern="yyyy-MM-dd"/>
 				</td>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
 				
-				<td>
-					<fmt:formatDate value="${dunningOrder.dunningtime}" pattern="yyyy-MM-dd HH:mm"/>
-				</td>
+<!-- 				<td> -->
+<%-- 					<fmt:formatDate value="${dunningOrder.dunningtime}" pattern="yyyy-MM-dd HH:mm"/> --%>
+<!-- 				</td> -->
 				
 				<td>
 					<fmt:formatDate value="${dunningOrder.payofftime}" pattern="yyyy-MM-dd HH:mm"/>
 				</td>
 				<td>
-<%-- 					<a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}"   > --%>
 					${dunningOrder.dealcode}
-<!-- 					</a> -->
 				</td>
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-					<td>
-						<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-					</td>
-				</shiro:hasPermission>
-				
 <!-- 				<td> -->
-<%-- 					${dunningOrder.dunningtaskstatusText} --%>
+<%-- 					<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd HH:mm:ss"/> --%>
 <!-- 				</td> -->
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><td> --%>
-<%--     				<a href="${ctx}/dunning/tMisDunningTask/form?id=${tMisDunningTask.id}">修改</a> --%>
-<%-- 					<a href="${ctx}/dunning/tMisDunningTask/delete?id=${tMisDunningTask.id}" onclick="return confirmx('确认要删除该催收任务吗？', this.href)">删除</a> --%>
-<%-- 				</td></shiro:hasPermission> --%>
+				<td>
+					<fmt:formatDate value="${dunningOrder.outsourcingBeginDate}" pattern="yyyy-MM-dd"/>
+				</td>
+				<td>
+					<fmt:formatDate value="${dunningOrder.outsourcingEndDate}" pattern="yyyy-MM-dd"/>
+				</td>
 			</tr>
 		</c:forEach>
 		</tbody>
