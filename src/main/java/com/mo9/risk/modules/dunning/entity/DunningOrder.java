@@ -33,6 +33,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private String dealcode;// # 订单编号
 	private String mobile;// # 手机号码
 	private Double amount;// # 欠款金额
+	private Double balance;// # 还款金额
 	private Double creditamount;// # 应催金额
 	private Date repaymenttime;// # 到期还款日期
 	private Integer overduedays;// # 逾期天数
@@ -395,6 +396,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setDunningPeople(TMisDunningPeople dunningPeople) {
 		this.dunningPeople = dunningPeople;
+	}
+
+	public Double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
 	}
 	
 }

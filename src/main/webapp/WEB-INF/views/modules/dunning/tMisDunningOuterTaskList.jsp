@@ -530,6 +530,7 @@
 				<th>手机号</th>
 				<th>欠款金额</th>
 				<th>应催金额</th>
+				<th>还款总额</th>
 				<th>到期还款日期</th>
 				<th>逾期天数</th>
 				<th>订单状态</th>
@@ -566,6 +567,9 @@
 				</td>
 				<td>
 					${dunningOrder.creditamountText}
+				</td>
+				<td>
+					${dunningOrder.balance}
 				</td>
 				<td>
 					<fmt:formatDate value="${dunningOrder.repaymenttime}" pattern="yyyy-MM-dd"/>
