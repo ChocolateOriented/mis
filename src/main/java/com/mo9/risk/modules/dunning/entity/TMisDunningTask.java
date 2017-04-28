@@ -67,6 +67,8 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private String dunningpeoplename;		// 催收人姓名
 	private String dunningcycle;		// 催收周期(队列)
 	
+	private Date outsourcingBeginDate ; //委外开始时间
+	private Date outsourcingEndDate ; //委外截止时间
 	
 	public TMisDunningTask() {
 		super();
@@ -264,6 +266,7 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 		this.dunningcycle = dunningcycle;
 	}
 	
+	
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
 //	public String getCreateby() {
 //		return createby;
@@ -321,6 +324,22 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	}*/
 
 
+
+	public Date getOutsourcingBeginDate() {
+		return outsourcingBeginDate;
+	}
+
+	public void setOutsourcingBeginDate(Date outsourcingBeginDate) {
+		this.outsourcingBeginDate = outsourcingBeginDate;
+	}
+
+	public Date getOutsourcingEndDate() {
+		return outsourcingEndDate;
+	}
+
+	public void setOutsourcingEndDate(Date outsourcingEndDate) {
+		this.outsourcingEndDate = outsourcingEndDate;
+	}
 
 	/**
 	 *  获取当前逾期天数

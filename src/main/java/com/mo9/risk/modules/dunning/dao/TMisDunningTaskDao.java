@@ -102,6 +102,13 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	public List<DunningOrder> findOrderPageList(DunningOrder dunningOrder);
 	
 	/**
+	 * 查询委外任务数据列表
+	 * @param entity
+	 * @return
+	 */
+	public List<DunningOrder> findOuterOrderPageList(DunningOrder dunningOrder);
+	
+	/**
 	 * 查询全部task任务
 	 * @return
 	 */
