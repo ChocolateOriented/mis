@@ -38,28 +38,30 @@
 			    },
 		        multiple: true,
 		        initSelection: function(element, callback) {//回显
-		            var ids=$(element).val();
-		            if (ids!=="") {
-		            	//根据组查询选项
-		                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
-		                    data: function(){
-		                    	var groupId = $("#groupList").val();     	
-	                    		return {groupId:groupId}             	
-		                    },
-		                    dataType: "json"
-		                }).done(function(data) {
-		                	var backData = [];
-		                	var index = 0 ;
-		                	for ( var item in data) {
-		                		//若回显ids里包含选项则选中
-								if (ids.indexOf(data[item].id) > -1 ) {
-									backData[index] = data[item] ;
-									index++;
-								}
-							}
-		                	callback(backData)
-		                });
+		        	var ids=$(element).val();
+		            if (ids=="") {
+		            	return;
 		            }
+	            	//根据组查询选项
+	                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+	                    data: function(){
+	                    	var groupId = $("#groupList").val();     	
+                    		return {groupId:groupId}             	
+	                    },
+	                    dataType: "json"
+	                }).done(function(data) {
+	                	
+	                	var backData = [];
+	                	var index = 0 ;
+	                	for ( var item in data) {
+	                		//若回显ids里包含选项则选中
+							if (ids.indexOf(data[item].id) > -1 ) {
+								backData[index] = data[item] ;
+								index++;
+							}
+						}
+	                	callback(backData)
+	                });
 		        },
 			    formatResult:formatPeopleList, //选择显示字段
 			    formatSelection:formatPeopleList, //选择选中后填写字段
@@ -488,7 +490,7 @@
 				<li>
 					<label >催款人</label>
 					<input id="peopleList" name="dunningPeople.queryIds" 
-					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0} ">
+					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0}">
 						value="${dunningOrder.dunningPeople.queryIds}"
 					</c:if>
 					type="hidden" />
