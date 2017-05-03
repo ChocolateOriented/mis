@@ -509,9 +509,9 @@
 				<li>
 					<label >催款人</label>
 					<input id="peopleList" name="dunningPeople.queryIds" 
-					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0}">
-						value="${dunningOrder.dunningPeople.queryIds}"
-					</c:if>
+					value="<c:forEach items="${dunningOrder.dunningPeople.queryIds}" var="item" varStatus="status">
+							<c:if test="${!status.first}">,</c:if>${item}
+						</c:forEach>"
 					type="hidden" />
 				</li>
 				

@@ -85,7 +85,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	}
 
 	public void setEndOutsourcingBeginDate(Date endOutsourcingBeginDate) {
-		this.endOutsourcingBeginDate = endOutsourcingBeginDate;
+		this.endOutsourcingBeginDate =  null != endOutsourcingBeginDate ? DateUtils.endDate(endOutsourcingBeginDate) : endOutsourcingBeginDate;
 	}
 
 	public Date getBeginOutsourcingEndDate() {
@@ -101,7 +101,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	}
 
 	public void setEndOutsourcingEndDate(Date endOutsourcingEndDate) {
-		this.endOutsourcingEndDate = endOutsourcingEndDate;
+		this.endOutsourcingEndDate =  null != endOutsourcingEndDate ? DateUtils.endDate(endOutsourcingEndDate) : endOutsourcingEndDate;
 	}
 
 	public Date getOutsourcingBeginDate() {
