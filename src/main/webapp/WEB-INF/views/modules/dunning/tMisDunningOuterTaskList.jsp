@@ -508,11 +508,7 @@
 				<li>
 				<li>
 					<label >催款人</label>
-					<input id="peopleList" name="dunningPeople.queryIds" 
-					<c:if test="${fn:length(dunningOrder.dunningPeople.queryIds)>0}">
-						value="${dunningOrder.dunningPeople.queryIds}"
-					</c:if>
-					type="hidden" />
+					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</li>
 				
 				<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
