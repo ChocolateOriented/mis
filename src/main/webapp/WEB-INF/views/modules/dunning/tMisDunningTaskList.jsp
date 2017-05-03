@@ -489,11 +489,7 @@
 				<li>
 				<li>
 					<label >催款人</label>
-					<input id="peopleList" name="dunningPeople.queryIds"
-						value="<c:forEach items="${dunningOrder.dunningPeople.queryIds}" var="item" varStatus="status">
-							<c:if test="${!status.first}">,</c:if>${item}
-						</c:forEach>"
-					type="hidden" />
+					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</li>
 				</shiro:hasPermission>
 				
