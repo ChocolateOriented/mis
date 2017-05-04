@@ -349,7 +349,18 @@
 					
 			 });
 			 // 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 end-->
-				
+			 
+			//获取代扣渠道成功率
+			$.get("${ctx}/dunning/tMisDunningDeduct/getSuccessRateByChannel", {}, function(data) {
+				if (data) {
+					var successRateInfo = "代扣成功率：";
+					for (var i = 0; i < data.length; i++) {
+						var rate = (!data[i].successrate && data[i].successrate !== 0) ? '-' : data[i].successrate.toFixed(2) + "%";
+						successRateInfo += data[i].channelname + "(" + rate + ") ";
+					}
+					$("#successRate").text(successRateInfo);
+				}
+			});
 		});
 		
 		//参数单位：毫秒    输出单位：天（向上取整）
@@ -390,6 +401,9 @@
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisDunningTask/findOrderPageList">催收任务列表</a></li>
+		<shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
+			<span id="successRate" style="float:right;padding:8px;"></span>
+		</shiro:hasPermission>
 	</ul>
 
 	<sys:message content="${message}"/>

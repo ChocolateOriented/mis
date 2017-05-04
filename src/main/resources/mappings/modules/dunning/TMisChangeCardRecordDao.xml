@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisChangeCardRecordDao">
+    
+	<sql id="TMisChangeCardRecordColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.dealcode as "dealcode",
+		a.bankname as "bankname",
+		a.bankcard as "bankcard",
+		a.mobile as "mobile",
+		a.idcard as "idcard",
+		a.createby as "createby.name",
+		a.createdate as "createdate",
+		a.updateby as "updateby.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisChangeCardRecord">
+		SELECT 
+			<include refid="TMisChangeCardRecordColumns"/>
+		FROM t_mis_changecard_record a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisChangeCardRecord">
+		SELECT 
+			a.dbid as "dbid",
+			a.id as "id",
+			a.dealcode as "dealcode",
+			a.bankname as "bankname",
+			a.bankcard as "bankcard",
+			a.mobile as "mobile",
+			a.idcard as "idcard",
+			a.createby as "createby.name",
+			a.createdate as "createdate",
+			a.updateby as "updateby.name",
+			a.updatedate as "updatedate"
+		FROM t_mis_changecard_record a
+		WHERE t.dbid IS NOT NULL 
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisChangeCardRecord">
+		SELECT 
+			<include refid="TMisChangeCardRecordColumns"/>
+		FROM t_mis_changecard_record a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_changecard_record(
+			id,
+			dealcode,
+			bankname,
+			bankcard,
+			mobile,
+			idcard,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{bankname},
+			#{bankcard},
+			#{mobile},
+			#{idcard},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_changecard_record SET 	
+			dealcode = #{dealcode},
+			bankname = #{bankname},
+			bankcard = #{bankcard},
+			mobile = #{mobile},
+			idcard = #{idcard},
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_changecard_record
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getCurrentBankCard" resultType="TMisChangeCardRecord">
+		SELECT 
+			<include refid="TMisChangeCardRecordColumns"/>
+		FROM t_mis_changecard_record a
+		WHERE a.dealcode = #{dealcode}
+		ORDER BY dbid DESC
+		LIMIT 1
+	</select>
+	
+	<select id="getAllChannelBank" resultType="string">
+		SELECT 
+			distinct a.bankname
+		FROM t_mis_paychannel_bank a
+		WHERE a.isshow = '1'
+		ORDER BY a.bankname
+	</select>
+	
+	<select id="getBankByCard" resultType="com.mo9.risk.modules.dunning.entity.BankCardInfo">
+		SELECT
+			a.bin,
+			a.cardlen,
+			a.orgcode,
+			a.bankname,
+			a.cardname,
+			a.cardtype
+		FROM t_mis_bank_identification a
+		WHERE a.bin = LEFT(#{bankCard}, LENGTH(a.bin))
+		AND a.cardlen = LENGTH(#{bankCard})
+		limit 1
+	</select>
+	
+</mapper>

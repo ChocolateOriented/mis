@@ -114,7 +114,7 @@
 			}
 		});
 		
-		$("input[name=iseffective]").change();
+		$("input[name=iseffective]:checked").change();
 		
 		//结果代码选择事件
 		$("#telstatus").change(function() {

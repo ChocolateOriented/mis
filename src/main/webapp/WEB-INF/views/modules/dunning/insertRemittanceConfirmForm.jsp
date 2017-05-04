@@ -70,6 +70,7 @@
         <shiro:hasPermission name="dunning:tMisDunningTask:view">
 	        <li><a id="applogiglog_a" href="#" >登录日志</a></li>
         </shiro:hasPermission> 
+        <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">扣款信息</a></li></shiro:hasPermission>
 	</ul> 
 	
 	<form:form id="inputForm" modelAttribute="TMisRemittanceConfirm" action="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirm" method="post" class="form-horizontal" enctype="multipart/form-data">

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao">
+    
+	<sql id="TMisDunningDeductLogColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.dealcode as "dealcode",
+		a.deductcode as "deductcode",
+		a.buyername as "buyername",
+		a.idcard as "idcard",
+		a.bankname as "bankname",
+		a.bankcard as "bankcard",
+		a.mobile as "mobile",
+		a.paytype as "paytype",
+		a.delaydays as "delaydays",
+		a.payamount as "payamount",
+		a.paychannel as "paychannel",
+		a.status as "status",
+		a.statusdetail as "statusdetail",
+		a.repaymentstatus as "repaymentstatus",
+		a.repaymentdetail as "repaymentdetail",
+		a.createby as "createby.name",
+		a.createdate as "createdate",
+		a.updateby as "updateby.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductLogColumns"/>
+		FROM t_mis_dunning_deduct_log a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningDeduct">
+		SELECT 
+			a.dbid AS "dbid",
+			a.id AS "id",
+			a.dealcode AS "dealcode",
+			a.deductcode AS "deductcode",
+			a.buyername AS "buyername",
+			a.idcard AS "idcard",
+			a.bankname AS "bankname",
+			a.bankcard AS "bankcard",
+			a.mobile AS "mobile",
+			a.paytype AS "paytype",
+			a.delaydays AS "delaydays",
+			a.payamount AS "payamount",
+			a.paychannel AS "paychannel",
+			a.status AS "status",
+			a.statusdetail AS "statusdetail",
+			a.repaymentstatus AS "repaymentstatus",
+			a.repaymentdetail AS "repaymentdetail",
+			a.createby AS "createBy.name",
+			a.createdate AS "createDate",
+			a.updateby AS "updateBy.name",
+			a.updatedate AS "updateDate"
+		FROM t_mis_dunning_deduct_log a
+		WHERE a.dealcode = #{dealcode}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductLogColumns"/>
+		FROM t_mis_dunning_deduct_log a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_deduct_log(
+			id,
+			dealcode,
+			deductcode,
+			buyername,
+			idcard,
+			bankname,
+			bankcard,
+			mobile,
+			paytype,
+			delaydays,
+			payamount,
+			paychannel,
+			status,
+			statusdetail,
+			repaymentstatus,
+			repaymentdetail,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{deductcode},
+			#{buyername},
+			#{idcard},
+			#{bankname},
+			#{bankcard},
+			#{mobile},
+			#{paytype},
+			#{delaydays},
+			#{payamount},
+			#{paychannel},
+			#{status},
+			#{statusdetail},
+			#{repaymentstatus},
+			#{repaymentdetail},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_deduct_log SET 	
+			dealcode = #{dealcode},
+			bankname = #{bankname},
+			buyername = #{buyername},
+			idcard = #{idcard},
+			bankcard = #{bankcard},
+			mobile = #{mobile},
+			paytype = #{paytype},
+			delaydays = #{delaydays},
+			payamount = #{payamount},
+			paychannel = #{paychannel},
+			status = #{status},
+			statusdetail = #{statusdetail},
+			repaymentstatus = #{repaymentstatus},
+			repaymentdetail = #{repaymentdetail},
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunning_deduct_log
+		WHERE id = #{id}
+	</update>
+
+</mapper>

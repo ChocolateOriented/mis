@@ -145,8 +145,8 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 	
 	@Transactional(readOnly = false)
 	@Override
-	public void delete(TMisDunnedConclusion TMisDunnedConclusion) {
-		super.delete(TMisDunnedConclusion);
+	public void delete(TMisDunnedConclusion tMisDunnedConclusion) {
+		super.delete(tMisDunnedConclusion);
 	}
 	
 }

@@ -142,7 +142,7 @@
             	
         		//根据勾选actions初始化是否有效联络
         		$("input[name=iseffective][value='" + window.parent.iseffective + "']").prop("checked", true);
-        		$("input[name=iseffective]").change();
+        		$("input[name=iseffective]:checked").change();
             	
         		//根据勾选actions初始化结果代码
         		if (window.parent.resultcode == "PTP") {

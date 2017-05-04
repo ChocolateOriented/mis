@@ -29,6 +29,57 @@
 				}
 			});
 		}
+		
+		function changeCard(obj, width, height){
+			$.get("${ctx}/dunning/tMisChangeCardRecord/preCheck", {dealcode:"${dealcode}"}, function(data) {
+				if(data && data.result != "OK") {
+					$.jBox.tip(data.msg, "warning");
+					return;
+				}
+				
+				var btn = $(obj);
+				var url = "${ctx}/dunning/tMisChangeCardRecord/changeCard?buyerId=${buyerId}&dealcode=${dealcode}&mobile=${changeCardRecord.mobile}&idcard=${changeCardRecord.idcard}&bankname=${changeCardRecord.bankname}&bankcard=${changeCardRecord.bankcard}&changeType=" + btn.prop("id");
+				$.jBox.open("iframe:" + url, btn.val() , width || 600, height || 430, {            
+					buttons: {//"确定": "ok", "取消": true
+	            	},
+					submit: function (v, h, f) {
+					},
+					loaded: function (h) {
+						$(".jbox-content", document).css("overflow-y", "hidden");
+					}
+				});
+				btnStatistics(document, obj);
+			});
+			
+		}
+		
+		//按钮点击统计
+		function btnStatistics(doc, btn) {
+			$.post("${ctx}/dunning/tMisBtnStatistics/save",
+					{buyerid: "${buyerId}", buyername: "${personalInfo.realName}", dealcode: "${dealcode}", pagename: doc.title, btnid: $(btn).prop('id'), btnname: $(btn).val()},
+					function(data) {});
+		}
+		
+		//打开代扣页面前验证
+		function deductPreCheck(callback, doc, btn) {
+			var bankName;
+			var bankCard;
+			if ("${changeCardRecord}") {
+				bankName = "${changeCardRecord.bankname}";
+				bankCard = "${changeCardRecord.bankcard}";
+			} else {
+				bankName = "${personalInfo.remitBankName}";
+				bankCard = "${personalInfo.remitBankNo}";
+			}
+			$.get("${ctx}/dunning/tMisDunningDeduct/preCheck", {dealcode:"${dealcode}" ,bankName: bankName, bankCard: bankCard}, function(data) {
+				if(data && data.result != "OK") {
+					$.jBox.tip(data.msg, "warning");
+					return;
+				}
+				callback();
+			});
+			btnStatistics(doc, btn);
+		}
 	</script>
 </head>
 <body>
@@ -85,7 +136,7 @@
 				<td>收款卡号：
 					<c:choose>  
 						<c:when test="${not empty personalInfo.remitBankNo}">  
-							<c:out value="${fn:substring(personalInfo.remitBankNo, 0, 4)} **** **** ${fn:substring(personalInfo.remitBankNo, 12, -1)}" />
+							<c:out value="${fn:substring(personalInfo.remitBankNo, 0, 4)} **** **** ${fn:substring(personalInfo.remitBankNo, 12, 16)} ${fn:substring(personalInfo.remitBankNo, 16, -1)}" />
 						</c:when>
 						<c:otherwise>
 							<c:out value="未知" />
@@ -95,6 +146,35 @@
 			</tr>
 		</tbody>
 	</table>
+	
+	<shiro:hasPermission name="dunning:tMisDunningDeduct:view">
+	<h4>&nbsp;&nbsp;扣款信息</h4>
+	<table id="customerTable4" class="table table-striped table-bordered table-condensed">
+		<tbody>
+			<tr>
+				<td>身份证号：${not empty changeCardRecord.idcard ? changeCardRecord.idcard : "未知"}</td>
+				<td>预留手机号：${not empty changeCardRecord.mobile ? changeCardRecord.mobile : "未知"}</td>
+				<td>扣款银行：${not empty changeCardRecord.bankname ? changeCardRecord.bankname : "未知"}</td>
+				<td>扣款卡号：
+					<c:choose>  
+						<c:when test="${not empty changeCardRecord.bankcard}">  
+							<c:out value="${fn:substring(changeCardRecord.bankcard, 0, 4)} **** **** ${fn:substring(changeCardRecord.bankcard, 12, 16) } ${fn:substring(changeCardRecord.bankcard, 16, -1)}" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="未知" />
+						</c:otherwise>  
+					</c:choose>
+				</td>
+				<td>添加人：${not empty changeCardRecord.createBy ? changeCardRecord.createBy.name : 'sys'}</td>
+				<td>
+					<input id="changeIdcard" class="btn btn-primary" type="button" value="换身份证" style="padding:0px 8px 0px 8px;" onclick="changeCard(this, null, 300)"/>&nbsp;
+					<input id="changeMobile" class="btn btn-primary" type="button" value="换手机号" style="padding:0px 8px 0px 8px;" onclick="changeCard(this, null, 300)"/>&nbsp;
+					<input id="changeBankcard" class="btn btn-primary" type="button" value="换卡" style="padding:0px 8px 0px 8px;" onclick="changeCard(this, null, 350)"/>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</shiro:hasPermission>
 <br/>
 <iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}" frameborder="0"  style="width:100%;height:600px;">
 </iframe> 
