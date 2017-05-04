@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.util.NumberUtil;
 

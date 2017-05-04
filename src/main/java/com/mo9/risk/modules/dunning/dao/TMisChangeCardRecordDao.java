@@ -23,7 +23,7 @@ public interface TMisChangeCardRecordDao extends CrudDao<TMisChangeCardRecord> {
 	 * @param tMisChangeCardRecord
 	 * @return
 	 */
-	public TMisChangeCardRecord getCurrentBankCard(String buyerId);
+	public TMisChangeCardRecord getCurrentBankCard(String dealcode);
 	
 	/**
 	 * 获取所有渠道支持的银行

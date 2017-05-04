@@ -1,7 +1,7 @@
 /**
  * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
  */
-package com.mo9.risk.modules.dunning.entity;
+package com.mo9.risk.modules.dunning.bean;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.thinkgem.jeesite.common.utils.Reflections;
 
 /**

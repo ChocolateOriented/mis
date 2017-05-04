@@ -1,4 +1,4 @@
-package com.mo9.risk.modules.dunning.entity;
+package com.mo9.risk.modules.dunning.enums;
 
 public enum PayStatus {
 	submitted("提交中"),

@@ -18,15 +18,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
+import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.Mo9ResponseData;
-import com.mo9.risk.modules.dunning.entity.PayChannelInfo;
-import com.mo9.risk.modules.dunning.entity.PayStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.sys.entity.User;

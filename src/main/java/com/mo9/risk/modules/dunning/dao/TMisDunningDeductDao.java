@@ -8,7 +8,7 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 import java.util.List;
 
-import com.mo9.risk.modules.dunning.entity.PayChannelInfo;
+import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 
 /**

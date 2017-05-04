@@ -160,7 +160,7 @@
 		WHERE deductcode = #{deductcode}
 	</update>
 	
-	<select id="getPayChannelList" resultType="com.mo9.risk.modules.dunning.entity.PayChannelInfo">
+	<select id="getPayChannelList" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
 		SELECT 
 			d.value as "channelid",
 			d.label as "channelname",
@@ -187,7 +187,7 @@
 		AND d.del_flag = '0'
 	</select>
 	
-	<select id="getSuccessRateByChannel" resultType="com.mo9.risk.modules.dunning.entity.PayChannelInfo">
+	<select id="getSuccessRateByChannel" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
 		SELECT 
 			d.value as "channelid",
 			d.label as "channelname",

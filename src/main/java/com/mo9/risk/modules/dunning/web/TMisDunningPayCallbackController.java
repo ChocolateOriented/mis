@@ -19,9 +19,9 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mo9.risk.modules.dunning.entity.Mo9ResponseData;
-import com.mo9.risk.modules.dunning.entity.PayStatus;
+import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
+import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.util.RequestParamSign;
 
