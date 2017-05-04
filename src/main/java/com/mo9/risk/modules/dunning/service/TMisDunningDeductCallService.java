@@ -95,7 +95,7 @@ public class TMisDunningDeductCallService {
 		Map<String, String> result = new HashMap<String, String>();
 		Mo9DeductOrder mo9Order = new Mo9DeductOrder(tMisDunningDeduct);
 		
-		String riskUrl =  DictUtils.getDictValue("riskclone", "orderUrl", "");
+		String riskUrl =  DictUtils.getDictValue("misUrl", "orderUrl", "");
 		mo9Order.setNotifyUrl(riskUrl + "mis/dunning/tMisDunningDeduct/updateRecord");
 		
 		String privateKey = DictUtils.getDictValue("mo9Deduct", "private_key", "");
