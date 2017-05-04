@@ -534,179 +534,179 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 * 检索已经过期的催款任务，设置状态为到期
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	private void updateExpiredTask() {
-		//分页处理，单页处理100条
-		Page<TMisDunningTask> page = new Page<TMisDunningTask>(1, 9999);  // 临时处理后期待优化 
-		int pageNo = 1; //页码
-		do {
-			page.setPageNo(pageNo);
-			page = this.findExpiredTask(page);
-			logger.info(MessageFormat.format("检索已过期催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
-
-			int i = 1;
-			for (TMisDunningTask task : page.getList()) {
-				logger.info(MessageFormat.format("正在處理第幾條===>{0}", i++ ) );
-				TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(task.getDealcode());
-				if(personalInfo == null){
-					logger.error(MessageFormat.format("自动分配personalInfo为空，Dealcode:===>{0}", task.getDealcode()));
-					continue;
-				}
-				Date now = new Date();
-				task.setEnd(now);
-				task.setDunningtaskstatus(TMisDunningTask.STATUS_EXPIRED);
-				task.setDunningAmounOnEnd((int)Double.valueOf(personalInfo.getCreditAmount()).doubleValue());
-				this.save(task);
-				logger.info("更新过期任务状态：" + task.getId());
-			}
-			pageNo++; //翻页
-			page.setList(null);
-		}
-		while (page != null && !page.isLastPage());
-	}
+//	@Transactional(propagation = Propagation.REQUIRES_NEW)
+//	private void updateExpiredTask() {
+//		//分页处理，单页处理100条
+//		Page<TMisDunningTask> page = new Page<TMisDunningTask>(1, 9999);  // 临时处理后期待优化 
+//		int pageNo = 1; //页码
+//		do {
+//			page.setPageNo(pageNo);
+//			page = this.findExpiredTask(page);
+//			logger.info(MessageFormat.format("检索已过期催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
+//
+//			int i = 1;
+//			for (TMisDunningTask task : page.getList()) {
+//				logger.info(MessageFormat.format("正在處理第幾條===>{0}", i++ ) );
+//				TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(task.getDealcode());
+//				if(personalInfo == null){
+//					logger.error(MessageFormat.format("自动分配personalInfo为空，Dealcode:===>{0}", task.getDealcode()));
+//					continue;
+//				}
+//				Date now = new Date();
+//				task.setEnd(now);
+//				task.setDunningtaskstatus(TMisDunningTask.STATUS_EXPIRED);
+//				task.setDunningAmounOnEnd((int)Double.valueOf(personalInfo.getCreditAmount()).doubleValue());
+//				this.save(task);
+//				logger.info("更新过期任务状态：" + task.getId());
+//			}
+//			pageNo++; //翻页
+//			page.setList(null);
+//		}
+//		while (page != null && !page.isLastPage());
+//	}
 
 	/**
 	 * 根据催款账期分配催收任务
 	 *
 	 * @param period
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	private void assignByPeriod(DunningPeriod period) {
-		/**
-		 *  获取对应催收账期的人员
-		 */
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("BEGIN", period.begin);
-		params.put("END", period.end);
-//		params.put("PEOPLE_TYPE", TMisDunningPeople.PEOPLE_TYPE_INNER);
-		List<TMisDunningPeople> peoples = this.tMisDunningPeopleDao.findByPeriod(params);
-		if (peoples == null || peoples.isEmpty()) {
-			logger.info(MessageFormat.format("{0}天到{1}天催收账期没有分配对应的催收人员", period.begin, period.end));
-			return;
-		}
-
-		/**
-		 * 获取待催收任务
-		 */
-		params = new HashMap<String, Object>();
-		params.put("BEGIN", period.begin);
-		params.put("END", period.end);
-		List<TMisDunningOrder> dunningOrders = this.tMisDunningTaskDao.findNeedDunningOrder(params);
-		if (dunningOrders == null || dunningOrders.isEmpty()) {
-			logger.info(MessageFormat.format("账期{0}天到{1}天没有需要催收订单", period.begin, period.end));
-			return;
-		}
-		logger.info(MessageFormat.format("账期{0}天到{1}天共有{2}条需要催收订单", period.begin, period.end, dunningOrders.size()));
-//		System.out.println(JSON.toJSONString(dunningOrders));
-
-		/**
-		 *  获取人员的正在催收任务数
-		 */
-		params = new HashMap<String, Object>();
-		params.put("BEGIN", period.begin);
-		params.put("END", period.end);
-		params.put("STATUS_DUNNING", TMisDunningTask.STATUS_DUNNING);
-		List<Map<String, Object>> taskCounts = this.tMisDunningTaskDao.findDunningTaskByPeople(params);
-		//计算该催款周期任务的总数
-		int totalCount = 0;
-		//计算最大待催人员订单数
-		int maxPersonDunningTasks = 0;
-		Map<String, Integer> peopleTaskCount = new HashMap<String, Integer>(); //催款人员对应当前任务表
-		for (Map<String, Object> taskCount : taskCounts) {
-			int task_count = null != taskCount.get("task_count") ?  ((Long)taskCount.get("task_count")).intValue(): 0;
-			String people = (String) taskCount.get("people");
-			peopleTaskCount.put(people, task_count);
-			logger.info(MessageFormat.format("催款人员:{0}在账期{1}天到{2}天上任有{3}条任务在催款", people, period.begin, period.end, task_count));
-			totalCount += task_count;
-			if(task_count>maxPersonDunningTasks)
-			{
-				maxPersonDunningTasks=task_count;
-			}
-		}
-		logger.info("个人最大在库订单数为"+maxPersonDunningTasks+"条");
-
-		/**
-		 * 分配算法
-		 * 1.从最小在库数人员开始分配
-		 * 2.剩余订单平均分配
-		 */
-		 Iterator<TMisDunningOrder> iterator  =  dunningOrders.iterator();
-		 while(iterator.hasNext())
-		 {
-			 /**
-			  * 获取任务最少的催收人
-			  */
-			 List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(peopleTaskCount.entrySet());
-			 if(list.isEmpty() || list.size() == 0)
-			 {
-				 logger.info("周期中催收人任务数为空");
-				 break;
-			 }
-			 Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-				 @Override
-				 public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-					 return o1.getValue()-o2.getValue();
-				 }
-			 });
-			 String peopleId = list.get(0).getKey(); //当前在库任务最少的催收人
-			 Integer taskCount = list.get(0).getValue();
-			 if(taskCount>=maxPersonDunningTasks)
-			 {
-				 logger.info("补齐任务分配时,所有人的任务达到个人最大在库订单数,当前在库订单" + taskCount + "条，所以不再分配");
-				 break;
-			 }
-			 TMisDunningOrder order = iterator.next();
-			 TMisDunningPeople people = this.tMisDunningPeopleDao.get(peopleId);
-			 if(people == null)
-			 {
-				 logger.info("催收人员;"+peopleId+",不存在");
-				 continue;
-			 }
-			 //分配
-			 try {
-
-				 int taskcount = peopleTaskCount.containsKey(people.getId()) ? peopleTaskCount.get(people.getId()) : 0; //当前用户任务数
-				 TMisDunningTask task = this.createDunningTask(people, order, period,null,null);
-				 //分配后
-				 taskcount++;  //任务数+1
-				 peopleTaskCount.put(people.getId(), taskcount);
-				 logger.info(MessageFormat.format("补齐分配订单：{0} 给催收人：{1} 进行催收,当前任务数:{2}", order.dealcode, people.getName(),taskcount));
-				 iterator.remove();
-
-			 } catch (Exception e) {
-				 logger.error(MessageFormat.format("补齐分配补齐订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
-			 }
-
-
-		 }
-
-		int i = 0;
-		for (TMisDunningOrder order : dunningOrders) {
-			{
-				/**
-				 * 平均分配
-				 */
-				TMisDunningPeople people = peoples.get(i); //催款人员
-				int taskcount = peopleTaskCount.containsKey(people.getId()) ? peopleTaskCount.get(people.getId()) : 0; //当前用户任务数
-				//分配
-				try {
-					TMisDunningTask task = this.createDunningTask(people, order, period,null,null);
-					//分配后
-					taskcount++;  //任务数+1
-					peopleTaskCount.put(people.getId(), taskcount);
-					logger.info(MessageFormat.format("平均分配订单：{0} 给催收人：{1}进行催收,当前任务数:{2}", order.dealcode, people.getName(),taskcount));
-
-				} catch (Exception e) {
-					logger.error(MessageFormat.format("平均分配订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
-				}
-				i++;
-				if (i >= peoples.size()) {
-					i = 0;
-				}
-		}
-
-		}
-	}
+//	@Transactional(propagation = Propagation.REQUIRES_NEW)
+//	private void assignByPeriod(DunningPeriod period) {
+//		/**
+//		 *  获取对应催收账期的人员
+//		 */
+//		Map<String, Object> params = new HashMap<String, Object>();
+//		params.put("BEGIN", period.begin);
+//		params.put("END", period.end);
+////		params.put("PEOPLE_TYPE", TMisDunningPeople.PEOPLE_TYPE_INNER);
+//		List<TMisDunningPeople> peoples = this.tMisDunningPeopleDao.findByPeriod(params);
+//		if (peoples == null || peoples.isEmpty()) {
+//			logger.info(MessageFormat.format("{0}天到{1}天催收账期没有分配对应的催收人员", period.begin, period.end));
+//			return;
+//		}
+//
+//		/**
+//		 * 获取待催收任务
+//		 */
+//		params = new HashMap<String, Object>();
+//		params.put("BEGIN", period.begin);
+//		params.put("END", period.end);
+//		List<TMisDunningOrder> dunningOrders = this.tMisDunningTaskDao.findNeedDunningOrder(params);
+//		if (dunningOrders == null || dunningOrders.isEmpty()) {
+//			logger.info(MessageFormat.format("账期{0}天到{1}天没有需要催收订单", period.begin, period.end));
+//			return;
+//		}
+//		logger.info(MessageFormat.format("账期{0}天到{1}天共有{2}条需要催收订单", period.begin, period.end, dunningOrders.size()));
+////		System.out.println(JSON.toJSONString(dunningOrders));
+//
+//		/**
+//		 *  获取人员的正在催收任务数
+//		 */
+//		params = new HashMap<String, Object>();
+//		params.put("BEGIN", period.begin);
+//		params.put("END", period.end);
+//		params.put("STATUS_DUNNING", TMisDunningTask.STATUS_DUNNING);
+//		List<Map<String, Object>> taskCounts = this.tMisDunningTaskDao.findDunningTaskByPeople(params);
+//		//计算该催款周期任务的总数
+//		int totalCount = 0;
+//		//计算最大待催人员订单数
+//		int maxPersonDunningTasks = 0;
+//		Map<String, Integer> peopleTaskCount = new HashMap<String, Integer>(); //催款人员对应当前任务表
+//		for (Map<String, Object> taskCount : taskCounts) {
+//			int task_count = null != taskCount.get("task_count") ?  ((Long)taskCount.get("task_count")).intValue(): 0;
+//			String people = (String) taskCount.get("people");
+//			peopleTaskCount.put(people, task_count);
+//			logger.info(MessageFormat.format("催款人员:{0}在账期{1}天到{2}天上任有{3}条任务在催款", people, period.begin, period.end, task_count));
+//			totalCount += task_count;
+//			if(task_count>maxPersonDunningTasks)
+//			{
+//				maxPersonDunningTasks=task_count;
+//			}
+//		}
+//		logger.info("个人最大在库订单数为"+maxPersonDunningTasks+"条");
+//
+//		/**
+//		 * 分配算法
+//		 * 1.从最小在库数人员开始分配
+//		 * 2.剩余订单平均分配
+//		 */
+//		 Iterator<TMisDunningOrder> iterator  =  dunningOrders.iterator();
+//		 while(iterator.hasNext())
+//		 {
+//			 /**
+//			  * 获取任务最少的催收人
+//			  */
+//			 List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(peopleTaskCount.entrySet());
+//			 if(list.isEmpty() || list.size() == 0)
+//			 {
+//				 logger.info("周期中催收人任务数为空");
+//				 break;
+//			 }
+//			 Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+//				 @Override
+//				 public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+//					 return o1.getValue()-o2.getValue();
+//				 }
+//			 });
+//			 String peopleId = list.get(0).getKey(); //当前在库任务最少的催收人
+//			 Integer taskCount = list.get(0).getValue();
+//			 if(taskCount>=maxPersonDunningTasks)
+//			 {
+//				 logger.info("补齐任务分配时,所有人的任务达到个人最大在库订单数,当前在库订单" + taskCount + "条，所以不再分配");
+//				 break;
+//			 }
+//			 TMisDunningOrder order = iterator.next();
+//			 TMisDunningPeople people = this.tMisDunningPeopleDao.get(peopleId);
+//			 if(people == null)
+//			 {
+//				 logger.info("催收人员;"+peopleId+",不存在");
+//				 continue;
+//			 }
+//			 //分配
+//			 try {
+//
+//				 int taskcount = peopleTaskCount.containsKey(people.getId()) ? peopleTaskCount.get(people.getId()) : 0; //当前用户任务数
+//				 TMisDunningTask task = this.createDunningTask(people, order, period,null,null);
+//				 //分配后
+//				 taskcount++;  //任务数+1
+//				 peopleTaskCount.put(people.getId(), taskcount);
+//				 logger.info(MessageFormat.format("补齐分配订单：{0} 给催收人：{1} 进行催收,当前任务数:{2}", order.dealcode, people.getName(),taskcount));
+//				 iterator.remove();
+//
+//			 } catch (Exception e) {
+//				 logger.error(MessageFormat.format("补齐分配补齐订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
+//			 }
+//
+//
+//		 }
+//
+//		int i = 0;
+//		for (TMisDunningOrder order : dunningOrders) {
+//			{
+//				/**
+//				 * 平均分配
+//				 */
+//				TMisDunningPeople people = peoples.get(i); //催款人员
+//				int taskcount = peopleTaskCount.containsKey(people.getId()) ? peopleTaskCount.get(people.getId()) : 0; //当前用户任务数
+//				//分配
+//				try {
+//					TMisDunningTask task = this.createDunningTask(people, order, period,null,null);
+//					//分配后
+//					taskcount++;  //任务数+1
+//					peopleTaskCount.put(people.getId(), taskcount);
+//					logger.info(MessageFormat.format("平均分配订单：{0} 给催收人：{1}进行催收,当前任务数:{2}", order.dealcode, people.getName(),taskcount));
+//
+//				} catch (Exception e) {
+//					logger.error(MessageFormat.format("平均分配订单：{0} 给催收人：{1}发生错误", order.dealcode, people.getName()) ,e);
+//				}
+//				i++;
+//				if (i >= peoples.size()) {
+//					i = 0;
+//				}
+//		}
+//
+//		}
+//	}
 
 	
 
