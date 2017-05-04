@@ -3,11 +3,15 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.jboss.logging.Logger;
+import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,15 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.entity.PayChannelInfo;
 import com.mo9.risk.modules.dunning.entity.PayStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -49,12 +50,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	
 	@Autowired
 	private TMisDunningDeductLogDao tMisDunningDeductLogDao;
-	
-	@Autowired
-	private TMisDunningTaskDao tMisDunningTaskDao;
-	
-	@Autowired
-	private TRiskBuyerPersonalInfoService personalInfoDao;
 	
 	@Autowired
 	private TMisDunningDeductCallService tMisDunningDeductCallService;
@@ -174,15 +169,37 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	 * @param dealcode
 	 * @return
 	 */
-	public TRiskBuyerPersonalInfo getBuyerInfoByDealcodeFromRisk(String dealcode) {
+	public DunningOrder getRiskOrderByDealcodeFromRisk(String dealcode) {
+		String sql = "select dealcode as \"dealcode\", status as \"status\", CASE WHEN o.status = 'payoff' THEN 0 ELSE (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) END as \"creditamount\" "
+				+ "from t_risk_order o where o.dealcode = ? limit 1";
+		
+		DbUtils dbUtils = new DbUtils();
+		dbUtils.setJndiName("java:comp/env/jdbc/jeesite2");
+		List<Object> paramList = new ArrayList<Object>();
+		paramList.add(dealcode);
 		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
-			return personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+			List<Map<String, Object>> result = dbUtils.getQueryList(sql, paramList);
+			if (result == null || result.size() == 0) {
+				return null;
+			}
+			Map<String, Object> record = result.get(0);
+			
+			DunningOrder order = new DunningOrder();
+			String deal = (String) record.get("dealcode");
+			String status = (String) record.get("status");
+			BigDecimal creditamount = (BigDecimal) record.get("creditamount");
+			order.setDealcode(deal);
+			order.setStatus(status);
+			if (creditamount == null) {
+				order.setCreditamount(0D);
+			} else {
+				order.setCreditamount(creditamount.doubleValue());
+			}
+			
+			return order;
 		} catch (Exception e) {
 			logger.info("切换数据源查询订单异常：" + e.getMessage());
 			return null;
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 	}
 	
@@ -222,7 +239,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		return tMisDunningDeductDao.getSuccessRateByChannel(paychannel);
 	}
 	
-	//@Scheduled(cron = "0 0/30 * * * ?")
+	@Scheduled(cron = "0 0/30 * * * ?")
 	@Transactional(readOnly = false)
 	public void querySubmittedDeductStatus() {
 		List<TMisDunningDeduct> deductRecords = tMisDunningDeductDao.getDeductListByStatus("submitted");

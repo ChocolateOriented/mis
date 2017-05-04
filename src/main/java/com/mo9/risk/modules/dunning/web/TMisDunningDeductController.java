@@ -23,11 +23,10 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.PayChannelInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductCallService;
 
@@ -96,21 +95,21 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		TRiskBuyerPersonalInfo personalInfo = tMisDunningDeductService.getBuyerInfoByDealcodeFromRisk(dealcode);
+		DunningOrder order = tMisDunningDeductService.getRiskOrderByDealcodeFromRisk(dealcode);
 		
-		if (personalInfo == null) {
+		if (order == null) {
 			result.put("result", "NO");
 			result.put("msg", "订单不存在");
 			return result;
 		}
 		
-		if (personalInfo.getCreditAmount() == null || "".equals(personalInfo.getCreditAmount())) {
+		if ("payoff".equals(order.getStatus())) {
 			result.put("result", "NO");
 			result.put("msg", "订单已还清");
 			return result;
 		}
 		
-		if (tMisDunningDeduct.getPayamount() > Double.parseDouble(personalInfo.getCreditAmount())) {
+		if (order.getCreditamount() == null || tMisDunningDeduct.getPayamount() > order.getCreditamount()) {
 			result.put("result", "NO");
 			result.put("msg", "扣款金额不应大于应催金额");
 			return result;
