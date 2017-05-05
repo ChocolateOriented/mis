@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisBtnStatisticsDao">
+    
+	<sql id="TMisBtnStatisticsColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.buyerid as "buyerid",
+		a.buyername as "buyername",
+		a.dealcode as "dealcode",
+		a.pagename as "pagename",
+		a.btnid as "btnid",
+		a.btnname as "btnname",
+		a.createby as "createby.name",
+		a.createdate as "createdate",
+		a.updateby as "updateby.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisBtnStatistics">
+		SELECT 
+			<include refid="TMisBtnStatisticsColumns"/>
+		FROM t_mis_btn_statistics a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisBtnStatistics">
+		SELECT 
+			a.dbid as "dbid",
+			a.id as "id",
+			a.buyerid as "buyerid",
+			a.buyername as "buyername",
+			a.dealcode as "dealcode",
+			a.pagename as "pagename",
+			a.btnid as "btnid",
+			a.btnname as "btnname",
+			a.createby as "createby.name",
+			a.createdate as "createdate",
+			a.updateby as "updateby.name",
+			a.updatedate as "updatedate"
+		FROM t_mis_btn_statistics a
+		WHERE t.dbid IS NOT NULL 
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisBtnStatistics">
+		SELECT 
+			<include refid="TMisBtnStatisticsColumns"/>
+		FROM t_mis_btn_statistics a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_btn_statistics(
+			id,
+			buyerid,
+			buyername,
+			dealcode,
+			pagename,
+			btnid,
+			btnname,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{buyerid},
+			#{buyername},
+			#{dealcode},
+			#{pagename},
+			#{btnid},
+			#{btnname},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_btn_statistics SET 
+			buyerid = #{buyerid},
+			buyername = #{buyername},
+			dealcode = #{dealcode},	
+			pagename = #{pagename},
+			btnid = #{btnid},
+			btnname = #{btnname},
+			updateby = #{updateBy.name},
+			updatedate = #{updatedate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_btn_statistics
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

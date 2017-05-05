@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
+import com.mo9.risk.modules.dunning.enums.DunningOverdueReason;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**

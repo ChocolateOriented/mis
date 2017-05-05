@@ -94,6 +94,7 @@
         <shiro:hasPermission name="dunning:tMisDunningTask:view">
 	        <li><a id="applogiglog_a" href="#" >登录日志</a></li>
         </shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">扣款信息</a></li></shiro:hasPermission>
 	</ul> 
 <!-- 	通话记录 -->
 	<sys:message content="${message}"/>
@@ -195,7 +196,10 @@
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />
-	<input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" />
+	<!-- <input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" /> -->
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
+	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
 	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />

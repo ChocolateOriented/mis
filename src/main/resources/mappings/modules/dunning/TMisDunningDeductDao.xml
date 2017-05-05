@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao">
+    
+	<sql id="TMisDunningDeductColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.dealcode as "dealcode",
+		a.deductcode as "deductcode",
+		a.starttime as "starttime",
+		a.buyername as "buyername",
+		a.idcard as "idcard",
+		a.bankname as "bankname",
+		a.bankcard as "bankcard",
+		a.mobile as "mobile",
+		a.paytype as "paytype",
+		a.delaydays as "delaydays",
+		a.payamount as "payamount",
+		a.paychannel as "paychannel",
+		a.status as "status",
+		a.statusdetail as "statusdetail",
+		a.reason as "reason",
+		a.repaymentstatus as "repaymentstatus",
+		a.repaymentdetail as "repaymentdetail",
+		a.finishtime as "finishtime",
+		a.createby as "createby.name",
+		a.createdate as "createdate",
+		a.updateby as "updateby.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductColumns"/>
+		FROM t_mis_dunning_deduct a
+		WHERE a.deductcode = #{deductcode}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningDeduct">
+		SELECT 
+			a.dbid AS "dbid",
+			a.id AS "id",
+			a.dealcode AS "dealcode",
+			a.deductcode AS "deductcode",
+			a.starttime AS "starttime",
+			a.buyername AS "buyername",
+			a.idcard AS "idcard",
+			a.bankname AS "bankname",
+			a.bankcard AS "bankcard",
+			a.mobile AS "mobile",
+			a.paytype AS "paytype",
+			a.delaydays AS "delaydays",
+			a.payamount AS "payamount",
+			IFNULL(d.label, a.paychannel) AS "paychannel",
+			a.status AS "status",
+			a.statusdetail AS "statusdetail",
+			a.reason as "reason",
+			a.repaymentstatus AS "repaymentstatus",
+			a.repaymentdetail AS "repaymentdetail",
+			a.finishtime AS "finishtime",
+			a.createby AS "createBy.name",
+			a.createdate AS "createDate",
+			a.updateby AS "updateBy.name",
+			a.updatedate AS "updateDate"
+		FROM t_mis_dunning_deduct a
+		LEFT JOIN sys_dict d ON d.type = 'pay_channel' AND a.paychannel = d.value and d.del_flag = '0'
+		WHERE a.dealcode = #{dealcode}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductColumns"/>
+		FROM t_mis_dunning_deduct a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_deduct(
+			id,
+			dealcode,
+			deductcode,
+			starttime,
+			buyername,
+			idcard,
+			bankname,
+			bankcard,
+			mobile,
+			paytype,
+			delaydays,
+			payamount,
+			paychannel,
+			status,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{deductcode},
+			#{starttime},
+			#{buyername},
+			#{idcard},
+			#{bankname},
+			#{bankcard},
+			#{mobile},
+			#{paytype},
+			#{delaydays},
+			#{payamount},
+			#{paychannel},
+			#{status},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_deduct SET
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="statusdetail != null">
+				statusdetail = #{statusdetail},
+			</if>
+			<if test="reason != null">
+				reason = #{reason},
+			</if>
+			<if test="repaymentstatus != null">
+				repaymentstatus = #{repaymentstatus},
+			</if>
+			<if test="repaymentdetail != null">
+				repaymentdetail = #{repaymentdetail},
+			</if>
+			<if test="finishtime != null">
+				finishtime = #{finishtime},
+			</if>
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE deductcode = #{deductcode}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunning_deduct
+		WHERE deductcode = #{deductcode}
+	</update>
+	
+	<select id="getPayChannelList" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
+		SELECT 
+			d.value as "channelid",
+			d.label as "channelname",
+			CASE WHEN t.paychannel IS NULL THEN 0 ELSE 1 END as "isusable"
+		FROM sys_dict d
+		LEFT JOIN ( SELECT DISTINCT paychannel
+					FROM t_mis_paychannel_bank p
+					WHERE p.bankname = #{bankname}
+					AND p.delflag = '0'
+		) t ON d.value = t.paychannel
+		WHERE d.type = 'pay_channel'
+		AND d.del_flag = '0'
+		ORDER BY d.sort
+	</select>
+	
+	<select id="getSupportedChannelCount" resultType="int">
+		SELECT 
+			COUNT(1)
+		FROM sys_dict d
+		JOIN ( SELECT DISTINCT paychannel
+					FROM t_mis_paychannel_bank p
+					WHERE p.bankname = #{bankname}
+					AND p.delflag = '0'
+		) t ON d.value = t.paychannel
+		WHERE d.type = 'pay_channel'
+		AND d.del_flag = '0'
+	</select>
+	
+	<select id="getSuccessRateByChannel" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
+		SELECT 
+			d.value as "channelid",
+			d.label as "channelname",
+			t.successrate as "successrate"
+		FROM sys_dict d
+		LEFT JOIN ( SELECT
+						a.paychannel,
+						COUNT(CASE a.reason WHEN 'NO_BAlANCE' THEN null ELSE 1 END) / COUNT(1) * 100 as successrate
+					FROM t_mis_dunning_deduct a
+					<where>
+						<if test="paychannel != null and paychannel != ''">
+							a.paychannel = #{paychannel}
+						</if>
+					</where>
+					GROUP BY a.paychannel
+		) t ON d.value = t.paychannel
+		WHERE d.type = 'pay_channel'
+		AND d.del_flag = '0'
+		ORDER BY d.sort
+	</select>
+	
+	<select id="getLatestDeductByDealcode" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductColumns"/>
+		FROM t_mis_dunning_deduct a
+		WHERE a.dealcode = #{dealcode}
+		ORDER BY a.dbid DESC
+		LIMIT 1
+	</select>
+	
+	<select id="getNoBalanceDeductNumByChannel" resultType="int">
+	<![CDATA[
+		SELECT 
+			COUNT(1)
+		FROM t_mis_dunning_deduct a
+		WHERE a.paychannel = #{paychannel}
+		AND a.status = 'failed'
+		AND a.reason = 'NO_BAlANCE'
+		AND a.updatedate >= current_date()
+		AND a.updatedate < date_add(current_date(), INTERVAL 1 DAY)
+	]]>
+	</select>
+	
+	<select id="getDeductListByStatus" resultType="TMisDunningDeduct">
+		SELECT 
+			<include refid="TMisDunningDeductColumns"/>
+		FROM t_mis_dunning_deduct a
+		WHERE a.status = #{status}
+	</select>
+
+</mapper>

@@ -1,4 +1,4 @@
-package com.mo9.risk.modules.dunning.entity;
+package com.mo9.risk.modules.dunning.enums;
 
 /**
  * 逾期原因

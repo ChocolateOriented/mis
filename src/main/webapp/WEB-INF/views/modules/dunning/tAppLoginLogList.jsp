@@ -20,10 +20,10 @@
 			}
 		});
 		
-		function collectionfunction(obj){
+		function collectionfunction(obj, width, height){
 			var method = $(obj).attr("method");
 			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}" ;
-			$.jBox.open("iframe:" + url, $(obj).attr("value") , 600, 430, {            
+			$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
                buttons: {
 //	            	   "确定": "ok", "取消": true
             	   },
@@ -50,6 +50,7 @@
         <shiro:hasPermission name="dunning:tMisDunningTask:view">
 	        <li class="active"><a id="applogiglog_a" href="#" >登录日志</a></li>
         </shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}">扣款信息</a></li></shiro:hasPermission>
 	</ul> 
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
@@ -99,7 +100,10 @@
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />
-	<input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" />
+	<!-- <input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" /> -->
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
+	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
 	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />

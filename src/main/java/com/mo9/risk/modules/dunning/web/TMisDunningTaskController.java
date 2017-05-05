@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gamaxpay.commonutil.web.GetRequest;
+import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
@@ -51,6 +52,7 @@ import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
+import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
@@ -66,9 +68,10 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
+import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
+import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
@@ -138,9 +141,13 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisRemittanceConfirmService tMisRemittanceConfirmService;
 	
 	@Autowired
-	private TMisDunnedConclusionService tMisDunnedConclusionService;
-	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
+	
+	@Autowired
+	private TMisChangeCardRecordService tMisChangeCardRecordService;
+	
+	@Autowired
+	private TMisDunningDeductService tMisDunningDeductService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -876,6 +883,18 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		model.addAttribute("hasContact", hasContact);
 		
+		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
+		
+		if (tMisChangeCardRecord == null) {
+			tMisChangeCardRecord = new TMisChangeCardRecord();
+			tMisChangeCardRecord.setBankcard(personalInfo.getRemitBankNo());
+			tMisChangeCardRecord.setBankname(personalInfo.getRemitBankName());
+			tMisChangeCardRecord.setIdcard(personalInfo.getIdcard());
+			tMisChangeCardRecord.setMobile(personalInfo.getMobile());
+		}
+		
+		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
+		
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	
@@ -1378,6 +1397,74 @@ public class TMisDunningTaskController extends BaseController {
 		return "modules/dunning/dialog/dialogCollectionPaid";
 	}
 	
+	
+	/**
+	 * 加载催收代扣页面
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionDeduct")
+	public String collectionDeduct(Model model, HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "views/error/500";
+		}
+		model.addAttribute("buyerId", buyerId);
+		model.addAttribute("dealcode", dealcode);
+		
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("STATUS_DUNNING", "dunning");
+		params.put("DEALCODE", dealcode);
+		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		if (task == null) {
+			logger.warn("任务不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
+		
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
+		//boolean isDelayable = order.isDelayable();
+		
+		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
+		
+		if (tMisChangeCardRecord != null) {
+			personalInfo.setRemitBankNo(tMisChangeCardRecord.getBankcard());
+			personalInfo.setRemitBankName(tMisChangeCardRecord.getBankname());
+			personalInfo.setMobile(tMisChangeCardRecord.getMobile());
+			personalInfo.setIdcard(tMisChangeCardRecord.getIdcard());
+		}
+		
+		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getPaychannelList(personalInfo.getRemitBankName());
+		
+		model.addAttribute("personalInfo", personalInfo);
+		model.addAttribute("payChannelList", payChannelList);
+		
+		/*BigDecimal delayAmount = new BigDecimal(0l);
+		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
+			if(Integer.valueOf(personalInfo.getOverdueDays()) < Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14"))){
+				
+
+				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getRootorderid());
+				boolean amt1500 = order.getAmount().compareTo(new BigDecimal(1500)) >= 0 ? true : false;
+				int base = amt1500 ? 80 : 40;
+				BigDecimal defaultInterestAmount = new BigDecimal((existDelayNumber + 1) * base);
+				
+				delayAmount = order.getCostAmount().add(defaultInterestAmount).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
+			}
+		}
+		
+		model.addAttribute("delayAmount", delayAmount);*/
+		int result = tMisRemittanceConfirmService.getResult(dealcode);
+		model.addAttribute("result", result);
+		//model.addAttribute("isDelayable", isDelayable);
+		return "modules/dunning/dialog/dialogCollectionDeduct";
+	}
 	
 	/**
 	 * 加载催收还款页面
