@@ -169,6 +169,7 @@
 		LEFT JOIN ( SELECT DISTINCT paychannel
 					FROM t_mis_paychannel_bank p
 					WHERE p.bankname = #{bankname}
+					AND p.delflag = '0'
 		) t ON d.value = t.paychannel
 		WHERE d.type = 'pay_channel'
 		AND d.del_flag = '0'
@@ -182,6 +183,7 @@
 		JOIN ( SELECT DISTINCT paychannel
 					FROM t_mis_paychannel_bank p
 					WHERE p.bankname = #{bankname}
+					AND p.delflag = '0'
 		) t ON d.value = t.paychannel
 		WHERE d.type = 'pay_channel'
 		AND d.del_flag = '0'

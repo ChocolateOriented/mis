@@ -118,6 +118,7 @@
 			distinct a.bankname
 		FROM t_mis_paychannel_bank a
 		WHERE a.isshow = '1'
+		AND a.delflag = '0'
 		ORDER BY a.bankname
 	</select>
 	

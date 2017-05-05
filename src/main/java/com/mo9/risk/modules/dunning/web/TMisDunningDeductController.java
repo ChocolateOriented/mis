@@ -174,11 +174,11 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		/*if (!tMisDunningDeductService.preCheckStatus(dealcode)) {
+		if (!tMisDunningDeductService.preCheckStatus(dealcode)) {
 			result.put("result", "NO");
 			result.put("msg", "当前订单代扣处理中，请勿发起代扣");
 			return result;
-		}*/
+		}
 		
 		result.put("result", "OK");
 		result.put("msg", "OK");
