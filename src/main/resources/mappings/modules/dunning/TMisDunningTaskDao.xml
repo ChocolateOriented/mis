@@ -1296,9 +1296,9 @@
 	        <if test="personnel != null and personnel != ''">
 	            AND p.Name LIKE concat('%',#{personnel},'%')
 	        </if>
-	        <if test="begin != null and end != null and begin != '' and end != ''">
+	        <if test="dunningCycle != null and dunningCycle != ''">
 	            <![CDATA[
-				AND  begin >= #{begin} AND end <= #{end}   
+				AND  dunningCycle = #{dunningCycle}
 			    ]]>
 	        </if>
         </where>
