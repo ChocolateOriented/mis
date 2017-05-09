@@ -16,8 +16,9 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 //	private Date datetime; // 日期
 	private Date datetimestart; // 时间参数
 	private Date datetimeend; // 时间参数
-	private Integer begin;
-	private Integer end;
+	private String dunningCycle;//催收队列
+//	private Integer begin;
+//	private Integer end;
 	private String personnel; // 催收员
 	private Double payamount; // 还款金额
 	private Long payorder; // 还清订单
@@ -93,22 +94,28 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	public void setSmsnum(Long smsnum) {
 		this.smsnum = smsnum;
 	}
+	@ExcelField(title="催收队列", type=1, align=2, sort=8)
+	public String getDunningCycle() {
+		return dunningCycle;
+	}
+	public void setDunningCycle(String dunningCycle) {
+		this.dunningCycle = dunningCycle;
+	}
 
-	@ExcelField(title="周期begin", type=1, align=2, sort=8)
-	public Integer getBegin() {
-		return begin;
-	}
-	public void setBegin(Integer begin) {
-		this.begin = begin;
-	}
-	
-	@ExcelField(title="周期end", type=1, align=2, sort=9)
-	public Integer getEnd() {
-		return end;
-	}
-	public void setEnd(Integer end) {
-		this.end = end;
-	}
-	
+//	@ExcelField(title="周期begin", type=1, align=2, sort=8)
+//	public Integer getBegin() {
+//		return begin;
+//	}
+//	public void setBegin(Integer begin) {
+//		this.begin = begin;
+//	}
+//	
+//	@ExcelField(title="周期end", type=1, align=2, sort=9)
+//	public Integer getEnd() {
+//		return end;
+//	}
+//	public void setEnd(Integer end) {
+//		this.end = end;
+//	}
 
 }

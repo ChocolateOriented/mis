@@ -52,11 +52,18 @@
 				</form:select>
 			</li>
 			
-			<li><label>催收周期：</label>
-				<form:input  path="begin"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  />
-				- 
-				<form:input  path="end"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   />
+			<li><label>催收队列：</label>
+				<form:select path="dunningCycle" class="input-medium" >
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('dunningCycle1')}" itemLabel="label" itemValue="label" htmlEscape="false"/>
+				</form:select>
 			</li>
+<!-- 			<li><label>催收周期：</label> -->
+<%-- 				<form:input  path="begin"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  /> --%>
+<!-- 				-  -->
+<%-- 				<form:input  path="end"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   /> --%>
+<!-- 			</li> -->
+			
 			
 			<li class="btns">
 			<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" />
@@ -70,7 +77,7 @@
 		<thead>
 			<tr>
 				<th>日期</th> 
-				<th>催收周期</th>
+				<th>催收队列</th>
 				<th>催收员</th>
 				<th>还款金额</th>
 				<th>还清订单</th>
@@ -87,7 +94,8 @@
 					<fmt:formatDate value="${performanceDay.datetimeend}" pattern="yyyy-MM-dd"/>
 				</td>
 				<td>
-					${performanceDay.begin}-${performanceDay.end}
+<%-- 					${performanceDay.begin}-${performanceDay.end} --%>
+					${performanceDay.dunningCycle}
 				</td>
 				<td>
 					${performanceDay.personnel}
