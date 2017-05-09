@@ -1233,8 +1233,7 @@
 			SELECT
 				#{datetimestart} AS datetimestart, 
 				#{datetimeend}  AS datetimeend, 
-				CASE WHEN t.DunningPeriodBegin IS NULL THEN p.Begin ELSE t.DunningPeriodBegin END AS begin,
-				CASE WHEN t.DunningPeriodEnd IS NULL THEN p.End ELSE t.DunningPeriodEnd END AS end,
+				t.DunningCycle AS DunningCycle,
 				p.Name AS personnel, 
 				IFNULL(t.payoffAmount, 0) AS payamount,
 				IFNULL(t.payoffOrder, 0) AS payorder,
@@ -1251,8 +1250,7 @@
 				) AS p
 			LEFT JOIN (
 				SELECT
-					t.DunningPeriodBegin,
-					t.DunningPeriodEnd,
+					t.DunningCycle,
 					t.DunningPeopleId,
 			
 					SUM(
@@ -1276,7 +1274,7 @@
 					  AND o.status = 'payoff'
 					  AND DATE(o.payoff_time) >= #{datetimestart}
 					  AND DATE(o.payoff_time) <= #{datetimeend}
-				GROUP BY t.DunningPeopleId ,t.DunningPeriodBegin, t.DunningPeriodEnd
+				GROUP BY t.DunningPeopleId  ,t.DunningCycle
 				)AS t ON t.DunningPeopleId = p.Id
 			LEFT JOIN (
 				SELECT
@@ -1304,7 +1302,7 @@
 			    ]]>
 	        </if>
         </where>
-		ORDER BY begin,end
+		ORDER BY DunningCycle
  	</select>
 
     <select id="findDunningCount" resultType="int">
