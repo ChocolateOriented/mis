@@ -196,6 +196,8 @@
         LEFT JOIN t_risk_buyer_idcard AS idc ON  o.buyer_id=idc.buyer_id 
        
       WHERE
+      o.type = 'loan' 
+        AND o.merchant_id = 7 and
      o.status = 'payment' and
       DATEDIFF( o.repayment_time,CURDATE()) in(1,0)
 </select>

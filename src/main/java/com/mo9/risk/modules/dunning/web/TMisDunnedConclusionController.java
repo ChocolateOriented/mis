@@ -42,7 +42,7 @@ public class TMisDunnedConclusionController extends BaseController {
 	
 	@RequiresPermissions("dunning:tMisContantRecord:view")
 	@RequestMapping(value = {"list", ""})
-	public String list(TMisDunnedConclusion tMisDunnedConclusion, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String list(TMisDunnedConclusion tMisDunnedConclusion, HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -70,6 +70,7 @@ public class TMisDunnedConclusionController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
+		model.addAttribute("mobileSelf", mobileSelf);
 		return "modules/dunning/tMisDunningTaskConclusionList";
 	}
 

@@ -137,7 +137,13 @@ function changGroupType(){
 				</form:select>
 			</div>
 		</div>
-
+		<div class="control-group">
+			<label class="control-label">催收员分机号：</label>
+			<div class="controls">
+				<input  value="${tMisDunningPeople.extensionNumber }" id="extensionNumber" name="extensionNumber" htmlEscape="false"  class="input-xlarge required "  />
+				<span class="help-inline"><font color="red">*</font></span>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">催收队列：</label>
 			<div class="controls">

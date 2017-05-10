@@ -32,6 +32,9 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private ContactsType contactstype;		// 催收联系人类型
 	private String contactstypestr;
 	private SmsTemp smstemp;		// 短信模板
+	private String templateName;		// 新短信模板名称
+	private String smsType;		// 短信类型，文字或语音
+	private String smsTemplateId;		// 短信模板id
 	private String smstempstr;
 	private Boolean iseffective;		//是否有效联络
 	private TelStatus telstatus;		//电话应答状态
@@ -221,7 +224,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 		this.overduedays = overduedays;
 	}
 	
-	@Length(min=0, max=255, message="备注长度必须介于 0 和 255 之间")
+//	@Length(min=0, max=255, message="备注长度必须介于 0 和 255 之间")
 	public String getRemark() {
 		return remark;
 	}
@@ -317,8 +320,16 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	public void setTelstatus(TelStatus telstatus) {
 		this.telstatus = telstatus;
 	}
+	
+	public String getTemplateName() {
+		return templateName;
+	}
 
-	//@Length(min=0, max=128, message="smstemp长度必须介于 0 和 128 之间")
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+//	@Length(min=0, max=128, message="smstemp长度必须介于 0 和 128 之间")
 	public SmsTemp getSmstemp() {
 		return smstemp;
 	}
@@ -326,10 +337,12 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	public void setSmstemp(SmsTemp smstemp) {
 		this.smstemp = smstemp;
 	}
+	
 
 	public String getContanttypestr() {
 		return contanttypestr;
 	}
+
 
 	public void setContanttypestr(String contanttypestr) {
 		this.contanttypestr = contanttypestr;
@@ -397,6 +410,22 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 
 	public void setBuyerid(Integer buyerid) {
 		this.buyerid = buyerid;
+	}
+
+	public String getSmsType() {
+		return smsType;
+	}
+
+	public void setSmsType(String smsType) {
+		this.smsType = smsType;
+	}
+
+	public String getSmsTemplateId() {
+		return smsTemplateId;
+	}
+
+	public void setSmsTemplateId(String smsTemplateId) {
+		this.smsTemplateId = smsTemplateId;
 	}
 	
 	

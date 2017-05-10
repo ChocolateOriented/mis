@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,9 +68,11 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
+import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
@@ -81,6 +84,7 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyer2contactsService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerContactRecordsService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
+import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -148,6 +152,10 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;
+	private TMisDunnedConclusionService tMisDunnedConclusionService;
+	
+	@Autowired
+	private TmisDunningSmsTemplateService tstService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -906,7 +914,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "customerDetails")
-	public String customerDetails(String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,Model model) {
+	public String customerDetails(String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,String  mobileSelf,Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -937,6 +945,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("mobileSelf", mobileSelf);
 		
 		model.addAttribute("ispayoff", ispayoff);
 		
@@ -953,7 +962,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "communicationDetails")
-	public String communicationDetails(HttpServletRequest request, HttpServletResponse response, Model model) {		
+	public String communicationDetails(HttpServletRequest request, HttpServletResponse response,String  mobileSelf, Model model) {		
 		
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
@@ -976,6 +985,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("mobileSelf", mobileSelf);
 		
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
@@ -1000,7 +1010,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "communicationRecord")
-	public String communicationRecord(HttpServletRequest request, HttpServletResponse response, Model model) {		
+	public String communicationRecord(HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -1020,6 +1030,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("mobileSelf", mobileSelf);
 		
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
@@ -1044,7 +1055,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "orderHistoryList")
-	public String orderHistoryList( String buyerId,String dealcode,boolean hasContact,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response, Model model) {		
+	public String orderHistoryList( String buyerId,String dealcode,boolean hasContact,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1069,6 +1080,7 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
+		model.addAttribute("mobileSelf", mobileSelf);
 		return "modules/dunning/tMisDunningOrderHistoryList";
 	}
 	
@@ -1082,7 +1094,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "apploginlogList")
-	public String apploginlogList(String buyerId,String dealcode,boolean hasContact,String dunningtaskdbid,String mobile,HttpServletRequest request, HttpServletResponse response, Model model) {		
+	public String apploginlogList(String buyerId,String dealcode,boolean hasContact,String dunningtaskdbid,String mobile,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||mobile==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)||"".equals(mobile)){
 			return "views/error/500";
 		}
@@ -1096,6 +1108,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 			model.addAttribute("buyerId", buyerId);
 			model.addAttribute("dealcode", dealcode);
+			model.addAttribute("mobileSelf", mobileSelf);
 			
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("STATUS_DUNNING", "dunning");
@@ -1130,6 +1143,7 @@ public class TMisDunningTaskController extends BaseController {
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
+		String mobileSelf = request.getParameter("mobileSelf");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1188,10 +1202,20 @@ public class TMisDunningTaskController extends BaseController {
 		
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
-		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() : chooseSelf ? "SELF" : "" );
+		if(StringUtils.isNotBlank(contactstype)){
+			contactstype=contactstype.toUpperCase();
+		}
+		//获取相对应的 短信模板
+		List<TmisDunningSmsTemplate> smsTemplateList = tstService.findSmsTemplate(contactstype,order.getRepaymentDate(),order,task);
+		model.addAttribute("smsTeplateList", smsTemplateList);
+		if(smsTemplateList.size()!=0)
+		model.addAttribute("tSTemplate", smsTemplateList.get(0));
+//		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() : chooseSelf ? "SELF" : "" );
+		model.addAttribute("contactstype", contactstype);
 		model.addAttribute("selfMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
 		
 		model.addAttribute("smsContext", smsContext);
+		model.addAttribute("mobileSelf", mobileSelf);
 		model.addAttribute("smsT", smsT);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);

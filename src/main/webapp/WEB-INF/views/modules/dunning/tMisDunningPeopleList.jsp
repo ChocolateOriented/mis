@@ -133,6 +133,7 @@ function page(n,s){
 				<th>组类型</th>
 				<th>催收队列</th>
 				<th>自动分配</th>
+				<th>催收员分机号</th>
 				<!-- 	<th>人员类型</th> -->
 				<!-- 	<th title="大于1为单笔固定费率，小于1大于0为单笔百分比费率">单笔费率</th> -->
 				<shiro:hasPermission name="dunning:tMisDunningPeople:edit">
@@ -150,6 +151,7 @@ function page(n,s){
 					<td>${groupTypes[tMisDunningPeople.group.type]}</td>
 					<td>${tMisDunningPeople.dunningcycle}</td>
 					<td>${'t' eq tMisDunningPeople.auto ? '启用' : '停止'}</td>
+					<td>${tMisDunningPeople.extensionNumber}</td>
 					<!-- 	<td>${tMisDunningPeople.dunningpeopletypeText}</td> -->
 					<!-- 	<td>${tMisDunningPeople.rate} </td> -->
 					<shiro:hasPermission name="dunning:tMisDunningPeople:edit">

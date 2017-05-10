@@ -19,7 +19,8 @@
 		a.Invalid AS "Invalid",
 		a.dunningcycle AS "dunningcycle",
 		a.nickname AS "nickname",
-		a.groupId AS "group.id"
+		a.groupId AS "group.id",
+		a.extensionNumber AS "extensionNumber"
 	</sql>
 	
 	<sql id="peopleJoinsColumns">
@@ -172,7 +173,8 @@
 			updatedate,
 			dunningcycle,
 			nickname,
-			groupId
+			groupId,
+			extensionNumber
 		) VALUES (
 			#{id},
 			#{name},
@@ -188,7 +190,8 @@
 			#{updateDate},
 			#{dunningcycle},
 			#{nickname},
-			#{group.id}
+			#{group.id},
+			#{extensionNumber}
 		)
 	</insert>
 	
@@ -205,7 +208,9 @@
 <!-- 			催收队列添加后只能在列表中手动修改 -->
 <!-- 			dunningcycle = #{dunningcycle}, -->
 			nickname = #{nickname},
-			groupId = #{group.id}
+			groupId = #{group.id},
+			extensionNumber = #{extensionNumber}
+			
 		WHERE dbid = #{dbid}
 	</update>
 	

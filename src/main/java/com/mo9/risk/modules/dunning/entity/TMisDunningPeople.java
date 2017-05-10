@@ -44,6 +44,11 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	private User user;
 
 	private List<String> queryIds;// 用于催收人查询
+	
+	private String extensionNumber;// 催收员分机号
+	
+	
+	
 
 	public TMisDunningPeople() {
 		super();
@@ -192,4 +197,13 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.queryIds = queryIds;
 	}
 
+	public String getExtensionNumber() {
+		return extensionNumber;
+	}
+
+	public void setExtensionNumber(String extensionNumber) {
+		this.extensionNumber = extensionNumber;
+	}
+
+	
 }

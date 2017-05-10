@@ -266,5 +266,9 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public int batchUpdateOutDistributionTask(List<TMisDunningTask> dunningTasks);
 	
-	
+	/**
+	 * 查询需要系统发送的订单
+	 * @return
+	 */
+	public List<DunningOrder> findallAtuoSms();
 }

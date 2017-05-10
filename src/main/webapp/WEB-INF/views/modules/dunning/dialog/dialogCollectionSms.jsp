@@ -6,6 +6,21 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+	if(""!=$("#contactstype").val()){	
+	
+	$("#contactstype").attr("readonly",true);
+	}
+	if("self"==$("#conctactOne").val()){
+	
+		$("#contactstype").val("self");
+   	 $("#s2id_contactstype span.select2-chosen").text("本人");	
+   	$("#contanttarget").val($("#mobileSelf").val());
+   	$("#contactstype").attr("readonly",true);
+   	
+	}
+	$("#smsType").attr("readonly",true);
+	
+	
 			$('#smsSave').click(function() {
  			 if($("#inputForm").valid()){
  				$("#smsSave").attr('disabled',"true");
@@ -79,22 +94,48 @@
 				window.parent.window.jBox.close();    
 			}); 
 			
-			// 短信类型选择
-			$("#smstemp").change(function(){
-				var url = "${ctx}/dunning/tMisContantRecord/smsGetTemp";
+			// 短信模板选择
+			$("#templateName").change(function(){
+// 				var url = "${ctx}/dunning/tMisContantRecord/smsGetTemp";
+				var url ="${ctx}/dunning/TmisDunningSmsTemplate/getTemplateByName?templateName="+$("#templateName").val()+"&contactType="+$("#contctType").val();
 				$.ajax({
 	                    type: 'POST',
 	                    url : url,
-	                    data: $('#inputForm').serialize(),             //获取表单数据
-	                    success : function(data) {
-	                        if (data != "") {
-	                        	 $('#content').val(data);
-	                        } 
-	                    }
+	                    data:{},            //获取表单数据
+	                    success : function(tMap) {
+	                        	 $('#smsTemplateId').val(tMap.tSTemplate.id);
+	                        	 $('#smsCotent').html(tMap.tSTemplate.smsCotent);
+	                        	 $('#smsType').val(tMap.tSTemplate.smsType);
+	                        	 
+	                        	 if(tMap.tSTemplate.smsType == 'wordText') {
+	                        		 $("#s2id_smsType span.select2-chosen").text("文字");
+	                        		
+	                        	 }
+	                        	 if(tMap.tSTemplate.smsType == 'voice'){
+	                        		 $("#s2id_smsType span.select2-chosen").text("语音");
+	                        	 }
+	                        		 
+	                        	 
+	                        	 if(tMap.tSTemplate.acceptType=="self"){
+	                        	$("#contactstype").val("self");
+	                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
+	                        	 $("#contanttarget").val($("#mobileSelf").val());
+	                        	$("#contactstype").attr("readonly",true);
+	                        		 
+	                        	 }
+	                        	
+	                        	 if(tMap.tSTemplate.acceptType!="self"&&""==tMap.contactType){
+	                        		
+	                        		 $("#contactstype").attr("readonly",false);
+	                        		 $("#s2id_contactstype span.select2-chosen").text("");
+	                        		   	$("#contanttarget").val("");
+	                        	 }
+	                        	 
+	                        	}
 	             });
 			});
 			
-			$("#content").html("${smsContext}");
+// 			$("#smsCotent").html("${smsContext}");
 		});
 		
 		
@@ -111,28 +152,45 @@
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
 <%-- 		<form:hidden path="id"/> --%>
 <%-- 		<sys:message content="${message}"/>		 --%>
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">短信类型：</label> -->
+<!-- 			<div class="controls"> -->
+<!-- 				<select path="" class="input-medium" id="smstemp" name="smstemp"> -->
+<!-- 					<option value=""></option> -->
+<%-- 					<options items="${fns:getDictList('gen_category')}" itemLabel="label" itemValue="value" htmlEscape="false"/> --%>
+<%-- 				<option value="ST_0" ${smsT=="ST_0"?'selected':''}>未逾期</option> --%>
+<%-- 				<option value="ST__1_7" ${smsT=="ST__1_7"?'selected':''}>逾期1-7</option> --%>
+<%-- 				<option value="ST_8_14" ${smsT=="ST_8_14"?'selected':''}>逾期8-14</option> --%>
+<%-- 				<option value="ST_15_21" ${smsT=="ST_15_21"?'selected':''}>逾期15-21</option> --%>
+<%-- 				<option value="ST_22_35" ${smsT=="ST_22_35"?'selected':''}>逾期22-35</option> --%>
+<%-- 				<option value="ST_15_PLUS" ${smsT=="ST_15_PLUS"?'selected':''}>逾期15+</option> --%>
+<!-- 				</select> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+			  <input type="hidden" name="smsTemplateId" id="smsTemplateId" value="${tSTemplate.id }"/>
+			  <input type="hidden"  id="conctactOne" value="${tSTemplate.acceptType}"/>
+			  <input type="hidden"  id="mobileSelf" value="${mobileSelf}"/>
+			  <input type="hidden"  id="contctType" value="${contactstype}"/>
+		
 		<div class="control-group">
-			<label class="control-label">短信类型：</label>
+			<label class="control-label">模板名称：</label>
 			<div class="controls">
-				<select path="" class="input-medium" id="smstemp" name="smstemp">
+				<select path="" class="input-medium" id="templateName" name="templateName">
 					<option value=""></option>
-					<%-- <options items="${fns:getDictList('gen_category')}" itemLabel="label" itemValue="value" htmlEscape="false"/> --%>
-				<option value="ST_0" ${smsT=="ST_0"?'selected':''}>未逾期</option>
-				<option value="ST__1_7" ${smsT=="ST__1_7"?'selected':''}>逾期1-7</option>
-				<option value="ST_8_14" ${smsT=="ST_8_14"?'selected':''}>逾期8-14</option>
-				<option value="ST_15_21" ${smsT=="ST_15_21"?'selected':''}>逾期15-21</option>
-				<option value="ST_22_35" ${smsT=="ST_22_35"?'selected':''}>逾期22-35</option>
-				<option value="ST_15_PLUS" ${smsT=="ST_15_PLUS"?'selected':''}>逾期15+</option>
+					<c:forEach items="${smsTeplateList}" var="smsTemplate">
+				<option value="${smsTemplate.templateName }" <c:if test="${smsTemplate.templateName eq tSTemplate.templateName  }">selected</c:if>>${smsTemplate.templateName }</option>
+					
+					</c:forEach>
 				</select>
 			</div>
 		</div>
 		
 		<div class="control-group">
 			<label class="control-label">联系对象：</label>
-			<div class="controls">
-				<select path="" class="input-medium" id="contactstype" name="contactstype">
+			<div class="controls" >
+				<select path="" class="input-medium" id="contactstype" name="contactstype" >
 					<option value=""></option>
-					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option>
+<%-- 					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option> --%>
 					<option value="MARRIED"<c:if test="${'MARRIED' eq contactstype}">selected</c:if>>夫妻</option>
 					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
 					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
@@ -149,24 +207,35 @@
 		<div class="control-group">
 			<label class="control-label">电话号码：</label>
 			<div class="controls">
-				<input  value="${selfMobile}" id="contanttarget" name="contanttarget" htmlEscape="false"  class="input-xlarge required "/>
+				<input  value="${selfMobile}" id="contanttarget" name="contanttarget" htmlEscape="false"  class="input-xlarge required " readonly="readonly"/>
 				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label">短信类型：</label>
+			<div class="controls">
+				<select path="" class="input-medium" id="smsType" name="smsType" >
+					<option id="wordText" value="wordText" <c:if test="${'wordText' eq tSTemplate.smsType}">selected</c:if>>文字</option>
+					<option id="voice" value="voice" <c:if test="${'voice' eq tSTemplate.smsType}">selected</c:if>>语音</option>
+				</select>
 			</div>
 		</div>
 		
 		<div class="control-group">
 			<label class="control-label">短信内容：</label>
 			<div class="controls">
-				<textarea id="content" value="${smsContext}" rows="4" name="content" htmlEscape="false" maxlength="500" class="input-xlarge required " /></textarea>
+				<textarea id="smsCotent" readonly="readonly"  rows="4" name="content" htmlEscape="false" maxlength="500" class="input-xlarge required " />${tSTemplate.smsCotent}</textarea>
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label">备注：</label>
-			<div class="controls">
-				<input path="" id="remark" rows="4" name="remark" htmlEscape="false" class="input-xlarge" />
-			</div>
-		</div>
+		
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">备注：</label> -->
+<!-- 			<div class="controls"> -->
+<!-- 				<input path="" id="remark" rows="4" name="remark" htmlEscape="false" class="input-xlarge" /> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
 		
 		<input style="display:none;" id="contanttype" name="contanttype" value="sms" />
 		<input style="display:none;" id="buyerId" name="buyerId" value="${buyerId}" />

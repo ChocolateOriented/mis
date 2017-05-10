@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao">
+    
+	<sql id="TmisDunningSmsTemplateColumns">
+		s.id  AS "id",
+		s.numbefore AS "numbefore",
+		s.numafter AS "numafter",
+		s.TemplateName AS "templateName",
+		s.SendMethod AS "sendMethod",
+		s.SendTime AS "sendTime",
+		s.SmsType AS "smsType",
+		s.AcceptType AS "acceptType",
+		s.SmsCotent AS "smsCotent"
+	
+	</sql>
+	
+	<select id="get" resultType="TmisDunningSmsTemplate">
+		SELECT 
+			<include refid="TmisDunningSmsTemplateColumns"/>
+		FROM t_mis_dunning_sms_template s
+		WHERE s.id = #{id}
+	</select>
+	<select id="getByName" resultType="TmisDunningSmsTemplate">
+		SELECT 
+			<include refid="TmisDunningSmsTemplateColumns"/>
+		FROM t_mis_dunning_sms_template s
+		WHERE s.TemplateName = #{templateName}
+	</select>
+	
+	 <select id="findSmsPageList" resultType="TmisDunningSmsTemplate">
+	SELECT 
+	        *
+		FROM t_mis_dunning_sms_template 
+	  <choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findListSMSTemplate" resultType="TmisDunningSmsTemplate">
+	   
+	SELECT 
+			<include refid="TmisDunningSmsTemplateColumns"/>
+		FROM t_mis_dunning_sms_template s
+		WHERE
+	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend"
+	
+	<if test="acceptType != null and acceptType != ''">
+	and s.AcceptType = #{acceptType}
+	</if>
+	</select>
+	
+	<select id="findByAutoSend" resultType="TmisDunningSmsTemplate">
+	   
+	SELECT 
+			*
+		FROM t_mis_dunning_sms_template s
+		WHERE
+	s.SendMethod="autosend"
+	
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_sms_template(
+		    id,
+		    numbefore,
+		    numafter,
+			templateName,
+			sendMethod,
+			sendTime,
+			smsType,
+			acceptType,
+			smsCotent,
+			createDate,
+			updateDate,
+			createBy,
+			updateBy
+		) VALUES (
+			#{id},
+			#{numbefore},
+			#{numafter},
+			#{templateName},
+			#{sendMethod},
+			#{sendTime},
+			#{smsType},
+			#{acceptType},
+			#{smsCotent},
+			#{createDate},
+			#{updateDate},
+			#{createBy.name},
+			#{updateBy.name}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_sms_template SET 
+		  	numbefore =#{numbefore},	
+		  	numafter =#{numafter},	
+			templateName = #{templateName},
+			sendMethod = #{sendMethod},
+			sendTime = #{sendTime},
+			smsType = #{smsType},
+			acceptType = #{acceptType},
+			smsCotent = #{smsCotent},
+			updateDate = #{updateDate},
+			updateBy = #{updateBy.name}
+			
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+	   delete from t_mis_dunning_sms_template 
+	   WHERE id = #{id}
+	   
+	
+	
+	</delete>
+	
+	
+	
+	
+
+</mapper>
