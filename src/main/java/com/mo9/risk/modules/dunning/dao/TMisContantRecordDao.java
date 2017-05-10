@@ -6,10 +6,13 @@ package com.mo9.risk.modules.dunning.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TelNumberBean;
+import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 
 /**
  * 催收任务联系记录DAO接口
@@ -34,5 +37,15 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 	 */
 	public List<TMisContantRecord> findDetailByDealcodeandTel(TMisContantRecord contantRecord);
 	
+	/**
+	 * 
+	 * 批量保存
+	 * @param list
+	 */
+	public int saveList(@Param("list") List<TMisContantRecord> tcontList);
+	
+
+
+	public void updateList(TMisContantRecord tMisContantRecord);
 	
 }

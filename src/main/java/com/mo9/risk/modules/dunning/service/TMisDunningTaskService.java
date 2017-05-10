@@ -22,19 +22,24 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gamaxpay.commonutil.msf.BaseResponse;
+import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
+import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
+import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -55,7 +60,9 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.MsfClient;
+import com.sun.tools.classfile.StackMapTable_attribute.same_frame;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -112,6 +119,14 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	@Autowired
 	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
+	
+	@Autowired
+	private TMisContantRecordDao tcontDao;
+	@Autowired
+	private TmisDunningSmsTemplateDao tdstDao;
+	@Autowired
+	private TmisDunningSmsTemplateService tdstService;
+	
 	
 	
 	public TMisDunningTask get(String id) {
@@ -2194,6 +2209,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoSendMessageBefore(){
 		
 		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+		List <TMisContantRecord> tcList=new ArrayList<TMisContantRecord>();
 		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
 			String route = "";
 			String msg="";
@@ -2234,6 +2250,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		Map<String,String> params = new HashMap<String,String>();
 		params.put("mobile", tAuto.getMobile());
 		params.put("message",msg);
+		Thread.sleep(100);
 		MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
 		logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
 		}catch (Exception e) {
@@ -2256,10 +2273,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		dunning.setDunningpeoplename("sys");
 		dunning.setRepaymenttime(tAuto.getRepaymentTime());
 		dunning.setRemark(null);
-		
-		tMisContantRecordService.save(dunning);
+		dunning.preInsert();
+	    tcList.add(dunning);	
 	}
-			
+		if(tcList!=null||!"".equals(tcList)){
+			tcontDao.saveList(tcList);
+		}
   }
 	
 	/**
@@ -2269,6 +2288,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoSendMessageNow(){
 		
 		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+		List <TMisContantRecord> trList=new ArrayList<TMisContantRecord>();
 		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
 			String route = "";
 			String msg="";
@@ -2302,6 +2322,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Map<String,String> params = new HashMap<String,String>();
 				params.put("mobile", tAuto.getMobile());
 				params.put("message",msg);
+				Thread.sleep(100);
 				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
 				logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
 			}catch (Exception e) {
@@ -2324,11 +2345,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			dunning.setDunningpeoplename("sys");
 			dunning.setRepaymenttime(tAuto.getRepaymentTime());
 			dunning.setRemark(null);
-			
-			tMisContantRecordService.save(dunning);
+			dunning.preInsert();
+		    trList.add(dunning);
 		}
 	  }
+		if(trList!=null||!"".equals(trList)){
+			tcontDao.saveList(trList);
+		}
 	}
+//	final static String same_frame = DictUtils.getDictValue("短信链接", "sms_url", "https://www.mo9.com");
+	
 	@Scheduled(cron = "0 0 9 * * ?")  
 	@Transactional
    public void autoMessageBefore(){
@@ -2363,4 +2389,99 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return page;
 	}
 
+	
+	@Scheduled(cron = "0 0 0 * * ?")  
+	@Transactional
+	public void AutoSmsSend(){
+		System.out.println(DictUtils.getDictValue("短信链接", "sms_url", "https://www.mo9.com"));
+		 List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();
+		SimpleDateFormat sb1=new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	     final List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms();
+	   for (final TmisDunningSmsTemplate smsTemplate : tstList) {
+		   Date sendDate=null;
+		   try {
+            String sendTime = smsTemplate.getSendTime();		   
+		   String format1 = sb1.format(new Date ());
+		   format1=format1+"  "+sendTime;
+		
+			sendDate = sb2.parse(format1);
+		} catch (Exception e) {
+			logger.info("转换时间失败:"+e);
+			logger.info("模板:"+smsTemplate.getTemplateName()+"时间转换失败");
+		}
+		   TaskScheduler taskScheduler = new ConcurrentTaskScheduler();
+			taskScheduler.schedule(new Runnable() {
+				@Override
+				public void run() {
+					
+				for (DunningOrder dunningOrder : findallAtuoSms) {
+					Integer overduedays = dunningOrder.getOverduedays();
+					Integer numafter = smsTemplate.getNumafter();
+					Integer numbefore = smsTemplate.getNumbefore();
+					if(overduedays>=numbefore&&overduedays<=numafter){
+						String smsCotent="";
+						TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dunningOrder.getDealcode());
+						TMisDunningTask task = tMisDunningTaskDao.get(dunningOrder.getDunningtaskdbid());
+							try {
+								if ("wordText".equals(smsTemplate.getSmsType())) {
+									Map<String, String> params = new HashMap<String, String>();
+									params.put("mobile", dunningOrder.getMobile());
+									 smsCotent = smsTemplate.getSmsCotent();
+									 smsCotent = tdstService.cousmscotent(smsCotent, order, task);
+									params.put("message", smsCotent);
+									MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params,
+											BaseResponse.class);
+								}
+								if ("voice".equals(smsTemplate.getSmsType())) {
+									 smsCotent = smsTemplate.getSmsCotent();
+									 smsCotent = tdstService.cousmscotent(smsCotent, order, task);
+									Map<String, String> vparams = new HashMap<String, String>();
+									vparams.put("mobile", dunningOrder.getMobile());// 发送手机号
+									vparams.put("style", "voiceContent");// 固定值
+									// 模板填充的map
+									Map<String, Object> map = tMisContantRecordService
+											.getCotentValue(smsTemplate.getSmsCotent(), order, task);
+									vparams.put("template_data", new JacksonConvertor().serialize(map));
+									vparams.put("template_name", smsTemplate.getTemplateName());// 模板名称
+									vparams.put("template_tags", "CN");// 模板标识
+									MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, vparams,
+											BaseResponse.class);
+								}
+								logger.info("给用户:"+dunningOrder.getMobile()+"发送短信成功");
+							} catch (Exception e) {
+								logger.info("发送短信失败:"+e);
+								logger.info("给用户:"+dunningOrder.getMobile()+"发送短信失败");
+							}	
+							TMisContantRecord dunning = new TMisContantRecord();
+							dunning.setTaskid(null);
+							dunning.setDealcode(dunningOrder.getDealcode());
+							dunning.setOrderstatus(false);
+							dunning.setOverduedays(overduedays);
+							dunning.setDunningtime(new Date());
+							dunning.setContanttype(ContantType.sms);
+							dunning.setContanttarget(dunningOrder.getMobile());
+							//短信内容
+							dunning.setContent(smsCotent);
+							dunning.setTemplateName(smsTemplate.getTemplateName());
+							dunning.setTelstatus(null);
+							dunning.setContactstype(ContactsType.SELF);
+							dunning.setDunningpeoplename("sys");
+							dunning.setRepaymenttime(dunningOrder.getRepaymenttime());
+							dunning.setRemark(null);
+							tMisContantRecordService.save(dunning);
+							
+					}
+				}	
+					
+				}
+			}, new Date(sendDate.getTime()));
+	}
+	     
+	 
+	}
+	
+	
+	
+	
 }

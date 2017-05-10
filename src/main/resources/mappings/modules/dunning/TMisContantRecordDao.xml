@@ -15,7 +15,8 @@
 		a.contanttarget AS "contanttarget",
 		a.content AS "content",
 		a.contactstype AS "contactstype",
-		a.smstemp AS "smstemp",
+		a.smstemp AS "templateName",
+		a.smsType AS "smsType",
 		a.telstatus AS "telstatus",
 		a.field1 AS "field1",
 		a.dunningpeoplename AS "dunningpeoplename",
@@ -27,7 +28,8 @@
 		a.createby AS "createBy.name",
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.name",
-		a.updatedate AS "updateDate"
+		a.updatedate AS "updateDate",
+		a.smsTemplateId AS "smsTemplateId"
 	</sql>
 	
 	<sql id="tMisContantRecordJoins">
@@ -55,7 +57,8 @@
 			a.contanttarget AS "contanttarget",
 			a.content AS "content",
 			a.contactstype AS "contactstype",
-			a.smstemp AS "smstemp",
+			a.smstemp AS "templateName",
+			a.smstype AS "smstype",
 			a.telstatus AS "telstatus",
 			a.field1 AS "field1",
 			a.dunningpeoplename AS "dunningpeoplename",
@@ -135,6 +138,7 @@
 			contactstype,
 			telstatus,
 			smstemp,
+			smsType,
 			field1,
 			dunningpeoplename,
 			repaymenttime,
@@ -144,7 +148,8 @@
 			createby,
 			createdate,
 			updateby,
-			updatedate
+			updatedate,
+			smsTemplateId
 		) VALUES (
 			#{id},
 			#{taskid},
@@ -158,7 +163,8 @@
 			#{content},
 			#{contactstype},
 			#{telstatus},
-			#{smstemp},
+			#{templateName},
+			#{smsType},
 			#{field1},
 			#{dunningpeoplename},
 			#{repaymenttime},
@@ -168,8 +174,73 @@
 			#{createBy.name},
 			#{createDate},
 			#{updateBy.name},
-			#{updateDate}
+			#{updateDate},
+			#{smsTemplateId}
+			
 		)
+	</insert>
+	<insert id="saveList" parameterType="java.util.List" >
+       INSERT INTO t_mis_contant_record
+            (
+			id,
+			taskid,
+			dealcode,
+			orderstatus,
+			overduedays,
+			remark,
+			dunningtime,
+			contanttype,
+			contanttarget,
+			content,
+			contactstype,
+			telstatus,
+			smstemp,
+			smsType,
+			field1,
+			dunningpeoplename,
+			repaymenttime,
+			iseffective,
+			promisepaydate,
+			contactsname,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+			
+			)
+			values
+			<foreach collection="list"  index="index" item="item" separator=",">
+			(
+			#{item.id},
+			#{item.taskid},
+			#{item.dealcode},
+			#{item.orderstatus},
+			#{item.overduedays},
+			#{item.remark},
+			#{item.dunningtime},
+			#{item.contanttype},
+			#{item.contanttarget},
+			#{item.content},
+			#{item.contactstype},
+			#{item.telstatus},
+			#{item.templateName},
+			#{item.smsType},
+			#{item.field1},
+			#{item.dunningpeoplename},
+			#{item.repaymenttime},
+			#{item.iseffective},
+			#{item.promisepaydate},
+			#{item.contactsname},
+			#{item.createBy.name},
+			#{item.createDate},
+			#{item.updateBy.name},
+			#{item.updateDate}
+		
+			)
+			
+			
+			</foreach>
+			
 	</insert>
 	
 	<update id="update">
@@ -185,7 +256,8 @@
 			content = #{content},
 			contactstype = #{contactstype},
 			telstatus = #{telstatus},
-			smstemp = #{smstemp},
+			smstemp = #{templateName},
+			smsType = #{smsType},
 			field1 = #{field1},
 			dunningpeoplename = #{dunningpeoplename},
 			repaymenttime = #{repaymenttime},
@@ -216,9 +288,25 @@
 	 	ORDER BY a.createdate desc	 
 	</select>
 	
+<!-- 	<select id="findBysmsTemplateId" resultType="TMisContantRecord"> -->
+<!-- 	    SELECT  -->
+<!-- 			* -->
+<!-- 		FROM t_mis_contant_record a -->
+		
+<!--  		WHERE  -->
+<!-- 	 	a.smsTemplateId=#{smsTemplateId} -->
+	 
+<!-- 	</select> -->
 	
-	
-	
+	<update id="updateList"   >
+	  update
+	   t_mis_contant_record
+	   set
+	   SmsTemp=#{templateName},
+	   SmsType=#{smsType}
+	  where
+	  smsTemplateId=#{smsTemplateId}
+	</update>
 	
 <!-- 	<update id="delete"> -->
 <!-- 		DELETE FROM t_mis_contant_record -->

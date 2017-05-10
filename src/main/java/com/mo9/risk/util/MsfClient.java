@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.web.PostRequest;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -64,13 +66,14 @@ public class MsfClient
         {
             inited=true;
 //            currHost = Mo9DataSourceProperty.getProperty(SOA_PATH_CONFIG);
-            currHost = "https://www.mo9.com";
+//            currHost = "https://www.mo9.com";
+            currHost=DictUtils.getDictValue("短信链接", "sms_url", "https://new.mo9.com");
             //currHost = "http://127.0.0.1";
 //           currHost = "https://new.mo9.com";
         }
         return INSTANCE;
     }
-
+  
 
     /**
      *
