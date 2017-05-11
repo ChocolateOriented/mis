@@ -87,7 +87,8 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
         PYD("已还款"),
         NSA("非本人接听"),
         NSN("非本人号码"),
-        OOC("完全失联")
+        OOC("完全失联"),
+        HOOC("半失联")
         ;
         
         private String desc;
