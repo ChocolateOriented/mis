@@ -90,7 +90,7 @@ public class TMisChangeCardRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningDeduct:view")
 	@RequestMapping(value = "preCheck")
 	@ResponseBody
-	public Map<String, String> preCheck(String dealcode, String bankName, String bankCard, HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, String> preCheck(String dealcode, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
 		
 		if (!tMisDunningDeductService.preCheckStatus(dealcode)) {

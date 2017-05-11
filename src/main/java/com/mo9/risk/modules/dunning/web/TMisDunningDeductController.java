@@ -110,6 +110,12 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
+		if (tMisDunningDeduct.getPayamount().equals(0D)) {
+			result.put("result", "NO");
+			result.put("msg", "扣款金额不应等于0");
+			return result;
+		}
+		
 		if (order.getCreditamount() == null || tMisDunningDeduct.getPayamount() > order.getCreditamount()) {
 			result.put("result", "NO");
 			result.put("msg", "扣款金额不应大于应催金额");
@@ -169,9 +175,41 @@ public class TMisDunningDeductController extends BaseController {
 	@ResponseBody
 	public Map<String, String> preCheck(String dealcode, String bankName, String bankCard, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
-		if (!tMisDunningDeductService.preCheckChannel(bankName)) {
+		
+		if (!tMisDunningDeductService.preCheckDunningPeople()) {
+			result.put("result", "NO");
+			result.put("msg", "当前登录账号不支持代扣");
+			return result;
+		}
+		
+		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankName);
+		
+		if (payChannelList == null || payChannelList.size() == 0) {
 			result.put("result", "NO");
 			result.put("msg", "当前银行卡暂不支持代扣");
+			return result;
+		}
+		
+		//验证支持的渠道中是否都存在余额不足的限制
+		boolean balanceFlag = false;
+		for (PayChannelInfo payChannel : payChannelList) {
+			//至少有一个渠道可用
+			if (payChannel.needCheckBalance()) {
+				balanceFlag = true;
+				boolean balance = tMisDunningDeductService.preCardBalance(bankCard);
+				if (balance) {
+					balanceFlag = false;
+					break;
+				}
+			} else {
+				balanceFlag = false;
+				break;
+			}
+		}
+		
+		if (balanceFlag) {
+			result.put("result", "NO");
+			result.put("msg", "该银行卡当前不能发起代扣");
 			return result;
 		}
 		

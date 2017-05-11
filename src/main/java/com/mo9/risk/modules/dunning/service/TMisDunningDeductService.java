@@ -126,8 +126,13 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		tMisDunningDeductDao.update(tMisDunningDeduct);
 	}
 	
+	/**
+	 * 获取扣款渠道列表
+	 * @param bankname
+	 * @return
+	 */
 	@Transactional(readOnly = true)
-	public List<PayChannelInfo> getPaychannelList(String bankname) {
+	public List<PayChannelInfo> getPaychannelList(String bankname, String bankCard) {
 		List<PayChannelInfo> channelList = tMisDunningDeductDao.getPayChannelList(bankname);
 		
 		if (channelList == null || channelList.size() == 0) {
@@ -136,12 +141,24 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		
 		for (PayChannelInfo channel : channelList) {
 			if (channel.needCheckBalance()) {
-				int num = tMisDunningDeductDao.getNoBalanceDeductNumByChannel(channel.getChannelid());
+				if (!channel.getIsusable()) {
+					continue;
+				}
+				int num = tMisDunningDeductDao.getNoBalanceDeductNumByCard(bankCard);
 				channel.setIsusable(num == 0);
 			}
 		}
 		
 		return channelList;
+	}
+	
+	/**
+	 * 获取当前支持的扣款渠道
+	 * @param bankname
+	 * @return
+	 */
+	public List<PayChannelInfo> getSupportedChannel(String bankname) {
+		return tMisDunningDeductDao.getSupportedChannel(bankname);
 	}
 	
 	/**
@@ -152,9 +169,10 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	 */
 	private String generateDeductCode(String dealcode) {
 		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleDao.get(UserUtils.getUser().getId());
+		String peopleDbid = tMisDunningPeople == null ? "0" : String.valueOf(tMisDunningPeople.getDbid());
 		StringBuilder builder = new StringBuilder();
 		String random = Integer.toHexString(new Random().nextInt(65536));
-		builder.append(dealcode).append(new Date().getTime()).append("0000".substring(0, 4 - random.length())).append(random).append(tMisDunningPeople.getDbid());
+		builder.append(dealcode).append(new Date().getTime()).append("0000".substring(0, 4 - random.length())).append(random).append(peopleDbid);
 		return builder.toString();
 	}
 	
@@ -204,6 +222,15 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	}
 	
 	/**
+	 * 验证当前登陆用户是否为催收人员
+	 * @return
+	 */
+	public boolean preCheckDunningPeople() {
+		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleDao.get(UserUtils.getUser().getId());
+		return tMisDunningPeople != null;
+	}
+	
+	/**
 	 * 验证银行支持的扣款渠道数
 	 * @param bankname
 	 * @return
@@ -211,6 +238,16 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	public boolean preCheckChannel(String bankname) {
 		int cnt = tMisDunningDeductDao.getSupportedChannelCount(bankname);
 		return cnt > 0;
+	}
+	
+	/**
+	 * 验证银行卡当天是否有余额不足的扣款记录
+	 * @param bankname
+	 * @return
+	 */
+	public boolean preCardBalance(String bankcard) {
+		int cnt = tMisDunningDeductDao.getNoBalanceDeductNumByCard(bankcard);
+		return cnt == 0;
 	}
 	
 	/**

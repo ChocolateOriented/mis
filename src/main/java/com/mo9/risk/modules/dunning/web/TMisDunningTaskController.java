@@ -1464,7 +1464,7 @@ public class TMisDunningTaskController extends BaseController {
 			personalInfo.setIdcard(tMisChangeCardRecord.getIdcard());
 		}
 		
-		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getPaychannelList(personalInfo.getRemitBankName());
+		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getPaychannelList(personalInfo.getRemitBankName(), personalInfo.getRemitBankNo());
 		
 		model.addAttribute("personalInfo", personalInfo);
 		model.addAttribute("payChannelList", payChannelList);

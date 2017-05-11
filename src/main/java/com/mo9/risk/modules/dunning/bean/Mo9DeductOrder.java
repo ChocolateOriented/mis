@@ -17,7 +17,7 @@ import com.thinkgem.jeesite.common.utils.Reflections;
  * @author shijlu
  * @version 2017-04-11
  */
-public class Mo9DeductOrder implements Serializable  {
+public class Mo9DeductOrder implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	

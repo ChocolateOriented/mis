@@ -34,8 +34,15 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	public int getSupportedChannelCount(String bankname);
 	
 	/**
-	 * 获取支持的扣款渠道数
+	 * 获取支持的扣款渠道
 	 * @param bankname
+	 * @return
+	 */
+	public List<PayChannelInfo> getSupportedChannel(String bankname);
+	
+	/**
+	 * 获取渠道扣款成功率
+	 * @param paychannel
 	 * @return
 	 */
 	public List<PayChannelInfo> getSuccessRateByChannel(String paychannel);
@@ -54,10 +61,10 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	public TMisDunningDeduct getLatestDeductByDealcode(String dealcode);
 	
 	/**
-	 * 查询渠道当天是否有余额不足的代扣记录
+	 * 查询银行卡当天是否有余额不足的代扣记录
 	 * @param dealcode
 	 * @return
 	 */
-	public int getNoBalanceDeductNumByChannel(String paychannel);
+	public int getNoBalanceDeductNumByCard(String bankcard);
 
 }
