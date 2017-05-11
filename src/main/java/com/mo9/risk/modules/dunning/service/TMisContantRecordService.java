@@ -459,7 +459,13 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     		map.put("realName",buyerInfeo.getRealName() );
     	}
     	if(smsCotent.contains("${sex}")){
-    		map.put("sex",buyerInfeo.getSex() );
+    		if("男".equals(buyerInfeo.getSex())){
+        		map.put("sex","先生");
+        	
+        		}
+        		if("女".equals(buyerInfeo.getSex())){
+        			map.put("sex","女士");
+        		}
     	}
     	if(smsCotent.contains("${idCard}")){
     		String idcard = buyerInfeo.getIdcard();
