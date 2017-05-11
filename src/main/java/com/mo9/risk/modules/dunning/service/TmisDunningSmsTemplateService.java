@@ -147,7 +147,12 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         		smsCotent=smsCotent.replace("${realName}",buyerInfeo.getRealName());
         	}
         	if(smsCotent.contains("${sex}")){
-        		smsCotent=smsCotent.replace("${sex}",buyerInfeo.getSex());
+        		if("男".equals(buyerInfeo.getSex())){
+        		smsCotent=smsCotent.replace("${sex}","先生");
+        		}
+        		if("女".equals(buyerInfeo.getSex())){
+        			smsCotent=smsCotent.replace("${sex}","女士");
+        		}
         	}
         	if(smsCotent.contains("${idCard}")){
         		String idcard = buyerInfeo.getIdcard();
