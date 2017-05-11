@@ -590,6 +590,12 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	if("M3第三方逾期提示".equals(tName)){
     		tName="mis_M3_overdue reminder";
     	}
+    	if("还款日前提示1".equals(tName)){
+    		tName="mis_advance reminder 1";
+    	}
+    	if("还款日前提示2（低风险）".equals(tName)){
+    		tName="mis_advance reminder 2";
+    	}
     	
     
     	return tName;
