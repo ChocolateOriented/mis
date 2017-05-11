@@ -80,7 +80,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   
 		   TmisDunningSmsTemplate template=new TmisDunningSmsTemplate();
 		  
-		  int overdayas =  (int) DateUtils.getDistanceOfTwoDate(repaymentDate, new Date());
+		  int overdayas =  (int) TMisDunningTaskService.GetOverdueDay(repaymentDate);
 		  String acceptType=""; 
 		  if("".equals(contactType)){
 			  
@@ -130,12 +130,12 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	if(smsCotent.contains("${platform}")){
         		if(order.getPlatformExt()!=null&&!"".equals(order.getPlatformExt())){
     	    		if(order.getPlatformExt().contains("feishudai")){
-    	    			platform ="飞鼠袋";
+    	    			platform ="飞鼠贷";
     	    		}else{
-    	    			platform = "MO9";
+    	    			platform = "mo9";
     	    		}
         		}else{
-        			platform = "MO9";
+        			platform = "mo9";
 
         		}
         	
