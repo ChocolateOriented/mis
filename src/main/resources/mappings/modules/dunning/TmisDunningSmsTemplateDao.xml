@@ -11,7 +11,8 @@
 		s.SendTime AS "sendTime",
 		s.SmsType AS "smsType",
 		s.AcceptType AS "acceptType",
-		s.SmsCotent AS "smsCotent"
+		s.SmsCotent AS "smsCotent",
+		s.sendReason AS "sendReason"
 	
 	</sql>
 	
@@ -85,7 +86,8 @@
 			createDate,
 			updateDate,
 			createBy,
-			updateBy
+			updateBy,
+			sendReason
 		) VALUES (
 			#{id},
 			#{numbefore},
@@ -99,7 +101,8 @@
 			#{createDate},
 			#{updateDate},
 			#{createBy.name},
-			#{updateBy.name}
+			#{updateBy.name},
+			#{sendReason}
 		)
 	</insert>
 	
@@ -114,7 +117,8 @@
 			acceptType = #{acceptType},
 			smsCotent = #{smsCotent},
 			updateDate = #{updateDate},
-			updateBy = #{updateBy.name}
+			updateBy = #{updateBy.name},
+			sendReason = #{sendReason}
 			
 		WHERE id = #{id}
 	</update>

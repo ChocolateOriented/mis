@@ -63,6 +63,12 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		if("labourSend".equals(tDunningSmsTemplate.getSendMethod())){
 			tDunningSmsTemplate.setSendTime(null);
 		}
+		if("".equals(tDunningSmsTemplate.getNumbefore())||tDunningSmsTemplate.getNumbefore()==null){
+			tDunningSmsTemplate.setNumbefore(-9999);
+		}
+		if("".equals(tDunningSmsTemplate.getNumafter())||tDunningSmsTemplate.getNumafter()==null){
+			tDunningSmsTemplate.setNumafter(9999);
+		}
 		
 		   super.save(tDunningSmsTemplate);
 	       tcrService.updateTmisContatRwcord(tDunningSmsTemplate);
@@ -76,13 +82,17 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		  
 		  int overdayas =  (int) DateUtils.getDistanceOfTwoDate(repaymentDate, new Date());
 		  String acceptType=""; 
-		  if(!"".equals(contactType)){
+		  if("".equals(contactType)){
+			  
+			 acceptType=""; 
+		  }else{
 		  if("self".equalsIgnoreCase(contactType)){
 			  acceptType="self";
-		  }else{
+		  }
+		  else{
 			  acceptType="others";
 		  }
-		  } 
+		  }
 		  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType);
 		  
 		 if(findList.size()!=0){
@@ -118,16 +128,17 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	String  creditAmount="";
         	
         	if(smsCotent.contains("${platform}")){
-        		if("weixin".equals(order.getPlatform())){
-        			platform="微信";
+        		if(order.getPlatformExt()!=null&&!"".equals(order.getPlatformExt())){
+    	    		if(order.getPlatformExt().contains("feishudai")){
+    	    			platform ="飞鼠袋";
+    	    		}else{
+    	    			platform = "MO9";
+    	    		}
+        		}else{
+        			platform = "MO9";
+
         		}
-        		if("app".equals(order.getPlatform())){
-        			platform="APP";
-        		}
-        		if("liulanqi".equals(order.getPlatform())){
-        			platform="浏览器";
-        		}
-        		
+        	
         	smsCotent=smsCotent.replace("${platform}", platform);
         		
         	}

@@ -33,6 +33,7 @@ import com.mo9.risk.modules.dunning.dao.TRiskBuyer2contactsDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerContactRecordsDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerWorkinfoDao;
+import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
@@ -79,6 +80,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	private TMisContantRecordDao tMisContantRecordDao;
 	@Autowired
 	private TMisDunningPeopleDao tmisPeopleDao;
+	@Autowired
+	private TmisDunningSmsTemplateDao tdstDao;
 
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
@@ -148,6 +151,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	public void saveRecord(TMisDunningTask task, TMisDunningOrder order, TMisContantRecord tMisContantRecord,
 			String dunningtaskdbid) {
 
+		String templateName = tMisContantRecord.getTemplateName();
 		try {
 			if (tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.sms) {
 				/**
@@ -161,22 +165,24 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					 params, BaseResponse.class);
 				}
 				if ("voice".equals(tMisContantRecord.getSmsType())) {
+					
 					Map<String, String> vparams = new HashMap<String, String>();
 					vparams.put("mobile", tMisContantRecord.getContanttarget());// 发送手机号
 					vparams.put("style", "voiceContent");// 固定值
 					//模板填充的map
-					Map<String, Object> map = this.getCotentValue(tMisContantRecord.getContent(), order, task);
+					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
+					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), order, task);
 					vparams.put("template_data", new JacksonConvertor().serialize(map));
 					vparams.put("template_name", tMisContantRecord.getTemplateName());// 模板名称
 					vparams.put("template_tags", "CN");// 模板标识
 					 MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE,
 					 vparams, BaseResponse.class);
 				}
-				 logger.info("给用户:"+tMisContantRecord.getContanttarget()+"发送短信成功，内容:"+tMisContantRecord.getContent());
+				 logger.info("给用户:"+tMisContantRecord.getContanttarget()+"发送短信成功，模板为:"+templateName+",内容为:"+tMisContantRecord.getContent());
 			}
 		} catch (Exception e) {
 			logger.info("发送短信失败:" + e);
-			logger.info("给用户:" + tMisContantRecord.getContanttarget() + "发送短信失败，内容:" + tMisContantRecord.getContent());
+			logger.info("给用户:" + tMisContantRecord.getContanttarget() +"发送短信成功，模板为:"+templateName+",内容为:"+ tMisContantRecord.getContent());
 		}
 		try {
 			TMisContantRecord dunning = new TMisContantRecord();
@@ -437,15 +443,16 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	
     	
     	if(smsCotent.contains("${platform}")){
-    		if("weixin".equals(order.getPlatform())){
-    			map.put("platform", "微信");
+    		if(order.getPlatformExt()!=null&&!"".equals(order.getPlatformExt())){
+	    		if(order.getPlatformExt().contains("feishudai")){
+	    			map.put("platform", "飞鼠袋");
+	    		}else{
+	    			map.put("platform", "MO9");
+	    		}
+    		}else{
+    			map.put("platform", "MO9");
     		}
-    		if("app".equals(order.getPlatform())){
-    			map.put("platform", "APP");
-    		}
-    		if("liulanqi".equals(order.getPlatform())){
-    			map.put("platform", "浏览器");
-    		}
+    		
     	}
     	
     	if(smsCotent.contains("${realName}")){

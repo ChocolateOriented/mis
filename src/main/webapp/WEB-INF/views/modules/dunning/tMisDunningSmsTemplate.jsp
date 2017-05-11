@@ -85,7 +85,7 @@
 				<th>发送时间</th>
 				<th>短信类型</th>
 				<th>接收号码类型</th>
-				<th>可发送逾期天数</th>
+				<th>可发送逻辑</th>
 				<th>模板内容</th>
 				<th>操作</th>	
 			</tr>
@@ -128,10 +128,18 @@
 					<c:if test="${smsTemplate.acceptType=='others'}">
 					第三方
 					</c:if>
+					<c:if test="${smsTemplate.acceptType=='all'}">
+					本人和第三方
+					</c:if>
 				</td>
 				
 				<td>
+				      <c:if test="${smsTemplate.acceptType=='all'}">
+					   ${smsTemplate.sendReason}
+					</c:if>
+				      <c:if test="${smsTemplate.acceptType!='all'}">
 				      ${smsTemplate.numbefore}≤逾期天数≤${smsTemplate.numafter}
+					</c:if>
                       
 				</td>
 				

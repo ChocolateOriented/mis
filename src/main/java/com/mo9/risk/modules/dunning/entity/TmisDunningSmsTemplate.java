@@ -40,6 +40,19 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	private Integer  numbefore;  //可逾期天数设定参数
 	
 	private Integer  numafter;   //可逾期天数设定参数
+	
+	private String  sendReason;   //可逾期天数设定参数
+	
+	public String getSendReason() {
+		return sendReason;
+	}
+
+
+	public void setSendReason(String sendReason) {
+		this.sendReason = sendReason;
+	}
+
+
 
 
 	public Integer getDbid() {
@@ -79,13 +92,12 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	public Date getSendTimeDate() {
 		SimpleDateFormat sdf=new SimpleDateFormat("HH:mm");
 		try {
-			if(this.sendTime!=null){
+			if(this.sendTime!=null&&!"".equals(this.sendTime)){
 			Date parse = sdf.parse(this.sendTime);
 			return parse;
 			}
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return null;
 		}
 		return null;
 	}

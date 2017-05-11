@@ -2393,7 +2393,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 0 0 * * ?")  
 	@Transactional
 	public void AutoSmsSend(){
-		System.out.println(DictUtils.getDictValue("短信链接", "sms_url", "https://www.mo9.com"));
 		 List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();
 		SimpleDateFormat sb1=new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");

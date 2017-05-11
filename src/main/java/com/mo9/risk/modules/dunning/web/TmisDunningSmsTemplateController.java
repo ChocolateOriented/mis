@@ -21,8 +21,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.drew.lang.StringUtil;
+import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
@@ -45,6 +48,8 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	
 	@Autowired
 	private TmisDunningSmsTemplateDao tstDao;
+	@Autowired
+	private TMisDunningTaskDao tdtDao;
 	
 	
 	
@@ -96,10 +101,10 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@ResponseBody
 	public String addSmsTemplate( TmisDunningSmsTemplate tSmsTemplate, String sendTimeString, Model model ){
 		
-		if(tSmsTemplate.getNumbefore()==null){
+		if("".equals(tSmsTemplate.getNumbefore())||tSmsTemplate.getNumbefore()==null){
 			tSmsTemplate.setNumbefore(-9999);
 		}
-		if(tSmsTemplate.getNumafter()==null){
+		if("".equals(tSmsTemplate.getNumafter())||tSmsTemplate.getNumafter()==null){
 			tSmsTemplate.setNumafter(9999);
 		}
 		
@@ -195,10 +200,13 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping("getTemplateByName")
 	@ResponseBody
-	public Map<String,Object> getTemplateByName( String templateName,String contactType,Model model){
+	public Map<String,Object> getTemplateByName( String templateName,String contactType,String dealcode,String dunningtaskdbid,Model model){
 		Map< String, Object> tMap=new HashMap();
-		
+		TMisDunningOrder order = tdtDao.findOrderByDealcode(dealcode);
+		TMisDunningTask task = tdtDao.get(dunningtaskdbid);
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
+		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(), order, task);
+		template.setSmsCotent(cousmscotent);
 		tMap.put("tSTemplate", template);
 		tMap.put("contactType", contactType);
 		return tMap;
