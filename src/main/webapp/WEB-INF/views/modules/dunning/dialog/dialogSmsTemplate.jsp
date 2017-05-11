@@ -17,20 +17,52 @@
 					 $("#acceptType").val("self");
 					 $("#s2id_acceptType span.select2-chosen").text("本人"); 
 					 $("#acceptType").attr("readonly",true); 
+					 $("#reasons").hide();
 				}
 		
+			
+			
+			if("all"==$("#acceptType").val()){
+				 $("#overday").hide();
+			}else{
+				 $("#reasons").hide();
+			}
+			
+			
+			$("#acceptType").change(function(){
+				if("all"==$("#acceptType").val()){
+					 $("#overday").hide();
+					 $("#numbefore").val("");
+					 $("#numafter").val("");
+					 $("#reasons").show();
+				}else{
+					 $("#overday").show();
+					 $("#reasons").hide();
+					 $("#sendReason").val("");
+					
+				}
+				
+			});
+			
 			
 			
 			$("#sendMethod").change(function(){
 				if(($("#sendMethod").val())=="labourSend"){
 					
 			       $("#sendTime").hide();
+			       $("#sTime").val("");
 			       $("#acceptType").attr("readonly",false);
+			       if("all"==$("#acceptType").val()){
+			       $("#reasons").show();
+			       }
 				}else{
 					 $("#sendTime").show();
 					 $("#acceptType").val("self");
 					 $("#s2id_acceptType span.select2-chosen").text("本人"); 
 					 $("#acceptType").attr("readonly",true);
+					 $("#overday").show();
+					 $("#reasons").hide();
+					 $("#sendReason").val("");
 				}
 				
 				
@@ -64,8 +96,9 @@
 				});
 				
 				
+				
+				
 			});
-			
 			
 			
 			//保存
@@ -89,8 +122,8 @@
 				
 			}
 			if($("#numbefore").val() &&$("#numafter").val()){
-				if($("#numafter").val()<$("#numbefore").val()){
-					$("#tipnum").html("请重新修改并填写正确的格式");
+				if(parseInt($("#numafter").val())<parseInt($("#numbefore").val())){
+					$("#tipnum").html("请重新配置并填写正确的格式");
 					 $("#smsSave").attr('disabled',"true");
 					return;
 				}
@@ -139,8 +172,9 @@
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
 			<div class="controls">
-				<input  value="${tSTemplate.templateName}" id="smsTemplateName" name="templateName" htmlEscape="false"  class="input-xlarge required "  />
+				<input  value="${tSTemplate.templateName}" id="templateName" name="templateName" htmlEscape="false"  class="input-xlarge required "  />
 					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="tipName"></font></span>
 			</div>
 		</div>
 		<div class="control-group">
@@ -156,7 +190,7 @@
 		<div class="control-group" id="sendTime">
 			<label class="control-label">发送时间：</label>
 			<div class="controls">
-				<input name="sendTime" type="text" readonly="readonly" maxlength="20" class="input-xlarge required "
+				<input name="sendTime" id="sTime" type="text" readonly="readonly" maxlength="20" class="input-xlarge required "
 					value="<fmt:formatDate value="${tSTemplate.sendTimeDate}" pattern='HH:mm'/>"
 					onclick="WdatePicker({dateFmt:'HH:mm',isShowClear:false});"/>
 				<span class="help-inline"><font color="red">*</font> </span>
@@ -167,7 +201,7 @@
 		<div class="control-group">
 			<label class="control-label">短信类型：</label>
 			<div class="controls">
-				<select path="" class="input-medium" id="smsType" name="smsType">
+				<select path="" class="input-medium" id="smsType" name="smsType" >
 					<option value="wordText" <c:if test="${'wordText' eq tSTemplate.smsType}">selected</c:if>>文字</option>
 					<option value="voice" <c:if test="${'voice' eq tSTemplate.smsType}">selected</c:if>>语音</option>
 				</select>
@@ -180,17 +214,27 @@
 				<select path="" class="input-medium" id="acceptType" name="acceptType">
 					<option value="self" <c:if test="${'self' eq  tSTemplate.acceptType}">selected</c:if>>本人</option>
 					<option value="others" <c:if test="${'others' eq tSTemplate.acceptType}">selected</c:if>>第三方</option>
+					<option value="all" <c:if test="${'all' eq tSTemplate.acceptType}">selected</c:if>>本人和第三方</option>
 				</select>
 			</div>
 		</div>
 		
-		<div >
+		<div class="control-group" id="reasons">
+			<label class="control-label">发送逻辑：</label>
+			<div class="controls">
+				<input name="sendReason" id="sendReason"  value="${tSTemplate.sendReason}" type="text"  maxlength="20" class="input-xlarge required"/>
+					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="tips"></font></span>
+			</div>
+		</div>
+		
+		<div id="overday">
 			<label class="control-label ">可发送逾期天数：</label>
 			<div >
-				<input id="numbefore" name="numbefore" type="text" value="${  tSTemplate.numbefore}"  placeholder="不写默认为无下限"/>——
+				<input id="numbefore" name="numbefore" type="text" value="${  tSTemplate.numbefore}"  placeholder="不写默认为无下限-9999"/>——
 			
 				
-				<input id="numafter" name="numafter" type="text" value="${ tSTemplate.numafter}"  placeholder="不写默认为无上限"/>
+				<input id="numafter" name="numafter" type="text" value="${ tSTemplate.numafter}"  placeholder="不写默认为无上限9999"/>
 			</div>
 				<span class="help-inline" ><font color="red" id="tipnum"></font> </span>
 		</div>

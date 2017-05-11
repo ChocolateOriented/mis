@@ -17,19 +17,39 @@
 					 $("#s2id_acceptType span.select2-chosen").text("本人"); 
 					 $("#acceptType").attr("readonly",true); 
 				}
-		
+			 $("#reasons").hide();
 			
+			$("#acceptType").change(function(){
+				if("all"==$("#acceptType").val()){
+					 $("#overday").hide();
+					 $("#numbefore").val("");
+					 $("#numafter").val("");
+					 $("#reasons").show();
+				}else{
+					 $("#overday").show();
+					 $("#reasons").hide();
+					 $("#sendReason").val("");
+					
+				}
+				
+			});
 			
 			$("#sendMethod").change(function(){
 				if(($("#sendMethod").val())=="labourSend"){
 					
 			       $("#sendTime").hide();
 			       $("#acceptType").attr("readonly",false);
+			       if("all"==$("#acceptType").val()){
+			       $("#reasons").show();
+			       }
 				}else{
 					 $("#sendTime").show();
 					 $("#acceptType").val("self");
 					 $("#s2id_acceptType span.select2-chosen").text("本人"); 
 					 $("#acceptType").attr("readonly",true);
+					 $("#overday").show();
+					 $("#reasons").hide();
+					 $("#sendReason").val("");
 				}
 				
 				
@@ -63,6 +83,8 @@
 				});
 				
 				
+				
+				
 			});
 			
 			//添加
@@ -88,7 +110,7 @@
 				
 			}
 			if($("#numbefore").val() &&$("#numafter").val()){
-				if($("#numafter").val()<$("#numbefore").val()){
+				if(parseInt($("#numafter").val())<parseInt($("#numbefore").val())){
 					$("#tipnum").html("请重新配置并填写正确的格式");
 					 $("#smsSave").attr('disabled',"true");
 					return;
@@ -129,7 +151,7 @@
 			}); 
 			
 			
-		$("#")	
+		
 			
 		});
 	</script>
@@ -184,11 +206,21 @@
 				<select path="" class="input-medium" id="acceptType" name="acceptType">
 					<option value="others">第三方</option>
 					<option value="self" >本人</option>
+					<option value="all" >本人和第三方</option>
 				</select>
 			</div>
 		</div>
 		
-		<div >
+		<div class="control-group" id="reasons">
+			<label class="control-label">发送逻辑：</label>
+			<div class="controls">
+				<input name="sendReason" id="sendReason" type="text"  maxlength="20" class="input-xlarge required"/>
+					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="tips"></font></span>
+			</div>
+		</div>
+		
+		<div id="overday">
 			<label class="control-label ">可发送逾期天数：</label>
 			<div >
 				<input id="numbefore" name="numbefore" type="text" value=""  placeholder="不写默认为-9999"/>——

@@ -6,19 +6,33 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-	if(""!=$("#contactstype").val()){	
-	
-	$("#contactstype").attr("readonly",true);
-	}
-	if("self"==$("#conctactOne").val()){
-	
-		$("#contactstype").val("self");
-   	 $("#s2id_contactstype span.select2-chosen").text("本人");	
-   	$("#contanttarget").val($("#mobileSelf").val());
-   	$("#contactstype").attr("readonly",true);
-   	
-	}
-	$("#smsType").attr("readonly",true);
+			
+			if($("#conctactOne").val()=="others"){
+			if(""!=$("#contactstype").val()){	
+				
+				$("#contactstype").attr("readonly",true);
+				}
+			}
+					if($("#conctactOne").val()=="self"){
+				if("self"==$("#conctactOne").val()){
+					$("#contactstype").val("self");
+			   	 $("#s2id_contactstype span.select2-chosen").text("本人");	
+			   	$("#contanttarget").val($("#mobileSelf").val());
+			   	$("#contactstype").attr("readonly",true);
+			   	
+				}
+				}
+					
+				
+// 		if($("#conctactOne").val()=="all"){
+			
+// 			$("#contactstype").attr("multiple",true);
+// 			$("#contactstype").append("<option value='self'>本人</option>");
+// 		}		
+			
+			
+				$("#smsType").attr("readonly",true);
+
 	
 	
 			$('#smsSave').click(function() {
@@ -88,6 +102,7 @@
 		               }
 		         	});
 				}
+
 			 });
 				
 			$('#esc').click(function() {
@@ -97,7 +112,8 @@
 			// 短信模板选择
 			$("#templateName").change(function(){
 // 				var url = "${ctx}/dunning/tMisContantRecord/smsGetTemp";
-				var url ="${ctx}/dunning/TmisDunningSmsTemplate/getTemplateByName?templateName="+$("#templateName").val()+"&contactType="+$("#contctType").val();
+				var url ="${ctx}/dunning/TmisDunningSmsTemplate/getTemplateByName?templateName="+$("#templateName").val()+
+				"&contactType="+$("#contctType").val()+"&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}";
 				$.ajax({
 	                    type: 'POST',
 	                    url : url,
@@ -171,6 +187,7 @@
 			  <input type="hidden"  id="conctactOne" value="${tSTemplate.acceptType}"/>
 			  <input type="hidden"  id="mobileSelf" value="${mobileSelf}"/>
 			  <input type="hidden"  id="contctType" value="${contactstype}"/>
+			  <input type="hidden"  id="tname" value="${tSTemplate.templateName }"/>
 		
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
@@ -190,7 +207,7 @@
 			<div class="controls" >
 				<select path="" class="input-medium" id="contactstype" name="contactstype" >
 					<option value=""></option>
-<%-- 					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option> --%>
+<%-- 					<option id="contactsSelf" hidden="hidden" value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option> --%>
 					<option value="MARRIED"<c:if test="${'MARRIED' eq contactstype}">selected</c:if>>夫妻</option>
 					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
 					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
