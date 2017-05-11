@@ -2205,167 +2205,167 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 * 自动发送短信提醒，还款的前一天和当天9点
 	 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void autoSendMessageBefore(){
-		
-		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
-		List <TMisContantRecord> tcList=new ArrayList<TMisContantRecord>();
-		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
-			String route = "";
-			String msg="";
-			String sex="";
-			try{
-				
-				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
-					if("男".equals(tAuto.getSex())){
-						 sex="先生";
-					}
-					if("女".equals(tAuto.getSex()))	{
-						sex="女士";
-					}
-				}
-				
-				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
-				  if(tAuto.getFinProduct().contains("feishudai")){
-						route="飞鼠袋";
-				  }else{
-					  route = "mo9信用钱包";
-				  }
-				}	
-				
-		
-		String name=tAuto.getRealName();
-		
-		Double amount = new Double(0);
-		amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String repaymentTime = sdf.format(tAuto.getRepaymentTime());
-		
-		if(tAuto.getRpayStatus()==1){
-		 msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期所需还款金额为{3}元，请您最晚于{4}请做好财务规划，及时还款哦。",name,sex,route,amount,repaymentTime);
-		}
-		if(tAuto.getRpayStatus()==0){
-			msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
-		}
-		Map<String,String> params = new HashMap<String,String>();
-		params.put("mobile", tAuto.getMobile());
-		params.put("message",msg);
-		Thread.sleep(100);
-		MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
-		logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
-		}catch (Exception e) {
-			logger.info("发送短信失败:"+e);
-			logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
-		}	
-		TMisContantRecord dunning = new TMisContantRecord();
-		dunning.setTaskid(null);
-		dunning.setDealcode(tAuto.getDealcode());
-		dunning.setOrderstatus(false);
-		dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
-		dunning.setDunningtime(new Date());
-		dunning.setContanttype(ContantType.sms);
-		dunning.setContanttarget(tAuto.getMobile());
-		//短信内容
-		dunning.setContent(msg);
-		dunning.setSmstemp(SmsTemp.ST_0);
-		dunning.setTelstatus(null);
-		dunning.setContactstype(ContactsType.SELF);
-		dunning.setDunningpeoplename("sys");
-		dunning.setRepaymenttime(tAuto.getRepaymentTime());
-		dunning.setRemark(null);
-		dunning.preInsert();
-	    tcList.add(dunning);	
-	}
-		if(tcList!=null||!"".equals(tcList)){
-			tcontDao.saveList(tcList);
-		}
-  }
+//	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+//	public void autoSendMessageBefore(){
+//		
+//		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+//		List <TMisContantRecord> tcList=new ArrayList<TMisContantRecord>();
+//		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+//			String route = "";
+//			String msg="";
+//			String sex="";
+//			try{
+//				
+//				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
+//					if("男".equals(tAuto.getSex())){
+//						 sex="先生";
+//					}
+//					if("女".equals(tAuto.getSex()))	{
+//						sex="女士";
+//					}
+//				}
+//				
+//				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
+//				  if(tAuto.getFinProduct().contains("feishudai")){
+//						route="飞鼠袋";
+//				  }else{
+//					  route = "mo9信用钱包";
+//				  }
+//				}	
+//				
+//		
+//		String name=tAuto.getRealName();
+//		
+//		Double amount = new Double(0);
+//		amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//		String repaymentTime = sdf.format(tAuto.getRepaymentTime());
+//		
+//		if(tAuto.getRpayStatus()==1){
+//		 msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期所需还款金额为{3}元，请您最晚于{4}请做好财务规划，及时还款哦。",name,sex,route,amount,repaymentTime);
+//		}
+//		if(tAuto.getRpayStatus()==0){
+//			msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+//		}
+//		Map<String,String> params = new HashMap<String,String>();
+//		params.put("mobile", tAuto.getMobile());
+//		params.put("message",msg);
+//		Thread.sleep(100);
+//		MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
+//		logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
+//		}catch (Exception e) {
+//			logger.info("发送短信失败:"+e);
+//			logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
+//		}	
+//		TMisContantRecord dunning = new TMisContantRecord();
+//		dunning.setTaskid(null);
+//		dunning.setDealcode(tAuto.getDealcode());
+//		dunning.setOrderstatus(false);
+//		dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
+//		dunning.setDunningtime(new Date());
+//		dunning.setContanttype(ContantType.sms);
+//		dunning.setContanttarget(tAuto.getMobile());
+//		//短信内容
+//		dunning.setContent(msg);
+//		dunning.setSmstemp(SmsTemp.ST_0);
+//		dunning.setTelstatus(null);
+//		dunning.setContactstype(ContactsType.SELF);
+//		dunning.setDunningpeoplename("sys");
+//		dunning.setRepaymenttime(tAuto.getRepaymentTime());
+//		dunning.setRemark(null);
+//		dunning.preInsert();
+//	    tcList.add(dunning);	
+//	}
+//		if(tcList!=null||!"".equals(tcList)){
+//			tcontDao.saveList(tcList);
+//		}
+//  }
 	
 	/**
 	 * 自动发送短信提醒，还款当天的13点
 	 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void autoSendMessageNow(){
-		
-		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
-		List <TMisContantRecord> trList=new ArrayList<TMisContantRecord>();
-		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
-			String route = "";
-			String msg="";
-			String sex="";
-			if(tAuto.getRpayStatus()==0){
-			try{
-				
-				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
-					if("男".equals(tAuto.getSex())){
-						 sex="先生";
-					}
-					if("女".equals(tAuto.getSex()))	{
-						sex="女士";
-					}
-				}
-				
-				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
-				  if(tAuto.getFinProduct().contains("feishudai")){
-						route="飞鼠袋";
-				  }else{
-					  route = "mo9信用钱包";
-				  }
-				}	
-				
-				String name=tAuto.getRealName();
-				Double amount = new Double(0);
-				amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				String repaymentTime = sdf.format(tAuto.getRepaymentTime());
-				msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
-				Map<String,String> params = new HashMap<String,String>();
-				params.put("mobile", tAuto.getMobile());
-				params.put("message",msg);
-				Thread.sleep(100);
-				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
-				logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
-			}catch (Exception e) {
-				logger.info("发送短信失败:"+e);
-				logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
-			}	
-			TMisContantRecord dunning = new TMisContantRecord();
-			dunning.setTaskid(null);
-			dunning.setDealcode(tAuto.getDealcode());
-			dunning.setOrderstatus(false);
-			dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
-			dunning.setDunningtime(new Date());
-			dunning.setContanttype(ContantType.sms);
-			dunning.setContanttarget(tAuto.getMobile());
-			//短信内容
-			dunning.setContent(msg);
-			dunning.setSmstemp(SmsTemp.ST_0);
-			dunning.setTelstatus(null);
-			dunning.setContactstype(ContactsType.SELF);
-			dunning.setDunningpeoplename("sys");
-			dunning.setRepaymenttime(tAuto.getRepaymentTime());
-			dunning.setRemark(null);
-			dunning.preInsert();
-		    trList.add(dunning);
-		}
-	  }
-		if(trList!=null||!"".equals(trList)){
-			tcontDao.saveList(trList);
-		}
-	}
+//	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+//	public void autoSendMessageNow(){
+//		
+//		List<TRiskBuyerPersonalInfo> autoSmsMessages = tpersonalInfoDao.getMessgeByRepaymentTime();
+//		List <TMisContantRecord> trList=new ArrayList<TMisContantRecord>();
+//		for (TRiskBuyerPersonalInfo tAuto : autoSmsMessages) {
+//			String route = "";
+//			String msg="";
+//			String sex="";
+//			if(tAuto.getRpayStatus()==0){
+//			try{
+//				
+//				if(tAuto.getRealName()!=null&&tAuto.getRealName()!=""){
+//					if("男".equals(tAuto.getSex())){
+//						 sex="先生";
+//					}
+//					if("女".equals(tAuto.getSex()))	{
+//						sex="女士";
+//					}
+//				}
+//				
+//				if(tAuto.getFinProduct()!=null&&tAuto.getFinProduct()!=""){
+//				  if(tAuto.getFinProduct().contains("feishudai")){
+//						route="飞鼠袋";
+//				  }else{
+//					  route = "mo9信用钱包";
+//				  }
+//				}	
+//				
+//				String name=tAuto.getRealName();
+//				Double amount = new Double(0);
+//				amount = Double.valueOf(tAuto.getCreditAmount()).doubleValue() /100D;
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//				String repaymentTime = sdf.format(tAuto.getRepaymentTime());
+//				msg = MessageFormat.format("【mo9】{0}{1}，您{2}本期的应还账单为{3}元，最后还款日期为{4}请及时还款，若已还款请勿理会。 ",name,sex,route,amount,repaymentTime);
+//				Map<String,String> params = new HashMap<String,String>();
+//				params.put("mobile", tAuto.getMobile());
+//				params.put("message",msg);
+//				Thread.sleep(100);
+//				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
+//				logger.info("给用户:"+tAuto.getMobile()+"发送短信成功，内容:"+msg);
+//			}catch (Exception e) {
+//				logger.info("发送短信失败:"+e);
+//				logger.info("给用户:"+tAuto.getMobile()+"发送短信失败，内容:"+msg);
+//			}	
+//			TMisContantRecord dunning = new TMisContantRecord();
+//			dunning.setTaskid(null);
+//			dunning.setDealcode(tAuto.getDealcode());
+//			dunning.setOrderstatus(false);
+//			dunning.setOverduedays(Integer.valueOf(tAuto.getOverdueDays()));
+//			dunning.setDunningtime(new Date());
+//			dunning.setContanttype(ContantType.sms);
+//			dunning.setContanttarget(tAuto.getMobile());
+//			//短信内容
+//			dunning.setContent(msg);
+//			dunning.setSmstemp(SmsTemp.ST_0);
+//			dunning.setTelstatus(null);
+//			dunning.setContactstype(ContactsType.SELF);
+//			dunning.setDunningpeoplename("sys");
+//			dunning.setRepaymenttime(tAuto.getRepaymentTime());
+//			dunning.setRemark(null);
+//			dunning.preInsert();
+//		    trList.add(dunning);
+//		}
+//	  }
+//		if(trList!=null||!"".equals(trList)){
+//			tcontDao.saveList(trList);
+//		}
+//	}
 //	final static String same_frame = DictUtils.getDictValue("短信链接", "sms_url", "https://www.mo9.com");
 	
-	@Scheduled(cron = "0 0 9 * * ?")  
-	@Transactional
-   public void autoMessageBefore(){
-		this.autoSendMessageBefore();
-	}
-
-	@Scheduled(cron = "0 0 13 * * ?")  
-	@Transactional
-   public void autoMessageNow(){
-		this.autoSendMessageNow();
-	}
+//	@Scheduled(cron = "0 0 9 * * ?")  
+//	@Transactional
+//   public void autoMessageBefore(){
+//		this.autoSendMessageBefore();
+//	}
+//
+//	@Scheduled(cron = "0 0 13 * * ?")  
+//	@Transactional
+//   public void autoMessageNow(){
+//		this.autoSendMessageNow();
+//	}
 
 	/**
 	 * @Description: 委外任务列表
