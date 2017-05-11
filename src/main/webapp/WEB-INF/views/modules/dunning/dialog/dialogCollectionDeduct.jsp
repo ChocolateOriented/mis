@@ -6,9 +6,6 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 	$(document).ready(function() {
-		/* intervalId = setInterval(queryDeductStatus.bind(null, '147010364408114937781354994d7425'), 1000);
-		loading(); */
-		
 		jQuery.validator.addMethod("numberFix2", function(value, element) {
 		    return this.optional(element) || /^\d+(\.\d{1,2})?$/.test(value);
 		}, "请输入小数2位以内的数字");
@@ -205,7 +202,7 @@
 			<label class="control-label">扣款类型：</label>
 			<div class="controls" style="padding-top:3px;">
 				<input type="radio" name="paytype" value="loan" checked/>全款扣款
-				<input type="radio" name="paytype" value="partial"/>部分扣款
+				<input type="radio" name="paytype" value="partial" ${personalInfo.corpusAmount * 0.5 >= personalInfo.creditAmount ? 'disabled' : ''}/>部分扣款
 				<!-- <span id="delay">
 					<input type="radio" name="paytype" value="delay"/>续期扣款
 				</span> -->

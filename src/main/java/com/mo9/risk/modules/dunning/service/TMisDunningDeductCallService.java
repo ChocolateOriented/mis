@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.web.PostRequest;
 import com.mo9.risk.modules.dunning.bean.Mo9DeductOrder;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
+import com.mo9.risk.modules.dunning.dao.TMisDunningConfigureDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
@@ -55,6 +56,9 @@ public class TMisDunningDeductCallService {
 	
 	@Autowired
 	private TMisDunningTaskLogDao tMisDunningTaskLogDao;
+	
+	@Autowired
+	private TMisDunningConfigureDao tMisDunningConfigureDao;
 	
 	private static Logger logger = Logger.getLogger(TMisDunningDeductCallService.class);
 	
@@ -98,7 +102,7 @@ public class TMisDunningDeductCallService {
 		String riskUrl =  DictUtils.getDictValue("misUrl", "orderUrl", "");
 		mo9Order.setNotifyUrl(riskUrl + "mis/dunning/tMisDunningDeduct/updateRecord");
 		
-		String privateKey = DictUtils.getDictValue("mo9Deduct", "private_key", "");
+		String privateKey = tMisDunningConfigureDao.get("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(mo9Order.toMap(), privateKey);
 		mo9Order.setSign(sign);
 		String mo9Url =  DictUtils.getDictValue("mo9Url", "orderUrl", "");
@@ -237,13 +241,12 @@ public class TMisDunningDeductCallService {
 		String riskUrl =  DictUtils.getDictValue("riskclone", "orderUrl", "");
 		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" + dealcode + "/" + paychannel + "/" + remark + "/" + paidType + "/" + bd.toString() + "/" + delayDay;
 		logger.info("江湖救急接口url：" + url);
-		String datas = "";
 		String resultMsg = "";
 		String resultCode = "";
 		
 		try {
 			String res =  URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String,String>()), "UTF-8");
-			logger.info("江湖救急接口url返回参数" + res.getBytes("UTF-8"));
+			logger.info("江湖救急接口url返回参数" + res);
 			if(StringUtils.isBlank(res)) {
 				return false;
 			}
@@ -251,9 +254,6 @@ public class TMisDunningDeductCallService {
 			resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
 			resultMsg = repJson.has("resultMsg") ? String.valueOf(repJson.get("resultMsg")) : "";
 			if("200".equals(resultCode)){
-				datas = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
-				logger.info("江湖救急接口返回成功" + datas);
-				
 				tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 				update(tMisDunningDeduct);
 				saveDeductLog(tMisDunningDeduct);

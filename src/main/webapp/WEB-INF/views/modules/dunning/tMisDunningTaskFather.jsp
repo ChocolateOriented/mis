@@ -80,6 +80,13 @@
 			});
 			btnStatistics(doc, btn);
 		}
+		
+		function disableBtn() {
+			$("#btnTelTaskFather").prop("disabled", true);
+			$("#changeIdcard").prop("disabled", true);
+			$("#changeMobile").prop("disabled", true);
+			$("#changeBankcard").prop("disabled", true);
+		}
 	</script>
 </head>
 <body>

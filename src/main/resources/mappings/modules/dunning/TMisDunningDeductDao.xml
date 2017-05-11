@@ -189,6 +189,21 @@
 		AND d.del_flag = '0'
 	</select>
 	
+	<select id="getSupportedChannel" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
+		SELECT 
+			d.value as "channelid",
+			d.label as "channelname",
+			1 as "isusable"
+		FROM sys_dict d
+		JOIN ( SELECT DISTINCT paychannel
+					FROM t_mis_paychannel_bank p
+					WHERE p.bankname = #{bankname}
+					AND p.delflag = '0'
+		) t ON d.value = t.paychannel
+		WHERE d.type = 'pay_channel'
+		AND d.del_flag = '0'
+	</select>
+	
 	<select id="getSuccessRateByChannel" resultType="com.mo9.risk.modules.dunning.bean.PayChannelInfo">
 		SELECT 
 			d.value as "channelid",
@@ -220,12 +235,12 @@
 		LIMIT 1
 	</select>
 	
-	<select id="getNoBalanceDeductNumByChannel" resultType="int">
+	<select id="getNoBalanceDeductNumByCard" resultType="int">
 	<![CDATA[
 		SELECT 
 			COUNT(1)
 		FROM t_mis_dunning_deduct a
-		WHERE a.paychannel = #{paychannel}
+		WHERE a.bankcard = #{bankcard}
 		AND a.status = 'failed'
 		AND a.reason = 'NO_BAlANCE'
 		AND a.updatedate >= current_date()

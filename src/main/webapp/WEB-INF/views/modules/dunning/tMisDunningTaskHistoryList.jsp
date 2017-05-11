@@ -19,7 +19,7 @@
 				$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
-				window.parent.$("#btnTelTaskFather").attr("disabled","disabled");
+				window.parent.disableBtn();
 			}
 			
 			$("#allAction").click(function() {

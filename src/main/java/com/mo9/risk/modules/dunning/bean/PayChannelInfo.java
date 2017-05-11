@@ -3,9 +3,9 @@
  */
 package com.mo9.risk.modules.dunning.bean;
 
-import com.thinkgem.jeesite.common.persistence.DataEntity;
+import java.io.Serializable;
 
-public class PayChannelInfo extends DataEntity<PayChannelInfo> {
+public class PayChannelInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -35,7 +35,7 @@ public class PayChannelInfo extends DataEntity<PayChannelInfo> {
 		this.channelname = channelname;
 	}
 
-	public boolean isIsusable() {
+	public boolean getIsusable() {
 		return isusable;
 	}
 
