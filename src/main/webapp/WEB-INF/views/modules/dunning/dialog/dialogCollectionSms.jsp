@@ -13,15 +13,16 @@
 				$("#contactstype").attr("readonly",true);
 				}
 			}
-					if($("#conctactOne").val()=="self"){
+					
 				if("self"==$("#conctactOne").val()){
-					$("#contactstype").val("self");
+				
+					$("#contactstype").val("SELF");
 			   	 $("#s2id_contactstype span.select2-chosen").text("本人");	
 			   	$("#contanttarget").val($("#mobileSelf").val());
 			   	$("#contactstype").attr("readonly",true);
 			   	
 				}
-				}
+			
 					
 				
 		if($("#conctactOne").val()=="all"){
@@ -133,7 +134,7 @@
 	                        		 
 	                        	 
 	                        	 if(tMap.tSTemplate.acceptType=="self"){
-	                        	$("#contactstype").val("self");
+	                        	$("#contactstype").val("SELF");
 	                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
 	                        	 $("#contanttarget").val($("#mobileSelf").val());
 	                        	$("#contactstype").attr("readonly",true);
@@ -142,7 +143,7 @@
 	                        	 }
 	                        	
 	                        	 if(tMap.tSTemplate.acceptType!="self"&&""==tMap.contactType){
-	                        		
+	                        	
 	                        		 $("#contactstype").attr("readonly",false);
 	                        		 $("#s2id_contactstype span.select2-chosen").text("");
 	                        		   	$("#contanttarget").val("");
@@ -212,7 +213,7 @@
 			<label class="control-label">联系对象：</label>
 			<div class="controls" >
 				<select path="" class="input-medium" id="contactstype" name="contactstype" >
-					<option value=""></option>
+					<option value="SELF"></option>
 <!-- 					<option id="contactsSelf" value="SELF" style="visibility:hidden;">本人</option> -->
 					<option value="MARRIED"<c:if test="${'MARRIED' eq contactstype}">selected</c:if>>夫妻</option>
 					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
