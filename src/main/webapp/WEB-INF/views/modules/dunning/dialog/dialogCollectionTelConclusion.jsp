@@ -18,6 +18,7 @@
 		var uneffective = [{value:"NSA", text:"非本人接听"},
 		                   {value:"NSN", text:"非本人号码"},
 		                   {value:"OOC", text:"完全失联"},
+		                   {value:"HOOC", text:"半失联"},
 		                   {value:"OTHER", text:"其他"}
 		                   ];
 		
