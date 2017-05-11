@@ -24,11 +24,11 @@
 				}
 					
 				
-// 		if($("#conctactOne").val()=="all"){
+		if($("#conctactOne").val()=="all"){
 			
-// 			$("#contactstype").attr("multiple",true);
-// 			$("#contactstype").append("<option value='self'>本人</option>");
-// 		}		
+			$("#contactstype").append("<option id='contactsSelf' value='SELF' >本人</option>");
+			
+		}		
 			
 			
 				$("#smsType").attr("readonly",true);
@@ -137,6 +137,7 @@
 	                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
 	                        	 $("#contanttarget").val($("#mobileSelf").val());
 	                        	$("#contactstype").attr("readonly",true);
+	                        	$("#contactsSelf ").remove();
 	                        		 
 	                        	 }
 	                        	
@@ -145,6 +146,11 @@
 	                        		 $("#contactstype").attr("readonly",false);
 	                        		 $("#s2id_contactstype span.select2-chosen").text("");
 	                        		   	$("#contanttarget").val("");
+	                        			$("#contactsSelf ").remove();
+	                        	 }
+	                        	 if(tMap.tSTemplate.acceptType=="all"){
+	                        		
+	                        		 $("#contactstype").append("<option id='contactsSelf' value='SELF' >本人</option>");
 	                        	 }
 	                        	 
 	                        	}
@@ -207,7 +213,7 @@
 			<div class="controls" >
 				<select path="" class="input-medium" id="contactstype" name="contactstype" >
 					<option value=""></option>
-<%-- 					<option id="contactsSelf" hidden="hidden" value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option> --%>
+<!-- 					<option id="contactsSelf" value="SELF" style="visibility:hidden;">本人</option> -->
 					<option value="MARRIED"<c:if test="${'MARRIED' eq contactstype}">selected</c:if>>夫妻</option>
 					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
 					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>

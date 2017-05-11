@@ -445,12 +445,12 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	if(smsCotent.contains("${platform}")){
     		if(order.getPlatformExt()!=null&&!"".equals(order.getPlatformExt())){
 	    		if(order.getPlatformExt().contains("feishudai")){
-	    			map.put("platform", "飞鼠袋");
+	    			map.put("platform", "飞鼠贷");
 	    		}else{
-	    			map.put("platform", "MO9");
+	    			map.put("platform", "mo9");
 	    		}
     		}else{
-    			map.put("platform", "MO9");
+    			map.put("platform", "mo9");
     		}
     		
     	}
