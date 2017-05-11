@@ -2423,13 +2423,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dunningOrder.getDealcode());
 						TMisDunningTask task = tMisDunningTaskDao.get(dunningOrder.getDunningtaskdbid());
 							try {
+								
 								if ("wordText".equals(smsTemplate.getSmsType())) {
-									Map<String, String> params = new HashMap<String, String>();
-									params.put("mobile", dunningOrder.getMobile());
-									 smsCotent = smsTemplate.getSmsCotent();
+									smsCotent = smsTemplate.getSmsCotent();
 									 smsCotent = tdstService.cousmscotent(smsCotent, order, task);
-									params.put("message", smsCotent);
-									MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params,
+									Map<String, String> wparams = new HashMap<String, String>();
+									wparams.put("mobile", dunningOrder.getMobile());// 发送手机号
+									// 模板填充的map
+									Map<String, Object> map = tMisContantRecordService
+											.getCotentValue(smsTemplate.getSmsCotent(), order, task);
+									wparams.put("template_data", new JacksonConvertor().serialize(map));
+									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
+									wparams.put("template_name",englishTemplateName );// 模板名称
+									wparams.put("template_tags", "CN");// 模板标识
+									MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, wparams,
 											BaseResponse.class);
 								}
 								if ("voice".equals(smsTemplate.getSmsType())) {
@@ -2442,7 +2449,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 									Map<String, Object> map = tMisContantRecordService
 											.getCotentValue(smsTemplate.getSmsCotent(), order, task);
 									vparams.put("template_data", new JacksonConvertor().serialize(map));
-									vparams.put("template_name", smsTemplate.getTemplateName());// 模板名称
+									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
+									vparams.put("template_name",englishTemplateName );// 模板名称
 									vparams.put("template_tags", "CN");// 模板标识
 									MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, vparams,
 											BaseResponse.class);
