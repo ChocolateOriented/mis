@@ -295,7 +295,7 @@ public class TMisDunningDeductCallService {
 		Mo9DeductOrder queryOrder = new Mo9DeductOrder();
 		queryOrder.setBizSys("mis.deduct");
 		queryOrder.setInvoice(deduct.getDeductcode());
-		String privateKey = DictUtils.getDictValue("mo9Deduct", "private_key", "");
+		String privateKey = tMisDunningConfigureDao.get("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(queryOrder.toMap(), privateKey);
 		queryOrder.setSign(sign);
 		String mo9Url =  DictUtils.getDictValue("mo9Url", "orderUrl", "");

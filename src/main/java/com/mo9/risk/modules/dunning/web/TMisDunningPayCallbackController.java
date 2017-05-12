@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
+import com.mo9.risk.modules.dunning.service.TMisDunningConfigureService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.util.RequestParamSign;
 
@@ -37,6 +37,9 @@ public class TMisDunningPayCallbackController extends BaseController {
 
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;
+	
+	@Autowired
+	private TMisDunningConfigureService tMisDunningConfigureService;
 	
 	@RequestMapping(value = "dunning/tMisDunningDeduct/updateRecord")
 	@ResponseBody
@@ -70,7 +73,7 @@ public class TMisDunningPayCallbackController extends BaseController {
 		jsonObj.remove("sign");
 		String jsonStr = jsonObj.toJSONString();
 		
-		String privateKey = DictUtils.getDictValue("mo9Deduct", "private_key", "");
+		String privateKey = tMisDunningConfigureService.getConfigureValue("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(jsonStr, privateKey);
 		
 		if (!requestSign.equalsIgnoreCase(sign)) {
