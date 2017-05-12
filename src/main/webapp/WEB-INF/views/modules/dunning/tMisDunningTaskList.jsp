@@ -551,7 +551,11 @@
 <!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="委外导出" /> -->
 <%-- 			</shiro:hasPermission>  --%>
 <!-- 		</form> -->
-		
+	<!-- test start -->
+	<shiro:hasPermission name="dunning:tMisDunningTest:view">
+		<a href="${ctx}/dunning/tMisDunningTest/testPage" target="_blank" >test</a>
+	</shiro:hasPermission>
+	<!-- test end -->
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
