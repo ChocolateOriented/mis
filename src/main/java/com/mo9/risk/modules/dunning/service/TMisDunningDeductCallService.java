@@ -69,6 +69,8 @@ public class TMisDunningDeductCallService {
 	 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public boolean updateDeductStatus(TMisDunningDeduct tMisDunningDeduct) {
+		String message = filterPaychannelName(tMisDunningDeduct.getPaychannel(), tMisDunningDeduct.getStatusdetail());
+		tMisDunningDeduct.setStatusdetail(message);
 		if (tMisDunningDeduct.getStatus() == PayStatus.succeeded) {
 			tMisDunningDeduct.setFinishtime(new Date());
 		}
@@ -141,35 +143,37 @@ public class TMisDunningDeductCallService {
 					result.put("msg", "下单成功");
 					return result;
 				} else if ("succeeded".equals(responseOrder.getOrderStatus())) {
-					result.put("result", "OK");
-					result.put("msg", "下单成功");
 					tMisDunningDeduct.setStatus(PayStatus.succeeded);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
 					updateDeductStatus(tMisDunningDeduct);
+					
+					result.put("result", "OK");
+					result.put("msg", "下单成功");
 					return result;
 				} else {
-					result.put("result", "NO");
-					if ("NO_BALANCE".equals(responseObj.getReason())) {
-						result.put("msg", "余额不足，本日请勿重复发起扣款");
-					} else {
-						result.put("msg", responseOrder.getMessage());
-					}
 					tMisDunningDeduct.setStatus(PayStatus.failed);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
 					updateDeductStatus(tMisDunningDeduct);
+					
+					result.put("result", "NO");
+					if ("NO_BALANCE".equals(responseOrder.getReason())) {
+						result.put("msg", "余额不足，本日请勿重复发起扣款");
+					} else {
+						result.put("msg", tMisDunningDeduct.getStatusdetail());
+					}
 					return result;
 				}
 				
 			} else if ("FAILED".equals(status)) {
-				result.put("result", "NO");
-				result.put("msg", responseObj.getMessage());
-				
 				tMisDunningDeduct.setStatus(PayStatus.failed);
 				tMisDunningDeduct.setStatusdetail(responseObj.getMessage());
 				tMisDunningDeduct.setReason(responseObj.getReason());
 				updateDeductStatus(tMisDunningDeduct);
+				
+				result.put("result", "NO");
+				result.put("msg", tMisDunningDeduct.getStatusdetail());
 				return result;
 			} else {
 				//状态不明确时，尝试查单获取状态
@@ -193,20 +197,22 @@ public class TMisDunningDeductCallService {
 					result.put("msg", "下单成功");
 					return result;
 				} else if ("succeeded".equals(responseOrder.getOrderStatus())) {
-					result.put("result", "OK");
-					result.put("msg", "下单成功");
 					tMisDunningDeduct.setStatus(PayStatus.succeeded);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
 					updateDeductStatus(tMisDunningDeduct);
+					
+					result.put("result", "OK");
+					result.put("msg", "下单成功");
 					return result;
 				} else {
-					result.put("result", "NO");
-					result.put("msg", responseOrder.getMessage());
 					tMisDunningDeduct.setStatus(PayStatus.failed);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
 					updateDeductStatus(tMisDunningDeduct);
+					
+					result.put("result", "NO");
+					result.put("msg", tMisDunningDeduct.getStatusdetail());
 					return result;
 				}
 			}
@@ -289,7 +295,7 @@ public class TMisDunningDeductCallService {
 		Mo9DeductOrder queryOrder = new Mo9DeductOrder();
 		queryOrder.setBizSys("mis.deduct");
 		queryOrder.setInvoice(deduct.getDeductcode());
-		String privateKey = DictUtils.getDictValue("mo9Deduct", "private_key", "");
+		String privateKey = tMisDunningConfigureDao.get("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(queryOrder.toMap(), privateKey);
 		queryOrder.setSign(sign);
 		String mo9Url =  DictUtils.getDictValue("mo9Url", "orderUrl", "");
@@ -311,5 +317,19 @@ public class TMisDunningDeductCallService {
 		Mo9ResponseData responseObj = JSON.parseObject(response, Mo9ResponseData.class);
 		
 		return responseObj;
+	}
+
+	/**
+	 * 过滤渠道真实名称
+	 */
+	private String filterPaychannelName(String channel, String data) {
+		if (data == null) {
+			return "";
+		}
+		
+		String realname = DictUtils.getDictLabel(channel, "pay_channel_realname", "");
+		
+		String result = data.replace(realname, "");
+		return result;
 	}
 }
