@@ -180,7 +180,7 @@ public class TMisDunningDeductCallService {
 				Mo9ResponseData queryResponse = queryOrderStatusInMo9(tMisDunningDeduct);
 				
 				if (queryResponse == null || !"SUCCEEDED".equals(queryResponse.getStatus())) {
-					result.put("result", "NO");
+					result.put("result", "WARN");
 					result.put("msg", "系统繁忙，请稍后查询");
 					return result;
 				}
@@ -218,8 +218,10 @@ public class TMisDunningDeductCallService {
 			}
 			
 		} catch (IOException e) {
-			result.put("result", "NO");
-			result.put("msg", "连接超时");
+			logger.info("mo9代扣接口url返回异常" + e.getMessage());
+			
+			result.put("result", "WARN");
+			result.put("msg", "系统繁忙，请稍后查询");
 			return result;
 		}
 	}

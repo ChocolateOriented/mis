@@ -68,8 +68,8 @@ public class PostRequest {
 				((HttpsURLConnection) conn).setHostnameVerifier(verifier);
 			}
 			
-		    conn.setConnectTimeout(30000);// 连接超时
-            conn.setReadTimeout(30000);// 超时时限
+		    conn.setConnectTimeout(45000);// 连接超时
+            conn.setReadTimeout(45000);// 超时时限
 
 			conn.setRequestMethod("POST");
 			// 这里是关键，表示我们要向链接里输出内容
@@ -117,7 +117,7 @@ public class PostRequest {
 			}
 			
 			if(timeout == null || timeout == 0){
-				timeout = 30000;
+				timeout = 45000;
 			}
 			conn.setConnectTimeout(timeout);
 			conn.setReadTimeout(timeout);// 超时时限
