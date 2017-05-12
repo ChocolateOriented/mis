@@ -189,6 +189,26 @@ public class TmisDunningSmsTemplateController extends BaseController{
 		}
 		return "OK";
 	}
+	/**
+	 * 添加时保证英文模板名唯一
+	 * @param templateName
+	 * @param model
+	 * @return
+	 */
+	
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping("findEnglishName")
+	@ResponseBody
+	public String findEnglishName( String englishTemplateName,Model model){
+		
+		TmisDunningSmsTemplate template = tstDao.getByEnglishName(englishTemplateName);
+		
+		if(template!=null){
+			model.addAttribute("tSTemplate", template);
+			return "false";
+		}
+		return "OK";
+	}
 	
 	/**
 	 * 

@@ -860,7 +860,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "pageFather")
-	public String pageFather(String buyerId, String dealcode,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,Model model) {
+	public String pageFather(String status,String buyerId, String dealcode,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -878,6 +878,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
+		model.addAttribute("status", status);
 		//model.addAttribute("isDelayable", isDelayable);
 		
 		TBuyerContact tBuyerContact = new TBuyerContact();
@@ -1199,12 +1200,19 @@ public class TMisDunningTaskController extends BaseController {
 		t.setSmstemp(SmsTemp.valueOf(smsT));
 		String smsContext = "";
 		smsContext = tMisContantRecordService.smsGetTemp(task,order, t);
-		
+		String contatType="";
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
 		if(StringUtils.isNotBlank(contactstype)){
 			contactstype=contactstype.toUpperCase();
+			if(!contactstype.equals("self")){
+				contatType ="others";
+			}
+			if(contactstype.equals("self")){
+				contatType ="self";
+			}
 		}
+		
 		//获取相对应的 短信模板
 		List<TmisDunningSmsTemplate> smsTemplateList = tstService.findSmsTemplate(contactstype,order.getRepaymentDate(),order,task);
 		model.addAttribute("smsTeplateList", smsTemplateList);
@@ -1220,6 +1228,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+		model.addAttribute("contatType", contatType);
 		return "modules/dunning/dialog/dialogCollectionSms";
 	}
 	

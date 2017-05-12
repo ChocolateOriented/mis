@@ -7,6 +7,7 @@
 		s.numbefore AS "numbefore",
 		s.numafter AS "numafter",
 		s.TemplateName AS "templateName",
+<!-- 		s.EnglishTemplateName AS "englishTemplateName", -->
 		s.SendMethod AS "sendMethod",
 		s.SendTime AS "sendTime",
 		s.SmsType AS "smsType",
@@ -27,6 +28,12 @@
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.TemplateName = #{templateName}
+	</select>
+	<select id="getByEnglishName" resultType="TmisDunningSmsTemplate">
+		SELECT 
+			<include refid="TmisDunningSmsTemplateColumns"/>
+		FROM t_mis_dunning_sms_template s
+		WHERE s.EnglishTemplateName = #{englishTemplateName}
 	</select>
 	
 	 <select id="findSmsPageList" resultType="TmisDunningSmsTemplate">
@@ -51,8 +58,12 @@
 		WHERE
 	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend"
 	
-	<if test="acceptType != null and acceptType != ''">
-	and s.AcceptType = #{acceptType}
+
+	<if test=" acceptType =='self'">
+	and s.AcceptType in("self","all")
+	</if>
+	<if test=" acceptType == 'others'">
+	and s.AcceptType in("others","all")
 	</if>
 	</select>
 	
@@ -78,6 +89,7 @@
 		    numbefore,
 		    numafter,
 			templateName,
+<!-- 			englishTemplateName, -->
 			sendMethod,
 			sendTime,
 			smsType,
@@ -93,6 +105,7 @@
 			#{numbefore},
 			#{numafter},
 			#{templateName},
+<!-- 			#{englishTemplateName}, -->
 			#{sendMethod},
 			#{sendTime},
 			#{smsType},
@@ -111,6 +124,7 @@
 		  	numbefore =#{numbefore},	
 		  	numafter =#{numafter},	
 			templateName = #{templateName},
+<!-- 			englishTemplateName = #{englishTemplateName}, -->
 			sendMethod = #{sendMethod},
 			sendTime = #{sendTime},
 			smsType = #{smsType},

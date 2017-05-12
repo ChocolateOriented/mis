@@ -10,6 +10,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 
 
+
 /**
  * 短信模板entity
  * @author jwchi
@@ -27,6 +28,8 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 
 	private String  templateName;  //短信模板名称
 	
+//	private String  englishTemplateName;  //英文短信模板名称
+	
 	private String  sendMethod;		//发送方式
 	
 	private String  sendTime;		//发送时间
@@ -43,6 +46,16 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	
 	private String  sendReason;   //可逾期天数设定参数
 	
+//	public String getEnglishTemplateName() {
+//		return englishTemplateName;
+//	}
+//
+//
+//	public void setEnglishTemplateName(String englishTemplateName) {
+//		this.englishTemplateName = englishTemplateName;
+//	}
+
+
 	public String getSendReason() {
 		return sendReason;
 	}

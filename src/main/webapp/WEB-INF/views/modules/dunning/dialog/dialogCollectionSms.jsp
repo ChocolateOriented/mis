@@ -7,29 +7,43 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			
-			if($("#conctactOne").val()=="others"){
-			if(""!=$("#contactstype").val()){	
-				
-				$("#contactstype").attr("readonly",true);
+			//只有第三方的短信初始化判断
+			if($("#contactstype").val()!=""&&$("#contactstype").val()!="SELF"){
+				if($("#contatType").val()=="others"){
+				   	
+			   
+					$("#contactstype").attr("readonly",true);
+					
 				}
 			}
-					
-				if("self"==$("#conctactOne").val()){
+			//对本人的短信模板初始化
+			if($("#contactstype").val()=="SELF"){
 				
 					$("#contactstype").val("SELF");
-			   	 $("#s2id_contactstype span.select2-chosen").text("本人");	
-			   	$("#contanttarget").val($("#mobileSelf").val());
-			   	$("#contactstype").attr("readonly",true);
-			   	
-				}
+				   	$("#s2id_contactstype span.select2-chosen").text("本人");	
+				   	$("#contanttarget").val($("#mobileSelf").val());
+				   	$("#contactstype").attr("readonly",true);
+					
+			}
 			
 					
-				
-		if($("#conctactOne").val()=="all"){
-			
-			$("#contactstype").append("<option id='contactsSelf' value='SELF' >本人</option>");
-			
-		}		
+	        //催收短信按钮初始化	
+		    if($("#contactstype").val()==""){
+		    
+		 
+			   if($("#conctactOne").val()=="others"){
+				   
+				   $("#contactsSelf ").remove();
+			   }
+			   if($("#conctactOne").val()=="self"){
+				   $("#contactsSelf ").remove();
+				   $("#contactstype").val("SELF");
+				   	$("#s2id_contactstype span.select2-chosen").text("本人");	
+				   	$("#contanttarget").val($("#mobileSelf").val());
+				   	$("#contactstype").attr("readonly",true);
+			   }
+			   
+		    }		
 			
 			
 				$("#smsType").attr("readonly",true);
@@ -114,12 +128,13 @@
 			$("#templateName").change(function(){
 // 				var url = "${ctx}/dunning/tMisContantRecord/smsGetTemp";
 				var url ="${ctx}/dunning/TmisDunningSmsTemplate/getTemplateByName?templateName="+$("#templateName").val()+
-				"&contactType="+$("#contctType").val()+"&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}";
+				"&contactType="+$("#contatType").val()+"&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}";
 				$.ajax({
 	                    type: 'POST',
 	                    url : url,
 	                    data:{},            //获取表单数据
 	                    success : function(tMap) {
+	                    	
 	                        	 $('#smsTemplateId').val(tMap.tSTemplate.id);
 	                        	 $('#smsCotent').html(tMap.tSTemplate.smsCotent);
 	                        	 $('#smsType').val(tMap.tSTemplate.smsType);
@@ -134,21 +149,22 @@
 	                        		 
 	                        	 
 	                        	 if(tMap.tSTemplate.acceptType=="self"){
-	                        	$("#contactstype").val("SELF");
-	                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
-	                        	 $("#contanttarget").val($("#mobileSelf").val());
-	                        	$("#contactstype").attr("readonly",true);
-	                        	$("#contactsSelf ").remove();
+		                        	 $("#contactstype").val("SELF");
+		                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
+		                        	 $("#contanttarget").val($("#mobileSelf").val());
+		                        	 $("#contactstype").attr("readonly",true);
+		                        	 $("#contactsSelf ").remove();
 	                        		 
 	                        	 }
 	                        	
 	                        	 if(tMap.tSTemplate.acceptType!="self"&&""==tMap.contactType){
-	                        	
+	                        	    
 	                        		 $("#contactstype").attr("readonly",false);
 	                        		 $("#s2id_contactstype span.select2-chosen").text("");
-	                        		   	$("#contanttarget").val("");
-	                        			$("#contactsSelf ").remove();
+	                        		 $("#contanttarget").val("");
+	                        	     $("#contactsSelf ").remove();
 	                        	 }
+	                        	 
 	                        	 if(tMap.tSTemplate.acceptType=="all"){
 	                        		
 	                        		 $("#contactstype").append("<option id='contactsSelf' value='SELF' >本人</option>");
@@ -193,7 +209,7 @@
 			  <input type="hidden" name="smsTemplateId" id="smsTemplateId" value="${tSTemplate.id }"/>
 			  <input type="hidden"  id="conctactOne" value="${tSTemplate.acceptType}"/>
 			  <input type="hidden"  id="mobileSelf" value="${mobileSelf}"/>
-			  <input type="hidden"  id="contctType" value="${contactstype}"/>
+			  <input type="hidden"  id="contatType" value="${contatType}"/>
 			  <input type="hidden"  id="tname" value="${tSTemplate.templateName }"/>
 		
 		<div class="control-group">
@@ -209,12 +225,13 @@
 			</div>
 		</div>
 		
+		
 		<div class="control-group">
 			<label class="control-label">联系对象：</label>
 			<div class="controls" >
 				<select path="" class="input-medium" id="contactstype" name="contactstype" >
-					<option value="SELF"></option>
-<!-- 					<option id="contactsSelf" value="SELF" style="visibility:hidden;">本人</option> -->
+					<option  value=""></option>
+					<option id="contactsSelf" value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option>
 					<option value="MARRIED"<c:if test="${'MARRIED' eq contactstype}">selected</c:if>>夫妻</option>
 					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
 					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>

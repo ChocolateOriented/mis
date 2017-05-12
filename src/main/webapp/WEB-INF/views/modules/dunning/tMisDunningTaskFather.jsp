@@ -99,8 +99,10 @@
 			<td>手机号：${personalInfo.mobile}(${personalInfo.mobileCity})&nbsp;&nbsp;
 				<input id="btnTelTaskFather" class="btn btn-primary" type="button" value="电话" style="padding:0px 8px 0px 8px;font-size:13px;"
 					contactMobile="${personalInfo.mobile}" contactstype="SELF" onclick="collectionfunction(this, 650)" method="Tel"/>
-		<input id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"   name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactMobile="${personalInfo.mobile}" contactstype="self"  method="Sms" type="button" value="短信" />
-					
+				
+				<input <c:if test="${'payoff' eq status }">disabled</c:if> id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"  
+				 name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactMobile="${personalInfo.mobile}" contactstype="self"  method="Sms" type="button" value="短信" />
+				
 			</td>
 			<td>姓名：${personalInfo.realName}(${personalInfo.sex})(${not empty personalInfo.marital ? personalInfo.marital eq 'Y' ? "已婚" : "未婚" : "未获取"})</td>
 			<td>身份证：${personalInfo.idcard}</td>

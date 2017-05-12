@@ -39,15 +39,22 @@
 		        }
 		    });
 		}
+		
+		//多选框只选择一个
+		 function check(obj) {
+            $("[name='sendMsgInfo']").attr('checked', false);
+            $(obj).attr('checked', true);
+        }
+		
 	</script>
 </head>
 <body>
 <div align="center">
-	<c:if test="${dialogType != 'tel'}">
-		<a href="javascript:qbSearch()" id="qbSearch" >全选</a>
-	    <a href="javascript:fxSearch()" id="fxSearch" >反选</a>
-	    <a href="javascript:qxSearch()" id="qxSearch" >取消</a>
-    </c:if>
+<%-- 	<c:if test="${dialogType != 'tel'}"> --%>
+<!-- 		<a href="javascript:qbSearch()" id="qbSearch" >全选</a> -->
+<!-- 	    <a href="javascript:fxSearch()" id="fxSearch" >反选</a> -->
+<!-- 	    <a href="javascript:qxSearch()" id="qxSearch" >取消</a> -->
+<%--     </c:if> --%>
 </div>
 	<form id="inputForm"   class="form-horizontal">
 <!-- 	<input id="decription" name="decription" value="aaa" type="text" /> -->
@@ -63,7 +70,7 @@
 											${sendMsgInfo.tel}<span style="color:#3FABE9">(${not empty map[sendMsgInfo.tel] ?map[sendMsgInfo.tel]:0})</span>
 									</c:when>
 									<c:otherwise>
-										<input type="checkbox" name="sendMsgInfo" value="${sendMsgInfo.tel}" namevalue="${sendMsgInfo.name}" />
+										<input type="checkbox" onclick="check(this)" name="sendMsgInfo" value="${sendMsgInfo.tel}" namevalue="${sendMsgInfo.name}" />
 											${sendMsgInfo.tel}<span style="color:#3FABE9">(${not empty map[sendMsgInfo.tel] ?map[sendMsgInfo.tel]:0})</span>
 									</c:otherwise>
 								</c:choose>
