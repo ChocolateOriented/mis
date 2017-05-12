@@ -107,7 +107,7 @@ function page(n,s){
 							<!-- 添加类型对应的小组 -->
 							<c:forEach items="${groupList}" var="item">
 								<c:if test="${item.type == type.key}">
-									<option value="${item.id}" groupType="${item.type}" <c:if test="${TMisDunningPeople.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
+									<option value="${item.id}" <c:if test="${TMisDunningPeople.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
 								</c:if>
 							</c:forEach>
 						</optgroup>

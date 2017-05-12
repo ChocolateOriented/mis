@@ -15,6 +15,11 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 @MyBatisDao
 public interface TMisDunningGroupDao extends CrudDao<TMisDunningGroup> {
 
+	/**
+	 * @Description: 查询所有用户
+	 * @return
+	 * @return: List<User>
+	 */
 	List<User> findUserList();
 	
 }

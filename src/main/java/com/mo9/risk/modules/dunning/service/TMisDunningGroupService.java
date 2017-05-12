@@ -22,6 +22,11 @@ public class TMisDunningGroupService extends CrudService<TMisDunningGroupDao,TMi
 		super.delete(entity);
 	}
 
+	/**
+	 * @Description: 查询所有用户(用于添加组长)
+	 * @return
+	 * @return: List<User>
+	 */
 	public List<User> findUserList() {
 		return dao.findUserList();
 	}
