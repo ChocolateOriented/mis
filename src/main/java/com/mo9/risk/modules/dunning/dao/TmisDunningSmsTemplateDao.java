@@ -28,6 +28,8 @@ public interface TmisDunningSmsTemplateDao  extends CrudDao<TmisDunningSmsTempla
 	
 	//获取所有系统的模板
 	public List<TmisDunningSmsTemplate>  findByAutoSend();
+
+	public TmisDunningSmsTemplate getByEnglishName(String englishTemplateName);
 	
 
 }

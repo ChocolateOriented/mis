@@ -81,10 +81,34 @@
 	                    }
 					
 				});
-				
-				
-				
-				
+			});
+			
+			//保证英文名字名字唯一
+			$("#englishTemplateName").blur(function(){
+				$.ajax({
+					url:"${ctx}/dunning/TmisDunningSmsTemplate/findEnglishName?englishTemplateName="+$("#englishTemplateName").val(),
+					type:"GET",
+					data:{},
+					success:function(data){
+						
+						if(data=="false"){
+							
+							$("#etipName").html("名字已存在");
+							$("#englishTemplateName").val("");
+						}
+						if(data=="OK"){
+							$("#etipName").html("");
+							
+						}
+						
+					},
+					error : function(XMLHttpRequest, textStatus, errorThrown){
+	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
+	                       $("#englishTemplateName").val("");
+	                       alert("查询失败:"+textStatus);
+	                    }
+					
+				});
 			});
 			
 			//添加
@@ -161,6 +185,15 @@
 
 	</ul>
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
+		
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">英文模板名称：</label> -->
+<!-- 			<div class="controls"> -->
+<!-- 				<input  value="" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  /> -->
+<!-- 					<span class="help-inline"><font color="red">*</font> </span> -->
+<!-- 					<span ><font color="red" id="etipName"></font></span> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
 			<div class="controls">
