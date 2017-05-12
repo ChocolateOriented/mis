@@ -34,12 +34,22 @@
 					url : "${ctx}/dunning/tMisDunningDeduct/saveRecord",
 					data: $('#inputForm').serialize(),             //获取表单数据
 					success : function(data) {
-						if (data && data.result == "OK") {
+						if (!data) {
+							alert("扣款失败");
+							closeSubmitting();
+							window.parent.window.jBox.close();
+							return;
+						}
+						
+						if (data.result == "OK") {
 							intervalId = setInterval(queryDeductStatus.bind(null, data.deductcode), 1000);
+						} else if (data.result == "WARN") {
+							alert(data.msg);
+							closeSubmitting();
+							window.parent.window.jBox.close();
 						} else {
 							alert("扣款失败:" + data.msg);
 							closeSubmitting();
-							//window.parent.page();
 							window.parent.window.jBox.close();
 						}
 					},
@@ -104,7 +114,7 @@
 		intervalCnt++;
 		$.get("${ctx}/dunning/tMisDunningDeduct/get", {deductcode: deductcode}, function(data) {
 			if (data.status == "submitted" || !data.repaymentstatus) {
-				if (intervalCnt >= 20) {
+				if (intervalCnt >= 60) {
 					alert("系统繁忙，请稍后查询");
 					clearInterval(intervalId);
 					closeSubmitting();
