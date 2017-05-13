@@ -2436,6 +2436,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
 									wparams.put("template_name",englishTemplateName );// 模板名称
 									wparams.put("template_tags", "CN");// 模板标识
+									Thread.sleep(100);
 									MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, wparams,
 											BaseResponse.class);
 								}
@@ -2452,6 +2453,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
 									vparams.put("template_name",englishTemplateName );// 模板名称
 									vparams.put("template_tags", "CN");// 模板标识
+									Thread.sleep(100);
 									MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, vparams,
 											BaseResponse.class);
 								}
