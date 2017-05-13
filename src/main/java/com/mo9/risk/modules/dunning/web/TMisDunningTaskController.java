@@ -18,11 +18,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -638,24 +635,24 @@ public class TMisDunningTaskController extends BaseController {
 	
 	public static void main(String[] args) {
 
-		try {
-		String[] arr = {"123","456","789","123","12"}; 
-		List<String> list = Arrays.asList(arr); 
+//		try {
+//		String[] arr = {"123","456","789","123","12"}; 
+//		List<String> list = Arrays.asList(arr); 
+////			for(String string : list){
+////				Thread.sleep(1000);
+////				System.out.println(string);
+////			}
 //			for(String string : list){
 //				Thread.sleep(1000);
-//				System.out.println(string);
+//				System.out.println(string+"==="+  new Date());
 //			}
-			for(String string : list){
-				Thread.sleep(1000);
-				System.out.println(string+"==="+  new Date());
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Thread1 mTh1=new Thread1("A");  
-//    	Thread1 mTh2=new Thread1("B");  
-    	mTh1.start();  
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		Thread1 mTh1=new Thread1("A");  
+////    	Thread1 mTh2=new Thread1("B");  
+//    	mTh1.start();  
 //    	mTh2.start();  
 //		String[] arr = {"123","456","789","123","12"}; 
 //		List<String> list = Arrays.asList(arr); 
