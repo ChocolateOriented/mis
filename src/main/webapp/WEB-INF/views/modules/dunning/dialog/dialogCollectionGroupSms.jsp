@@ -22,29 +22,29 @@
 			
 			// 群发短信
 			$('#groupSmsSend').click(function() {
- 			  if($("#inputForm").valid()){
- 				 $("#groupSmsSend").attr('disabled',"true");
- 	                $.ajax({
- 	                    type: 'POST',
- 	                    url : "${ctx}/dunning/tMisDunningTask/groupSmsSend",
- 	                	data: $('#inputForm').serialize(),             //获取表单数据
- 	                    success : function(data) {
- 	                        if (data == "OK") {
- 	                            alert("保存成功");
- 	                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
- 	                            window.parent.window.jBox.close();            //关闭子窗体
- 	                        } else {
- 	                            alert("保存失败:"+data.message);
- 	                            window.parent.page();
- 	                            window.parent.window.jBox.close();
- 	                        }
- 	                    },
- 	                    error : function(XMLHttpRequest, textStatus, errorThrown){
- 	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
- 	                       alert("保存失败:"+textStatus);
- 	                    }
- 	                });
- 		          }
+//  			  if($("#inputForm").valid()){
+//  				 $("#groupSmsSend").attr('disabled',"true");
+//  	                $.ajax({
+//  	                    type: 'POST',
+//  	                    url : "${ctx}/dunning/tMisDunningTask/groupSmsSend",
+//  	                	data: $('#inputForm').serialize(),             //获取表单数据
+//  	                    success : function(data) {
+//  	                        if (data == "OK") {
+//  	                            alert("保存成功");
+//  	                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+//  	                            window.parent.window.jBox.close();            //关闭子窗体
+//  	                        } else {
+//  	                            alert("保存失败:"+data.message);
+//  	                            window.parent.page();
+//  	                            window.parent.window.jBox.close();
+//  	                        }
+//  	                    },
+//  	                    error : function(XMLHttpRequest, textStatus, errorThrown){
+//  	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
+//  	                       alert("保存失败:"+textStatus);
+//  	                    }
+//  	                });
+//  		          }
 			}); 
 			
 			// 取消

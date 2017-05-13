@@ -201,13 +201,13 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "collectionGroupSms")
-	public String collectionGroupSms( Model model) {
-//		System.out.println("");
-		model.addAttribute("smsTemplates", DunningSmsTemplate.values());
-		return "modules/dunning/dialog/dialogCollectionGroupSms";
-	}
+//	@RequiresPermissions("dunning:tMisDunningTask:view")
+//	@RequestMapping(value = "collectionGroupSms")
+//	public String collectionGroupSms( Model model) {
+////		System.out.println("");
+//		model.addAttribute("smsTemplates", DunningSmsTemplate.values());
+//		return "modules/dunning/dialog/dialogCollectionGroupSms";
+//	}
 	
 	
 	/**
@@ -248,65 +248,65 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "groupSmsSend")
-	@ResponseBody
-	public String groupSmsSend(String ordersStr,String smsTemplate ,Model model,String taskidStr) {
-		String[] strOrders = ordersStr.split(",");
-		Set<String> set = new HashSet<String>(Arrays.asList(strOrders));
-		Iterator<String> it = set.iterator();  
-		while (it.hasNext()) {
-			String[] strTemplate = it.next().split("#");
-			if(!"".equals(strTemplate[0]) && !"".equals(strTemplate[1]) && !"".equals(strTemplate[2])){
-//				strTemplate[3];   获取手机号码
-				
-				/**
-				 *  发送短信
-				 *//*
-				Map<String,String> params = new HashMap<String,String>();
-				params.put("mobile", strTemplate[3]);
-				params.put("message",message);
-				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);*/
-				
-				
-				
-				String dealcode = strTemplate[0];
-				TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-				if (order == null) {
-					logger.warn("订单不存在，订单号：" + dealcode);
-					continue;
-				}
-				
-				String platformExt = order.getPlatformExt();
-				String route = "【mo9】";
-				if (platformExt != null && platformExt.contains("feishudai")) {
-					route = "[飞鼠贷]";
-				}
-				String message =  tMisContantRecordService.getDunningSmsTemplate
-						(route, new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));
-				
-				Map<String,Object> parameter = new HashMap<String,Object>();
-				parameter.put("STATUS_DUNNING", "dunning");
-				parameter.put("DEALCODE", dealcode);
-				TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(parameter);
-				
-				if (task == null) {
-					logger.warn("任务不存在，订单号：" + dealcode);
-					continue;
-				}
-				TMisContantRecord t =new TMisContantRecord();
-				t.setSmstemp(TMisContantRecord.SmsTemp.valueOf(smsTemplate));
-				t.setContactstype(TMisContantRecord.ContactsType.SELF);
-				t.setContanttarget(strTemplate[3]);
-				t.setContanttype(TMisContantRecord.ContantType.sms);
-				t.setContent(message);
-				tMisContantRecordService.saveRecord(task,order, t,null);
-			}
-		}
-		String[] taskids = taskidStr.split(",");
-		tMisDunningTaskDao.updatedunningtimeList(Arrays.asList(taskids));
-		return "OK";
-	}
+//	@RequiresPermissions("dunning:tMisDunningTask:view")
+//	@RequestMapping(value = "groupSmsSend")
+//	@ResponseBody
+//	public String groupSmsSend(String ordersStr,String smsTemplate ,Model model,String taskidStr) {
+//		String[] strOrders = ordersStr.split(",");
+//		Set<String> set = new HashSet<String>(Arrays.asList(strOrders));
+//		Iterator<String> it = set.iterator();  
+//		while (it.hasNext()) {
+//			String[] strTemplate = it.next().split("#");
+//			if(!"".equals(strTemplate[0]) && !"".equals(strTemplate[1]) && !"".equals(strTemplate[2])){
+////				strTemplate[3];   获取手机号码
+//				
+//				/**
+//				 *  发送短信
+//				 *//*
+//				Map<String,String> params = new HashMap<String,String>();
+//				params.put("mobile", strTemplate[3]);
+//				params.put("message",message);
+//				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);*/
+//				
+//				
+//				
+//				String dealcode = strTemplate[0];
+//				TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+//				if (order == null) {
+//					logger.warn("订单不存在，订单号：" + dealcode);
+//					continue;
+//				}
+//				
+//				String platformExt = order.getPlatformExt();
+//				String route = "【mo9】";
+//				if (platformExt != null && platformExt.contains("feishudai")) {
+//					route = "[飞鼠贷]";
+//				}
+//				String message =  tMisContantRecordService.getDunningSmsTemplate
+//						(route, new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));
+//				
+//				Map<String,Object> parameter = new HashMap<String,Object>();
+//				parameter.put("STATUS_DUNNING", "dunning");
+//				parameter.put("DEALCODE", dealcode);
+//				TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(parameter);
+//				
+//				if (task == null) {
+//					logger.warn("任务不存在，订单号：" + dealcode);
+//					continue;
+//				}
+//				TMisContantRecord t =new TMisContantRecord();
+//				t.setSmstemp(TMisContantRecord.SmsTemp.valueOf(smsTemplate));
+//				t.setContactstype(TMisContantRecord.ContactsType.SELF);
+//				t.setContanttarget(strTemplate[3]);
+//				t.setContanttype(TMisContantRecord.ContantType.sms);
+//				t.setContent(message);
+//				tMisContantRecordService.saveRecord(task,order, t,null);
+//			}
+//		}
+//		String[] taskids = taskidStr.split(",");
+//		tMisDunningTaskDao.updatedunningtimeList(Arrays.asList(taskids));
+//		return "OK";
+//	}
 	
 	/*催收留案功能-委外任务截止时间设置 Patch 0002 by GQWU at 2016-11-25 start*/
 	@RequiresPermissions("dunning:tMisDunningTask:directorview")
@@ -637,6 +637,26 @@ public class TMisDunningTaskController extends BaseController {
 	}
 	
 	public static void main(String[] args) {
+
+		try {
+		String[] arr = {"123","456","789","123","12"}; 
+		List<String> list = Arrays.asList(arr); 
+//			for(String string : list){
+//				Thread.sleep(1000);
+//				System.out.println(string);
+//			}
+			for(String string : list){
+				Thread.sleep(1000);
+				System.out.println(string+"==="+  new Date());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Thread1 mTh1=new Thread1("A");  
+//    	Thread1 mTh2=new Thread1("B");  
+    	mTh1.start();  
+//    	mTh2.start();  
 //		String[] arr = {"123","456","789","123","12"}; 
 //		List<String> list = Arrays.asList(arr); 
 //		Map<String, String> map = MapUtils.putAll(new HashMap<String, String>(), arr); 

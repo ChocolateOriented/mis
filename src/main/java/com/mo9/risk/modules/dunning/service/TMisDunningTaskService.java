@@ -489,62 +489,62 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 * 自动发送催收短信，到期还款日为今日
 	 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	private void sendSms() {
-		//分页处理，单页处理100条
-		Page<TRiskBuyerPersonalInfo> page = new Page<TRiskBuyerPersonalInfo>(1, 100);
-		int pageNo = 1; //页码
-		do {
-			page.setPageNo(pageNo);
-			page = this.getBuyerListByRepaymentTime(page);
-			logger.info(MessageFormat.format("检索已还清催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
-			for (TRiskBuyerPersonalInfo dealInfo : page.getList()) {
-				Double amount = new Double(0);
-				amount = Double.valueOf(dealInfo.getCreditAmount()).doubleValue() /100D;
-				
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				String repaymentTime = sdf.format(dealInfo.getRepaymentTime());
-				
-				String msg = MessageFormat.format("【mo9】江湖救急用户，您的借款即将到期，还款金额{0}元，最后还款日{1}，按时还款有助您提高借款额度。",amount,repaymentTime);
-				
-				try{
-					/**
-					 *  发送短信
-					 */
-					Map<String,String> params = new HashMap<String,String>();
-					params.put("mobile", dealInfo.getMobile());
-					params.put("message",msg);
-					MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
-					logger.info("给用户:"+dealInfo.getMobile()+"发送短信成功，内容:"+msg);
-					
-					TMisContantRecord dunning = new TMisContantRecord();
-					dunning.setTaskid(null);
-					dunning.setDealcode(dealInfo.getDealcode());
-					dunning.setOrderstatus(false);
-					dunning.setOverduedays(Integer.valueOf(dealInfo.getOverdueDays()));
-					dunning.setDunningtime(new Date());
-					dunning.setContanttype(ContantType.sms);
-					dunning.setContanttarget(dealInfo.getMobile());
-					//短信内容
-					dunning.setContent(msg);
-					dunning.setSmstemp(SmsTemp.ST_0);
-					dunning.setTelstatus(null);
-					dunning.setContactstype(ContactsType.SELF);
-					dunning.setDunningpeoplename("sys");
-					dunning.setRepaymenttime(dealInfo.getRepaymentTime());
-					dunning.setRemark(null);
-					
-					tMisContantRecordService.save(dunning);
-				}catch (Exception e) {
-					logger.info("发送短信失败:"+e);
-					logger.info("给用户:"+dealInfo.getMobile()+"发送短信失败，内容:"+msg);
-				}
-			}
-			pageNo++; //翻页
-			page.setList(null);
-		}
-		while (page != null && !page.isLastPage());
-	}
+//	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+//	private void sendSms() {
+//		//分页处理，单页处理100条
+//		Page<TRiskBuyerPersonalInfo> page = new Page<TRiskBuyerPersonalInfo>(1, 100);
+//		int pageNo = 1; //页码
+//		do {
+//			page.setPageNo(pageNo);
+//			page = this.getBuyerListByRepaymentTime(page);
+//			logger.info(MessageFormat.format("检索已还清催款任务，第{0}页,共{1}条", page.getPageNo(), page.getList().size()));
+//			for (TRiskBuyerPersonalInfo dealInfo : page.getList()) {
+//				Double amount = new Double(0);
+//				amount = Double.valueOf(dealInfo.getCreditAmount()).doubleValue() /100D;
+//				
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//				String repaymentTime = sdf.format(dealInfo.getRepaymentTime());
+//				
+//				String msg = MessageFormat.format("【mo9】江湖救急用户，您的借款即将到期，还款金额{0}元，最后还款日{1}，按时还款有助您提高借款额度。",amount,repaymentTime);
+//				
+//				try{
+//					/**
+//					 *  发送短信
+//					 */
+//					Map<String,String> params = new HashMap<String,String>();
+//					params.put("mobile", dealInfo.getMobile());
+//					params.put("message",msg);
+//					MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
+//					logger.info("给用户:"+dealInfo.getMobile()+"发送短信成功，内容:"+msg);
+//					
+//					TMisContantRecord dunning = new TMisContantRecord();
+//					dunning.setTaskid(null);
+//					dunning.setDealcode(dealInfo.getDealcode());
+//					dunning.setOrderstatus(false);
+//					dunning.setOverduedays(Integer.valueOf(dealInfo.getOverdueDays()));
+//					dunning.setDunningtime(new Date());
+//					dunning.setContanttype(ContantType.sms);
+//					dunning.setContanttarget(dealInfo.getMobile());
+//					//短信内容
+//					dunning.setContent(msg);
+//					dunning.setSmstemp(SmsTemp.ST_0);
+//					dunning.setTelstatus(null);
+//					dunning.setContactstype(ContactsType.SELF);
+//					dunning.setDunningpeoplename("sys");
+//					dunning.setRepaymenttime(dealInfo.getRepaymentTime());
+//					dunning.setRemark(null);
+//					
+//					tMisContantRecordService.save(dunning);
+//				}catch (Exception e) {
+//					logger.info("发送短信失败:"+e);
+//					logger.info("给用户:"+dealInfo.getMobile()+"发送短信失败，内容:"+msg);
+//				}
+//			}
+//			pageNo++; //翻页
+//			page.setList(null);
+//		}
+//		while (page != null && !page.isLastPage());
+//	}
 
 	/**
 	 * 检索已经过期的催款任务，设置状态为到期

@@ -119,64 +119,7 @@
 				    });
 			 	}
 			 });
-			 
-			// 群发短信
-			 $("#texting").click(function(){
-					var orders = new Array();
-					var overDuedays = new Array();
-					$("[name='orders']").each(function() {
-						if(this.checked){
-// 							orders.push($(this).val());
-							orders.push($(this).attr("orders"));
-							overDuedays.push($(this).attr("overDuedays"));
-						}
-					});
-					
-					//群发短信必须选择处于同一逾期周期用户的判断
-					for(var i = 0; i < overDuedays.length; i++){
-						var num = overDuedays[i];
-						if(parseInt(num)<parseInt(0) || parseInt(num) == parseInt(0)){
-							overDuedays[i] = 'Z';
-						}else if(parseInt(num)>parseInt(0) && parseInt(num)<parseInt(8)){
-							overDuedays[i] = 'A';
-						}else if(parseInt(num)>parseInt(7) && parseInt(num)<parseInt(15)){
-							overDuedays[i] = 'B';
-						}else if(parseInt(num)>parseInt(14) && parseInt(num)<parseInt(22)){
-							overDuedays[i] = 'C';
-						}else if(parseInt(num)>parseInt(21) && parseInt(num)<parseInt(36)){
-							overDuedays[i] = 'D';
-						}else if(parseInt(num)>parseInt(35)){
-							overDuedays[i] = 'E';
-						}
-						if(i > 0){
-							if(overDuedays[i] != overDuedays[i-1]){
-								$.jBox.tip("群发短信必须选择处于同一逾期周期用户！", 'warning');
-								return false;
-							}
-						}
-					}
-					
-					if(orders.length==0){
-						$.jBox.tip("请勾选发送短信的催收订单", 'warning');
-						return;
-					}
-					var url = "${ctx}/dunning/tMisDunningOuterTask/collectionGroupSms";
-								$.jBox.open("iframe:" + url, "群发短信" , 600, 350, {            
-					               buttons: {},
-//		 			                   submit: function (v, h, f) {
-//				 	                       if (v == "ok") {
-//				 	                           var iframeName = h.children(0).attr("name");
-//				 	                           var iframeHtml = window.frames[iframeName];               //获取子窗口的句柄
-//				 	                           iframeHtml.saveOrUpdate();
-//				 	                           return false;
-//				 	                       }
-//		 			                   },
-					               loaded: function (h) {
-					                   $(".jbox-content", document).css("overflow-y", "hidden");
-					               }
-					         });
-			 }); 
-			 
+			 	 
 			// 手动分配
 			 $("#distribution").click(function(){
 				 var orders = new Array();
