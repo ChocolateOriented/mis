@@ -62,7 +62,7 @@
 			a.telstatus AS "telstatus",
 			a.field1 AS "field1",
 			a.dunningpeoplename AS "dunningpeoplename",
-			CASE WHEN p.Name = 'sys' THEN '' ELSE p.nickname END AS "peoplename",
+			CASE WHEN a.dunningpeoplename = 'sys' THEN 'sys' ELSE p.nickname END AS "peoplename",
 			a.repaymenttime AS "repaymenttime",
 			a.iseffective AS "iseffective",
 			a.promisepaydate AS "promisepaydate",
