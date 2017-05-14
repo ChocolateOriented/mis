@@ -18,7 +18,6 @@
 			}
 			//对本人的短信模板初始化
 			if($("#contactstype").val()=="SELF"){
-				
 					$("#contactstype").val("SELF");
 				   	$("#s2id_contactstype span.select2-chosen").text("本人");	
 				   	$("#contanttarget").val($("#mobileSelf").val());
@@ -36,7 +35,6 @@
 				   $("#contactsSelf ").remove();
 			   }
 			   if($("#conctactOne").val()=="self"){
-				   $("#contactsSelf ").remove();
 				   $("#contactstype").val("SELF");
 				   	$("#s2id_contactstype span.select2-chosen").text("本人");	
 				   	$("#contanttarget").val($("#mobileSelf").val());
@@ -149,11 +147,11 @@
 	                        		 
 	                        	 
 	                        	 if(tMap.tSTemplate.acceptType=="self"){
+	                        		 $("#contactstype").append("<option id='contactsSelf' value='SELF' >本人</option>");
 		                        	 $("#contactstype").val("SELF");
 		                        	 $("#s2id_contactstype span.select2-chosen").text("本人");	
 		                        	 $("#contanttarget").val($("#mobileSelf").val());
 		                        	 $("#contactstype").attr("readonly",true);
-		                        	 $("#contactsSelf ").remove();
 	                        		 
 	                        	 }
 	                        	

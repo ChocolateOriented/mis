@@ -1681,16 +1681,11 @@
 <select id="findallAtuoSms" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
       
         SELECT
-        o.buyer_id AS "buyerid",
+        
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
          repayment_time AS "repaymenttime",
         CASE
-        WHEN o.`status` = 'payoff' THEN
-        DATEDIFF(
-        o.payoff_time,
-        o.repayment_time
-        )
         WHEN o.`status` = 'payment' THEN
         DATEDIFF(CURDATE(), o.repayment_time)
         END AS overduedays,
@@ -1704,9 +1699,9 @@
         WHERE
 		o.type = 'loan' 
         AND o.merchant_id = 7
-		AND o.`status` IN ( 'payment' )
+		AND o.`status`= 'payment' 
         AND t.dbid IS NOT NULL
-        AND t.dunningtaskstatus IN ('dunning')
+        AND t.dunningtaskstatus ='dunning'
         
      
     </select>

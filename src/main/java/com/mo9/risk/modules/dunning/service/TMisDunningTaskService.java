@@ -2396,8 +2396,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		 List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();
 		SimpleDateFormat sb1=new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	     final List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms();
-	   for (final TmisDunningSmsTemplate smsTemplate : tstList) {
+
+	   for ( final TmisDunningSmsTemplate smsTemplate : tstList) {
 		   Date sendDate=null;
 		   try {
             String sendTime = smsTemplate.getSendTime();		   
@@ -2413,7 +2413,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			taskScheduler.schedule(new Runnable() {
 				@Override
 				public void run() {
-					
+				List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms();
 				for (DunningOrder dunningOrder : findallAtuoSms) {
 					Integer overduedays = dunningOrder.getOverduedays();
 					Integer numafter = smsTemplate.getNumafter();
@@ -2462,6 +2462,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								logger.info("发送短信失败:"+e);
 								logger.info("给用户:"+dunningOrder.getMobile()+"发送短信失败");
 							}	
+							//更新催收任务的更新时间
+//							task
+//							tMisDunningTaskDao.update(task);
+							//保存到催收历史记录里
 							TMisContantRecord dunning = new TMisContantRecord();
 							dunning.setTaskid(null);
 							dunning.setDealcode(dunningOrder.getDealcode());
@@ -2473,6 +2477,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							//短信内容
 							dunning.setContent(smsCotent);
 							dunning.setTemplateName(smsTemplate.getTemplateName());
+							dunning.setSmsType(smsTemplate.getSmsType());
 							dunning.setTelstatus(null);
 							dunning.setContactstype(ContactsType.SELF);
 							dunning.setDunningpeoplename("sys");
