@@ -1685,10 +1685,7 @@
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
          repayment_time AS "repaymenttime",
-        CASE
-        WHEN o.`status` = 'payment' THEN
-        DATEDIFF(CURDATE(), o.repayment_time)
-        END AS overduedays,
+        DATEDIFF(CURDATE(), o.repayment_time) AS overduedays,
          t.id AS dunningtaskdbid
         FROM
         t_risk_order AS o
