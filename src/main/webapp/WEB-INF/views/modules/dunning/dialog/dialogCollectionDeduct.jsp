@@ -113,7 +113,17 @@
 	function queryDeductStatus(deductcode) {
 		intervalCnt++;
 		$.get("${ctx}/dunning/tMisDunningDeduct/get", {deductcode: deductcode}, function(data) {
-			if (data.status == "submitted" || !data.repaymentstatus) {
+			if (data.status == "succeeded" && data.repaymentstatus == "succeeded") {
+				alert("扣款成功");
+			} else if (data.status == "succeeded" && data.repaymentstatus == "failed") {
+				alert("还款失败:" + data.repaymentdetail || "");
+			} else if (data.status == "failed") {
+				var msg = data.statusdetail || "";
+				if (data.reason == "NO_BALANCE") {
+					msg = "余额不足，本日请勿重复发起扣款";
+				}
+				alert("扣款失败:" + msg);
+			} else {
 				if (intervalCnt >= 60) {
 					alert("系统繁忙，请稍后查询");
 					clearInterval(intervalId);
@@ -121,15 +131,6 @@
 					window.parent.window.location.reload();
 					window.parent.window.jBox.close();
 				}
-				return;
-			}
-			if (data.status == "succeeded" && data.repaymentstatus == "succeeded") {
-				alert("扣款成功");
-			} else if (data.status == "succeeded" && data.repaymentstatus == "failed") {
-				alert("还款失败:" + data.repaymentdetail || "");
-			} else if (data.status == "failed") {
-				alert("扣款失败:" + data.statusdetail || "");
-			} else {
 				return;
 			}
 			
