@@ -212,7 +212,12 @@
 		FROM sys_dict d
 		LEFT JOIN ( SELECT
 						a.paychannel,
-						COUNT(CASE a.reason WHEN 'NO_BAlANCE' THEN null ELSE 1 END) / COUNT(1) * 100 as successrate
+						COUNT(CASE a.paychannel WHEN 'yilianpay' THEN
+								CASE a.reason WHEN 'NO_BALANCE' THEN NULL ELSE 1 END
+						      ELSE
+						      	CASE a.status WHEN 'succeeded' THEN 1 ELSE NULL END
+						      END
+						) / COUNT(1) * 100 as successrate
 					FROM t_mis_dunning_deduct a
 					<where>
 						<if test="paychannel != null and paychannel != ''">
@@ -235,12 +240,13 @@
 		LIMIT 1
 	</select>
 	
-	<select id="getNoBalanceDeductNumByCard" resultType="int">
+	<select id="getNoBalanceDeductNum" resultType="int">
 	<![CDATA[
 		SELECT 
 			COUNT(1)
 		FROM t_mis_dunning_deduct a
 		WHERE a.bankcard = #{bankcard}
+		AND a.paychannel = #{paychannel}
 		AND a.status = 'failed'
 		AND a.reason = 'NO_BAlANCE'
 		AND a.updatedate >= current_date()

@@ -61,10 +61,10 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	public TMisDunningDeduct getLatestDeductByDealcode(String dealcode);
 	
 	/**
-	 * 查询银行卡当天是否有余额不足的代扣记录
+	 * 查询银行卡在给定渠道当天余额不足的代扣记录数
 	 * @param dealcode
 	 * @return
 	 */
-	public int getNoBalanceDeductNumByCard(String bankcard);
+	public int getNoBalanceDeductNum(TMisDunningDeduct tMisDunningDeduct);
 
 }
