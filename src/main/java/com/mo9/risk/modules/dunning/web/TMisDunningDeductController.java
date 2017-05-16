@@ -194,14 +194,9 @@ public class TMisDunningDeductController extends BaseController {
 		boolean balanceFlag = false;
 		for (PayChannelInfo payChannel : payChannelList) {
 			//至少有一个渠道可用
-			if (payChannel.needCheckBalance()) {
-				balanceFlag = true;
-				boolean balance = tMisDunningDeductService.preCardBalance(bankCard);
-				if (balance) {
-					balanceFlag = false;
-					break;
-				}
-			} else {
+			balanceFlag = true;
+			boolean balance = tMisDunningDeductService.preCardBalanceLimit(payChannel.getChannelid(), bankCard);
+			if (balance) {
 				balanceFlag = false;
 				break;
 			}

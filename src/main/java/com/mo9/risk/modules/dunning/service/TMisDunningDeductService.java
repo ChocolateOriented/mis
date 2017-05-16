@@ -30,6 +30,7 @@ import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
@@ -140,13 +141,12 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		}
 		
 		for (PayChannelInfo channel : channelList) {
-			if (channel.needCheckBalance()) {
-				if (!channel.getIsusable()) {
-					continue;
-				}
-				int num = tMisDunningDeductDao.getNoBalanceDeductNumByCard(bankCard);
-				channel.setIsusable(num == 0);
+			if (!channel.getIsusable()) {
+				continue;
 			}
+			
+			boolean balance = preCardBalanceLimit(channel.getChannelid(), bankCard);
+			channel.setIsusable(balance);
 		}
 		
 		return channelList;
@@ -241,13 +241,22 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	}
 	
 	/**
-	 * 验证银行卡当天是否有余额不足的扣款记录
-	 * @param bankname
+	 * 验证银行卡是否有余额不足的限制
+	 * @param paychannel
+	 * @param bankcard
 	 * @return
 	 */
-	public boolean preCardBalance(String bankcard) {
-		int cnt = tMisDunningDeductDao.getNoBalanceDeductNumByCard(bankcard);
-		return cnt == 0;
+	public boolean preCardBalanceLimit(String paychannel, String bankcard) {
+		String value =  DictUtils.getDictValue(paychannel, "channel_nobalance", "");
+		if (value == null || "".equals(value)) {
+			return true;
+		}
+		int limit = Integer.parseInt(value);
+		TMisDunningDeduct tMisDunningDeduct = new TMisDunningDeduct();
+		tMisDunningDeduct.setBankcard(bankcard);
+		tMisDunningDeduct.setPaychannel(paychannel);
+		int cnt = tMisDunningDeductDao.getNoBalanceDeductNum(tMisDunningDeduct);
+		return cnt < limit;
 	}
 	
 	/**

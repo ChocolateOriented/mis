@@ -247,7 +247,7 @@ public class TMisDunningDeductCallService {
 			bd = bd.multiply(BigDecimal.valueOf(100));
 		}
 		String riskUrl =  DictUtils.getDictValue("riskclone", "orderUrl", "");
-		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" + dealcode + "/" + paychannel + "/" + remark + "/" + paidType + "/" + bd.toString() + "/" + delayDay;
+		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" + dealcode + "/" + paychannel + "/" + remark + "/" + paidType + "/" + String.valueOf(bd.doubleValue()) + "/" + delayDay;
 		logger.info("江湖救急接口url：" + url);
 		String resultMsg = "";
 		String resultCode = "";
