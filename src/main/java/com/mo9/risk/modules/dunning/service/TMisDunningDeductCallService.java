@@ -101,8 +101,8 @@ public class TMisDunningDeductCallService {
 		Map<String, String> result = new HashMap<String, String>();
 		Mo9DeductOrder mo9Order = new Mo9DeductOrder(tMisDunningDeduct);
 		
-		String riskUrl =  DictUtils.getDictValue("misUrl", "orderUrl", "");
-		mo9Order.setNotifyUrl(riskUrl + "mis/dunning/tMisDunningDeduct/updateRecord");
+		String misUrl =  DictUtils.getDictValue("misUrl", "orderUrl", "");
+		mo9Order.setNotifyUrl(misUrl + "dunning/tMisDunningDeduct/updateRecord");
 		
 		String privateKey = tMisDunningConfigureDao.get("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(mo9Order.toMap(), privateKey);
