@@ -48,6 +48,9 @@
 			<if test="type != null and type != ''">
 				AND a.type = #{type}
 			</if>
+			<if test="leader != null and leader.id != null and leader.Id != ''">
+				AND a.leaderId = #{leader.id}
+			</if>
 			<if test="leader != null and leader.name != null and leader.name != ''">
 				AND u.name LIKE concat('%', #{leader.name},'%')
 			</if>
