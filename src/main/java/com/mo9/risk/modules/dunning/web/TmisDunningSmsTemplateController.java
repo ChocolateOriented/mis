@@ -21,10 +21,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.drew.lang.StringUtil;
+import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
@@ -50,7 +52,8 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	private TmisDunningSmsTemplateDao tstDao;
 	@Autowired
 	private TMisDunningTaskDao tdtDao;
-	
+	@Autowired
+	TMisDunningPeopleDao tmisPeopleDao;
 	
 	
 	
@@ -67,7 +70,7 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping("list")
+	@RequestMapping(value = {"list", ""})
 	public String findPageList(TmisDunningSmsTemplate tstemplate, HttpServletRequest request, HttpServletResponse response, Model model){
 		Page<TmisDunningSmsTemplate> page = tstService.findOrderPageList(new Page<TmisDunningSmsTemplate>(request, response), tstemplate);
 		
@@ -225,7 +228,9 @@ public class TmisDunningSmsTemplateController extends BaseController{
 		TMisDunningOrder order = tdtDao.findOrderByDealcode(dealcode);
 		TMisDunningTask task = tdtDao.get(dunningtaskdbid);
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
-		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(), order, task);
+		 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(),order.getDealcode(),
+				order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
 		template.setSmsCotent(cousmscotent);
 		tMap.put("tSTemplate", template);
 		tMap.put("contactType", contactType);

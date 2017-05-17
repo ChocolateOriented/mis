@@ -99,7 +99,8 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
 		  
 		  String smsCotent = tSmsTemplate.getSmsCotent();
-		  String cousmscotent = cousmscotent(smsCotent,order,task);
+		  TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+		  String cousmscotent = this.cousmscotent(smsCotent,order.getDealcode(),order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
 		  tSmsTemplate.setSmsCotent(cousmscotent); 
 		 } 
 		  return findList;
@@ -112,13 +113,11 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   * @param smsCotent
 		   * @return
 		   */
-        public String cousmscotent(String smsCotent,TMisDunningOrder order,TMisDunningTask task){
+        public String cousmscotent(String smsCotent,String  dealcode,String platformExt,String dunningpeopleid,String extensionNumber){
         	
-        	String dunningpeopleid = task.getDunningpeopleid();
+//        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
         	
-        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
-        	
-        	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getBuyerInfoByDealcode(order.getDealcode());
+        	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(dealcode);
         	
         	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         	
@@ -128,8 +127,8 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	String  creditAmount="";
         	
         	if(smsCotent.contains("${platform}")){
-        		if(order.getPlatformExt()!=null&&!"".equals(order.getPlatformExt())){
-    	    		if(order.getPlatformExt().contains("feishudai")){
+        		if(null!=platformExt&&!"".equals(platformExt)){
+    	    		if(platformExt.contains("feishudai")){
     	    			platform ="飞鼠贷";
     	    		}else{
     	    			platform = "mo9";
@@ -166,8 +165,10 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         		creditAmount=String.valueOf((Double.valueOf(buyerInfeo.getCreditAmount()).doubleValue()/100D));
         		smsCotent=smsCotent.replace("${creditamount}",creditAmount);
         	}
-        	if(smsCotent.contains("${extensionNumber}")){
-        		smsCotent=smsCotent.replace("${extensionNumber}",tMisDunningPeople.getExtensionNumber());
+        	if(null!=extensionNumber&&""!=extensionNumber){
+	        	if(smsCotent.contains("${extensionNumber}")){
+	        		smsCotent=smsCotent.replace("${extensionNumber}",extensionNumber);
+	        	}
         	}
         	if(smsCotent.contains("${creadateTime}")){
         		

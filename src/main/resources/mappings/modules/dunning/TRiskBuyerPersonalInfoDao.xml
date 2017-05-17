@@ -201,4 +201,19 @@
      o.status = 'payment' and
       DATEDIFF( o.repayment_time,CURDATE()) in(1,0)
 </select>
+
+<select id = "getbuyerIfo" resultType="TRiskBuyerPersonalInfo">
+	  SELECT
+		o.create_time as "createTime",
+		o.repayment_time as "repaymentTime",
+		c.real_name as "realName",
+		c.idCard as "idcard",
+		DATEDIFF(curdate(), o.repayment_time)  as "overdueDays",
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		c.sex As sex
+	FROM t_risk_order AS o
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status ='payment' and o.dealcode = #{dealcode} 
+	</select>
+
 </mapper>

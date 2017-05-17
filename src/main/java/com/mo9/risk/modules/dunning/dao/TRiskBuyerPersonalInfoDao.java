@@ -26,4 +26,6 @@ public interface TRiskBuyerPersonalInfoDao {
 	public TRiskBuyerPersonalInfo getNewBuyerInfoByDealcode(String dealcode);
 	
 	public List<TRiskBuyerPersonalInfo> getMessgeByRepaymentTime();
+	
+	public TRiskBuyerPersonalInfo getbuyerIfo(String dealcode);
 }

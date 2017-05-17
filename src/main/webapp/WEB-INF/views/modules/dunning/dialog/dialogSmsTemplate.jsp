@@ -194,14 +194,14 @@
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
 	  <input type="hidden" name="id" value="${tSTemplate.id }"/>
 		
-<!-- 		<div class="control-group"> -->
-<!-- 			<label class="control-label">英文模板名称：</label> -->
-<!-- 			<div class="controls"> -->
-<%-- 				<input  value="${tSTemplate.englishTemplateName}" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  /> --%>
-<!-- 					<span class="help-inline"><font color="red">*</font> </span> -->
-<!-- 					<span ><font color="red" id="etipName"></font></span> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
+		<div class="control-group">
+			<label class="control-label">英文模板名称：</label>
+			<div class="controls">
+				<input  value="${tSTemplate.englishTemplateName}" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  />
+					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="etipName"></font></span>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
 			<div class="controls">

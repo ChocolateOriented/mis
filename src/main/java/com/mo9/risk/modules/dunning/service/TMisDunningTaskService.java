@@ -2393,7 +2393,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 0 0 * * ?")  
 	@Transactional
 	public void AutoSmsSend(){
-		 List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();
+		 List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();//查询所有系统模板
 		SimpleDateFormat sb1=new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -2413,27 +2413,27 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			taskScheduler.schedule(new Runnable() {
 				@Override
 				public void run() {
-				List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms();
+				List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms();//查询所有需要催收的订单
 				for (DunningOrder dunningOrder : findallAtuoSms) {
 					Integer overduedays = dunningOrder.getOverduedays();
 					Integer numafter = smsTemplate.getNumafter();
 					Integer numbefore = smsTemplate.getNumbefore();
 					if(overduedays>=numbefore&&overduedays<=numafter){
-						String smsCotent="";
-						TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dunningOrder.getDealcode());
-						TMisDunningTask task = tMisDunningTaskDao.get(dunningOrder.getDunningtaskdbid());
+//						TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dunningOrder.getDealcode());
+//						TMisDunningTask task = tMisDunningTaskDao.get(dunningOrder.getDunningtaskdbid());
+						String smsCotent = tdstService.cousmscotent( smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),
+								dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 							try {
 								
 								if ("wordText".equals(smsTemplate.getSmsType())) {
-									smsCotent = smsTemplate.getSmsCotent();
-									 smsCotent = tdstService.cousmscotent(smsCotent, order, task);
+									
 									Map<String, String> wparams = new HashMap<String, String>();
 									wparams.put("mobile", dunningOrder.getMobile());// 发送手机号
 									// 模板填充的map
 									Map<String, Object> map = tMisContantRecordService
-											.getCotentValue(smsTemplate.getSmsCotent(), order, task);
+											.getCotentValue(smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 									wparams.put("template_data", new JacksonConvertor().serialize(map));
-									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
+									String englishTemplateName =smsTemplate.getEnglishTemplateName();
 									wparams.put("template_name",englishTemplateName );// 模板名称
 									wparams.put("template_tags", "CN");// 模板标识
 									Thread.sleep(100);
@@ -2441,16 +2441,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 											BaseResponse.class);
 								}
 								if ("voice".equals(smsTemplate.getSmsType())) {
-									 smsCotent = smsTemplate.getSmsCotent();
-									 smsCotent = tdstService.cousmscotent(smsCotent, order, task);
+									
 									Map<String, String> vparams = new HashMap<String, String>();
 									vparams.put("mobile", dunningOrder.getMobile());// 发送手机号
 									vparams.put("style", "voiceContent");// 固定值
 									// 模板填充的map
 									Map<String, Object> map = tMisContantRecordService
-											.getCotentValue(smsTemplate.getSmsCotent(), order, task);
+											.getCotentValue(smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 									vparams.put("template_data", new JacksonConvertor().serialize(map));
-									String englishTemplateName = tMisContantRecordService.EnglishTemplateName(smsTemplate.getTemplateName());
+									String englishTemplateName =smsTemplate.getEnglishTemplateName();
 									vparams.put("template_name",englishTemplateName );// 模板名称
 									vparams.put("template_tags", "CN");// 模板标识
 									Thread.sleep(100);
@@ -2462,9 +2461,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								logger.info("发送短信失败:"+e);
 								logger.info("给用户:"+dunningOrder.getMobile()+"发送短信失败");
 							}	
-							//更新催收任务的更新时间
-//							task
-//							tMisDunningTaskDao.update(task);
 							//保存到催收历史记录里
 							TMisContantRecord dunning = new TMisContantRecord();
 							dunning.setTaskid(null);

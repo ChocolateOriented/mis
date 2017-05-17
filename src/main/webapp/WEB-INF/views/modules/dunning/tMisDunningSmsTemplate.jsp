@@ -64,6 +64,14 @@
                }
       });
 	}
+	
+	function page(n,s){
+		$("#pageNo").val(n);
+		$("#pageSize").val(s);
+	location.href="${ctx}/dunning/TmisDunningSmsTemplate/list?pageNo="+n+"&pageSize="+s;
+	}
+
+
 	</script>
 	
 </head>

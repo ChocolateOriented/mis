@@ -186,14 +186,14 @@
 	</ul>
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
 		
-<!-- 		<div class="control-group"> -->
-<!-- 			<label class="control-label">英文模板名称：</label> -->
-<!-- 			<div class="controls"> -->
-<!-- 				<input  value="" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  /> -->
-<!-- 					<span class="help-inline"><font color="red">*</font> </span> -->
-<!-- 					<span ><font color="red" id="etipName"></font></span> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
+		<div class="control-group">
+			<label class="control-label">英文模板名称：</label>
+			<div class="controls">
+				<input  value="" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  />
+					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="etipName"></font></span>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
 			<div class="controls">
