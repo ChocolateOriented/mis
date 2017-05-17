@@ -268,7 +268,9 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	
 	/**
 	 * 查询需要系统发送的订单
+	 * @param numafter 
+	 * @param numbefore 
 	 * @return
 	 */
-	public List<DunningOrder> findallAtuoSms();
+	public List<DunningOrder> findallAtuoSms(@Param("numbefore")Integer numbefore,@Param("numafter") Integer numafter);
 }

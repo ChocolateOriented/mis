@@ -1700,7 +1700,7 @@
 		AND o.`status`= 'payment' 
         AND t.dbid IS NOT NULL
         AND t.dunningtaskstatus ='dunning'
-        
+        AND DATEDIFF(CURDATE(), o.repayment_time)  BETWEEN #{numbefore} AND #{numafter}
      
     </select>
 	

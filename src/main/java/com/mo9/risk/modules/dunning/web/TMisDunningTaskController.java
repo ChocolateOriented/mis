@@ -1222,10 +1222,10 @@ public class TMisDunningTaskController extends BaseController {
 		String contactstype = request.getParameter("contactstype");
 		if(StringUtils.isNotBlank(contactstype)){
 			contactstype=contactstype.toUpperCase();
-			if(!contactstype.equals("self")){
+			if(!contactstype.equals("SELF")){
 				contatType ="others";
 			}
-			if(contactstype.equals("self")){
+			if(contactstype.equals("SELF")){
 				contatType ="self";
 			}
 		}
