@@ -168,7 +168,7 @@
 		FROM sys_dict d
 		LEFT JOIN ( SELECT DISTINCT paychannel
 					FROM t_mis_paychannel_bank p
-					WHERE p.bankname = #{bankname}
+					WHERE instr(#{bankname}, p.bankname) > 0
 					AND p.delflag = '0'
 		) t ON d.value = t.paychannel
 		WHERE d.type = 'pay_channel'
@@ -182,7 +182,7 @@
 		FROM sys_dict d
 		JOIN ( SELECT DISTINCT paychannel
 					FROM t_mis_paychannel_bank p
-					WHERE p.bankname = #{bankname}
+					WHERE instr(#{bankname}, p.bankname) > 0
 					AND p.delflag = '0'
 		) t ON d.value = t.paychannel
 		WHERE d.type = 'pay_channel'
@@ -197,7 +197,7 @@
 		FROM sys_dict d
 		JOIN ( SELECT DISTINCT paychannel
 					FROM t_mis_paychannel_bank p
-					WHERE p.bankname = #{bankname}
+					WHERE instr(#{bankname}, p.bankname) > 0
 					AND p.delflag = '0'
 		) t ON d.value = t.paychannel
 		WHERE d.type = 'pay_channel'

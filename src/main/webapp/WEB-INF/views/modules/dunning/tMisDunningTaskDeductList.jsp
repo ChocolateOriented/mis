@@ -117,8 +117,15 @@
 				<td>
 					${tMisDunningDeduct.paychannel}
 				</td>
-				<td>
-					${tMisDunningDeduct.status.desc}
+				<td title="${tMisDunningDeduct.statusDesc}">
+					<c:choose>
+						<c:when test="${fn:length(tMisDunningDeduct.statusDesc) > 20}">
+							<c:out value="${fn:substring(tMisDunningDeduct.statusDesc, 0, 20)}..." />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${tMisDunningDeduct.statusDesc}" />
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td>
 					<fmt:formatDate value="${tMisDunningDeduct.finishtime}" pattern="yyyy-MM-dd HH:mm:ss"/>
