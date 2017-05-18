@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao">
   	
+  	<!--计算剩余待还金额  t_risk_order AS o -->
+    <sql id="countRemainAmmount">
+    	CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
+    </sql>
+	<!--计算还款金额  t_risk_order AS o -->
+	<sql id="countBalance">
+		 CASE WHEN o.`status` = 'payoff' THEN (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END ) ELSE IFNULL(o.balance, 0) END
+    </sql>
+    
 	<select id = "getBuyerInfoByDealcode" resultType="TRiskBuyerPersonalInfo">
 	  SELECT
 		o.dealcode as "dealcode",
@@ -33,11 +42,9 @@
 		IFNULL(o.amount, 0) * 100 as "amount",
 		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
 		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
-		IFNULL(o.balance, 0) * 100 as "balance",
-<!-- 	IFNULL(o.modify_amount, 0) * 100 as "modifyAmount", -->
+		(<include refid="countBalance"/>) * 100 as "balance",
 		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
-<!-- 	(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)) * 100 as "creditAmount", -->
-		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		(<include refid="countRemainAmmount"/>) * 100 as "creditAmount",
 		IFNULL(r.Delay_Count, 0) As delayCount,
 		c.sex As sex
 	FROM t_risk_order AS o
@@ -87,11 +94,9 @@
 		IFNULL(o.amount, 0) * 100 as "amount",
 		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
 		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
-		IFNULL(o.balance, 0) * 100 as "balance",
-<!-- 	IFNULL(o.modify_amount, 0) * 100 as "modifyAmount", -->
+		(<include refid="countBalance"/>) * 100 as "balance",
 		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
-<!-- 	(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)) * 100 as "creditAmount", -->
-		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditAmount",
+		(<include refid="countRemainAmmount"/>) * 100 as "creditAmount",
 	IFNULL(r.Delay_Count, 0) As delayCount
 	FROM t_risk_order AS o
 	LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
@@ -150,9 +155,9 @@
 		IFNULL(o.credit_amount, 0) * 100 as "amount",
 		IFNULL(o.overdue_amount, 0) * 100 as "overdueAmount",
 		(IFNULL(o.amount, 0) - ifnull(o.credit_amount, 0)) * 100 as "discountAmount",
-		CASE WHEN o.`status` = 'payoff' THEN (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END ) * 100 ELSE IFNULL(o.balance, 0) * 100 END as "balance",
+		(<include refid="countBalance"/>) * 100 as "balance",
 		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyAmount",
-		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 END as "creditAmount",
+		(<include refid="countRemainAmmount"/>) * 100 as "creditAmount",
 		IFNULL(r.Delay_Count, 0) As delayCount,
 		c.sex As sex,
 		IFNULL(q.bank_no,"") AS remitBankNo,
@@ -186,7 +191,7 @@
 	 idc.sex AS "sex",
 	 DATEDIFF(curdate(), o.repayment_time) as "overdueDays",
 	 o.platform_ext AS "finProduct",
-	CASE WHEN o.`status` = 'payment' THEN (IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0)) * 100 END AS "creditAmount",
+	(<include refid="countRemainAmmount"/>) * 100 AS "creditAmount",
 	 o.repayment_time AS "repaymentTime",
 	CASE WHEN   DATEDIFF( o.repayment_time,CURDATE())=1 THEN 1 
 	     WHEN DATEDIFF( o.repayment_time,CURDATE())=0 THEN 0 END AS "rpayStatus"

@@ -29,7 +29,14 @@
 
     <sql id="tMisDunningTaskJoins">
     </sql>
-
+	<!--计算剩余待还金额  t_risk_order AS o -->
+    <sql id="countRemainAmmount">
+    	CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
+    </sql>
+	<!--计算还款金额  t_risk_order AS o -->
+	<sql id="countBalance">
+		 CASE WHEN o.`status` = 'payoff' THEN (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END ) ELSE IFNULL(o.balance, 0) END
+    </sql>
     <select id="get" resultType="TMisDunningTask">
         SELECT
         <include refid="tMisDunningTaskColumns"/>
@@ -398,7 +405,7 @@
 					o.dealcode AS "dealcode",
 					b.mobile AS "mobile", 
 					o.amount AS "amount",
-					IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+					<include refid="countRemainAmmount"/> AS creditamount,
 					repayment_time AS "repaymenttime",
 					CASE
 					WHEN o.`status` = 'payoff' THEN
@@ -449,9 +456,8 @@
         CURDATE()
         ) AS delaydays,
         IFNULL(o.overdue_amount, 0) AS overdueamount,
-        IFNULL(o.balance, 0) AS balance,
-        IFNULL(o.credit_amount, 0) + IFNULL(overdue_amount, 0) - IFNULL(balance, 0) AS remainammount,
-<!--    IFNULL(o.modify_amount, 0) AS modifyamount, -->
+        <include refid="countBalance"/> AS balance,
+        <include refid="countRemainAmmount"/> AS remainammount,
 		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END AS modifyamount,
         o.remit_time AS remittime,
         o.days AS days,
@@ -625,7 +631,7 @@
 			 o.payoff_time AS payofftime,
 			 CASE 
 <!-- 			WHEN o.type = 'loan' THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)  -->
-			 	WHEN o.type = 'loan' THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)
+			 	WHEN o.type = 'loan' THEN <include refid="countRemainAmmount"/>
 <!-- 			WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) -->
 				WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END
 			 END AS amount,
@@ -692,8 +698,7 @@
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
         o.amount AS "amount",
-<!--    IFNULL(o.credit_amount, 0) - IFNULL(o.modify_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount, -->
-		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END AS creditamount,
+		<include refid="countRemainAmmount"/> AS creditamount,
         repayment_time AS "repaymenttime",
         CASE
         WHEN o.`status` = 'payoff' THEN
@@ -841,9 +846,8 @@
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
         o.amount AS "amount",
-        CASE WHEN o.`status` = 'payoff' THEN (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END ) ELSE IFNULL(o.balance, 0) END as "balance",
-<!--    IFNULL(o.credit_amount, 0) - IFNULL(o.modify_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount, -->
-		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END AS creditamount,
+        <include refid="countBalance"/> as "balance",
+		<include refid="countRemainAmmount"/> AS creditamount,
         repayment_time AS "repaymenttime",
         CASE
         WHEN o.`status` = 'payoff' THEN
@@ -1002,7 +1006,7 @@
 	        o.dealcode AS "dealcode",
 	        b.mobile AS "mobile",
 	        o.amount AS "amount",
-			IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) AS creditamount,
+			<include refid="countRemainAmmount"/> AS creditamount,
 	        repayment_time AS "repaymenttime",
 	        CASE
 	        WHEN o.`status` = 'payoff' THEN
@@ -1331,12 +1335,12 @@
 <!-- 														new自动分配 - begin								 	    -->
    
    	<select id="newfindExpiredTask" resultType="TMisDunningTask">
-   	    <![CDATA[  
 		    select 
 				t.*,
-				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamountOnEnd"
+				(<include refid="countRemainAmmount"/>) * 100 as "creditamountOnEnd"
 			from t_mis_dunning_task as t 
 				LEFT JOIN t_risk_order AS o ON  t.dealcode = o.dealcode
+   	    <![CDATA[  
 			where  date(Deadline) <= date(now()) and DunningTaskStatus = 'dunning' ORDER BY dbid 
 	    ]]>
 	</select>
@@ -1364,7 +1368,7 @@
 					IFNULL(o.cost_amount, 0) * 100  as "costamout",
 					IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 					CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-					(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+					(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
 					t.id as "taskid",
 					t.DunningCycle as "dunningcycle",
 					p.id as "dunningpeopleid",
@@ -1413,7 +1417,7 @@
 				IFNULL(o.cost_amount, 0) * 100  as "costamout",
 				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount"
+				(<include refid="countRemainAmmount"/>) * 100 as "creditamount"
 		FROM t_risk_order AS o
 			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 			LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
@@ -1540,7 +1544,7 @@
 				IFNULL(o.cost_amount, 0) * 100  as "costamout",
 				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+				(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
 				t.id as "taskid",
 				t.DunningCycle as "dunningcycle",
 				p.id as "dunningpeopleid",
@@ -1584,7 +1588,7 @@
 				IFNULL(o.cost_amount, 0) * 100  as "costamout",
 				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-				(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+				(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
 				t.id as "taskid",
 				t.DunningCycle as "dunningcycle",
 				p.id as "dunningpeopleid",
@@ -1628,7 +1632,7 @@
 					IFNULL(o.cost_amount, 0) * 100  as "costamout",
 					IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 					CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-					(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) * 100 as "creditamount",
+					(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
 					t.id as "taskid",
 					t.DunningCycle as "dunningcycle",
 					p.id as "dunningpeopleid",
