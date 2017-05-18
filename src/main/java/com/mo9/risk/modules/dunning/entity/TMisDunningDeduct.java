@@ -229,5 +229,27 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	public void setRepaymentdetail(String repaymentdetail) {
 		this.repaymentdetail = repaymentdetail;
 	}
+	
+	public String getStatusDesc() {
+		if (status == null) {
+			return "";
+		}
+		
+		if (status != PayStatus.failed) {
+			return status.getDesc();
+		}
+		
+		if (statusdetail == null || "".equals(statusdetail)) {
+			return status.getDesc();
+		}
+		
+		int index = statusdetail.indexOf("-->");
+		
+		if (index < 0 || statusdetail.length() <= index + 3) {
+			return status.getDesc() + "(" + statusdetail + ")";
+		}
+		
+		return status.getDesc() + "(" + statusdetail.substring(index + 3, statusdetail.length()) + ")";
+	}
 
 }
