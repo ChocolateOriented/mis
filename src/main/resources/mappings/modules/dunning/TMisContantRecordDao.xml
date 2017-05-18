@@ -298,15 +298,15 @@
 	 
 <!-- 	</select> -->
 	
-	<update id="updateList"   >
-	  update
-	   t_mis_contant_record
-	   set
-	   SmsTemp=#{templateName},
-	   SmsType=#{smsType}
-	  where
-	  smsTemplateId=#{smsTemplateId}
-	</update>
+<!-- 	<update id="updateList"   > -->
+<!-- 	  update -->
+<!-- 	   t_mis_contant_record -->
+<!-- 	   set -->
+<!-- 	   SmsTemp=#{templateName}, -->
+<!-- 	   SmsType=#{smsType} -->
+<!-- 	  where -->
+<!-- 	  smsTemplateId=#{smsTemplateId} -->
+<!-- 	</update> -->
 	
 <!-- 	<update id="delete"> -->
 <!-- 		DELETE FROM t_mis_contant_record -->

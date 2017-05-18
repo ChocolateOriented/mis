@@ -421,16 +421,16 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
      * 根据短信模板修改后更新催收历史记录
      * @param tDunningSmsTemplate
      */
-	@Transactional(readOnly = false)
-	public void updateTmisContatRwcord(TmisDunningSmsTemplate tDunningSmsTemplate) {
-		   TMisContantRecord tMisContantRecord=new TMisContantRecord();
-		   tMisContantRecord.setTemplateName(tDunningSmsTemplate.getTemplateName());
-		   tMisContantRecord.setSmsType(tDunningSmsTemplate.getSmsType());
-		   tMisContantRecord.setSmsTemplateId(tDunningSmsTemplate.getId());
-			tMisContantRecordDao.updateList(tMisContantRecord);
-			
-		
-	}
+//	@Transactional(readOnly = false)
+//	public void updateTmisContatRwcord(TmisDunningSmsTemplate tDunningSmsTemplate) {
+//		   TMisContantRecord tMisContantRecord=new TMisContantRecord();
+//		   tMisContantRecord.setTemplateName(tDunningSmsTemplate.getTemplateName());
+//		   tMisContantRecord.setSmsType(tDunningSmsTemplate.getSmsType());
+//		   tMisContantRecord.setSmsTemplateId(tDunningSmsTemplate.getId());
+//			tMisContantRecordDao.updateList(tMisContantRecord);
+//			
+//		
+//	}
 
     /**
      * 

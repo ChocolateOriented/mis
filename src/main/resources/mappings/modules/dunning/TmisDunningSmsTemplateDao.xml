@@ -28,12 +28,14 @@
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.TemplateName = #{templateName}
+		AND s.SendMethod ="labourSend"
 	</select>
 	<select id="getByEnglishName" resultType="TmisDunningSmsTemplate">
 		SELECT 
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.EnglishTemplateName = #{englishTemplateName}
+		AND s.SendMethod ="labourSend"
 	</select>
 	
 	 <select id="findSmsPageList" resultType="TmisDunningSmsTemplate">

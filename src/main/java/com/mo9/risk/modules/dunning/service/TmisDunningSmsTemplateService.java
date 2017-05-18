@@ -45,8 +45,8 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 	@Autowired
 	TRiskBuyerPersonalInfoDao tbuyerDao;
 
-	@Autowired
-	private TMisContantRecordService tcrService;
+//	@Autowired
+//	private TMisContantRecordService tcrService;
 	
 	public Page<TmisDunningSmsTemplate> findOrderPageList(Page<TmisDunningSmsTemplate> page, TmisDunningSmsTemplate entity) {
 		
@@ -71,7 +71,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		}
 		
 		   super.save(tDunningSmsTemplate);
-	       tcrService.updateTmisContatRwcord(tDunningSmsTemplate);
+//	       tcrService.updateTmisContatRwcord(tDunningSmsTemplate);
            
 	}
     
