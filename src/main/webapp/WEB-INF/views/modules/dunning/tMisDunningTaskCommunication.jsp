@@ -101,6 +101,8 @@
 		<input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/>
 		<input id ="dealcode" name="dealcode" type="hidden" value="${dealcode}"/>
 		<input id = "dunningtaskdbid" name="dunningtaskdbid" type="hidden" value="${dunningtaskdbid}"/>
+		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
+		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
 	</form:form>
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">		
 		<thead>
