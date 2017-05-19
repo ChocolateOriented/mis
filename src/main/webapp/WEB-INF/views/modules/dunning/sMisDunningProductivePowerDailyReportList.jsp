@@ -10,7 +10,7 @@
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出催收员案件活动日报数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/sMisDunningProductivePowerDailyReport/export");
+						$("#searchForm").attr("action","${ctx}/dunning/report/productivePowerDailyReportExport");
 						$("#searchForm").submit();
 					}
 				},{buttonsFocus:1});
@@ -56,7 +56,7 @@
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
 			if(s) $("#pageSize").val(s);
-			$("#searchForm").attr("action","${ctx}/dunning/sMisDunningProductivePowerDailyReport");
+			$("#searchForm").attr("action","${ctx}/dunning/report/productivePowerDailyReport");
 			$("#searchForm").submit();
         	return false;
         }
@@ -73,9 +73,9 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/sMisDunningProductivePowerDailyReport/">催收员案件活动日报列表</a></li>
+		<li class="active"><a href="${ctx}/dunning/report/productivePowerDailyReport">催收员案件活动日报列表</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="SMisDunningProductivePowerDailyReport" action="${ctx}/dunning/sMisDunningProductivePowerDailyReport" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="SMisDunningProductivePowerDailyReport" action="${ctx}/dunning/report/productivePowerDailyReport" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">

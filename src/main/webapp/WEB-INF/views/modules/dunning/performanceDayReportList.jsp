@@ -9,7 +9,7 @@
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出催收员工日报数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/performanceDayReportExport");
+						$("#searchForm").attr("action","${ctx}/dunning/report/performanceDayReportExport");
 						$("#searchForm").submit();
 					}
 				},{buttonsFocus:1});
@@ -21,7 +21,7 @@
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
 			if(s) $("#pageSize").val(s);
-			$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/findPerformanceDayReport");
+			$("#searchForm").attr("action","${ctx}/dunning/report/findPerformanceDayReport");
 			$("#searchForm").submit();
         	return false;
         }
@@ -29,9 +29,9 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisDunningTask/findPerformanceDayReport">催收员工日报</a></li>
+		<li class="active"><a href="${ctx}/dunning/report/findPerformanceDayReport">催收员工日报</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="performanceDayReport" action="${ctx}/dunning/tMisDunningTask/findPerformanceDayReport" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="performanceDayReport" action="${ctx}/dunning/report/findPerformanceDayReport" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
