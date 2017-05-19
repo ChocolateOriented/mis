@@ -1232,12 +1232,18 @@
 
     <!-- 按日查询-->
     <select id="findPerformanceDayReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceDayReport">
- 	    <![CDATA[
 
 			SELECT
 				#{datetimestart} AS datetimestart, 
 				#{datetimeend}  AS datetimeend, 
-				t.DunningCycle AS DunningCycle,
+				<choose>
+					<when test="dunningCycle != null and dunningCycle != ''">
+						#{dunningCycle} AS DunningCycle,
+					</when>
+					<otherwise>
+						t.DunningCycle AS DunningCycle,
+					</otherwise>
+				</choose>
 				p.Name AS personnel, 
 				IFNULL(t.payoffAmount, 0) AS payamount,
 				IFNULL(t.payoffOrder, 0) AS payorder,
@@ -1247,8 +1253,7 @@
 				SELECT
 					ID,
 					NAME,
-					Begin,
-					End
+					DunningCycle
 				FROM t_mis_dunning_people
 				WHERE Field1 = 'active'
 				) AS p
@@ -1257,6 +1262,7 @@
 					t.DunningCycle,
 					t.DunningPeopleId,
 			
+   			<![CDATA[
 					SUM(
 						CASE
 							WHEN IFNULL(o.delay_days, 0) > 0
@@ -1273,9 +1279,14 @@
 			
 				WHERE t.DunningTaskStatus = 'finished' 
 					  AND DATE(t.CreateDate) <= #{datetimeend} 
+ 		 	]]>
 					  AND o.type = 'loan'
 					  AND o.merchant_id = 7
 					  AND o.status = 'payoff'
+					  <if test="dunningCycle != null and dunningCycle != ''">
+						AND  t.dunningCycle = #{dunningCycle}
+					  </if>
+		<![CDATA[
 					  AND DATE(o.payoff_time) >= #{datetimestart}
 					  AND DATE(o.payoff_time) <= #{datetimeend}
 				GROUP BY t.DunningPeopleId  ,t.DunningCycle
@@ -1301,9 +1312,7 @@
 	            AND p.Name LIKE concat('%',#{personnel},'%')
 	        </if>
 	        <if test="dunningCycle != null and dunningCycle != ''">
-	            <![CDATA[
-				AND  dunningCycle = #{dunningCycle}
-			    ]]>
+				AND  p.dunningCycle LIKE concat('%',#{dunningCycle},'%')
 	        </if>
         </where>
 		ORDER BY DunningCycle
