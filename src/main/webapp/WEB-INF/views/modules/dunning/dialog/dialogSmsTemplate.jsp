@@ -55,6 +55,40 @@
 			       if("all"==$("#acceptType").val()){
 			       $("#reasons").show();
 			       }
+			       $.ajax({
+						url:"${ctx}/dunning/TmisDunningSmsTemplate/findOne?templateName="+$("#templateName").val()+"&sendMethod="+$("#sendMethod").val()+"&englishTemplateName="+$("#englishTemplateName").val(),
+						type:"GET",
+						data:{},
+						success:function(data){
+							
+							if(data=="allName"){
+								$("#etipName").html("名字已存在");
+								$("#tipName").html("名字已存在");
+								$("#templateName").val("");
+								$("#englishTemplateName").val("");
+							}
+							if(data=="eName"){
+								$("#etipName").html("名字已存在");
+								$("#englishTemplateName").val("");
+							}
+							if(data=="tName"){
+								$("#tipName").html("名字已存在");
+								$("#templateName").val("");
+							}
+							if(data=="OK"){
+								$("#tipName").html("");
+								$("#etipName").html("");
+								
+							}
+							
+						},
+						error : function(XMLHttpRequest, textStatus, errorThrown){
+		                       //通常情况下textStatus和errorThrown只有其中一个包含信息
+		                       $("#templateName").val("");
+		                       alert("查询失败:"+textStatus);
+		                    }
+						
+					});
 				}else{
 					 $("#sendTime").show();
 					 $("#acceptType").val("self");
@@ -64,14 +98,13 @@
 					 $("#reasons").hide();
 					 $("#sendReason").val("");
 				}
-				
-				
+							
 			});
 			
-			//保证名字唯一
+			//保证人工中文名字唯一
 			$("#templateName").blur(function(){
 				$.ajax({
-					url:"${ctx}/dunning/TmisDunningSmsTemplate/findName?templateName="+$("#templateName").val(),
+					url:"${ctx}/dunning/TmisDunningSmsTemplate/findName?templateName="+$("#templateName").val()+"&sendMethod="+$("#sendMethod").val(),
 					type:"GET",
 					data:{},
 					success:function(data){
@@ -94,13 +127,12 @@
 	                    }
 					
 				});
-				
 			});
 			
-			//保证英文名字名字唯一
+			//保证人工英文名字名字唯一
 			$("#englishTemplateName").blur(function(){
 				$.ajax({
-					url:"${ctx}/dunning/TmisDunningSmsTemplate/findEnglishName?englishTemplateName="+$("#englishTemplateName").val(),
+					url:"${ctx}/dunning/TmisDunningSmsTemplate/findEnglishName?englishTemplateName="+$("#englishTemplateName").val()+"&sendMethod="+$("#sendMethod").val(),
 					type:"GET",
 					data:{},
 					success:function(data){
@@ -194,14 +226,14 @@
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
 	  <input type="hidden" name="id" value="${tSTemplate.id }"/>
 		
-<!-- 		<div class="control-group"> -->
-<!-- 			<label class="control-label">英文模板名称：</label> -->
-<!-- 			<div class="controls"> -->
-<%-- 				<input  value="${tSTemplate.englishTemplateName}" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  /> --%>
-<!-- 					<span class="help-inline"><font color="red">*</font> </span> -->
-<!-- 					<span ><font color="red" id="etipName"></font></span> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
+		<div class="control-group">
+			<label class="control-label">英文模板名称：</label>
+			<div class="controls">
+				<input  value="${tSTemplate.englishTemplateName}" id="englishTemplateName" name="englishTemplateName" htmlEscape="false"  class="input-xlarge required "  />
+					<span class="help-inline"><font color="red">*</font> </span>
+					<span ><font color="red" id="etipName"></font></span>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>
 			<div class="controls">

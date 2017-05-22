@@ -1,16 +1,13 @@
 package com.mo9.risk.modules.dunning.web;
 
 
-import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,16 +15,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.JSON;
-import com.drew.lang.StringUtil;
+import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
-import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -50,7 +44,8 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	private TmisDunningSmsTemplateDao tstDao;
 	@Autowired
 	private TMisDunningTaskDao tdtDao;
-	
+	@Autowired
+	TMisDunningPeopleDao tmisPeopleDao;
 	
 	
 	
@@ -67,7 +62,7 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping("list")
+	@RequestMapping(value = {"list", ""})
 	public String findPageList(TmisDunningSmsTemplate tstemplate, HttpServletRequest request, HttpServletResponse response, Model model){
 		Page<TmisDunningSmsTemplate> page = tstService.findOrderPageList(new Page<TmisDunningSmsTemplate>(request, response), tstemplate);
 		
@@ -170,7 +165,7 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	}
 	
 	/**
-	 * 添加时保证模板名唯一
+	 * 添加时保证人工中文模板名唯一
 	 * @param templateName
 	 * @param model
 	 * @return
@@ -179,18 +174,20 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping("findName")
 	@ResponseBody
-	public String findName( String templateName,Model model){
+	public String findName( String templateName,String sendMethod,Model model){
 		
+		if("autoSend".equals(sendMethod)){
+			return "OK";
+		}
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
 		
-		if(template!=null){
-			model.addAttribute("tSTemplate", template);
+		if(null!=template){
 			return "false";
 		}
 		return "OK";
 	}
 	/**
-	 * 添加时保证英文模板名唯一
+	 * 添加时保证人工英文模板名唯一
 	 * @param templateName
 	 * @param model
 	 * @return
@@ -199,13 +196,54 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping("findEnglishName")
 	@ResponseBody
-	public String findEnglishName( String englishTemplateName,Model model){
-		
+	public String findEnglishName( String englishTemplateName,String sendMethod,Model model){
+		if("autoSend".equals(sendMethod)){
+			return "OK";
+		}
 		TmisDunningSmsTemplate template = tstDao.getByEnglishName(englishTemplateName);
 		
-		if(template!=null){
-			model.addAttribute("tSTemplate", template);
+		if(null!=template){
 			return "false";
+		}
+		return "OK";
+	}
+	
+	/**
+	 * 改变发送方式为保证人工短信模板名唯一
+	 * @param templateName
+	 * @param englishTemplateName
+	 * @param sendMethod
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping("findOne")
+	@ResponseBody
+	public String findOne(  String templateName,String englishTemplateName,String sendMethod,Model model){
+		if(StringUtils.isNotEmpty(templateName)&&StringUtils.isNotEmpty(englishTemplateName)){
+			TmisDunningSmsTemplate etemplate = tstDao.getByEnglishName(englishTemplateName);
+			TmisDunningSmsTemplate template = tstDao.getByName(templateName);
+			if(null!=etemplate&&null!=template){
+				return "allName";
+			}
+			if(null==etemplate&&null!=template){
+				return "tName";
+			}
+			if(null!=etemplate&&null==template){
+				return "eName";
+			}
+		}
+		if(StringUtils.isNotEmpty(englishTemplateName)&&StringUtils.isEmpty(templateName)){
+			TmisDunningSmsTemplate etemplate = tstDao.getByEnglishName(englishTemplateName);
+			if(null!=etemplate){
+				return "eName";
+			}
+		}
+		if(StringUtils.isEmpty(englishTemplateName)&&StringUtils.isNotEmpty(templateName)){
+			TmisDunningSmsTemplate template = tstDao.getByName(templateName);
+			if(null!=template){
+				return "tName";
+			}
 		}
 		return "OK";
 	}
@@ -225,7 +263,9 @@ public class TmisDunningSmsTemplateController extends BaseController{
 		TMisDunningOrder order = tdtDao.findOrderByDealcode(dealcode);
 		TMisDunningTask task = tdtDao.get(dunningtaskdbid);
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
-		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(), order, task);
+		 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(),order.getDealcode(),
+				order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
 		template.setSmsCotent(cousmscotent);
 		tMap.put("tSTemplate", template);
 		tMap.put("contactType", contactType);

@@ -1691,10 +1691,12 @@
    
 <!-- 	new自动分配 - end 	    -->
 
-<select id="findallAtuoSms" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+	<select id="findallAtuoSms" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
       
         SELECT
-        
+        p.extensionNumber AS "extensionNumber",
+        t.DunningPeopleId AS "dunningpeopleid",
+        o.platform_ext AS "platformExt",
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
          repayment_time AS "repaymenttime",
@@ -1703,18 +1705,17 @@
         FROM
         t_risk_order AS o
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-<!--         LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id -->
         LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-<!--         LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id -->
+        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
         WHERE
 		o.type = 'loan' 
         AND o.merchant_id = 7
 		AND o.`status`= 'payment' 
         AND t.dbid IS NOT NULL
         AND t.dunningtaskstatus ='dunning'
-        
+        AND DATEDIFF(CURDATE(), o.repayment_time)  BETWEEN #{numbefore} AND #{numafter}
      
     </select>
-
+	
 
 </mapper>

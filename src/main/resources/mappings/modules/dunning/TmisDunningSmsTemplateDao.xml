@@ -7,7 +7,7 @@
 		s.numbefore AS "numbefore",
 		s.numafter AS "numafter",
 		s.TemplateName AS "templateName",
-<!-- 		s.EnglishTemplateName AS "englishTemplateName", -->
+		s.EnglishTemplateName AS "englishTemplateName",
 		s.SendMethod AS "sendMethod",
 		s.SendTime AS "sendTime",
 		s.SmsType AS "smsType",
@@ -28,18 +28,20 @@
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.TemplateName = #{templateName}
+		AND s.SendMethod ="labourSend"
 	</select>
 	<select id="getByEnglishName" resultType="TmisDunningSmsTemplate">
 		SELECT 
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.EnglishTemplateName = #{englishTemplateName}
+		AND s.SendMethod ="labourSend"
 	</select>
 	
 	 <select id="findSmsPageList" resultType="TmisDunningSmsTemplate">
 	SELECT 
-	        *
-		FROM t_mis_dunning_sms_template 
+	      <include refid="TmisDunningSmsTemplateColumns"/>
+		FROM t_mis_dunning_sms_template s
 	  <choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -53,7 +55,11 @@
 	<select id="findListSMSTemplate" resultType="TmisDunningSmsTemplate">
 	   
 	SELECT 
-			<include refid="TmisDunningSmsTemplateColumns"/>
+		s.id  AS "id",
+		s.TemplateName AS "templateName",
+		s.SmsType AS "smsType",
+		s.AcceptType AS "acceptType",
+		s.SmsCotent AS "smsCotent"
 		FROM t_mis_dunning_sms_template s
 		WHERE
 	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend"
@@ -89,7 +95,7 @@
 		    numbefore,
 		    numafter,
 			templateName,
-<!-- 			englishTemplateName, -->
+			englishTemplateName,
 			sendMethod,
 			sendTime,
 			smsType,
@@ -105,7 +111,7 @@
 			#{numbefore},
 			#{numafter},
 			#{templateName},
-<!-- 			#{englishTemplateName}, -->
+			#{englishTemplateName},
 			#{sendMethod},
 			#{sendTime},
 			#{smsType},
@@ -124,7 +130,7 @@
 		  	numbefore =#{numbefore},	
 		  	numafter =#{numafter},	
 			templateName = #{templateName},
-<!-- 			englishTemplateName = #{englishTemplateName}, -->
+			englishTemplateName = #{englishTemplateName},
 			sendMethod = #{sendMethod},
 			sendTime = #{sendTime},
 			smsType = #{smsType},

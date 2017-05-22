@@ -71,6 +71,27 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date outsourcingEndDate ; //委外截止时间
 	private Date beginOutsourcingEndDate ; //查询开始-委外截止时间
 	private Date endOutsourcingEndDate ; //查询结束-委外截止时间
+	
+	private String platformExt ; //金融产品
+	private String extensionNumber ; //fengjihao
+
+	public String getPlatformExt() {
+		return platformExt;
+	}
+
+	public void setPlatformExt(String platformExt) {
+		this.platformExt = platformExt;
+	}
+	
+	
+
+	public String getExtensionNumber() {
+		return extensionNumber;
+	}
+
+	public void setExtensionNumber(String extensionNumber) {
+		this.extensionNumber = extensionNumber;
+	}
 
 	public Date getBeginOutsourcingBeginDate() {
 		return beginOutsourcingBeginDate;

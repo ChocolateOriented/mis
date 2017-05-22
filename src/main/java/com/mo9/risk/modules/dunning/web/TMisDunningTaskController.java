@@ -1183,49 +1183,49 @@ public class TMisDunningTaskController extends BaseController {
 			return null;
 		}
 		
-		String selfMobile = "";
-		List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,"self");
-		if(list != null && list.size() > 0){
-			selfMobile = list.get(0).getTel();
-		}
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-		if(personalInfo == null){
-			return "views/error/500";
-		}
-		Integer odds = Integer.valueOf(personalInfo.getOverdueDays());
-		String smsT = "";
-		boolean chooseSelf = true;
-		if(odds == 0 || odds < 0){
-			smsT = "ST_0";
-		}
-		else if(0 < odds && odds < 8){
-			smsT = "ST__1_7";
-		}else if(7 < odds && odds < 15){
-			smsT = "ST_8_14";
-		}else if(14 < odds && odds < 22){
-			smsT = "ST_15_21";
-		}else if(21 < odds && odds < 36){
-			smsT = "ST_22_35";
-		}else{
-			chooseSelf = false;
-			smsT = "ST_15_PLUS";
-			selfMobile = "";
-		}
-		
-		
-		TMisContantRecord t = new TMisContantRecord();
-		t.setSmstemp(SmsTemp.valueOf(smsT));
-		String smsContext = "";
-		smsContext = tMisContantRecordService.smsGetTemp(task,order, t);
+//		String selfMobile = "";
+//		List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,"self");
+//		if(list != null && list.size() > 0){
+//			selfMobile = list.get(0).getTel();
+//		}
+//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+//		if(personalInfo == null){
+//			return "views/error/500";
+//		}
+//		Integer odds = Integer.valueOf(personalInfo.getOverdueDays());
+//		String smsT = "";
+//		boolean chooseSelf = true;
+//		if(odds == 0 || odds < 0){
+//			smsT = "ST_0";
+//		}
+//		else if(0 < odds && odds < 8){
+//			smsT = "ST__1_7";
+//		}else if(7 < odds && odds < 15){
+//			smsT = "ST_8_14";
+//		}else if(14 < odds && odds < 22){
+//			smsT = "ST_15_21";
+//		}else if(21 < odds && odds < 36){
+//			smsT = "ST_22_35";
+//		}else{
+//			chooseSelf = false;
+//			smsT = "ST_15_PLUS";
+//			selfMobile = "";
+//		}
+//		
+//		
+//		TMisContantRecord t = new TMisContantRecord();
+//		t.setSmstemp(SmsTemp.valueOf(smsT));
+//		String smsContext = "";
+//		smsContext = tMisContantRecordService.smsGetTemp(task,order, t);
 		String contatType="";
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
 		if(StringUtils.isNotBlank(contactstype)){
 			contactstype=contactstype.toUpperCase();
-			if(!contactstype.equals("self")){
+			if(!contactstype.equals("SELF")){
 				contatType ="others";
 			}
-			if(contactstype.equals("self")){
+			if(contactstype.equals("SELF")){
 				contatType ="self";
 			}
 		}
@@ -1239,9 +1239,9 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("contactstype", contactstype);
 		model.addAttribute("selfMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
 		
-		model.addAttribute("smsContext", smsContext);
+//		model.addAttribute("smsContext", smsContext);
 		model.addAttribute("mobileSelf", mobileSelf);
-		model.addAttribute("smsT", smsT);
+//		model.addAttribute("smsT", smsT);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);

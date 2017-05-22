@@ -208,7 +208,7 @@
 			  <input type="hidden"  id="conctactOne" value="${tSTemplate.acceptType}"/>
 			  <input type="hidden"  id="mobileSelf" value="${mobileSelf}"/>
 			  <input type="hidden"  id="contatType" value="${contatType}"/>
-			  <input type="hidden"  id="tname" value="${tSTemplate.templateName }"/>
+<%-- 			  <input type="hidden"  id="tname" value="${tSTemplate.templateName }"/> --%>
 		
 		<div class="control-group">
 			<label class="control-label">模板名称：</label>

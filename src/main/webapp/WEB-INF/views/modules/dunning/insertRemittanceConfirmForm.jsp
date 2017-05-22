@@ -80,6 +80,8 @@
 		<input type="hidden" name="dunningtaskdbid" value="${dunningtaskdbid}" />
 		<input type="hidden" name="buyerId" value="${buyerId}" />
 		<input type="hidden" name="formurl" value="insertRemittanceConfirmForm" />
+		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
+		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
 		<div class="control-group">
 			<label class="control-label">汇款人：</label>
 			<div class="controls">
