@@ -119,7 +119,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	
         	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(dealcode);
         	
-        	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd ");
         	
         	Map<String, Object> map = new HashMap<String, Object>();
         	
