@@ -29,12 +29,12 @@
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
 			        	var groupId=$("#groupList").val(); 
-		            	return {'group.id': groupId , nickname:term};
+		            	return {'group.id': groupId , name:term};
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	var resultsData = [] ;
 			        	for (var i = 0; i < data.length; i++) {
-			        		resultsData[i] = {id:data[i].nickname,nickname:data[i].nickname};
+			        		resultsData[i] = {id:data[i].name,name:data[i].name};
 						}
 			        	return { results: resultsData };
 			        },
@@ -43,11 +43,11 @@
 			    formatResult:formatPeopleList, //选择显示字段
 			    formatSelection:formatPeopleList, //选择选中后填写字段
 			    initSelection: function(element, callback) {//回显
-		            var nickname=$(element).val();
-		            if (nickname=="") {
+		            var name=$(element).val();
+		            if (name=="") {
 		            	return;
 		            }
-		            callback({id:nickname,nickname:nickname})
+		            callback({id:name,name:name})
 			    },
 		        width:170
 			});
@@ -63,11 +63,11 @@
 
 		//格式化peopleList选项
 		function formatPeopleList( item ){
-			var nickname = item.nickname ;
-			if(nickname == null || nickname ==''){
-				nickname = "空" ;
+			var name = item.name ;
+			if(name == null || name ==''){
+				name = "空" ;
 			}
-			return nickname ;
+			return name ;
 		}
 	</script>
 </head>
@@ -145,7 +145,7 @@
 				<th>承诺还款占比_逾期金额</th>
 				<th>承诺还款占比_本金</th>
 				<th>还款户数</th>
-				<th>还夸的总本金</th>
+				<th>还款的总本金</th>
 				<th>还款总金额</th>
 			</tr>
 		</thead>

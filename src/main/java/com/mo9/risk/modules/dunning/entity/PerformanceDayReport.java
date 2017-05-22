@@ -24,7 +24,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	private Long payorder; // 还清订单
 	private Long telnum;
 	private Long smsnum;
-	
+	private String groupId ; // 小组ID
 	
 //	@ExcelField(title="日期", type=1, align=2, sort=1)
 //	public Date getDatetime() {
@@ -100,6 +100,12 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	}
 	public void setDunningCycle(String dunningCycle) {
 		this.dunningCycle = dunningCycle;
+	}
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 //	@ExcelField(title="周期begin", type=1, align=2, sort=8)

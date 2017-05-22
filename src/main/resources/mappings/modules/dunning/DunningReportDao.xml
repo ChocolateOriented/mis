@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.DunningReportDao">
-<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+<cache type="org.mybatis.caches.ehcache.EhcacheCache" flushInterval="600"/>
     
      <!-- 案件活动日报 -->
 	<select id="findProductivePowerDailyReport" resultType="SMisDunningProductivePowerDailyReport">
@@ -86,6 +86,15 @@
 					DunningCycle
 				FROM t_mis_dunning_people
 				WHERE Field1 = 'active'
+		        <if test="personnel != null and personnel != ''">
+		            AND Id = #{personnel}
+		        </if>
+		        <if test="groupId != null and groupId != ''">
+					AND groupId = #{groupId}
+		        </if>
+		        <if test="dunningCycle != null and dunningCycle != ''">
+					AND dunningCycle LIKE concat('%',#{dunningCycle},'%')
+		        </if>
 				) AS p
 			LEFT JOIN (
 				SELECT
@@ -138,12 +147,6 @@
 		]]>
 	<!-- 		WHERE t.DunningPeriodBegin is not null AND t.DunningPeriodEnd is not null -->
 		<where>
-	        <if test="personnel != null and personnel != ''">
-	            AND p.Name LIKE concat('%',#{personnel},'%')
-	        </if>
-	        <if test="dunningCycle != null and dunningCycle != ''">
-				AND  p.dunningCycle LIKE concat('%',#{dunningCycle},'%')
-	        </if>
         </where>
 		ORDER BY DunningCycle
  	</select>

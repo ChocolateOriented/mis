@@ -13,6 +13,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -20,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.SMisDunningProductivePowerDailyReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.DunningReportService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -43,6 +43,15 @@ public class DunningReportController extends BaseController {
 	private TMisDunningGroupService groupService;
 	
 	/**
+	 * @Description: 催收小组集合
+	 */
+	@ModelAttribute
+	public void groupType(Model model) {
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
+	}
+	
+	
+	/**
 	 * @Description: 催收员案件活动日报
 	 * @param performanceDayReport
 	 * @param dunningPeople
@@ -58,7 +67,6 @@ public class DunningReportController extends BaseController {
 		try {
 			Page<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(new Page<SMisDunningProductivePowerDailyReport>(request, response), smMisDunningProductivePowerDailyReport);
 			model.addAttribute("page", page);
-			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 			
 			//催收小组列表,若无限制则查询所有小组
 			List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups() ;
@@ -110,12 +118,14 @@ public class DunningReportController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
-	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
 			model.addAttribute("page", page);
+			
+			model.addAttribute("groupList", groupService.findList(new TMisDunningGroup()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

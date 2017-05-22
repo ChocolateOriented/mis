@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao">
+<cache type="org.mybatis.caches.ehcache.EhcacheCache" flushInterval="600"/>
 
 	<sql id="tMisDunningGroupColumns">
 		a.dbid AS "dbid",
@@ -23,7 +24,7 @@
 		LEFT JOIN sys_user u on u.id = a.leaderId
 	</sql>
 
-	<select id="get" resultType="TMisDunningGroup">
+	<select id="get" resultType="TMisDunningGroup" useCache="false">
 		SELECT
 		<include refid="tMisDunningGroupColumns" />
 		<include refid="tMisDunningGroupJoinsColumns" />
@@ -64,7 +65,7 @@
 		</choose>
 	</select>
 	
-	<select id="findUserList" resultType="com.thinkgem.jeesite.modules.sys.entity.User">
+	<select id="findUserList" resultType="com.thinkgem.jeesite.modules.sys.entity.User" useCache="false">
 		SELECT 
 			u.*
 			FROM sys_user u

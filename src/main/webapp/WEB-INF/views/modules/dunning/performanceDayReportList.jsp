@@ -16,6 +16,52 @@
 				top.$('.jbox-body .jbox-icon').css('top','55px');
 			});
 			
+			//组与花名联动查询
+			$("#groupList").on("change",function(){
+				$("#dunningPeople").select2("val", null);
+			});
+			
+			$("#dunningPeople").select2({//
+			    ajax: {
+			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
+			        dataType: 'json',
+			        quietMillis: 250,
+			        data: function (term, page) {//查询参数 ,term为输入字符
+			        	var groupId=$("#groupList").val(); 
+		            	return {'group.id': groupId , name:term};
+			        },
+			        results: function (data, page) {//选择要显示的数据
+			        	return { results: data };
+			        },
+			        cache: true
+			    },
+			    formatResult:formatPeopleList, //选择显示字段
+			    formatSelection:formatPeopleList, //选择选中后填写字段
+			    initSelection: function(element, callback) {//回显
+			    	var id = $(element).val();
+		            if (id == "") {
+		            	return;
+		            }
+	            	//根据组查询选项
+	                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+	                    data: function(){
+	                    	var groupId = $("#groupList").val();     	
+                    		return {groupId:groupId}             	
+	                    },
+	                    dataType: "json"
+	                }).done(function(data) {
+	                	for ( var item in data) {
+	                		//若回显ids里包含选项则选中
+							if (id == data[item].id) {
+			                	callback(data[item])
+			                	return ;
+							}
+						}
+	                });
+			    },
+		        width:170
+			});
+			
 		});
 		
 		function page(n,s){
@@ -25,6 +71,15 @@
 			$("#searchForm").submit();
         	return false;
         }
+
+		//格式化peopleList选项
+		function formatPeopleList( item ){
+			var name = item.name ;
+			if(name == null || name ==''){
+				name = "空" ;
+			}
+			return name ;
+		}
 	</script>
 </head>
 <body>
@@ -45,25 +100,33 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			
-			<li><label>催款员：</label>
-				<form:select id="personnel"  path="personnel" class="input-medium" >
-					<form:option selected="selected" value="" label="全部人员"/>
-					<form:options items="${dunningPeoples}" itemLabel="name" itemValue="name" htmlEscape="false" />
-				</form:select>
-			</li>
-			
 			<li><label>催收队列：</label>
 				<form:select path="dunningCycle" class="input-medium" >
 					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('dunningCycle1')}" itemLabel="label" itemValue="label" htmlEscape="false"/>
 				</form:select>
 			</li>
-<!-- 			<li><label>催收周期：</label> -->
-<%-- 				<form:input  path="begin"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  /> --%>
-<!-- 				-  -->
-<%-- 				<form:input  path="end"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   /> --%>
-<!-- 			</li> -->
-			
+			<li>
+				<label>催收小组：</label>
+				<form:select id="groupList" path="groupId" class="input-medium">
+				<form:option value="">全部</form:option>
+					<!-- 添加组类型为optgroup -->
+					<c:forEach items="${groupTypes}" var="type">
+						<optgroup label="${type.value}">
+							<!-- 添加类型对应的小组 -->
+							<c:forEach items="${groupList}" var="item">
+								<c:if test="${item.type == type.key}">
+									<option value="${item.id}" <c:if test="${performanceDayReport.groupId == item.id }">selected="selected"</c:if>>${item.name}</option>
+								</c:if>
+							</c:forEach>
+						</optgroup>
+					</c:forEach>
+				</form:select></li>
+			<li>			
+			<li>
+				<label>催收人：</label>
+				<form:input id="dunningPeople" path="personnel" type="hidden" />
+			</li>
 			
 			<li class="btns">
 			<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" />
