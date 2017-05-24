@@ -77,34 +77,40 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
     
 	  //根据逾期天数对应的模板
 	   public List<TmisDunningSmsTemplate> findSmsTemplate(String contactType,Date repaymentDate,TMisDunningOrder order,TMisDunningTask task){
-		   
-		   TmisDunningSmsTemplate template=new TmisDunningSmsTemplate();
-		  
-		  int overdayas =  (int) TMisDunningTaskService.GetOverdueDay(repaymentDate);
-		  String acceptType=""; 
-		  if("".equals(contactType)){
+		try{   
+			  TmisDunningSmsTemplate template=new TmisDunningSmsTemplate();
 			  
-			 acceptType=""; 
-		  }else{
-		  if("self".equalsIgnoreCase(contactType)){
-			  acceptType="self";
-		  }
-		  else{
-			  acceptType="others";
-		  }
-		  }
-		  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType);
-		  
-		 if(findList.size()!=0){
-		  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
-		  
-		  String smsCotent = tSmsTemplate.getSmsCotent();
-		  TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-		  String cousmscotent = this.cousmscotent(smsCotent,order.getDealcode(),order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
-		  tSmsTemplate.setSmsCotent(cousmscotent); 
-		 } 
-		  return findList;
+			  int overdayas =  (int) TMisDunningTaskService.GetOverdueDay(repaymentDate);
+			  String acceptType=""; 
+			  if("".equals(contactType)){
+				  
+				 acceptType=""; 
+			  }else{
+				  if("self".equalsIgnoreCase(contactType)){
+					  acceptType="self";
+				  }
+				  else{
+					  acceptType="others";
+				  }
+			  }
+			  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType);
+			  
+			 if(findList.size()!=0){
+			  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
+			  
+			  String smsCotent = tSmsTemplate.getSmsCotent();
+			  TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+			  TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(order.getDealcode());
+			  String cousmscotent = this.cousmscotent(smsCotent,buyerInfeo,order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
+			  tSmsTemplate.setSmsCotent(cousmscotent); 
+			 } 
+			 return findList;
+		}catch(Exception e){
+			e.getMessage();
+			logger.warn("根据逾期天数找对应的模板失败");
 		}
+		return null;
+	}
 	   
 	 
 		  /**
@@ -113,11 +119,11 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   * @param smsCotent
 		   * @return
 		   */
-        public String cousmscotent(String smsCotent,String  dealcode,String platformExt,String dunningpeopleid,String extensionNumber){
+        public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber) throws Exception{
         	
 //        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
         	
-        	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(dealcode);
+//        	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(dealcode);
         	
         	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd ");
         	
@@ -165,11 +171,11 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         		creditAmount=String.valueOf((Double.valueOf(buyerInfeo.getCreditAmount()).doubleValue()/100D));
         		smsCotent=smsCotent.replace("${creditamount}",creditAmount);
         	}
-        	if(null!=extensionNumber&&""!=extensionNumber){
+//        	if(null!=extensionNumber&&""!=extensionNumber){
 	        	if(smsCotent.contains("${extensionNumber}")){
 	        		smsCotent=smsCotent.replace("${extensionNumber}",extensionNumber);
 	        	}
-        	}
+//        	}
         	if(smsCotent.contains("${creadateTime}")){
         		
         		smsCotent=smsCotent.replace("${creadateTime}",ss.format(buyerInfeo.getCreateTime()));
@@ -187,6 +193,10 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	return smsCotent;
         }	
         	
-    
+    public static void main(String[] args) {
+    	String string = "aaa";
+    	String smsCotent=string.replace("${realName}",null);
+    	
+	}
 	
 }

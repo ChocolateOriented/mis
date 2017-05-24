@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -46,7 +48,8 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	private TMisDunningTaskDao tdtDao;
 	@Autowired
 	TMisDunningPeopleDao tmisPeopleDao;
-	
+	@Autowired
+	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
 	
 	
 	
@@ -259,17 +262,25 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@RequestMapping("getTemplateByName")
 	@ResponseBody
 	public Map<String,Object> getTemplateByName( String templateName,String contactType,String dealcode,String dunningtaskdbid,Model model){
+		try {
 		Map< String, Object> tMap=new HashMap();
 		TMisDunningOrder order = tdtDao.findOrderByDealcode(dealcode);
 		TMisDunningTask task = tdtDao.get(dunningtaskdbid);
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
-		 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-		String cousmscotent = tstService.cousmscotent(template.getSmsCotent(),order.getDealcode(),
-				order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
+		TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+		TRiskBuyerPersonalInfo buyerInfeo= tpersonalInfoDao.getbuyerIfo(order.getDealcode());
+		String cousmscotent;
+			cousmscotent = tstService.cousmscotent(template.getSmsCotent(),buyerInfeo,
+					order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
 		template.setSmsCotent(cousmscotent);
 		tMap.put("tSTemplate", template);
 		tMap.put("contactType", contactType);
 		return tMap;
+		} catch (Exception e) {
+			e.getMessage();
+			logger.warn("通过名字获取短信模板对象失败");
+		}
+		return null;
 	}
 	
 }
