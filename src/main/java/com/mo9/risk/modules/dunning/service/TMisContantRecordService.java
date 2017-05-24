@@ -104,6 +104,10 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	public void save(TMisContantRecord tMisContantRecord) {
 		super.save(tMisContantRecord);
 	}
+	@Transactional(readOnly = false)
+	public void saveList(List<TMisContantRecord> trList) {
+		tMisContantRecordDao.saveList(trList);
+	}
 
 	@Transactional(readOnly = false)
 	public void delete(TMisContantRecord tMisContantRecord) {
@@ -149,6 +153,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			String dunningtaskdbid) {
 
 		String templateName = tMisContantRecord.getTemplateName();
+		//判断是否给该订单发送短信成功的字段
+		String smsSendSueOrFle="";
 		try {
 			if (tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.sms) {
 				/**
@@ -161,7 +167,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					//模板填充的map
 					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
 					 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), order.getDealcode(),
+					 TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
 							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
 					params.put("template_data", new JacksonConvertor().serialize(map));
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
@@ -178,8 +185,9 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					//模板填充的map
 					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
 					 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), order.getDealcode(),
-							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
+					 TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+						Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
+								order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
 					vparams.put("template_data", new JacksonConvertor().serialize(map));
 //					String englishTemplateName = this.EnglishTemplateName(tMisContantRecord.getTemplateName());
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
@@ -191,8 +199,9 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				 logger.info("给用户:"+tMisContantRecord.getContanttarget()+"发送短信成功，模板为:"+templateName+",内容为:"+tMisContantRecord.getContent());
 			}
 		} catch (Exception e) {
-			logger.info("发送短信失败:" + e);
-			logger.info("给用户:" + tMisContantRecord.getContanttarget() +"发送短信成功，模板为:"+templateName+",内容为:"+ tMisContantRecord.getContent());
+			logger.warn("发送短信失败:" + e);
+			logger.warn("给用户:" + tMisContantRecord.getContanttarget() +"发送短信成功，模板为:"+templateName+",内容为:"+ tMisContantRecord.getContent());
+			smsSendSueOrFle="false";
 		}
 		try {
 			TMisContantRecord dunning = new TMisContantRecord();
@@ -262,6 +271,9 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			// 应该还款时间
 			dunning.setRepaymenttime(order.repaymentDate);
 			dunning.setRemark(tMisContantRecord.getRemark());
+			if("false".equals(smsSendSueOrFle)){
+				dunning.setRemark("短信发送失败");
+			}
 			// 是否有效联络
 			dunning.setIseffective(tMisContantRecord.getIseffective());
 			// 承诺还款时间
@@ -273,7 +285,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				dunningTaskDao.updatedunningtime(dunningtaskdbid);
 			}
 		} catch (Exception e) {
-			throw new ServiceException(e);
+//			throw new ServiceException(e);
+			logger.warn("订单号为:"+order.getDealcode()+",保存到催收历史失败");
 		}
 	}
 
@@ -438,13 +451,13 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
      * @param smsCotent
      * @return
      */
-    public Map<String, Object> getCotentValue(String smsCotent,String dealcode,String platformExt,String dunningpeopleid,String extensionNumber){
+    public Map<String, Object> getCotentValue(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber){
     	
 //    	String dunningpeopleid = task.getDunningpeopleid();
     	
 //    	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
     	
-    	TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(dealcode);
+//    	TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(dealcode);
     	
     	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd ");
     	
@@ -489,11 +502,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	String	creditAmount=String.valueOf((Double.valueOf(buyerInfeo.getCreditAmount()).doubleValue()/100D));
     		map.put("creditamount",creditAmount );
     	}
-    	if(null!=extensionNumber&&""!=extensionNumber){
+//    	if(null!=extensionNumber&&""!=extensionNumber){
         	if(smsCotent.contains("${extensionNumber}")){
         		map.put("extensionNumber",extensionNumber);
         	}
-    	}
+//    	}
     	if(smsCotent.contains("${creadateTime}")){
     		
     		map.put("creadateTime",ss.format(buyerInfeo.getCreateTime()) );

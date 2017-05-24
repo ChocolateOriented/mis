@@ -2391,26 +2391,26 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 
 	
-	@Scheduled(cron = "0 0 0 * * ?")  
+	@Scheduled(cron = "0 41 18 * * ?")  
 	@Transactional
 	public void AutoSmsSend(){
 		List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();//查询所有系统模板
 		SimpleDateFormat sb1=new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-	 for ( final TmisDunningSmsTemplate smsTemplate : tstList) {
-		 Date sendDate=null;
-		try {
-          String sendTime = smsTemplate.getSendTime();		   
-		  String format1 = sb1.format(new Date ());
-		  format1=format1+"  "+sendTime;
+		final SimpleDateFormat sb2=new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		
-			sendDate = sb2.parse(format1);
-		} catch (Exception e) {
-			logger.info("转换时间失败:"+e);
-			logger.info("模板:"+smsTemplate.getTemplateName()+",自动发送短信是失败");
-			continue;
-		}
+	 for ( final TmisDunningSmsTemplate smsTemplate : tstList) {
+		 	Date sendDate=null;
+			try {
+	          String sendTime = smsTemplate.getSendTime();		   
+			  String format1 = sb1.format(new Date ());
+			  format1=format1+"  "+sendTime;
+			
+				sendDate = sb2.parse(format1);
+			} catch (Exception e) {
+				logger.warn("模板:"+smsTemplate.getTemplateName()+",自动发送短信失败");
+				continue;
+			}
+	
 //		   TaskScheduler taskScheduler = new ConcurrentTaskScheduler();
 		   scheduler.schedule(new Runnable() {
 				@Override
@@ -2418,23 +2418,32 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Integer numafter = smsTemplate.getNumafter();
 				Integer numbefore = smsTemplate.getNumbefore();
 				List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms(numbefore,numafter);//查询所有需要催收的订单
+				logger.info("系统发送,查询时间为"+sb2.format(new Date())+",查询催收任务通过条件逾期天数为"+numbefore+"天到"
+				+numafter+"天,短信模板为:"+smsTemplate.getTemplateName()+",查询到的总条数为"+findallAtuoSms.size()+"条");
+			    //跟踪短信发送的条数
+				int i=1;
+				List <TMisContantRecord> trList=new ArrayList<TMisContantRecord>();
 				for (DunningOrder dunningOrder : findallAtuoSms) {
 //					Integer numafter = smsTemplate.getNumafter();
 //					Integer numbefore = smsTemplate.getNumbefore();
 //					if(overduedays>=numbefore&&overduedays<=numafter){
 //						TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dunningOrder.getDealcode());
 //						TMisDunningTask task = tMisDunningTaskDao.get(dunningOrder.getDunningtaskdbid());
-						String smsCotent = tdstService.cousmscotent( smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),
-								dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
-						try {
-								
-								
+						String smsCotent="";
+						//判断是否给该订单发送短信成功的字段
+						String smsSendSueOrFle="";
+						try {								
+							
+							TRiskBuyerPersonalInfo buyerInfeo= tpersonalInfoDao.getbuyerIfo(dunningOrder.getDealcode());
+							
+							smsCotent = tdstService.cousmscotent( smsTemplate.getSmsCotent(),buyerInfeo,
+									dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 								if ("wordText".equals(smsTemplate.getSmsType())) {
 									Map<String, String> params = new HashMap<String, String>();
 									params.put("mobile", dunningOrder.getMobile());// 发送手机号
 									// 模板填充的map
 									Map<String, Object> map = tMisContantRecordService
-											.getCotentValue(smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
+											.getCotentValue(smsTemplate.getSmsCotent(),buyerInfeo,dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 									params.put("template_data", new JacksonConvertor().serialize(map));
 									String englishTemplateName =smsTemplate.getEnglishTemplateName();
 									params.put("template_name",englishTemplateName );// 模板名称
@@ -2449,7 +2458,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 									params.put("style", "voiceContent");// 固定值
 									// 模板填充的map
 									Map<String, Object> map = tMisContantRecordService
-											.getCotentValue(smsTemplate.getSmsCotent(),dunningOrder.getDealcode(),dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
+											.getCotentValue(smsTemplate.getSmsCotent(),buyerInfeo,dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
 									params.put("template_data", new JacksonConvertor().serialize(map));
 									String englishTemplateName =smsTemplate.getEnglishTemplateName();
 									params.put("template_name",englishTemplateName );// 模板名称
@@ -2458,11 +2467,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 									MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, params,
 											BaseResponse.class);
 								}
-								logger.info("给逾期天数为:"+dunningOrder.getOverduedays()+"天,用户电话为:"+dunningOrder.getMobile()+",发送短信成功");
+								
+								logger.info("系统发送,给订单号为:"+dunningOrder.getDealcode()+",用户电话为:"+dunningOrder.getMobile()+",发送短信成功.模板名为:"+smsTemplate.getTemplateName()+",该模板发送的第"+i+"条");
 							} catch (Exception e) {
-								logger.info("发送短信失败:"+e);
-								logger.info("给逾期天数为:"+dunningOrder.getOverduedays()+"天,用户电话为:"+dunningOrder.getMobile()+",发送短信失败");
-							}	
+							
+								logger.warn("发送短信失败:"+e);
+								logger.warn("系统发送,给订单号为:"+dunningOrder.getDealcode()+",用户电话为:"+dunningOrder.getMobile()+",发送短信失败.用户信息不全,模板名为:"+smsTemplate.getTemplateName()+",该模板发送的第"+i+"条");
+								smsSendSueOrFle="false";
+							}
+						   //跟踪短信发送的条数
+						    i+=1;
 							//保存到催收历史记录里
 							TMisContantRecord dunning = new TMisContantRecord();
 							dunning.setTaskid(null);
@@ -2481,19 +2495,24 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							dunning.setDunningpeoplename("sys");
 							dunning.setRepaymenttime(dunningOrder.getRepaymenttime());
 							dunning.setRemark(null);
-							tMisContantRecordService.save(dunning);
-							
+							if("false".equals(smsSendSueOrFle)){
+							dunning.setRemark("短信发送失败,用户信息不全");
+							}
+							dunning.preInsert();
+							trList.add(dunning);
 					}
-				}	
+				//批量保存
+			if(trList.size()>0){
+				tMisContantRecordService.saveList(trList);
+				
+			}
+		  	
+		}	
 					
 				
-			}, new Date(sendDate.getTime()));
-	  }
+	   }, new Date(sendDate.getTime()));
+	 }
 	     
 	 
 	}
-	
-	
-	
-	
 }
