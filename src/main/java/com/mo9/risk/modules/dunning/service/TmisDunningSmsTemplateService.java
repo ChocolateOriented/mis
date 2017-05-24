@@ -119,7 +119,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   * @param smsCotent
 		   * @return
 		   */
-        public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber) throws Exception{
+        public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber) {
         	
 //        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
         	
@@ -147,44 +147,57 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	smsCotent=smsCotent.replace("${platform}", platform);
         		
         	}
-        	
-        	if(smsCotent.contains("${realName}")){
-        		smsCotent=smsCotent.replace("${realName}",buyerInfeo.getRealName());
+        	if(null!=buyerInfeo.getRealName()&&!"".equals(buyerInfeo.getRealName())){
+	        	if(smsCotent.contains("${realName}")){
+	        		smsCotent=smsCotent.replace("${realName}",buyerInfeo.getRealName());
+	        	}
         	}
-        	if(smsCotent.contains("${sex}")){
-        		if("男".equals(buyerInfeo.getSex())){
-        		smsCotent=smsCotent.replace("${sex}","先生");
-        		}
-        		if("女".equals(buyerInfeo.getSex())){
-        			smsCotent=smsCotent.replace("${sex}","女士");
-        		}
+        	if(null!=buyerInfeo.getSex()&&!"".equals(buyerInfeo.getSex())){
+	        	if(smsCotent.contains("${sex}")){
+	        		if("男".equals(buyerInfeo.getSex())){
+	        		smsCotent=smsCotent.replace("${sex}","先生");
+	        		}
+	        		if("女".equals(buyerInfeo.getSex())){
+	        			smsCotent=smsCotent.replace("${sex}","女士");
+	        		}
+	        	}
         	}
-        	if(smsCotent.contains("${idCard}")){
-        		String idcard = buyerInfeo.getIdcard();
-        		
-        		StringBuilder sb=new StringBuilder(idcard);
-        		sb= sb.replace(3, 15, "*********");
-        		
-        		smsCotent=smsCotent.replace("${idCard}",sb.toString());
+        	if(null!=buyerInfeo.getIdcard()&&!"".equals(buyerInfeo.getIdcard())){
+	        	if(smsCotent.contains("${idCard}")){
+	        		String idcard = buyerInfeo.getIdcard();
+	        		
+	        		StringBuilder sb=new StringBuilder(idcard);
+	        		sb= sb.replace(3, 15, "*********");
+	        		
+	        		smsCotent=smsCotent.replace("${idCard}",sb.toString());
+	        	}
         	}
-        	if(smsCotent.contains("${creditamount}")){
-        		creditAmount=String.valueOf((Double.valueOf(buyerInfeo.getCreditAmount()).doubleValue()/100D));
-        		smsCotent=smsCotent.replace("${creditamount}",creditAmount);
+        	if(null!=buyerInfeo.getCreditAmount()&&!"".equals(buyerInfeo.getCreditAmount())){
+	        	if(smsCotent.contains("${creditamount}")){
+	        		creditAmount=String.valueOf((Double.valueOf(buyerInfeo.getCreditAmount()).doubleValue()/100D));
+	        		smsCotent=smsCotent.replace("${creditamount}",creditAmount);
+	        	}
         	}
-//        	if(null!=extensionNumber&&""!=extensionNumber){
+        	if(null!=extensionNumber&&""!=extensionNumber){
 	        	if(smsCotent.contains("${extensionNumber}")){
 	        		smsCotent=smsCotent.replace("${extensionNumber}",extensionNumber);
 	        	}
-//        	}
-        	if(smsCotent.contains("${creadateTime}")){
-        		
-        		smsCotent=smsCotent.replace("${creadateTime}",ss.format(buyerInfeo.getCreateTime()));
         	}
-        	if(smsCotent.contains("${repaymentTime}")){
-        		smsCotent=smsCotent.replace("${repaymentTime}",ss.format(buyerInfeo.getRepaymentTime()));
+        	if(null!=buyerInfeo.getCreateTime()){
+	        	if(smsCotent.contains("${creadateTime}")){
+	        		
+	        		smsCotent=smsCotent.replace("${creadateTime}",ss.format(buyerInfeo.getCreateTime()));
+	        	}
         	}
-        	if(smsCotent.contains("${overduedays}")){
-        		smsCotent=smsCotent.replace("${overduedays}",buyerInfeo.getOverdueDays());
+        	if(null!=buyerInfeo.getRepaymentTime()){
+	        	if(smsCotent.contains("${repaymentTime}")){
+	        		smsCotent=smsCotent.replace("${repaymentTime}",ss.format(buyerInfeo.getRepaymentTime()));
+	        	}
+        	}
+        	if(null!=buyerInfeo.getOverdueDays()){
+	        	if(smsCotent.contains("${overduedays}")){
+	        		smsCotent=smsCotent.replace("${overduedays}",buyerInfeo.getOverdueDays());
+	        	}
         	}
         	if(smsCotent.contains("${todayDate}")){
         		smsCotent=smsCotent.replace("${todayDate}",ss.format(new Date()));
@@ -193,10 +206,5 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	return smsCotent;
         }	
         	
-    public static void main(String[] args) {
-    	String string = "aaa";
-    	String smsCotent=string.replace("${realName}",null);
-    	
-	}
-	
+   
 }

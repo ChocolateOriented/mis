@@ -2391,7 +2391,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 
 	
-	@Scheduled(cron = "0 41 18 * * ?")  
+	@Scheduled(cron = "0 0 0 * * ?")  
 	@Transactional
 	public void AutoSmsSend(){
 		List<TmisDunningSmsTemplate> tstList = tdstDao.findByAutoSend();//查询所有系统模板
@@ -2438,6 +2438,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							
 							smsCotent = tdstService.cousmscotent( smsTemplate.getSmsCotent(),buyerInfeo,
 									dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),dunningOrder.getExtensionNumber());
+							if(smsCotent.contains("$")){
+								throw new RuntimeException();
+							}
 								if ("wordText".equals(smsTemplate.getSmsType())) {
 									Map<String, String> params = new HashMap<String, String>();
 									params.put("mobile", dunningOrder.getMobile());// 发送手机号
