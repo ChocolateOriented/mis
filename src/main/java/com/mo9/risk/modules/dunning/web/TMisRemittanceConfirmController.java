@@ -49,6 +49,7 @@ import com.mo9.risk.modules.dunning.service.TMisRemittanceConfirmService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.mo9.risk.util.GetRequest;
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -125,9 +126,19 @@ public class TMisRemittanceConfirmController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-		tMisRemittanceConfirm.setName(personalInfo.getRealName());
-		tMisRemittanceConfirm.setMobile(personalInfo.getMobile());
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+			if (personalInfo != null) {
+				tMisRemittanceConfirm.setName(personalInfo.getRealName());
+				tMisRemittanceConfirm.setMobile(personalInfo.getMobile());
+			}
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		tMisRemittanceConfirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_SUBMIT);
 		tMisRemittanceConfirm.preUpdate();
 		if(tMisRemittanceConfirmService.getSerialnumber(tMisRemittanceConfirm.getSerialnumber()) > 0 && null != tMisRemittanceConfirm.getSerialnumber() && !tMisRemittanceConfirm.getSerialnumber().isEmpty()){
@@ -177,8 +188,16 @@ public class TMisRemittanceConfirmController extends BaseController {
 		if(buyerId==null||dealcode==null ||"".equals(buyerId)||"".equals(dealcode) ){
 			return "views/error/500";
 		}
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-		model.addAttribute("personalInfo", personalInfo);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+			model.addAttribute("personalInfo", personalInfo);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		return "modules/dunning/tMisRemittanceConfirmCustomerDetail";
@@ -336,25 +355,35 @@ public class TMisRemittanceConfirmController extends BaseController {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		if (task == null) {
-			logger.warn("任务不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
-		
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
 		
 		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
 		
 		Map<String,Object> maps = new HashMap<String,Object>();
 		maps.put("buyerId",buyerId);
 		
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-		model.addAttribute("personalInfo", personalInfo);
+		TMisDunningTask task = null;
+		TMisDunningOrder order = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			if (task == null) {
+				logger.warn("任务不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			
+			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+			model.addAttribute("personalInfo", personalInfo);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		
 		model.addAttribute("task", task);
 		
