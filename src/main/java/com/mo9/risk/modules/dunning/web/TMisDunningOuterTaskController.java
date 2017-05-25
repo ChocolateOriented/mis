@@ -52,8 +52,6 @@ import com.thinkgem.jeesite.common.web.BaseController;
 @RequestMapping(value = "${adminPath}/dunning/tMisDunningOuterTask")
 public class TMisDunningOuterTaskController extends BaseController {
 
-	private static final Logger actionlog = Logger.getLogger("com.mo9.cuishou.liulan");
-	
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 	@Autowired
@@ -186,4 +184,17 @@ public class TMisDunningOuterTaskController extends BaseController {
 		}
 		return  mes;
 	}
+	/**
+	 * 系统短信定时任务分配
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "autoSend")
+	@ResponseBody
+	public String autoSend() {
+		tMisDunningTaskService.autoSmsSend();
+		logger.info("系统短信定时任务分配成功");
+		return "OK";
+	}
+	
 }
