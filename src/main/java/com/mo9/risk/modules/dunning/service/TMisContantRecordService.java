@@ -156,13 +156,13 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		//判断是否给该订单发送短信成功的字段
 		String smsSendSueOrFle="";
 		try {
-			if(tMisContantRecord.getContent().contains("$")){
-				throw new RuntimeException();
-			}
 			if (tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.sms) {
 				/**
 				 * 发送短信
 				 */
+				if(tMisContantRecord.getContent().contains("$")){
+					throw new RuntimeException();
+				}
 				
 				if ("wordText".equals(tMisContantRecord.getSmsType())) {
 					Map<String, String> params = new HashMap<String, String>();
