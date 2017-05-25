@@ -181,6 +181,15 @@
 	LEFT JOIN t_risk_buyer2bankinfo AS p ON o.buyer_id = p.buyer_id 
 	LEFT JOIN  t_risk_bankinfo AS q ON p.bank_id = q.id
 	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status in ('payment', 'payoff') and o.dealcode = #{dealcode}
+	<![CDATA[
+		AND NOT EXISTS (
+				SELECT 
+					1
+				FROM t_risk_buyer_idcard AS id 
+				WHERE id.buyer_id = c.buyer_id
+					AND id.id > c.id
+			)
+	]]>
 	</select>
 	
 	<select  id="getMessgeByRepaymentTime" resultType="TRiskBuyerPersonalInfo">
