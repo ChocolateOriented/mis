@@ -69,7 +69,6 @@ import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
@@ -149,7 +148,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;
-	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	
 	@Autowired
 	private TmisDunningSmsTemplateService tstService;
@@ -882,27 +880,36 @@ public class TMisDunningTaskController extends BaseController {
 			return "views/error/500";
 		}
 		
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
 		
 		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
 		
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
-		model.addAttribute("personalInfo", personalInfo);
+		TRiskBuyerPersonalInfo personalInfo = null;
+		TBuyerContact tBuyerContact = new TBuyerContact();
+		tBuyerContact.setBuyerId(buyerId);
+		tBuyerContact.setDealcode(dealcode);
+		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+			model.addAttribute("personalInfo", personalInfo);
+			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("status", status);
 		//model.addAttribute("isDelayable", isDelayable);
 		
-		TBuyerContact tBuyerContact = new TBuyerContact();
-		tBuyerContact.setBuyerId(buyerId);
-		tBuyerContact.setDealcode(dealcode);
-		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
-		contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
 		boolean hasContact = false;
 		if(contactPage.getCount() > 0L){
 			hasContact = true;
@@ -913,10 +920,12 @@ public class TMisDunningTaskController extends BaseController {
 		
 		if (tMisChangeCardRecord == null) {
 			tMisChangeCardRecord = new TMisChangeCardRecord();
-			tMisChangeCardRecord.setBankcard(personalInfo.getRemitBankNo());
-			tMisChangeCardRecord.setBankname(personalInfo.getRemitBankName());
-			tMisChangeCardRecord.setIdcard(personalInfo.getIdcard());
-			tMisChangeCardRecord.setMobile(personalInfo.getMobile());
+			if (personalInfo != null) {
+				tMisChangeCardRecord.setBankcard(personalInfo.getRemitBankNo());
+				tMisChangeCardRecord.setBankname(personalInfo.getRemitBankName());
+				tMisChangeCardRecord.setIdcard(personalInfo.getIdcard());
+				tMisChangeCardRecord.setMobile(personalInfo.getMobile());
+			}
 		}
 		
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
@@ -994,7 +1003,20 @@ public class TMisDunningTaskController extends BaseController {
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
 		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
-		contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact); 
+		TMisDunningTask task = null;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("STATUS_DUNNING", "dunning");
+		params.put("DEALCODE", dealcode);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		
 //		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
 //		model.addAttribute("personalInfo", personalInfo);
@@ -1005,10 +1027,6 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("mobileSelf", mobileSelf);
 		
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		boolean ispayoff = false;
 		if(null != task){
 			ispayoff = task.getIspayoff();
@@ -1400,22 +1418,33 @@ public class TMisDunningTaskController extends BaseController {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		if (task == null) {
-			logger.warn("任务不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
-		
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
 		
 		Map<String,Object> maps = new HashMap<String,Object>();
 		maps.put("buyerId",buyerId);
 		
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+		TRiskBuyerPersonalInfo personalInfo = null;
+		TMisDunningTask task = null;
+		TMisDunningOrder order = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			if (task == null) {
+				logger.warn("任务不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			
+			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("personalInfo", personalInfo);
 		
 		model.addAttribute("task", task);
@@ -1467,23 +1496,32 @@ public class TMisDunningTaskController extends BaseController {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		if (task == null) {
-			logger.warn("任务不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
-		
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
 		//boolean isDelayable = order.isDelayable();
 		
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+		TRiskBuyerPersonalInfo personalInfo = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			if (task == null) {
+				logger.warn("任务不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
 		
-		if (tMisChangeCardRecord != null) {
+		if (tMisChangeCardRecord != null && personalInfo != null) {
 			personalInfo.setRemitBankNo(tMisChangeCardRecord.getBankcard());
 			personalInfo.setRemitBankName(tMisChangeCardRecord.getBankname());
 			personalInfo.setMobile(tMisChangeCardRecord.getMobile());

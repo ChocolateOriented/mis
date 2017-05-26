@@ -34,6 +34,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -101,26 +102,34 @@ public class TMisDunningOuterTaskController extends BaseController {
 			return "views/error/500";
 		}
 		
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return "views/error/500";
-		}
 		
 		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
-		
-		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
-		model.addAttribute("personalInfo", personalInfo);
-		model.addAttribute("dealcode", dealcode);
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("buyerId", buyerId);
-		//model.addAttribute("isDelayable", isDelayable);
 		
 		TBuyerContact tBuyerContact = new TBuyerContact();
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
 		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
-		contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
+			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
+			model.addAttribute("personalInfo", personalInfo);
+			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+		model.addAttribute("buyerId", buyerId);
+		//model.addAttribute("isDelayable", isDelayable);
+		
 		boolean hasContact = false;
 		if(contactPage.getCount() > 0L){
 			hasContact = true;

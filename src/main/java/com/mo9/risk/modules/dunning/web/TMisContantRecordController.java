@@ -32,6 +32,7 @@ import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -96,18 +97,30 @@ public class TMisContantRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisContantRecord:view")
 	@RequestMapping(value = "dialogTelInfos")
 	public  String dialogTelInfos(String buyerId,String type,String dialogType, Model model,String dealcode){
-		List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,type.toLowerCase());
+		List<TMisSendMsgInfo> list = null;
 //		List<Map<String,Integer>>  map = tMisContantRecordService.findSmsNum(dealcode);
-		List<TelNumberBean> telNumberBeans = tMisContantRecordService.findSmsNum(dealcode);
+		List<TelNumberBean> telNumberBeans = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			list = tMisContantRecordService.getTelInfos(buyerId,type.toLowerCase());
+			telNumberBeans = tMisContantRecordService.findSmsNum(dealcode);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		Map<String,Integer> map = new HashMap<String, Integer>();
-		for(TelNumberBean telNumberBean : telNumberBeans){
-			String[] str = telNumberBean.getTel().split(",");
-			if(str.length > 1){
-				for(String tel : str){
-					map.put(tel, telNumberBean.getCount());
+		if (telNumberBeans != null) {
+			for(TelNumberBean telNumberBean : telNumberBeans){
+				String[] str = telNumberBean.getTel().split(",");
+				if(str.length > 1){
+					for(String tel : str){
+						map.put(tel, telNumberBean.getCount());
+					}
+				}else{
+					map.put(telNumberBean.getTel(), telNumberBean.getCount());
 				}
-			}else{
-				map.put(telNumberBean.getTel(), telNumberBean.getCount());
 			}
 		}
 		model.addAttribute("map", map);
@@ -140,36 +153,52 @@ public class TMisContantRecordController extends BaseController {
 		}
 		
 		tMisContantRecord.setBuyerid(Integer.parseInt(buyerId));
-		Page<TMisContantRecord> page = tMisContantRecordService.findPage(new Page<TMisContantRecord>(request, response, 50), tMisContantRecord); 
-		List<TMisContantRecord> t = page.getList();
-		for(TMisContantRecord record :t){
-			//操作类型汉字话
-			if(record.getContanttype() != null){
-				record.setContanttypestr(record.getContanttype().getDesc());
-			}
-			//电话应答状态汉字话
-			if(record.getTelstatus()  != null){
-				record.setTelstatusstr(record.getTelstatus().getDesc());
-			}
-			
-			//联系人类型汉字话
-			if(record.getContactstype()  != null){
-				record.setContactstypestr(record.getContactstype().getDesc());
-			}
-			
-			//短信类型汉字话
-			if(record.getSmstemp() != null){
-				record.setSmstempstr(record.getSmstemp().getDesc());
-			}
-			//取催收人姓名
-//			if(record.getDunningpeoplename() != null){
-//				if("sys".equals(record.getDunningpeoplename())){
-//					record.setDunningpeoplename("定时发送");
-//				}else{
-//					TMisDunningPeople people = tMisDunningPeopleService.get(record.getDunningpeoplename());
-//					record.setDunningpeoplename(null != people ? people.getName():"");
+		Page<TMisContantRecord> page = null;
+		TMisDunningTask task = null;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("STATUS_DUNNING", "dunning");
+		params.put("DEALCODE", dealcode);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			page = tMisContantRecordService.findPage(new Page<TMisContantRecord>(request, response, 50), tMisContantRecord);
+			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		if (page != null) {
+			List<TMisContantRecord> t = page.getList();
+			for(TMisContantRecord record :t){
+				//操作类型汉字话
+				if(record.getContanttype() != null){
+					record.setContanttypestr(record.getContanttype().getDesc());
+				}
+				//电话应答状态汉字话
+				if(record.getTelstatus()  != null){
+					record.setTelstatusstr(record.getTelstatus().getDesc());
+				}
+				
+				//联系人类型汉字话
+				if(record.getContactstype()  != null){
+					record.setContactstypestr(record.getContactstype().getDesc());
+				}
+				
+				//短信类型汉字话
+				if(record.getSmstemp() != null){
+					record.setSmstempstr(record.getSmstemp().getDesc());
+				}
+				//取催收人姓名
+//				if(record.getDunningpeoplename() != null){
+//					if("sys".equals(record.getDunningpeoplename())){
+//						record.setDunningpeoplename("定时发送");
+//					}else{
+//						TMisDunningPeople people = tMisDunningPeopleService.get(record.getDunningpeoplename());
+//						record.setDunningpeoplename(null != people ? people.getName():"");
+//					}
 //				}
-//			}
+			}
 		}
 //		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
 //		model.addAttribute("personalInfo", personalInfo);
@@ -177,10 +206,7 @@ public class TMisContantRecordController extends BaseController {
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		
 		boolean ispayoff = false;
 		if(null != task){
 			ispayoff = task.getIspayoff();
@@ -251,24 +277,34 @@ public class TMisContantRecordController extends BaseController {
 			return form(tMisContantRecord, model);
 		}
 		String dealcode = request.getParameter("dealcode");
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
 		
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
+		String smsTemp = "";
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return null;
+			}
+			
+			Map<String,Object> params = new HashMap<String,Object>();
+			params.put("STATUS_DUNNING", "dunning");
+			params.put("DEALCODE", dealcode);
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			
+			if (task == null) {
+				logger.warn("任务不存在，订单号：" + dealcode);
+				return null;
+			}
+			smsTemp = tMisContantRecordService.smsGetTemp(task,order, tMisContantRecord);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
 			return null;
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
-		
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		
-		if (task == null) {
-			logger.warn("任务不存在，订单号：" + dealcode);
-			return null;
-		}
-		
-		return tMisContantRecordService.smsGetTemp(task,order, tMisContantRecord);
+		return smsTemp;
 	}
 	
 	
@@ -308,8 +344,16 @@ public class TMisContantRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisContantRecord:view")
 	@RequestMapping(value = "dialogSmsDetail")
 	public  String dialogSmsDetail( TMisContantRecord tMisContantRecord,Model model){
-		List<TMisContantRecord>  list = tMisContantRecordService.findDetailByDealcodeandTel(tMisContantRecord);
-		model.addAttribute("tmiscontantrecord", list);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			List<TMisContantRecord>  list = tMisContantRecordService.findDetailByDealcodeandTel(tMisContantRecord);
+			model.addAttribute("tmiscontantrecord", list);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		return "modules/dunning/dialog/dialogSmsDetail";
 	}
 	
@@ -317,8 +361,16 @@ public class TMisContantRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisContantRecord:view")
 	@RequestMapping(value = "dialogTelDetail")
 	public  String dialogTelDetail( TMisContantRecord tMisContantRecord,Model model){
-		List<TMisContantRecord>  list = tMisContantRecordService.findDetailByDealcodeandTel(tMisContantRecord);
-		model.addAttribute("tmiscontantrecord", list);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			List<TMisContantRecord>  list = tMisContantRecordService.findDetailByDealcodeandTel(tMisContantRecord);
+			model.addAttribute("tmiscontantrecord", list);
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败：" + e.getMessage());
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		return "modules/dunning/dialog/dialogTelDetail";
 	}
 	
