@@ -82,10 +82,13 @@ public class TMisContantRecordController extends BaseController {
 	@ResponseBody
 	public List<TMisSendMsgInfo>  getTelInfos(String buyerId,String type){
 		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,type.toLowerCase());
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 		return new ArrayList<TMisSendMsgInfo>();
 	}

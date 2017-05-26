@@ -945,39 +945,46 @@ public class TMisDunningTaskController extends BaseController {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
-		TRiskBuyerWorkinfo workinfo =
-				tRiskBuyerWorkinfoService.getWorkInfoByBuyerId(buyerId,dealcode).isEmpty()? 
-						new TRiskBuyerWorkinfo() : tRiskBuyerWorkinfoService.getWorkInfoByBuyerId(buyerId,dealcode).get(0);
-						
-		List<TRiskBuyer2contacts> buyer2Contacts = tRiskBuyer2contactsService.getContactsByBuyerId(buyerId,dealcode); 
-//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-
-		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-		if (order == null) {
-			logger.warn("订单不存在，订单号：" + dealcode);
-			return null;
+		try{
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
+			TRiskBuyerWorkinfo workinfo =
+					tRiskBuyerWorkinfoService.getWorkInfoByBuyerId(buyerId,dealcode).isEmpty()? 
+							new TRiskBuyerWorkinfo() : tRiskBuyerWorkinfoService.getWorkInfoByBuyerId(buyerId,dealcode).get(0);
+							
+			List<TRiskBuyer2contacts> buyer2Contacts = tRiskBuyer2contactsService.getContactsByBuyerId(buyerId,dealcode); 
+	//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
+	
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return null;
+			}
+			Map<String,Object> params = new HashMap<String,Object>();
+			params.put("STATUS_DUNNING", "dunning");
+			params.put("DEALCODE", dealcode);
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			boolean ispayoff = false;
+			if(null != task){
+				ispayoff = task.getIspayoff();
+			}else{
+				ispayoff = true;
+			}
+			model.addAttribute("workInfo", workinfo);
+			model.addAttribute("contacts", buyer2Contacts);
+			model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+			model.addAttribute("buyerId", buyerId);
+			model.addAttribute("dealcode", dealcode);
+			model.addAttribute("mobileSelf", mobileSelf);
+			
+			model.addAttribute("ispayoff", ispayoff);
+			
+			model.addAttribute("hasContact", hasContact);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
-			ispayoff = true;
-		}
-		model.addAttribute("workInfo", workinfo);
-		model.addAttribute("contacts", buyer2Contacts);
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("buyerId", buyerId);
-		model.addAttribute("dealcode", dealcode);
-		model.addAttribute("mobileSelf", mobileSelf);
-		
-		model.addAttribute("ispayoff", ispayoff);
-		
-		model.addAttribute("hasContact", hasContact);
-		
 		return "modules/dunning/tMisDunningTaskCustomerDetails";
 	}
 	
@@ -1937,6 +1944,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
 	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
@@ -1945,6 +1953,9 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("page", page);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return "error";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 		return "modules/dunning/performanceDayReportList";
 	}
@@ -1961,6 +1972,7 @@ public class TMisDunningTaskController extends BaseController {
     @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
     public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
             String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
@@ -1969,6 +1981,8 @@ public class TMisDunningTaskController extends BaseController {
     		return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
     }
