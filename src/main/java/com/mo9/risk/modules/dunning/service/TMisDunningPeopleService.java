@@ -99,21 +99,21 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 			dunningGroup = new TMisDunningGroup() ;
 			tMisDunningPeople.setGroup(dunningGroup);
 		}
-		List<String> queryTypes = dunningGroup.getQueryTypes() ;
+		List<GroupType> queryTypes = dunningGroup.getQueryTypes() ;
 		if (queryTypes == null) {
-			queryTypes = new ArrayList<String>() ;
+			queryTypes = new ArrayList<GroupType>() ;
 			dunningGroup.setQueryTypes(queryTypes);
 		}
 		
 		int permissions = TMisDunningTaskService.getPermissions();
 		//内部催收主管可查看自营
 		if(TMisDunningTaskService.DUNNING_INNER_PERMISSIONS == permissions){
-			queryTypes.add(GroupType.SELF.code);
+			queryTypes.add(GroupType.selfSupport);
 		}
 		//外部催收主管可查看外包坐席及委外佣金
 		if(TMisDunningTaskService.DUNNING_OUTER_PERMISSIONS == permissions){
-			queryTypes.add(GroupType.OUT_COMMISSION.code);
-			queryTypes.add(GroupType.OUT_SEAT.code);
+			queryTypes.add(GroupType.outsourceCommission);
+			queryTypes.add(GroupType.outsourceSeat);
 		}
 		//催收专员只能查看自己
 		if(TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS == permissions){
@@ -161,7 +161,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	
 	/**
 	 * 批量更新完成的任务
-	 * @param ids
+	 * @param
 	 * @return
 	 */
 	@Transactional(readOnly = false)
