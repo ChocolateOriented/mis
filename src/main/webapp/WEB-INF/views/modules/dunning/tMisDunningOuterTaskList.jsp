@@ -233,6 +233,7 @@ function formatPeopleList( item ){
 				<th><input type="checkbox" id="allorder" /></th>
 				<th>序号</th>
 				<th>姓名</th>
+				<th>手机号</th>
 				<th>欠款金额</th>
 				<th>应催金额</th>
 				<th>还款总额</th>
