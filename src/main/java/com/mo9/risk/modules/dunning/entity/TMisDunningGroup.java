@@ -16,12 +16,12 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Map<String, String> groupTypes;
+	public static final Map<GroupType, String> groupTypes;
 
 	static {
-		groupTypes = new HashMap<String, String>(GroupType.values().length);
+		groupTypes = new HashMap<GroupType, String>(GroupType.values().length);
 		for (GroupType groupType : GroupType.values()) {
-			groupTypes.put(groupType.name(), groupType.desc);
+			groupTypes.put(groupType, groupType.desc);
 		}
 	}
 
