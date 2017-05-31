@@ -40,7 +40,7 @@
 			});
 			
 			$("#btnReturn").click(function() {
-				var url = "${ctx}/dunning/tMisRemittanceConfirm/financialReturn?id=${TMisRemittanceConfirm.id}&financialremark=" + ($("#financialremark").val() || "");
+				var url = "${ctx}/dunning/tMisRemittanceConfirm/financialReturn?id=${TMisRemittanceConfirm.id}&financialremark=" + encodeURI($("#financialremark").val() || "");
 				confirmx("确认要打回改汇款信息吗？", url);
 
 			});
