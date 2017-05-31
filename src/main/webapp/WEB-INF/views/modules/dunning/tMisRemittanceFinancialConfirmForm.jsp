@@ -40,7 +40,7 @@
 			});
 			
 			$("#btnReturn").click(function() {
-				var url = "${ctx}/dunning/tMisRemittanceConfirm/financialReturn?id=" + "${TMisRemittanceConfirm.id}";
+				var url = "${ctx}/dunning/tMisRemittanceConfirm/financialReturn?id=${TMisRemittanceConfirm.id}&financialremark=" + ($("#financialremark").val() || "");
 				confirmx("确认要打回改汇款信息吗？", url);
 
 			});
@@ -137,7 +137,7 @@
 		<div class="control-group">
 			<label class="control-label">备注：</label>
 			<div class="controls">
-				<form:textarea path="financialremark"  rows="3" maxlength="500"></form:textarea>
+				<form:textarea id="financialremark" path="financialremark"  rows="3" maxlength="500"></form:textarea>
 			</div>
 		</div>
 		
