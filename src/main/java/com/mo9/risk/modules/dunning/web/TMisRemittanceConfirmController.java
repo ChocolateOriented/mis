@@ -457,6 +457,10 @@ public class TMisRemittanceConfirmController extends BaseController {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
+		if (!StringUtils.isBlank(remark)) {
+			remark = remark.replace('\r', ' ');
+			remark = remark.replace('\n', ' ');
+		}
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
 		String delayDay = paid.getDelayDay();
