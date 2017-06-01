@@ -1383,7 +1383,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		sortList.sort(dicts, "label", "desc"); 
 		
 		for(Dict dict : dicts){
-			if(!dict.getLabel().equals(P4_P5) || !dict.getLabel().equals(P3_P4)){
+			if(!dict.getLabel().equals(P4_P5) && !dict.getLabel().equals(P3_P4)){
 				String begin = dict.getValue().split("_")[0];
 				String end = dict.getValue().split("_")[1];
 				
