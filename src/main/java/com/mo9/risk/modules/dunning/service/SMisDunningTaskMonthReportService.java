@@ -5,6 +5,7 @@ package com.mo9.risk.modules.dunning.service;
 
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +44,13 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	public void delete(SMisDunningTaskMonthReport sMisDunningTaskMonthReport) {
 		super.delete(sMisDunningTaskMonthReport);
 	}
-	
+
+	/**
+	 * @Description 自动邮件
+	 * @param
+	 * @return void
+	 */
+	@Scheduled(cron = "0 0 8 * * ?")
+	public void autoSendMail(){
+	}
 }
