@@ -110,6 +110,7 @@
 				<th>[财]到账金额</th>
 				<th>[催]汇款渠道</th>
 				<th>[财]汇款渠道</th>
+				<th>操作人</th>
 				<th>审核状态</th>
 				<th>付款类型</th>
 				<th>操作</th>
@@ -164,6 +165,10 @@
 				</td>
 				
 				<td>
+					${tMisRemittanceConfirm.updateBy.name}
+				</td>
+				
+				<td>
 					${tMisRemittanceConfirm.confirmstatusText}
 				</td>
 				
@@ -175,17 +180,18 @@
 					<c:when test="${'ch_confirm' ne tMisRemittanceConfirm.confirmstatus}">
 					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:edit">
 						<input  id="btnch"   name="btnCollection" onclick="ckFunction('ch',this)" class="btn btn-primary"
+							${tMisRemittanceConfirm.confirmstatus eq 'cw_return' ? '' : 'disabled'}
 							remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="编辑" />
 	    				<input  id="btnPaid" ${not empty tMisRemittanceConfirm.accountamount ? '' : 'disabled'}  name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"
 	    				 	remittanceconfirmid="${tMisRemittanceConfirm.id}"  buyerId="${tMisRemittanceConfirm.buyerId}" dealcode="${tMisRemittanceConfirm.dealcode}" method="Confirmpay"  type="button" value="还款" />
 <%-- 	    				 <a href="${ctx}/dunning/tMisRemittanceConfirm/delete?id=${tMisRemittanceConfirm.id}" onclick="return confirmx('确认要删除该汇款确认信息吗？', this.href)">删除</a> --%>
 					</shiro:hasPermission>
 					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:financialEdit">
-						<c:if test="${'cw_return' ne tMisRemittanceConfirm.confirmstatus}">
+						<c:if test="${'ch_submit' eq tMisRemittanceConfirm.confirmstatus}">
 							<input  id="btncw"  name="btnCollection" onclick="ckFunction('cw',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  
-							type="button" value="${'cw_submit' eq tMisRemittanceConfirm.confirmstatus ? '编辑' : '审核'}" />
+							type="button" value="审核" />
 						</c:if>
-						<c:if test="${'cw_return' eq tMisRemittanceConfirm.confirmstatus}">
+						<c:if test="${'ch_submit' ne tMisRemittanceConfirm.confirmstatus}">
 							<input  id="btnover"  name="btnCollection" onclick="ckFunction('over',this)" class="btn btn-primary" remittanceconfirmid="${tMisRemittanceConfirm.id}"  type="button" value="查看" />
 						</c:if>
 	   				</shiro:hasPermission>

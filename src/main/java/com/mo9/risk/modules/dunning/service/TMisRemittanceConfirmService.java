@@ -30,6 +30,9 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private TMisRemittanceConfirmDao misRemittanceConfirmDao;
 	
+	@Autowired
+	private TMisRemittanceConfirmLogService tMisRemittanceConfirmLogService;
+	
 	public TMisRemittanceConfirm get(String id) {
 		return super.get(id);
 	}
@@ -45,11 +48,13 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Transactional(readOnly = false)
 	public void save(TMisRemittanceConfirm tMisRemittanceConfirm) {
 		super.save(tMisRemittanceConfirm);
+		tMisRemittanceConfirmLogService.saveLog(tMisRemittanceConfirm);
 	}
 	
 	@Transactional(readOnly = false)
 	public void delete(TMisRemittanceConfirm tMisRemittanceConfirm) {
 		super.delete(tMisRemittanceConfirm);
+		tMisRemittanceConfirmLogService.saveLog(tMisRemittanceConfirm.getId());
 	}
 	
 	public TMisRemittanceConfirm findRemittanceConfirmColumnByDealcode(String code){
@@ -65,7 +70,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	public int remittanceUpdate(TMisRemittanceConfirm entity){
 		entity.preUpdate();
 		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_SUBMIT);
-		return misRemittanceConfirmDao.remittanceUpdate(entity);
+		int result = 0;
+		result = misRemittanceConfirmDao.remittanceUpdate(entity);
+		tMisRemittanceConfirmLogService.saveLog(entity.getId());
+		return result;
 	}
 	
 	/**
@@ -77,7 +85,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	public int financialUpdate(TMisRemittanceConfirm entity){
 		entity.preUpdate();
 		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CW_SUBMIT);
-		return misRemittanceConfirmDao.financialUpdate(entity);
+		int result = 0;
+		result = misRemittanceConfirmDao.financialUpdate(entity);
+		tMisRemittanceConfirmLogService.saveLog(entity.getId());
+		return result;
 	}
 	
 	/**
@@ -89,7 +100,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	public int financialReturn(TMisRemittanceConfirm entity){
 		entity.preUpdate();
 		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CW_RETURN);
-		return misRemittanceConfirmDao.financialReturn(entity);
+		int result = 0;
+		result = misRemittanceConfirmDao.financialReturn(entity);
+		tMisRemittanceConfirmLogService.saveLog(entity.getId());
+		return result;
 	}
 	
 	/**
@@ -101,7 +115,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	public int confirmationUpdate(TMisRemittanceConfirm entity){
 		entity.preUpdate();
 		entity.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM);
-		return misRemittanceConfirmDao.confirmationUpdate(entity);
+		int result = 0;
+		result = misRemittanceConfirmDao.confirmationUpdate(entity);
+		tMisRemittanceConfirmLogService.saveLog(entity.getId());
+		return result;
 	}
 	
 	/**
@@ -118,7 +135,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		relatedIds.add(entity.getId());
 		param.put("ids", relatedIds);
 		param.put("tMisRemittanceConfirm", entity);
-		return misRemittanceConfirmDao.confirmationMergeUpdate(param);
+		int result = 0;
+		result = misRemittanceConfirmDao.confirmationMergeUpdate(param);
+		tMisRemittanceConfirmLogService.saveLog(relatedIds);
+		return result;
 	}
 	
 	/**

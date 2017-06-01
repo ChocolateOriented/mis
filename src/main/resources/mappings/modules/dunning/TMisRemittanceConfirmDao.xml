@@ -28,6 +28,8 @@
 		a.name AS "name",
 		a.mobile AS "mobile",
 		a.createDate AS "createDate",
+		a.updateby AS "updateby.name",
+		a.invalid AS "invalid",
 		a.serialnumber AS "serialnumber",
 		a.financialserialnumber AS "financialserialnumber"
 	</sql>
@@ -211,6 +213,7 @@
 	<update id="financialReturn">
 		UPDATE t_mis_remittance_confirm SET 	
 			confirmstatus = #{confirmstatus},
+			financialremark = #{financialremark},
 			updateby = #{updateBy.name},
 			updatedate = #{updateDate}
 		WHERE id = #{id}

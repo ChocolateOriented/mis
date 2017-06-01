@@ -303,7 +303,6 @@ public class TMisRemittanceConfirmController extends BaseController {
 	@RequestMapping(value = "financialReturn")
 	public String financialReturn(TMisRemittanceConfirm tMisRemittanceConfirm, RedirectAttributes redirectAttributes) {
 		if (StringUtils.isNotBlank(tMisRemittanceConfirm.getId())) {
-			
 			tMisRemittanceConfirmService.financialReturn(tMisRemittanceConfirm);
 			addMessage(redirectAttributes, "汇款信息打回成功");
 		} else {
