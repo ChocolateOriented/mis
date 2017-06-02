@@ -48,7 +48,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 //	@Autowired
 //	private TMisContantRecordService tcrService;
 	
-	public Page<TmisDunningSmsTemplate> findOrderPageList(Page<TmisDunningSmsTemplate> page, TmisDunningSmsTemplate entity) {
+	public Page<TmisDunningSmsTemplate> findSmsTemplatePageList(Page<TmisDunningSmsTemplate> page, TmisDunningSmsTemplate entity) {
 		
 		entity.setPage(page);
 		page.setList(dao.findSmsPageList(entity));

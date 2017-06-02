@@ -16,6 +16,7 @@
 				$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
+				$('#btnDeduct').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
 		});
