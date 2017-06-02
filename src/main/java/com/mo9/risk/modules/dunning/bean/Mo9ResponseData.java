@@ -74,6 +74,8 @@ public class Mo9ResponseData implements Serializable  {
 		
 		private String dealAmount;		//交易金额
 		
+		private Double chargeRate;		//扣款费率
+		
 		private String orderStatus;		//当前订单状态
 		
 		private String reason;		//订单状态原因
@@ -102,6 +104,14 @@ public class Mo9ResponseData implements Serializable  {
 
 		public void setDealAmount(String dealAmount) {
 			this.dealAmount = dealAmount;
+		}
+
+		public Double getChargeRate() {
+			return chargeRate;
+		}
+
+		public void setChargeRate(Double chargeRate) {
+			this.chargeRate = chargeRate;
 		}
 
 		public String getOrderStatus() {

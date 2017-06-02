@@ -47,6 +47,8 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	private String paychannel;		//扣款渠道
 
 	private Date finishtime;		//扣款成功时间
+	
+	private Double chargerate;		//扣款费率
 
 	private PayStatus status;		//扣款状态
 
@@ -190,6 +192,14 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 		this.finishtime = finishtime;
 	}
 	
+	public Double getChargerate() {
+		return chargerate;
+	}
+
+	public void setChargerate(Double chargerate) {
+		this.chargerate = chargerate;
+	}
+
 	public PayStatus getStatus() {
 		return status;
 	}

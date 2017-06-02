@@ -146,6 +146,7 @@ public class TMisDunningDeductCallService {
 					tMisDunningDeduct.setStatus(PayStatus.succeeded);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
+					tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 					updateDeductStatus(tMisDunningDeduct);
 					
 					result.put("result", "OK");
@@ -155,6 +156,7 @@ public class TMisDunningDeductCallService {
 					tMisDunningDeduct.setStatus(PayStatus.failed);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
+					tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 					updateDeductStatus(tMisDunningDeduct);
 					
 					result.put("result", "NO");
@@ -200,6 +202,7 @@ public class TMisDunningDeductCallService {
 					tMisDunningDeduct.setStatus(PayStatus.succeeded);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
+					tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 					updateDeductStatus(tMisDunningDeduct);
 					
 					result.put("result", "OK");
@@ -209,6 +212,7 @@ public class TMisDunningDeductCallService {
 					tMisDunningDeduct.setStatus(PayStatus.failed);
 					tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 					tMisDunningDeduct.setReason(responseOrder.getReason());
+					tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 					updateDeductStatus(tMisDunningDeduct);
 					
 					result.put("result", "NO");
