@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 
 /**
  * 催收代扣DAO接口
@@ -49,6 +50,7 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	
 	/**
 	 * 根据状态获取扣款记录
+	 * @param status
 	 * @return
 	 */
 	public List<TMisDunningDeduct> getDeductListByStatus(String status);
@@ -62,9 +64,16 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	
 	/**
 	 * 查询银行卡在给定渠道当天余额不足的代扣记录数
-	 * @param dealcode
+	 * @param tMisDunningDeduct
 	 * @return
 	 */
 	public int getNoBalanceDeductNum(TMisDunningDeduct tMisDunningDeduct);
+	
+	/**
+	 *通过订单号查询订单
+	 * @param dealcode
+	 * @return
+	 */
+	public TMisDunningOrder  findByDealcode(String dealcode);
 
 }

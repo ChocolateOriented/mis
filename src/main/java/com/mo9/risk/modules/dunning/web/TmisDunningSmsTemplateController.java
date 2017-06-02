@@ -67,7 +67,7 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = {"list", ""})
 	public String findPageList(TmisDunningSmsTemplate tstemplate, HttpServletRequest request, HttpServletResponse response, Model model){
-		Page<TmisDunningSmsTemplate> page = tstService.findOrderPageList(new Page<TmisDunningSmsTemplate>(request, response), tstemplate);
+		Page<TmisDunningSmsTemplate> page = tstService.findSmsTemplatePageList(new Page<TmisDunningSmsTemplate>(request, response), tstemplate);
 		
 		model.addAttribute("page",page);
 		return "modules/dunning/tMisDunningSmsTemplate";

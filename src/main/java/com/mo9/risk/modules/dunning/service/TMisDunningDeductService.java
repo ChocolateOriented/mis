@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -323,5 +325,31 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			logger.info("代扣定时任务查询失败:" + e.getMessage());
 		}
 	}
-
+   /**
+    * 通过资方和逾期天数判断是否可以开启代扣
+    * @param dealcode
+    * @return
+    */
+	public boolean findOrderByPayCode(String dealcode){
+		TMisDunningOrder order = tMisDunningDeductDao.findByDealcode(dealcode);
+		String payCode = order.getPayCode();
+		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
+		if(StringUtils.isEmpty(payCode)){
+			return false;
+		}
+		if("mindaipay".equals(payCode)){
+			if(overdayas<2){
+				return false;	
+			}
+		}
+		if("lianlianpay".equals(payCode)||"yilianpay".equals(payCode)||"suixinpay".equals(payCode)||"unspay".equals(payCode)||
+		   "chinapay".equals(payCode)||"manualpay".equals(payCode)||"baofoopay".equals(payCode)||"yichuangpay".equals(payCode)||
+		   "koudaipay".equals(payCode)||"kaolapay".equals(payCode)||"dianrongpay".equals(payCode)){
+			if(overdayas<0){
+				return false;
+			}
+		}
+		
+	  return true;
+	}
 }

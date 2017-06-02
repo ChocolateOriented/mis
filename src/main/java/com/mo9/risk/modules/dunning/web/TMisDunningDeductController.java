@@ -182,6 +182,13 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
+
+		if(!tMisDunningDeductService.findOrderByPayCode(dealcode)){
+			result.put("result", "NO");
+			result.put("msg", "未能符合代扣条件，不能发起代扣");
+			return result;
+		}
+		
 		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankName);
 		
 		if (payChannelList == null || payChannelList.size() == 0) {
@@ -207,6 +214,7 @@ public class TMisDunningDeductController extends BaseController {
 			result.put("msg", "该银行卡当前不能发起代扣");
 			return result;
 		}
+		
 		
 		if (!tMisDunningDeductService.preCheckStatus(dealcode)) {
 			result.put("result", "NO");
