@@ -853,6 +853,42 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	/**
+	 * 查询分页数据-优化版
+	 * @param page 分页对象
+	 * @param entity
+	 * @return
+	 */
+	public Page<DunningOrder> newfindOrderPageList(Page<DunningOrder> page, DunningOrder entity) {
+		int permissions = getPermissions();
+		if(DUNNING_ALL_PERMISSIONS == permissions){
+			entity.setDunningpeopleid(null);
+		}
+		if(DUNNING_INNER_PERMISSIONS == permissions){
+			entity.setDunningpeopleid(null);
+		}
+		if(DUNNING_OUTER_PERMISSIONS == permissions){
+			entity.setDunningpeopleid(null);
+		}
+		if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
+			if(null == entity.getStatus()){
+				entity.setStatus("payment");
+			}
+			entity.setDunningpeopleid(UserUtils.getUser().getId());
+		}
+		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
+			entity.setDunningpeopleid(null);
+		}
+		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
+			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
+		}else{
+			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
+		}
+		entity.setPage(page);
+		page.setList(dao.newfindOrderPageList(entity));
+		return page;
+	}
+	
+	/**
 	 * 查询催收列表数据
 	 * @param entity
 	 * @return

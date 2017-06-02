@@ -182,7 +182,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = {"findOrderPageList", ""})
 	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<DunningOrder> page = tMisDunningTaskService.findOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
+		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
 		//催收小组列表
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;

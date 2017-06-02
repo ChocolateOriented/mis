@@ -206,4 +206,22 @@ public class TMisDunningOuterTaskController extends BaseController {
 		return "OK";
 	}
 	
+	
+	/**
+	 * 原催收逾期列表页面
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = {"oldfindOrderPageList", ""})
+	public String oldfindOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<DunningOrder> page = tMisDunningTaskService.findOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
+		//催收小组列表
+		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
+		model.addAttribute("page", page);
+		return "modules/dunning/oldTmisDunningTaskList";
+	}
+	
+	
+	
 }
