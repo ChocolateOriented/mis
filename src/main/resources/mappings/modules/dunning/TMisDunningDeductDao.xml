@@ -266,12 +266,6 @@
 		WHERE a.status = #{status}
 	</select>
 	
-	<select id="findByDealcode" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningOrder">
-		SELECT 
-			o.pay_code AS "payCode",
-			o.repayment_time AS "repaymentDate"                
-		FROM t_risk_order o
-		WHERE o.dealcode = #{dealcode}
-	</select>
+
 
 </mapper>

@@ -19,6 +19,9 @@
 				$('#btnDeduct').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
+			if("daikoufalse"==window.parent.$("#daikouStatus").val()){
+				$("#btnDeduct").attr("disabled",true);
+			}
 		});
 		
 		function collectionfunction(obj, width, height){

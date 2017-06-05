@@ -888,9 +888,10 @@ public class TMisDunningTaskController extends BaseController {
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
 		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
+		TMisDunningOrder order=null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
 			if (order == null) {
 				logger.warn("订单不存在，订单号：" + dealcode);
 				return "views/error/500";
@@ -930,6 +931,9 @@ public class TMisDunningTaskController extends BaseController {
 		
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
 		
+		//根据资方和逾期天数判断是否开启代扣
+		String daikouStatus=tMisDunningTaskService.findOrderByPayCode(order);
+		model.addAttribute("daikouStatus", daikouStatus);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	

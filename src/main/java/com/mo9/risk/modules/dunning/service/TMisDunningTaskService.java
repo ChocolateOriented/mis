@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2550,5 +2551,27 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	     
 	 
+	}
+
+	public String findOrderByPayCode(TMisDunningOrder order) {
+		String payCode = order.getPayCode();
+		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
+		if(StringUtils.isEmpty(payCode)){
+			return "daikoufalse";
+		}
+		if(payCode.contains("mindaipay")){
+			if(overdayas<2){
+				return "daikoufalse";	
+			}
+		}
+		if(payCode.contains("lianlianpay")||payCode.contains("yilianpay")||payCode.contains("suixinpay")||payCode.contains("unspay")||
+			payCode.contains("chinapay")||payCode.contains("manualpay")||payCode.contains("baofoopay")||payCode.contains("yichuangpay")||
+			payCode.contains("koudaipay")||payCode.contains("kaolapay")||payCode.contains("dianrongpay")){
+			if(overdayas<0){
+				return "daikoufalse";
+			}
+		}
+		
+	  return "daikoutrue";
 	}
 }

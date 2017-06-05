@@ -92,6 +92,7 @@
 <body>
 	<h4>&nbsp;&nbsp; </h4>
 	<h4>&nbsp;&nbsp;个人信息 </h4>
+	<input id="daikouStatus" name="daikouStatus" type="hidden" value="${daikouStatus}" />
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">
 		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />
 		<tbody>
@@ -187,7 +188,7 @@
 	</table>
 	</shiro:hasPermission>
 <br/>
-<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}" frameborder="0"  style="width:100%;height:600px;">
+<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?daikouStatus=${daikouStatus}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}" frameborder="0"  style="width:100%;height:600px;">
 </iframe> 
 </body>
 </html>
