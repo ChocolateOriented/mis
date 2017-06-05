@@ -337,14 +337,14 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		if(StringUtils.isEmpty(payCode)){
 			return false;
 		}
-		if("mindaipay".equals(payCode)){
+		if(payCode.contains("mindaipay")){
 			if(overdayas<2){
 				return false;	
 			}
 		}
-		if("lianlianpay".equals(payCode)||"yilianpay".equals(payCode)||"suixinpay".equals(payCode)||"unspay".equals(payCode)||
-		   "chinapay".equals(payCode)||"manualpay".equals(payCode)||"baofoopay".equals(payCode)||"yichuangpay".equals(payCode)||
-		   "koudaipay".equals(payCode)||"kaolapay".equals(payCode)||"dianrongpay".equals(payCode)){
+		if(payCode.contains("lianlianpay")||payCode.contains("yilianpay")||payCode.contains("suixinpay")||payCode.contains("unspay")||
+			payCode.contains("chinapay")||payCode.contains("manualpay")||payCode.contains("baofoopay")||payCode.contains("yichuangpay")||
+			payCode.contains("koudaipay")||payCode.contains("kaolapay")||payCode.contains("dianrongpay")){
 			if(overdayas<0){
 				return false;
 			}
