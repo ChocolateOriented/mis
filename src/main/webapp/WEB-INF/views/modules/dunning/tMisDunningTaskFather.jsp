@@ -188,7 +188,7 @@
 	</table>
 	</shiro:hasPermission>
 <br/>
-<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?daikouStatus=${daikouStatus}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}" frameborder="0"  style="width:100%;height:600px;">
+<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}" frameborder="0"  style="width:100%;height:600px;">
 </iframe> 
 </body>
 </html>
