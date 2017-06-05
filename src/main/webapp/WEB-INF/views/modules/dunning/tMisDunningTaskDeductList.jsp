@@ -15,7 +15,6 @@
 				$('#btnTel').attr("disabled","disabled");
 				$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
-				$('#btnDeduct').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
 				$('#btnDeduct').attr("disabled","disabled");
 				window.parent.disableBtn();
@@ -92,6 +91,7 @@
 				<th>扣款渠道</th>
 				<th>扣款状态</th>
 				<th>扣款成功时间</th>
+				<th>扣款费率(%)</th>
 				<th>还款状态</th>
 				<th>扣款人</th>
 			</tr>
@@ -132,6 +132,9 @@
 				</td>
 				<td>
 					<fmt:formatDate value="${tMisDunningDeduct.finishtime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
+				<td>
+					${tMisDunningDeduct.chargerate}
 				</td>
 				<td>
 					${tMisDunningDeduct.repaymentstatus.desc}

@@ -105,6 +105,7 @@ public class TMisDunningPayCallbackController extends BaseController {
 		}
 		tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 		tMisDunningDeduct.setReason(responseOrder.getReason());
+		tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 		
 		boolean result = tMisDunningDeductService.updateRecord(tMisDunningDeduct);
 		return result ? "OK" : "NO";
