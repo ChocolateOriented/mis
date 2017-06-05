@@ -23,6 +23,7 @@
 		a.repaymentstatus as "repaymentstatus",
 		a.repaymentdetail as "repaymentdetail",
 		a.finishtime as "finishtime",
+		a.chargerate as "chargerate",
 		a.createby as "createby.name",
 		a.createdate as "createdate",
 		a.updateby as "updateby.name",
@@ -51,13 +52,14 @@
 			a.paytype AS "paytype",
 			a.delaydays AS "delaydays",
 			a.payamount AS "payamount",
-			IFNULL(d.label, a.paychannel) AS "paychannel",
+			IFNULL(d.label, ' ') AS "paychannel",
 			a.status AS "status",
 			a.statusdetail AS "statusdetail",
 			a.reason as "reason",
 			a.repaymentstatus AS "repaymentstatus",
 			a.repaymentdetail AS "repaymentdetail",
 			a.finishtime AS "finishtime",
+			a.chargerate * 100 AS "chargerate",
 			a.createby AS "createBy.name",
 			a.createdate AS "createDate",
 			a.updateby AS "updateBy.name",
@@ -149,6 +151,9 @@
 			</if>
 			<if test="finishtime != null">
 				finishtime = #{finishtime},
+			</if>
+			<if test="chargerate != null">
+				chargerate = #{chargerate},
 			</if>
 			updateby = #{updateBy.name},
 			updatedate = #{updateDate}

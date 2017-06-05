@@ -97,6 +97,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		currentRecord.setStatus(tMisDunningDeduct.getStatus());
 		currentRecord.setStatusdetail(tMisDunningDeduct.getStatusdetail());
 		currentRecord.setReason(tMisDunningDeduct.getReason());
+		currentRecord.setChargerate(tMisDunningDeduct.getChargerate());
 		User user = new User("auto_admin");
 		user.setName("auto_admin");
 		currentRecord.setCreateBy(user);
@@ -308,18 +309,16 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				String orderStatus = responseOrder.getOrderStatus();
 				if ("succeeded".equals(orderStatus)) {
 					record.setStatus(PayStatus.succeeded);
-					record.setStatusdetail(responseOrder.getMessage());
-					record.setReason(responseOrder.getReason());
-					updateRecord(record);
 				} else if ("failed".equals(orderStatus) || "unmatched".equals(orderStatus)) {
 					record.setStatus(PayStatus.failed);
-					record.setStatusdetail(responseOrder.getMessage());
-					record.setReason(responseOrder.getReason());
-					updateRecord(record);
 				} else {
 					continue;
 				}
 	
+				record.setStatusdetail(responseOrder.getMessage());
+				record.setReason(responseOrder.getReason());
+				record.setChargerate(responseOrder.getChargeRate());
+				updateRecord(record);
 			}
 		} catch(Exception e) {
 			logger.info("代扣定时任务查询失败:" + e.getMessage());
