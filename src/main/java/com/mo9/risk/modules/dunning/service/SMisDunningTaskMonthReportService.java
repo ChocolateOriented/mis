@@ -3,16 +3,27 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.dao.SMisDunningTaskMonthReportDao;
+import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
+import com.mo9.risk.util.CsvUtil;
+import com.mo9.risk.util.MailSender;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-
+import javax.activation.DataSource;
+import javax.mail.MessagingException;
+import javax.mail.util.ByteArrayDataSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.service.CrudService;
-import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
-import com.mo9.risk.modules.dunning.dao.SMisDunningTaskMonthReportDao;
 
 /**
  * 催收月绩效Service
@@ -20,6 +31,7 @@ import com.mo9.risk.modules.dunning.dao.SMisDunningTaskMonthReportDao;
  * @version 2016-11-30
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTaskMonthReportDao, SMisDunningTaskMonthReport> {
 
@@ -46,11 +58,62 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	}
 
 	/**
-	 * @Description 自动邮件
-	 * @param
 	 * @return void
+	 * @Description 自动邮件
 	 */
 	@Scheduled(cron = "0 0 8 * * ?")
-	public void autoSendMail(){
+	public void autoSendMail() {
+		String receiver = DictUtils.getDictValue("e_mail", "month_report_receiver", "");
+		logger.info("自动发送月报邮件至"+receiver);
+
+		//获取截止到当前的月报
+		SMisDunningTaskMonthReport query = new SMisDunningTaskMonthReport();
+		String month = DateUtils.formatDate(new Date(), "yyyyMM");
+		query.setMonths(month);
+		List<SMisDunningTaskMonthReport> data = super.findList(query);
+		if (data == null){
+			logger.warn("月报表数据为空");
+			return;
+		}
+
+		//获取T-1日期
+		Date date = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int day = calendar.get(Calendar.DATE);
+		calendar.set(Calendar.DATE, day - 1);
+		String yesterday = DateUtils.formatDate(calendar.getTime());
+
+		//生成cvs
+		String fileName = "performanceMonthReport" + yesterday + ".csv";
+		//表头200每条数据约为120字节
+		ByteArrayOutputStream os = new ByteArrayOutputStream(200+120*data.size());
+		try {
+			CsvUtil.export(os, SMisDunningTaskMonthReport.class, data);
+		} catch (IOException e) {
+			logger.warn("月报表自动邮件创建csv失败", e);
+			return;
+		}
+
+		//创建邮件
+		MailSender mailSender = new MailSender(receiver);
+		mailSender.setSubject("绩效月报-" + yesterday);
+		//添加附件cvs
+		DataSource dataSource;
+		try {
+			dataSource = new ByteArrayDataSource(new ByteArrayInputStream(os.toByteArray()), "text/csv");
+		} catch (IOException e) {
+			logger.warn("月报表自动邮件添加附件失败", e);
+			return;
+		}
+		mailSender.addAttachSource(dataSource, fileName);
+
+		//发送
+		try {
+			mailSender.sendMail();
+			logger.debug("月报邮件发送成功");
+		} catch (MessagingException e) {
+			logger.warn("月报表自动邮件发送失败", e);
+		}
 	}
 }

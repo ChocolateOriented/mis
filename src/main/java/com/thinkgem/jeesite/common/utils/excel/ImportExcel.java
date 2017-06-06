@@ -3,17 +3,19 @@
  */
 package com.thinkgem.jeesite.common.utils.excel;
 
+import com.google.common.collect.Lists;
+import com.thinkgem.jeesite.common.utils.Reflections;
+import com.thinkgem.jeesite.common.utils.excel.ExcelFieldParser.ExcelFieldNode;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -26,11 +28,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.google.common.collect.Lists;
-import com.thinkgem.jeesite.common.utils.Reflections;
-import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 导入Excel文件（支持“XLS”和“XLSX”格式）
@@ -58,7 +55,7 @@ public class ImportExcel {
 	
 	/**
 	 * 构造函数
-	 * @param path 导入文件，读取第一个工作表
+	 * @param fileName 导入文件，读取第一个工作表
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
@@ -70,19 +67,19 @@ public class ImportExcel {
 	
 	/**
 	 * 构造函数
-	 * @param path 导入文件对象，读取第一个工作表
+	 * @param file 导入文件对象，读取第一个工作表
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(File file, int headerNum) 
+	public ImportExcel(File file, int headerNum)
 			throws InvalidFormatException, IOException {
 		this(file, headerNum, 0);
 	}
 
 	/**
 	 * 构造函数
-	 * @param path 导入文件
+	 * @param fileName 导入文件
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
@@ -95,20 +92,20 @@ public class ImportExcel {
 	
 	/**
 	 * 构造函数
-	 * @param path 导入文件对象
+	 * @param file 导入文件对象
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(File file, int headerNum, int sheetIndex) 
+	public ImportExcel(File file, int headerNum, int sheetIndex)
 			throws InvalidFormatException, IOException {
 		this(file.getName(), new FileInputStream(file), headerNum, sheetIndex);
 	}
 	
 	/**
 	 * 构造函数
-	 * @param file 导入文件对象
+	 * @param multipartFile 导入文件对象
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
@@ -121,7 +118,7 @@ public class ImportExcel {
 
 	/**
 	 * 构造函数
-	 * @param path 导入文件对象
+	 * @param fileName 导入文件对象
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
@@ -214,62 +211,8 @@ public class ImportExcel {
 	 * @param groups 导入分组
 	 */
 	public <E> List<E> getDataList(Class<E> cls, int... groups) throws InstantiationException, IllegalAccessException{
-		List<Object[]> annotationList = Lists.newArrayList();
-		// Get annotation field 
-		Field[] fs = cls.getDeclaredFields();
-		for (Field f : fs){
-			ExcelField ef = f.getAnnotation(ExcelField.class);
-			if (ef != null && (ef.type()==0 || ef.type()==2)){
-				if (groups!=null && groups.length>0){
-					boolean inGroup = false;
-					for (int g : groups){
-						if (inGroup){
-							break;
-						}
-						for (int efg : ef.groups()){
-							if (g == efg){
-								inGroup = true;
-								annotationList.add(new Object[]{ef, f});
-								break;
-							}
-						}
-					}
-				}else{
-					annotationList.add(new Object[]{ef, f});
-				}
-			}
-		}
-		// Get annotation method
-		Method[] ms = cls.getDeclaredMethods();
-		for (Method m : ms){
-			ExcelField ef = m.getAnnotation(ExcelField.class);
-			if (ef != null && (ef.type()==0 || ef.type()==2)){
-				if (groups!=null && groups.length>0){
-					boolean inGroup = false;
-					for (int g : groups){
-						if (inGroup){
-							break;
-						}
-						for (int efg : ef.groups()){
-							if (g == efg){
-								inGroup = true;
-								annotationList.add(new Object[]{ef, m});
-								break;
-							}
-						}
-					}
-				}else{
-					annotationList.add(new Object[]{ef, m});
-				}
-			}
-		}
-		// Field sorting
-		Collections.sort(annotationList, new Comparator<Object[]>() {
-			public int compare(Object[] o1, Object[] o2) {
-				return new Integer(((ExcelField)o1[0]).sort()).compareTo(
-						new Integer(((ExcelField)o2[0]).sort()));
-			};
-		});
+		ExcelFieldParser parser = new ExcelFieldParser(cls,2,groups);
+		List<ExcelFieldNode> annotationList = parser.init();
 		//log.debug("Import column count:"+annotationList.size());
 		// Get excel data
 		List<E> dataList = Lists.newArrayList();
@@ -278,10 +221,11 @@ public class ImportExcel {
 			int column = 0;
 			Row row = this.getRow(i);
 			StringBuilder sb = new StringBuilder();
-			for (Object[] os : annotationList){
+			for (ExcelFieldNode node : annotationList){
 				Object val = this.getCellValue(row, column++);
 				if (val != null){
-					ExcelField ef = (ExcelField)os[0];
+					ExcelField ef = node.getExcelField();
+					Object target = node.getTarget();
 					// If is dict type, get dict value
 					if (StringUtils.isNotBlank(ef.dictType())){
 						val = DictUtils.getDictValue(val.toString(), ef.dictType(), "");
@@ -289,14 +233,14 @@ public class ImportExcel {
 					}
 					// Get param type and type cast
 					Class<?> valType = Class.class;
-					if (os[1] instanceof Field){
-						valType = ((Field)os[1]).getType();
-					}else if (os[1] instanceof Method){
-						Method method = ((Method)os[1]);
+					if (target instanceof Field){
+						valType = ((Field)target).getType();
+					}else if (target instanceof Method){
+						Method method = ((Method)target);
 						if ("get".equals(method.getName().substring(0, 3))){
 							valType = method.getReturnType();
 						}else if("set".equals(method.getName().substring(0, 3))){
-							valType = ((Method)os[1]).getParameterTypes()[0];
+							valType = ((Method)target).getParameterTypes()[0];
 						}
 					}
 					//log.debug("Import value type: ["+i+","+column+"] " + valType);
@@ -331,10 +275,10 @@ public class ImportExcel {
 						val = null;
 					}
 					// set entity value
-					if (os[1] instanceof Field){
-						Reflections.invokeSetter(e, ((Field)os[1]).getName(), val);
-					}else if (os[1] instanceof Method){
-						String mthodName = ((Method)os[1]).getName();
+					if (target instanceof Field){
+						Reflections.invokeSetter(e, ((Field)target).getName(), val);
+					}else if (target instanceof Method){
+						String mthodName = ((Method)target).getName();
 						if ("get".equals(mthodName.substring(0, 3))){
 							mthodName = "set"+StringUtils.substringAfter(mthodName, "get");
 						}

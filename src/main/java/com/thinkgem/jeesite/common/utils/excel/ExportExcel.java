@@ -3,21 +3,19 @@
  */
 package com.thinkgem.jeesite.common.utils.excel;
 
+import com.google.common.collect.Lists;
+import com.thinkgem.jeesite.common.utils.Encodes;
+import com.thinkgem.jeesite.common.utils.excel.ExcelFieldParser.ExcelFieldNode;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -34,12 +32,6 @@ import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-import com.thinkgem.jeesite.common.utils.Encodes;
-import com.thinkgem.jeesite.common.utils.Reflections;
-import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 导出Excel文件（导出“XLSX”格式，支持大数据量导出   @see org.apache.poi.ss.SpreadsheetVersion）
@@ -69,11 +61,16 @@ public class ExportExcel {
 	 * 当前行号
 	 */
 	private int rownum;
+
+	/**
+	 * ExcelField解析器
+	 */
+	ExcelFieldParser parser;
 	
 	/**
 	 * 注解列表（Object[]{ ExcelField, Field/Method }）
 	 */
-	List<Object[]> annotationList = Lists.newArrayList();
+	List<ExcelFieldNode> annotationList = Lists.newArrayList();
 	
 	/**
 	 * 构造函数
@@ -92,74 +89,9 @@ public class ExportExcel {
 	 * @param groups 导入分组
 	 */
 	public ExportExcel(String title, Class<?> cls, int type, int... groups){
-		// Get annotation field 
-		Field[] fs = cls.getDeclaredFields();
-		for (Field f : fs){
-			ExcelField ef = f.getAnnotation(ExcelField.class);
-			if (ef != null && (ef.type()==0 || ef.type()==type)){
-				if (groups!=null && groups.length>0){
-					boolean inGroup = false;
-					for (int g : groups){
-						if (inGroup){
-							break;
-						}
-						for (int efg : ef.groups()){
-							if (g == efg){
-								inGroup = true;
-								annotationList.add(new Object[]{ef, f});
-								break;
-							}
-						}
-					}
-				}else{
-					annotationList.add(new Object[]{ef, f});
-				}
-			}
-		}
-		// Get annotation method
-		Method[] ms = cls.getDeclaredMethods();
-		for (Method m : ms){
-			ExcelField ef = m.getAnnotation(ExcelField.class);
-			if (ef != null && (ef.type()==0 || ef.type()==type)){
-				if (groups!=null && groups.length>0){
-					boolean inGroup = false;
-					for (int g : groups){
-						if (inGroup){
-							break;
-						}
-						for (int efg : ef.groups()){
-							if (g == efg){
-								inGroup = true;
-								annotationList.add(new Object[]{ef, m});
-								break;
-							}
-						}
-					}
-				}else{
-					annotationList.add(new Object[]{ef, m});
-				}
-			}
-		}
-		// Field sorting
-		Collections.sort(annotationList, new Comparator<Object[]>() {
-			public int compare(Object[] o1, Object[] o2) {
-				return new Integer(((ExcelField)o1[0]).sort()).compareTo(
-						new Integer(((ExcelField)o2[0]).sort()));
-			};
-		});
-		// Initialize
-		List<String> headerList = Lists.newArrayList();
-		for (Object[] os : annotationList){
-			String t = ((ExcelField)os[0]).title();
-			// 如果是导出，则去掉注释
-			if (type==1){
-				String[] ss = StringUtils.split(t, "**", 2);
-				if (ss.length==2){
-					t = ss[0];
-				}
-			}
-			headerList.add(t);
-		}
+		parser = new ExcelFieldParser(cls,type,groups);
+		annotationList = parser.init();
+		List<String> headerList = parser.getHeaderList();
 		initialize(title, headerList);
 	}
 	
@@ -301,94 +233,33 @@ public class ExportExcel {
 	public Row addRow(){
 		return sheet.createRow(rownum++);
 	}
-	
 
-	/**
-	 * 添加一个单元格
-	 * @param row 添加的行
-	 * @param column 添加列号
-	 * @param val 添加值
-	 * @return 单元格对象
-	 */
-	public Cell addCell(Row row, int column, Object val){
-		return this.addCell(row, column, val, 0, Class.class);
-	}
-	
-	/**
-	 * 添加一个单元格
-	 * @param row 添加的行
-	 * @param column 添加列号
-	 * @param val 添加值
-	 * @param align 对齐方式（1：靠左；2：居中；3：靠右）
-	 * @return 单元格对象
-	 */
-//	public Cell addCell(Row row, int column, Object val, int align, Class<?> fieldType){
-//		Cell cell = row.createCell(column);
-//		CellStyle style = styles.get("data"+(align>=1&&align<=3?align:""));
-//		try {
-//			if (val == null){
-//				cell.setCellValue("");
-//			} else if (val instanceof String) {
-//				cell.setCellValue((String) val);
-//			} else if (val instanceof Integer) {
-//				cell.setCellValue((Integer) val);
-//			} else if (val instanceof Long) {
-//				cell.setCellValue((Long) val);
-//			} else if (val instanceof Double) {
-//				cell.setCellValue((Double) val);
-//			} else if (val instanceof Float) {
-//				cell.setCellValue((Float) val);
-//			} else if (val instanceof Date) {
-//				DataFormat format = wb.createDataFormat();
-//	            style.setDataFormat(format.getFormat("yyyy-MM-dd"));
-//				cell.setCellValue((Date) val);
-//			} else {
-//				if (fieldType != Class.class){
-//					cell.setCellValue((String)fieldType.getMethod("setValue", Object.class).invoke(null, val));
-//				}else{
-//					cell.setCellValue((String)Class.forName(this.getClass().getName().replaceAll(this.getClass().getSimpleName(), 
-//						"fieldtype."+val.getClass().getSimpleName()+"Type")).getMethod("setValue", Object.class).invoke(null, val));
-//				}
-//			}
-//		} catch (Exception ex) {
-//			log.info("Set cell value ["+row.getRowNum()+","+column+"] error: " + ex.toString());
-//			cell.setCellValue(val.toString());
-//		}
-//		cell.setCellStyle(style);
-//		return cell;
-//	}
-	
-	public Cell addCell(Row row, int column, Object val, int align, Class<?> fieldType){
+
+	public <E> Cell addCell(Row row, int column, E e, ExcelFieldNode node) {
+		ExcelField ef = node.getExcelField();
+		int align = ef.align();
+		Class fieldType = ef.fieldType();
+
 		Cell cell = row.createCell(column);
-		CellStyle style = styles.get("data"+(align>=1&&align<=3?align:""));
+		CellStyle style = styles.get("data" + (align >= 1 && align <= 3 ? align : ""));
+
+		Object val = null;
 		try {
-			if (val == null){
-				cell.setCellValue("");
-			} else if (val instanceof String) {
-				cell.setCellValue((String) val);
-			} else if (val instanceof Integer) {
-				cell.setCellValue(val.toString());
-			} else if (val instanceof Long) {
-				cell.setCellValue(val.toString());
-			} else if (val instanceof Double) {
-				cell.setCellValue(val.toString());
-			} else if (val instanceof Float) {
-				cell.setCellValue(val.toString());
-			} else if (val instanceof Date) {
+			val = parser.getTargetValue(e, node);
+			if (val instanceof Date) {
 				DataFormat format = wb.createDataFormat();
-	            style.setDataFormat(format.getFormat("yyyy-MM-dd"));
+				style.setDataFormat(format.getFormat("yyyy-MM-dd"));
 				cell.setCellValue((Date) val);
 			} else {
-				if (fieldType != Class.class){
-					cell.setCellValue((String)fieldType.getMethod("setValue", Object.class).invoke(null, val));
-				}else{
-					cell.setCellValue((String)Class.forName(this.getClass().getName().replaceAll(this.getClass().getSimpleName(), 
-						"fieldtype."+val.getClass().getSimpleName()+"Type")).getMethod("setValue", Object.class).invoke(null, val));
-				}
+				String stringVal = parser.value2String(val, fieldType);
+				cell.setCellValue(stringVal);
 			}
 		} catch (Exception ex) {
-			log.info("Set cell value ["+row.getRowNum()+","+column+"] Exception : " + ex.toString());
-			cell.setCellValue(val.toString());
+			log.info(
+					"Set cell value [" + row.getRowNum() + "," + column + "] Exception : " + ex.toString());
+			if (null != val) {
+				cell.setCellValue(val.toString());
+			}
 		}
 		cell.setCellStyle(style);
 		return cell;
@@ -398,38 +269,14 @@ public class ExportExcel {
 	 * 添加数据（通过annotation.ExportField添加数据）
 	 * @return list 数据列表
 	 */
-	public <E> ExportExcel setDataList(List<E> list){
-		for (E e : list){
+	public <E> ExportExcel setDataList(List<E> list) {
+		for (E e : list) {
 			int colunm = 0;
 			Row row = this.addRow();
-			StringBuilder sb = new StringBuilder();
-			for (Object[] os : annotationList){
-				ExcelField ef = (ExcelField)os[0];
-				Object val = null;
-				// Get entity value
-				try{
-					if (StringUtils.isNotBlank(ef.value())){
-						val = Reflections.invokeGetter(e, ef.value());
-					}else{
-						if (os[1] instanceof Field){
-							val = Reflections.invokeGetter(e, ((Field)os[1]).getName());
-						}else if (os[1] instanceof Method){
-							val = Reflections.invokeMethod(e, ((Method)os[1]).getName(), new Class[] {}, new Object[] {});
-						}
-					}
-					// If is dict, get dict label
-					if (StringUtils.isNotBlank(ef.dictType())){
-						val = DictUtils.getDictLabel(val==null?"":val.toString(), ef.dictType(), "");
-					}
-				}catch(Exception ex) {
-					// Failure to ignore
-					log.info(ex.toString());
-					val = "";
-				}
-				this.addCell(row, colunm++, val, ef.align(), ef.fieldType());
-				sb.append(val + ", ");
+			for (ExcelFieldNode node : annotationList) {
+				this.addCell(row, colunm++, e, node);
 			}
-			log.debug("Write success: ["+row.getRowNum()+"] "+sb.toString());
+			log.debug("Write success: [" + row.getRowNum() + "] ");
 		}
 		return this;
 	}
@@ -459,7 +306,7 @@ public class ExportExcel {
 	
 	/**
 	 * 输出到文件
-	 * @param fileName 输出文件名
+	 * @param name 输出文件名
 	 */
 	public ExportExcel writeFile(String name) throws FileNotFoundException, IOException{
 		FileOutputStream os = new FileOutputStream(name);
@@ -504,7 +351,7 @@ public class ExportExcel {
 //			}
 //		}
 //		
-//		ee.writeFile("target/export.xlsx");
+//		ee.writeFile("narget/export.xlsx");
 //
 //		ee.dispose();
 //		
