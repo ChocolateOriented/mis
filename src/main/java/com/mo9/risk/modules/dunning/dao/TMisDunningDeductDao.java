@@ -69,11 +69,5 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	 */
 	public int getNoBalanceDeductNum(TMisDunningDeduct tMisDunningDeduct);
 	
-	/**
-	 *通过订单号查询订单
-	 * @param dealcode
-	 * @return
-	 */
-	public TMisDunningOrder  findByDealcode(String dealcode);
 
 }

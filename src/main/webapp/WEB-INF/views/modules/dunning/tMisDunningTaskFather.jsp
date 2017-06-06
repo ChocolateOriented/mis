@@ -92,6 +92,7 @@
 <body>
 	<h4>&nbsp;&nbsp; </h4>
 	<h4>&nbsp;&nbsp;个人信息 </h4>
+	<input id="daikouStatus" name="daikouStatus" type="hidden" value="${daikouStatus}" />
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">
 		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />
 		<tbody>

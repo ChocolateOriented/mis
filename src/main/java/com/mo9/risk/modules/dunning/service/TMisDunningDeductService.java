@@ -324,31 +324,5 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			logger.info("代扣定时任务查询失败:" + e.getMessage());
 		}
 	}
-   /**
-    * 通过资方和逾期天数判断是否可以开启代扣
-    * @param dealcode
-    * @return
-    */
-	public boolean findOrderByPayCode(String dealcode){
-		TMisDunningOrder order = tMisDunningDeductDao.findByDealcode(dealcode);
-		String payCode = order.getPayCode();
-		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
-		if(StringUtils.isEmpty(payCode)){
-			return false;
-		}
-		if(payCode.contains("mindaipay")){
-			if(overdayas<2){
-				return false;	
-			}
-		}
-		if(payCode.contains("lianlianpay")||payCode.contains("yilianpay")||payCode.contains("suixinpay")||payCode.contains("unspay")||
-			payCode.contains("chinapay")||payCode.contains("manualpay")||payCode.contains("baofoopay")||payCode.contains("yichuangpay")||
-			payCode.contains("koudaipay")||payCode.contains("kaolapay")||payCode.contains("dianrongpay")){
-			if(overdayas<0){
-				return false;
-			}
-		}
-		
-	  return true;
-	}
+   
 }

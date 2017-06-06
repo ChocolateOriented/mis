@@ -29,6 +29,9 @@
 					$(this).prop('checked', checked);
 				});
 			});
+			if("daikoufalse"==window.parent.$("#daikouStatus").val()){
+				$("#btnDeduct").attr("disabled",true);
+			}
 		});
 		
 		function collectionfunction(obj, width, height, param){
