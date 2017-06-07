@@ -1127,27 +1127,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		page.setList(dao.findPerformanceMonthReport(entity));
 		return page;
 	}
-	
-	/**
-	 * 催收日报表
-	 * @param performanceMonthReport
-	 * @return
-	 */
-	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceMonthReport){
-		return tMisDunningTaskDao.findPerformanceDayReport(performanceMonthReport);
-	}
-	
-	/**
-	 * 催收日报表-分页
-	 * @param performanceMonthReport
-	 * @return
-	 */
-	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport entity) {
-		entity.setPage(page);
-		page.setList(dao.findPerformanceDayReport(entity));
-		return page;
-	}
-	
+
 	/**
 	 * 记录催收操作记录时间
 	 * @param ids

@@ -10,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mo9.risk.modules.dunning.dao.SMisDunningProductivePowerDailyReportDao;
+import com.mo9.risk.modules.dunning.dao.DunningReportDao;
+import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.SMisDunningProductivePowerDailyReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -25,7 +26,9 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
  */
 @Service
 @Transactional(readOnly = true)
-public class SMisDunningProductivePowerDailyReportService extends CrudService<SMisDunningProductivePowerDailyReportDao, SMisDunningProductivePowerDailyReport> {
+public class DunningReportService extends BaseService {
+	@Autowired
+	DunningReportDao dunningReportDao ;
 	@Autowired
 	private TMisDunningGroupService groupService ;
 	
@@ -34,10 +37,9 @@ public class SMisDunningProductivePowerDailyReportService extends CrudService<SM
 	 * @param performanceMonthReport
 	 * @return
 	 */
-	@Override
-	public List<SMisDunningProductivePowerDailyReport> findList(SMisDunningProductivePowerDailyReport entity){
+	public List<SMisDunningProductivePowerDailyReport> findProductivePowerDailyReport(SMisDunningProductivePowerDailyReport entity){
 		this.setQueryConditions(entity);
-		return dao.findList(entity) ;
+		return dunningReportDao.findProductivePowerDailyReport(entity) ;
 	}
 
 	/**
@@ -45,11 +47,10 @@ public class SMisDunningProductivePowerDailyReportService extends CrudService<SM
 	 * @param performanceMonthReport
 	 * @return
 	 */
-	@Override
-	public Page<SMisDunningProductivePowerDailyReport> findPage(Page<SMisDunningProductivePowerDailyReport> page, SMisDunningProductivePowerDailyReport entity) {
+	public Page<SMisDunningProductivePowerDailyReport> findProductivePowerDailyReport(Page<SMisDunningProductivePowerDailyReport> page, SMisDunningProductivePowerDailyReport entity) {
 		this.setQueryConditions(entity);
 		entity.setPage(page);
-		page.setList(dao.findList(entity));
+		page.setList(dunningReportDao.findProductivePowerDailyReport(entity));
 		return page;
 	}
 	
@@ -76,4 +77,25 @@ public class SMisDunningProductivePowerDailyReportService extends CrudService<SM
 			entity.setQueryGroups(groups);
 		}
 	}
+	
+	/**
+	 * 催收日报表
+	 * @param performanceMonthReport
+	 * @return
+	 */
+	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceMonthReport){
+		return dunningReportDao.findPerformanceDayReport(performanceMonthReport);
+	}
+	
+	/**
+	 * 催收日报表-分页
+	 * @param performanceMonthReport
+	 * @return
+	 */
+	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport entity) {
+		entity.setPage(page);
+		page.setList(dunningReportDao.findPerformanceDayReport(entity));
+		return page;
+	}
+	
 }
