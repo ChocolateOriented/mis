@@ -21,8 +21,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.SMisDunningProductivePowerDailyReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.DunningReportService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
+import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
@@ -41,6 +44,8 @@ public class DunningReportController extends BaseController {
 	private DunningReportService reportService;
 	@Autowired
 	private TMisDunningGroupService groupService;
+	@Autowired
+	private TMisDunningPeopleService tMisDunningPeopleService;
 	
 	/**
 	 * @Description: 催收小组集合
@@ -118,16 +123,20 @@ public class DunningReportController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
-	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
+			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
+			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
-			
-			model.addAttribute("groupList", groupService.findList(new TMisDunningGroup()));
 		} catch (Exception e) {
 			e.printStackTrace();
+			return "error";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 		return "modules/dunning/performanceDayReportList";
 	}
@@ -144,6 +153,7 @@ public class DunningReportController extends BaseController {
     @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
     public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
             String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
@@ -152,7 +162,9 @@ public class DunningReportController extends BaseController {
     		return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
-		return "redirect:" + adminPath + "/dunning/report/findPerformanceDayReport?repage";
+		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
     }
 }
