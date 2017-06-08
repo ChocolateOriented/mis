@@ -917,11 +917,11 @@
         
         <if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
                 <!-- 			    # 到期还款日期-->
-                AND o.repaymenttime BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
+                AND o.repayment_time BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
         </if>
         <if test="beginPayofftime != null and endPayofftime != null and beginPayofftime != '' and endPayofftime != ''">
             <!-- 			    # 还清日期-->
-            AND o.payofftime BETWEEN #{beginPayofftime} AND #{endPayofftime}
+            AND o.payoff_time BETWEEN #{beginPayofftime} AND #{endPayofftime}
         </if>
         <if test="status != null and status != ''">
             <!-- 			    # 订单状态 payoff 已还清 payment  -->
