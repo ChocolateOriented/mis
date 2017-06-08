@@ -249,9 +249,9 @@ public class TRiskBuyerContactRecordsService {
 				Map<String, Object> map2 = new HashMap<String, Object>();
 				DbUtils dbUtils = new DbUtils();
 //				List<TRiskBuyerContactRecords> contactRecordsList = null;
-				System.out.println("通话记录buyerId切源查询:" + buyerId);
+				System.out.println("预缓存通话记录buyerId切源查询:" + buyerId);
 				List<TRiskBuyerContactRecords> contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
-				System.out.println("通话记录条数："+contactRecordsList.size());
+				System.out.println("预缓存通话记录条数："+contactRecordsList.size());
 				
 				if(!contactRecordsList.isEmpty()){
 					for(TRiskBuyerContactRecords records : contactRecordsList){
@@ -280,7 +280,7 @@ public class TRiskBuyerContactRecordsService {
 				System.out.println("buyerId:" + buyerId + "缓存已存在");
 			}
 		} catch (Exception e) {
-			System.out.println("通讯失败：buyerid-"+buyerId);
+			System.out.println("预缓存通讯失败：buyerid-"+buyerId);
 			e.printStackTrace();
 			return "f";
 		}
