@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -281,4 +282,11 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public List<DunningOrder> findallAtuoSms(@Param("numbefore")Integer numbefore,@Param("numafter") Integer numafter);
+	
+	/**
+	 * 查询预提醒新进入正在催收案件buyerid
+	 * @return
+	 */
+	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
+	
 }
