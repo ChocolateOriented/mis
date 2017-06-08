@@ -388,7 +388,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		
 		List<TMisRemittanceConfirm> relatedList = tMisRemittanceConfirmService.findRelatedList(tMisRemittanceConfirm);
 		boolean hasRelatedRecord = false;
-		double remittanceamount = 0;
+		BigDecimal remittanceamount = BigDecimal.valueOf(0d);
 		String financialremittancechannel = "";
 		if (relatedList != null && relatedList.size() > 0) {
 			financialremittancechannel = relatedList.get(0).getFinancialremittancechannel();
@@ -400,7 +400,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 					if (relatedList.get(i).getId().equals(tMisRemittanceConfirm.getId())) {
 						index = i;
 					}
-					remittanceamount += relatedList.get(i).getAccountamount();
+					Double amount = relatedList.get(i).getAccountamount();
+					remittanceamount = remittanceamount.add(BigDecimal.valueOf(amount == null ? 0d : amount));
 				}
 				relatedList.remove(index);
 			}
@@ -434,7 +435,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		//model.addAttribute("delayAmount", delayAmount);
 		model.addAttribute("hasRelatedRecord", hasRelatedRecord);
 		model.addAttribute("relatedList", relatedList);
-		model.addAttribute("remittanceamount", remittanceamount);
+		model.addAttribute("remittanceamount", remittanceamount.doubleValue());
 		model.addAttribute("financialremittancechannel", financialremittancechannel);
 		//model.addAttribute("isDelayable", isDelayable);
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
