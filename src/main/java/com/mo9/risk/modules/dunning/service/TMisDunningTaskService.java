@@ -880,9 +880,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			entity.setDunningpeopleid(null);
 		}
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
-			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
+			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
 		}else{
-			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
+			entity.getSqlMap().put("orderbyMap", " o.status,date_FORMAT(o.repayment_time, '%Y-%m-%d') DESC,creditamount DESC,o.dealcode DESC");
 		}
 		entity.setPage(page);
 		page.setList(dao.newfindOrderPageList(entity));
@@ -1177,15 +1177,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	
 	/**
-	 *  定时清理任务缓存
+	 *  定时清理任务已还清通话记录缓存
 	 */
-	@Scheduled(cron = "0 10 5 * * ?")  //每天上午四点十分
+	@Scheduled(cron = "0 0 3 * * ?")  //每天上午四点
 	@Transactional(readOnly = false)
 	public void delDunningTaskJedis(){
 		
 		String scheduledBut =  DictUtils.getDictValue("delDunningTaskJedis","Scheduled","false");
 		if(scheduledBut.equals("true")){
-			logger.info("redis开始清理已还清任务缓存:" + new Date());
+			logger.info("redis开始清理已还清通话记录任务缓存:" + new Date());
 	//		String keys = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:*";
 			String keys = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_*";
 			
@@ -1215,10 +1215,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						JedisUtils.del(redisKeys);
 					}
 				}
-				logger.info("redis清理完成:" + new Date());
+				logger.info("redis清理已还清通话记录完成:" + new Date());
 			} catch (Exception e) {
 				e.printStackTrace();
-				logger.warn("异常", e);
+				logger.warn("redis清理已还清通话记录异常", e);
 			}
 		}
 	}
