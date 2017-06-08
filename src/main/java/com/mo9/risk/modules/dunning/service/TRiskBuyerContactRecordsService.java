@@ -194,7 +194,7 @@ public class TRiskBuyerContactRecordsService {
 	/**
 	 *  定时缓存预提醒通话记录任务
 	 */
-	@Scheduled(cron = "0 15 21 * * ?")  //每天上午4点10
+	@Scheduled(cron = "0 20 3 * * ?")  //每天上午4点10
 	@Transactional(readOnly = false)
 	public void insertDunningTaskJedisJob(){
 		
@@ -208,6 +208,7 @@ public class TRiskBuyerContactRecordsService {
 			List<String>  buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
 			
 			if(!buyerids.isEmpty()){
+				logger.info("redis缓存预提醒通话记录条数:" + buyerids.size());
 				for(String buyerid : buyerids){
 					String mes = insertDunningTaskJedis(buyerid);
 					if("f".equals(mes)){
