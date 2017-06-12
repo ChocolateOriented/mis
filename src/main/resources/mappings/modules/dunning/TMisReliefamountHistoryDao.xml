@@ -8,7 +8,9 @@
 		a.dealcode AS "dealcode",
 		a.reliefamount AS "reliefamount",
 		a.createdate AS "createdate",
-		a.createby AS "createby"
+		a.createby AS "createby",
+		a.derateReason AS "derateReason",
+		a.remark AS "remarks"
 	</sql>
 	
 	<sql id="tMisReliefamountHistoryJoins">
@@ -65,7 +67,9 @@
 			a.dealcode AS "dealcode",
 			a.reliefamount AS "reliefamount",
 			a.createdate AS "createdate",
-			a.createby AS "createBy.name"
+			a.createby AS "createBy.name",
+			a.derateReason AS "derateReason",
+			a.remark AS "remarks"
 		FROM t_mis_reliefamount_history a
 			WHERE a.dealcode = #{dealcode}
 	</select>
@@ -77,13 +81,17 @@
 			dealcode,
 			reliefamount,
 			createdate,
-			createby
+			createby,
+			derateReason,
+			remark
 		) VALUES (
 			#{id},
 			#{dealcode},
 			#{reliefamount},
 			#{createDate},
-			#{createBy.name}
+			#{createBy.name},
+			#{derateReason},
+			#{remarks}
 		)
 	</insert>
 	
@@ -91,6 +99,8 @@
 		UPDATE t_mis_reliefamount_history SET 	
 			dealcode = #{dealcode},
 			reliefamount = #{reliefamount},
+			derateReason = #{derateReason},
+			remark = #{remarks}
 <!-- 			createdate = #{createdate}, -->
 <!-- 			createby = #{createby} -->
 		WHERE id = #{id}

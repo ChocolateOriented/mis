@@ -43,6 +43,7 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
+import com.mo9.risk.modules.dunning.entity.DerateReason;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
@@ -1359,6 +1360,10 @@ public class TMisDunningTaskController extends BaseController {
 			return "views/error/500";
 		}
 		List<TMisReliefamountHistory> list = tMisReliefamountHistoryService.findListByDealcode(dealcode);
+		//获取所有的减免原因
+		DerateReason[] derateReasons = DerateReason.values();
+		List<DerateReason> derateReasonList = Arrays.asList(derateReasons);
+		model.addAttribute("derateReasonList", derateReasonList);
 		model.addAttribute("list", list);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
@@ -1378,7 +1383,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "savefreeCreditAmount")
 	@ResponseBody
-	public String savefreeCreditAmount(TMisDunningTask task,Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
+	public String savefreeCreditAmount(TMisReliefamountHistory tfHistory,TMisDunningTask task,Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
 //		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String amount = request.getParameter("amount");
 		Integer freeCreditAmount = 0;
@@ -1404,7 +1409,8 @@ public class TMisDunningTaskController extends BaseController {
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
-		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount);
+		
+		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount,tfHistory);
 		return "OK";
 	}
 	

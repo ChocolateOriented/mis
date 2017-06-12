@@ -20,7 +20,18 @@ public class TMisReliefamountHistory extends DataEntity<TMisReliefamountHistory>
 	private String dbid;		// dbid
 	private String dealcode;		// 订单号
 	private String reliefamount;		// 减免金额
+	//减免原因
+	private DerateReason derateReason;		
 	
+	
+	public DerateReason getDerateReason() {
+		return derateReason;
+	}
+
+	public void setDerateReason(DerateReason derateReason) {
+		this.derateReason = derateReason;
+	}
+
 	public TMisReliefamountHistory() {
 		super();
 	}
