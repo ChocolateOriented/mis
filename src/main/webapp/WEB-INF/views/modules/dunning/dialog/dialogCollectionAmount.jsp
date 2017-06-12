@@ -35,7 +35,6 @@
 			$('#esc').click(function() {
 				window.parent.window.jBox.close();    
 			});
-			
 		});
 	</script>
 </head>
@@ -108,20 +107,13 @@
 					${tMisReliefamountHistory.derateReason.derateReasonName}
 				</td>
 				<td>
-					<label name="remark"  title="<c:if test='${fn:length(tMisReliefamountHistory.remarks)>15}'> ${tMisReliefamountHistory.remarks}     </c:if>"
-					style="width:100px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;"
-					 >
-<%-- 						<c:if test="${fn:length(tMisReliefamountHistory.remarks)>15}" > --%>
-<%-- 						     ${fn:substring(tMisReliefamountHistory.remarks,0,14)}... --%>
-<%-- 						</c:if> --%>
-<%-- 						<c:if test="${fn:length(tMisReliefamountHistory.remarks)<15}" > --%>
+					<label name="remark"  title="<c:if test='${fn:length(tMisReliefamountHistory.remarks)>15}'> ${tMisReliefamountHistory.remarks}</c:if>"
+					style="width:100px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">
 						     ${tMisReliefamountHistory.remarks}
-<%-- 						</c:if> --%>
 					</label>
 				</td>
 			</tr>
 		</c:forEach>
-		
 		</tbody>
 	</table>
 	
