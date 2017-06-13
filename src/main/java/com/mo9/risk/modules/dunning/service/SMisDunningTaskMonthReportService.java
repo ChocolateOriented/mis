@@ -66,16 +66,6 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 		String receiver = DictUtils.getDictValue("e_mail", "month_report_receiver", "");
 		logger.info("自动发送月报邮件至"+receiver);
 
-		//获取截止到当前的月报
-		SMisDunningTaskMonthReport query = new SMisDunningTaskMonthReport();
-		String month = DateUtils.formatDate(new Date(), "yyyyMM");
-		query.setMonths(month);
-		List<SMisDunningTaskMonthReport> data = super.findList(query);
-		if (data == null){
-			logger.warn("月报表数据为空");
-			return;
-		}
-
 		//获取T-1日期
 		Date date = new Date();
 		Calendar calendar = Calendar.getInstance();
@@ -84,29 +74,42 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 		calendar.set(Calendar.DATE, day - 1);
 		String yesterday = DateUtils.formatDate(calendar.getTime());
 
-		//生成cvs
-		String fileName = "performanceMonthReport" + yesterday + ".csv";
-		//表头200每条数据约为120字节
-		ByteArrayOutputStream os = new ByteArrayOutputStream(200+120*data.size());
-		try {
-			CsvUtil.export(os, SMisDunningTaskMonthReport.class, data);
-		} catch (IOException e) {
-			logger.warn("月报表自动邮件创建csv失败", e);
-			return;
-		}
-
 		//创建邮件
 		MailSender mailSender = new MailSender(receiver);
 		mailSender.setSubject("绩效月报-" + yesterday);
-		//添加附件cvs
-		DataSource dataSource;
-		try {
-			dataSource = new ByteArrayDataSource(new ByteArrayInputStream(os.toByteArray()), "text/csv");
-		} catch (IOException e) {
-			logger.warn("月报表自动邮件添加附件失败", e);
-			return;
+
+		//获取截止到当前的月报
+		SMisDunningTaskMonthReport query = new SMisDunningTaskMonthReport();
+		String month = DateUtils.formatDate(new Date(), "yyyyMM");
+		query.setMonths(month);
+		List<SMisDunningTaskMonthReport> data = super.findList(query);
+
+		if (data == null || data.size()==0){//无数据
+			logger.info("月报表数据为空");
+			mailSender.setContent("数据未更新");
+
+		}else {
+			//生成cvs
+			String fileName = "performanceMonthReport" + yesterday + ".csv";
+			//表头200每条数据约为120字节
+			ByteArrayOutputStream os = new ByteArrayOutputStream(200+120*data.size());
+			try {
+				CsvUtil.export(os, SMisDunningTaskMonthReport.class, data);
+			} catch (IOException e) {
+				logger.warn("月报表自动邮件创建csv失败", e);
+				return;
+			}
+
+			//添加附件cvs
+			DataSource dataSource;
+			try {
+				dataSource = new ByteArrayDataSource(new ByteArrayInputStream(os.toByteArray()), "text/csv");
+			} catch (IOException e) {
+				logger.warn("月报表自动邮件添加附件失败", e);
+				return;
+			}
+			mailSender.addAttachSource(dataSource, fileName);
 		}
-		mailSender.addAttachSource(dataSource, fileName);
 
 		//发送
 		try {
