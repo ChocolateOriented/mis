@@ -1,12 +1,17 @@
 package com.mo9.risk.util;
 
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -45,6 +50,8 @@ public class MailSender {
 	private String content;//邮件正文
 
 	private List<File> attachFiles = new ArrayList<File>();//附件文件集合
+
+	private Map<DataSource,String> attachSource ; //附件数据集合
 
 	public String getProtocol() {
 		return protocol;
@@ -126,6 +133,25 @@ public class MailSender {
 		this.content = content;
 	}
 
+	public MailSender() {
+		super();
+	}
+
+	/**
+	 * @Description 使用系统默认邮箱
+	 * @param to
+	 */
+	public MailSender(String to) {
+		//使用数据库字典
+		this.host = DictUtils.getDictValue("email_server","sys_email","");
+		String userAdress = DictUtils.getDictValue("email_username","sys_email","");
+		this.username = userAdress ;
+		this.from = userAdress ;
+		this.password = DictUtils.getDictValue("email_password","sys_email","");
+
+		this.to = to;
+	}
+
 	/**
 	 * 添加附件
 	 * @param filenam
@@ -133,6 +159,7 @@ public class MailSender {
 	public void addAttachFile(String filenam) {
 		File file = new File(filenam);
 		attachFiles.add(file);
+
 	}
 
 	/**
@@ -149,7 +176,17 @@ public class MailSender {
 	public void clearAttachFile() {
 		attachFiles.clear();
 	}
-
+	/**
+	 * @Description 添加附件
+	 * @param null
+	 * @return
+	 */
+	public void addAttachSource(DataSource dataSource ,String fileName) {
+		if (attachSource == null){
+			attachSource = new HashMap<DataSource, String>();
+		}
+		attachSource.put(dataSource,fileName);
+	}
 	/**
 	 * 发送邮件
 	 * @throws MessagingException 
@@ -220,10 +257,18 @@ public class MailSender {
 				for (File file : attachFiles) {
 					MimeBodyPart mbpFile = new MimeBodyPart();
 					mbpFile.attachFile(file);
+					mbpFile.getInputStream();
 					mp.addBodyPart(mbpFile);
 				}
 			}
-			
+			if(attachSource != null){
+				for (Entry<DataSource,String> dataSource:attachSource.entrySet()) {
+					MimeBodyPart mbpFile = new MimeBodyPart();
+					mbpFile.setDataHandler(new DataHandler(dataSource.getKey()));
+					mbpFile.setFileName(dataSource.getValue());
+					mp.addBodyPart(mbpFile);
+				}
+			}
 
 			msg.setContent(mp);
 			msg.setSentDate(new Date());

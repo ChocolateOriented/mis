@@ -1,15 +1,11 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.Length;
-
-import com.thinkgem.jeesite.common.persistence.DataEntity;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 
 /**
  * @Description 催收小组,区分不同性质的催收人员
@@ -20,20 +16,21 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Map<String, String> groupTypes;
+	public static final Map<GroupType, String> groupTypes;
+
 	static {
-		groupTypes = new HashMap<String, String>(GroupType.values().length);
+		groupTypes = new HashMap<GroupType, String>(GroupType.values().length);
 		for (GroupType groupType : GroupType.values()) {
-			groupTypes.put(groupType.code, groupType.name);
+			groupTypes.put(groupType, groupType.desc);
 		}
 	}
 
 	private Integer dbid;
 	private String name; // 组名
-	private String type; // 组类型
+	private GroupType type; // 组类型
 	private User leader; // 组长
 
-	private List<String> queryTypes;
+	private List<GroupType> queryTypes;
 
 	public TMisDunningGroup(String id) {
 		super(id);
@@ -60,16 +57,6 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 		this.name = name;
 	}
 
-	@Length(min = 1, max = 64, message = "组长度在1-64之间")
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	@NotNull(message = "组长不能为空")
 	public User getLeader() {
 		return leader;
 	}
@@ -78,30 +65,37 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 		this.leader = leader;
 	}
 
-	public List<String> getQueryTypes() {
+	public GroupType getType() {
+		return type;
+	}
+
+	public void setType(GroupType type) {
+		this.type = type;
+	}
+
+	public List<GroupType> getQueryTypes() {
 		return queryTypes;
 	}
 
-	public void setQueryTypes(List<String> queryTypes) {
+	public void setQueryTypes(List<GroupType> queryTypes) {
 		this.queryTypes = queryTypes;
 	}
 
 	@Override
 	public String toString() {
-		return "TMisDunningGroup [dbid=" + dbid + ", name=" + name + ", type=" + type + ", leader=" + leader + "]";
+		return "TMisDunningGroup [dbid=" + dbid + ", name=" + name + ", type=" + getType() + ", leader="
+				+ leader + "]";
 	}
 
 	public enum GroupType {
-		SELF("selfSupport", "自营"), 
-		OUT_SEAT("outsourceSeat", "外包坐席"), 
-		OUT_COMMISSION("outsourceCommission", "委外佣金");
+		selfSupport("自营"),
+		outsourceSeat("外包坐席"),
+		outsourceCommission("委外佣金");
 
-		private GroupType(String code, String name) {
-			this.code = code;
-			this.name = name;
+		GroupType(String desc) {
+			this.desc = desc;
 		}
 
-		public final String code;
-		public final String name;
+		public final String desc;
 	}
 }
