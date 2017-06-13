@@ -10,6 +10,7 @@ import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,9 +62,13 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	 * @return void
 	 * @Description 自动邮件
 	 */
-	@Scheduled(cron = "0 0 8 * * ?")
+	@Scheduled(cron = "0 41 18 * * ?")
 	public void autoSendMail() {
 		String receiver = DictUtils.getDictValue("e_mail", "month_report_receiver", "");
+		if (StringUtils.isBlank(receiver)){
+			logger.warn("自动发送月报失败, 未配置收件人邮箱");
+			return;
+		}
 		logger.info("自动发送月报邮件至"+receiver);
 
 		//获取T-1日期
