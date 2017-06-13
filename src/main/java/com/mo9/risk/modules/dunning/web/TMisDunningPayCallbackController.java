@@ -47,27 +47,30 @@ public class TMisDunningPayCallbackController extends BaseController {
 		String data = request.getParameter("object");
 		
 		if (data == null || "".equals(data)) {
-			return "NO";
+			logger.info("代扣回调报文错误");
+			return "OK";
 		}
 		
 		String decodeData = null;
 		try {
 			decodeData = URLDecoder.decode(data, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			logger.info("代扣回调报文解析错误:" + data);
-			return "NO";
+			logger.info("代扣回调报文解析错误：" + data);
+			return "OK";
 		}
 		logger.info("代扣回调报文:" + decodeData);
 		
 		JSONObject jsonObj = JSON.parseObject(decodeData);
 		if (jsonObj == null || jsonObj.isEmpty()) {
-			return "NO";
+			logger.info("代扣回调报文解析错误：" + decodeData);
+			return "OK";
 		}
 		
 		String requestSign = jsonObj.getString("sign");
 		
 		if (requestSign == null && "".equals(requestSign)) {
-			return "NO";
+			logger.info("代扣回调报文验签错误：" + decodeData);
+			return "OK";
 		}
 		
 		jsonObj.remove("sign");
@@ -77,14 +80,15 @@ public class TMisDunningPayCallbackController extends BaseController {
 		String sign = RequestParamSign.generateParamSign(jsonStr, privateKey);
 		
 		if (!requestSign.equalsIgnoreCase(sign)) {
-			logger.info("代扣回调验签错误");
+			logger.info("代扣回调报文验签错误：" + decodeData);
 			return "OK";
 		}
 		
 		Mo9ResponseData responseObj = JSON.parseObject(decodeData, Mo9ResponseData.class);
 		
 		if (responseObj == null || responseObj.getData() == null) {
-			return "NO";
+			logger.info("代扣回调报文解析错误：" + decodeData);
+			return "OK";
 		}
 		Mo9ResponseData.Mo9ResponseOrder responseOrder = responseObj.getData();
 		
@@ -101,14 +105,15 @@ public class TMisDunningPayCallbackController extends BaseController {
 		} else if ("failed".equals(orderStatus) || "unmatched".equals(orderStatus)) {
 			tMisDunningDeduct.setStatus(PayStatus.failed);
 		} else {
-			return "NO";
+			logger.info("代扣回调报文状态错误：" + decodeData);
+			return "OK";
 		}
 		tMisDunningDeduct.setStatusdetail(responseOrder.getMessage());
 		tMisDunningDeduct.setReason(responseOrder.getReason());
 		tMisDunningDeduct.setChargerate(responseOrder.getChargeRate());
 		
-		boolean result = tMisDunningDeductService.updateRecord(tMisDunningDeduct);
-		return result ? "OK" : "NO";
+		tMisDunningDeductService.updateRecord(tMisDunningDeduct);
+		return "OK";
 	}
 
 }

@@ -24,6 +24,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	private Long payorder; // 还清订单
 	private Long telnum;
 	private Long smsnum;
+	private TMisDunningGroup group;
 	
 	
 //	@ExcelField(title="日期", type=1, align=2, sort=1)
@@ -100,6 +101,12 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	}
 	public void setDunningCycle(String dunningCycle) {
 		this.dunningCycle = dunningCycle;
+	}
+	public TMisDunningGroup getGroup() {
+		return group;
+	}
+	public void setGroup(TMisDunningGroup group) {
+		this.group = group;
 	}
 
 //	@ExcelField(title="周期begin", type=1, align=2, sort=8)
