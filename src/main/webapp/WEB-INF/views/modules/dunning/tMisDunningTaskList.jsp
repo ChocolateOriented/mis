@@ -489,7 +489,9 @@
 				<li>
 					<label>催收小组：</label>
 					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
-					<form:option value="">全部</form:option>
+					<c:if test="${groupLimit == false}">
+						<form:option value="">全部</form:option>
+					</c:if>
 						<!-- 添加组类型为optgroup -->
 						<c:forEach items="${groupTypes}" var="type">
 							<optgroup label="${type.value}">

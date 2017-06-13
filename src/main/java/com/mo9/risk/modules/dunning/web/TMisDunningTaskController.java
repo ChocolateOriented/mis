@@ -185,9 +185,17 @@ public class TMisDunningTaskController extends BaseController {
 	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
 		//催收小组列表
-		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
+		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
+		int permissions = TMisDunningTaskService.getPermissions();
+		boolean groupLimit = false;
+		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
+			tMisDunningGroup.setLeader(UserUtils.getUser());
+			groupLimit = true;
+		}
+		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
+		model.addAttribute("groupLimit", groupLimit);
 		return "modules/dunning/tMisDunningTaskList";
 	}
 	
@@ -1954,7 +1962,15 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
 	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			int permissions = TMisDunningTaskService.getPermissions();
+			if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
+				TMisDunningPeople people = tMisDunningPeopleService.get(UserUtils.getUser().getId());
+				if (people != null) {
+					performanceDayReport.setGroup(people.getGroup());
+					dunningPeople.setGroup(people.getGroup());
+				}
+			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
@@ -1982,7 +1998,14 @@ public class TMisDunningTaskController extends BaseController {
     @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
     public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			int permissions = TMisDunningTaskService.getPermissions();
+			if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
+				TMisDunningPeople people = tMisDunningPeopleService.get(UserUtils.getUser().getId());
+				if (people != null) {
+					performanceDayReport.setGroup(people.getGroup());
+				}
+			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
             String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
