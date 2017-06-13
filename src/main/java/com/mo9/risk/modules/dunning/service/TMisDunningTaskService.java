@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -205,7 +206,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	
 	@Transactional(readOnly = false)
-	public boolean savefreeCreditAmount(String dealcode,TMisDunningTask task,String amount) {
+	public boolean savefreeCreditAmount(String dealcode,TMisDunningTask task,String amount
+			,TMisReliefamountHistory tfHistory) {
 		try {
 			/**
 			 *  根据订单号保存订单减免金额
@@ -226,6 +228,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			reliefamountHistory.preInsert();
 			reliefamountHistory.setDealcode(dealcode);
 			reliefamountHistory.setReliefamount(amount);
+			reliefamountHistory.setDerateReason(tfHistory.getDerateReason());
+			reliefamountHistory.setRemarks(tfHistory.getRemarks());
 			tMisReliefamountHistoryDao.insert(reliefamountHistory);
 			return true;
 		} catch (Exception e) {
@@ -2576,4 +2580,25 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		
 	  return "daikoutrue";
 	}
+	/**
+	 * 验证手机号码和电话号码的格式是否对.第一个参数为号码.第二个参数为类型(1表示手机号码.2表示电话号码)
+	 * @param phoneNumber
+	 * @param type
+	 * @return
+	 */
+	public boolean  yanZhengNumber(String phoneNumber,int type ){
+		String regex="";
+		if(StringUtils.isEmpty(phoneNumber)){
+			return false;
+		}
+		if(type==1){
+			 regex="^1[0-9]{10}$";
+		}
+		if(type==2){
+			 regex = "^(\\d{3,4}-)?\\d{6,8}$";
+		}
+		return Pattern.matches(regex, phoneNumber);
+	}
+	
+	
 }
