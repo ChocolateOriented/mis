@@ -62,7 +62,7 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	 * @return void
 	 * @Description 自动邮件
 	 */
-	@Scheduled(cron = "0 41 18 * * ?")
+	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
 		String receiver = DictUtils.getDictValue("e_mail", "month_report_receiver", "");
 		if (StringUtils.isBlank(receiver)){
