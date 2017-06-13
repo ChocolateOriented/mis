@@ -186,14 +186,14 @@ public class TRiskBuyerContactRecordsService {
 		String scheduledBut =  DictUtils.getDictValue("insertDunningTaskJedis","Scheduled","false");
 		if(scheduledBut.equals("true")){
 			
-			logger.info("redis开始缓存预提醒通话记录任务:" + new Date());
+			logger.info("redis开始预缓存提醒通话记录任务:" + new Date());
 			String begin_Q0 = tMisDunningTaskService.getCycleDict_Q0().get("begin");
 			logger.info("redis预提醒DAY:" + begin_Q0);
 			Vector<String> buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
 //			List<String>  buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
 			
 			if(!buyerids.isEmpty()){
-				logger.info("redis缓存预提醒通话记录条数:" + buyerids.size());
+				logger.info("redis缓存预提醒通话记录总条数:" + buyerids.size());
 //				for(String buyerid : buyerids){
 //					String mes = insertDunningTaskJedis(buyerid);
 //					if("f".equals(mes)){
@@ -218,7 +218,7 @@ public class TRiskBuyerContactRecordsService {
 					insertRedisThread.setCacheSeconds(cacheSeconds);
 					new Thread(insertRedisThread).start();
 				}
-				logger.info("redis缓存预通话记录任务完成:" + new Date());
+				logger.info("redis缓存预通话记录定时多线程任务完成:" + new Date());
 			}else{
 				logger.info("查询预提醒新进入正在催收案件buyerid为0个" + new Date());
 			}
