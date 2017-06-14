@@ -34,6 +34,8 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 	private BigDecimal creditamount;//催回金额
 	private BigDecimal finishedanddelaycorpusamount; //催回本金（含续期）
 	private Date datetime; 
+	private Integer unfinishedtask;//未还款任务数
+	private BigDecimal unfinishedcorpusamount;//未还款本金
 	
 	public SMisDunningTaskMonthReport() {
 		super();
@@ -157,8 +159,22 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.datetime = datetime;
 	}
 
-	
-	
-	
-	
+	@ExcelField(title="未还款任务数", type=1, align=2, sort=14)
+	public Integer getUnfinishedtask() {
+		return unfinishedtask;
+	}
+
+	public void setUnfinishedtask(Integer unfinishedtask) {
+		this.unfinishedtask = unfinishedtask;
+	}
+
+	@ExcelField(title="未还款本金", type=1, align=2, sort=15)
+	public BigDecimal getUnfinishedcorpusamount() {
+		return unfinishedcorpusamount;
+	}
+
+	public void setUnfinishedcorpusamount(BigDecimal unfinishedcorpusamount) {
+		this.unfinishedcorpusamount = unfinishedcorpusamount;
+	}
+
 }

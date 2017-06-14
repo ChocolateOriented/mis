@@ -16,7 +16,10 @@
 		a.finishedAndDelayAmount AS "finishedAndDelayAmount",
 		a.finishedanddelaycorpusamount AS "finishedanddelaycorpusamount",
 		a.amount AS "amount",
-		a.creditamount AS "creditamount"
+		a.creditamount AS "creditamount",
+		a.unfinishedtask AS "unfinishedtask",
+		a.unfinishedcorpusamount AS "unfinishedcorpusamount",
+		a.createdate AS "createdate"
 	</sql>
 	
 	<sql id="sMisDunningTaskMonthReportJoins">
