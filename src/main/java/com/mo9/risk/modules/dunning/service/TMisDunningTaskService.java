@@ -871,7 +871,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(DUNNING_INNER_PERMISSIONS == permissions){
 			TMisDunningPeople people = tMisDunningPeopleDao.get(UserUtils.getUser().getId());
 			entity.setDunningpeopleid(null);
-			entity.setDunningPeople(people);
+			if (entity.getDunningPeople() != null) {
+				entity.getDunningPeople().setGroup(people == null ? null : people.getGroup());
+			} else {
+				entity.setDunningPeople(people);
+			}
 		}
 		if(DUNNING_OUTER_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
