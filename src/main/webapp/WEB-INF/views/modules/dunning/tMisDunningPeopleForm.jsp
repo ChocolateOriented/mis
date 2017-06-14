@@ -23,11 +23,27 @@ $(document).ready(function() {
 				        }
 				    }
 				}
+			},
+			extensionNumber:{
+				remote:{
+					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng",
+   					type:"post",
+   					dataType: "json", 
+    				data:{
+	    				extensionNumber:function() {
+				            return $("#extensionNumber").val();
+				        	}
+						}
+   					
+				}
 			}
 		},
 		messages:{
 			nickname:{
 				remote:"该花名已被占用"
+			},
+			extensionNumber:{
+				remote:"请填写正确的格式"
 			}
 		},
 		submitHandler: function(form){
