@@ -184,8 +184,9 @@ public class TMisDunningOuterTaskController extends BaseController {
 				}
 			}
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
-			tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
-			mes = "OK,手动均分"+dealcodes.size()+"条订单成功";
+//			tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
+			String outAssignmes = tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
+			mes = "OK,手动勾选"+dealcodes.size()+"条订单," + outAssignmes;
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
 			logger.warn("订单已还款更新任务失败"+ new Date());
