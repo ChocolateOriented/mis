@@ -1768,6 +1768,8 @@
 					LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 					LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
 			WHERE 
+			o.status = 'payment'  AND
+			t.dunningtaskstatus ='dunning'  AND
 			t.DunningCycle = #{dunningcycle} AND
 			t.dealcode in 
 			<foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">

@@ -1430,7 +1430,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		sortList.sort(dicts, "label", "desc"); 
 		
 		for(Dict dict : dicts){
-			if(!dict.getLabel().equals(P4_P5) && !dict.getLabel().equals(P3_P4)){
+			if(!dict.getLabel().equals(P4_P5)){
 				String begin = dict.getValue().split("_")[0];
 				String end = dict.getValue().split("_")[1];
 				
@@ -1955,7 +1955,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
      * @param peopleId
      */
     @Transactional(readOnly = false)
-    public void assign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ){ 	
+    public String assign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
 			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
@@ -2013,6 +2013,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}else{
 				logger.info(dunningcycle + "队列没有手动分配任务！" + new Date());
 			}
+			return "实际均分未还款订单" + assignDunningTaskLogs.size() + "条";
 		} catch (Exception e) {
 			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
 			logger.error("错误信息"+e.getMessage());
@@ -2029,7 +2030,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
      * @param peopleId
      */
     @Transactional(readOnly = false)
-    public void outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
+    public String outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
 			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
@@ -2088,6 +2089,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}else{
 				logger.info(dunningcycle + "队列没有手动分配任务！" + new Date());
 			}
+			return "实际均分未还款订单" + assignDunningTaskLogs.size() + "条";
 		} catch (Exception e) {
 			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
 			logger.error("错误信息"+e.getMessage());

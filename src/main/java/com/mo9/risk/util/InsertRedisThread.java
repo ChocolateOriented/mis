@@ -18,8 +18,6 @@ import com.thinkgem.jeesite.common.utils.JedisUtils;
 public class InsertRedisThread  implements Runnable{
 	
 	private static Logger logger = Logger.getLogger(InsertRedisThread.class);
-//	@Autowired
-//	private TMisDunningTaskDao tMisDunningTaskDao;
 	
 	private Vector<String> buyerids;
 	public Vector<String> getBuyerids() {
@@ -42,12 +40,12 @@ public class InsertRedisThread  implements Runnable{
 		try {
 			if(!buyerids.isEmpty()){
 //				synchronized(this) {
-				logger.info("redis预提醒通话记录条数:" + buyerids.size());
+				logger.info("线程" + Thread.currentThread().getName() + "redis预提醒通话记录条数:" + buyerids.size());
 				for(String buyerid : buyerids){
-					System.out.println(buyerid + "=========" + Thread.currentThread().getName());
+					logger.info(buyerid + "=========" + Thread.currentThread().getName());
 					insertDunningTaskJedis(buyerid,cacheSeconds);
 				}
-				logger.info("线程" + Thread.currentThread().getName() +"redis缓存预提醒通话记录完成:" + new Date());
+				logger.info("线程" + Thread.currentThread().getName() +"redis缓存预提醒通话记录完成时间:" + new Date());
 //				}
 			}else{
 				logger.info("线程" + Thread.currentThread().getName() +"查询预提醒新进入正在催收案件buyerid为0个" + new Date());
@@ -75,9 +73,9 @@ public class InsertRedisThread  implements Runnable{
 				Map<String, Object> map2 = new HashMap<String, Object>();
 				DbUtils dbUtils = new DbUtils();
 //				List<TRiskBuyerContactRecords> contactRecordsList = null;
-				System.out.println("预缓存通话记录buyerId切源查询:" + buyerId);
+				System.out.println("预缓存通话记录切源查询buyerId：" + buyerId);
 				List<TRiskBuyerContactRecords> contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
-				System.out.println("预缓存通话记录条数："+contactRecordsList.size());
+				System.out.println("buyerId：" + buyerId + "预缓存通话记录条数：" + contactRecordsList.size());
 				
 				if(!contactRecordsList.isEmpty()){
 					for(TRiskBuyerContactRecords records : contactRecordsList){
