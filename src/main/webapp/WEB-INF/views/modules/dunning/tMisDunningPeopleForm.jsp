@@ -158,7 +158,6 @@ function changGroupType(){
 			<div class="controls">
 				<input  value="${tMisDunningPeople.extensionNumber }" id="extensionNumber" name="extensionNumber" htmlEscape="false"  class="input-xlarge required "  />
 				<span class="help-inline"><font color="red">*</font></span>
-				<span ><font color="red" id="validNumber"></font></span>
 			</div>
 		</div>
 		<div class="control-group">
