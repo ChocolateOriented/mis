@@ -225,5 +225,41 @@ public class TMisDunningPeopleController extends BaseController {
 	public Boolean isUniqueNickname(String nickname,String id){
 		return tMisDunningPeopleService.checkNicknameUnique(nickname,id);
 	}
+	
+	/**
+	 * 
+	 * 验证座机号是否正确
+	 * 
+	 * @param extensionNumber
+	 * 
+	 * @return
+	 * 
+	 */
+
+	@RequiresPermissions("dunning:tMisDunningPeople:view")
+
+	@RequestMapping(value = "extensionNumberYanZheng")
+
+	@ResponseBody
+
+	public String isUniqueNickname(String extensionNumber) {
+
+		if (StringUtils.isEmpty(extensionNumber)) {
+
+			return "false";
+
+		}
+
+		boolean yanZhengNumber = tMisDunningTaskService.yanZhengNumber(extensionNumber, 2);
+
+		if (!yanZhengNumber) {
+
+			return "false";
+
+		}
+
+		return "OK";
+
+	}
 
 }
