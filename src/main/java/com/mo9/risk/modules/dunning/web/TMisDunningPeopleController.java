@@ -242,11 +242,11 @@ public class TMisDunningPeopleController extends BaseController {
 
 	@ResponseBody
 
-	public String isUniqueNickname(String extensionNumber) {
+	public Boolean valideNumber(String extensionNumber) {
 
 		if (StringUtils.isEmpty(extensionNumber)) {
 
-			return "false";
+			return false;
 
 		}
 
@@ -254,11 +254,11 @@ public class TMisDunningPeopleController extends BaseController {
 
 		if (!yanZhengNumber) {
 
-			return "false";
+			return false;
 
 		}
 
-		return "OK";
+		return true;
 
 	}
 

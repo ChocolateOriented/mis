@@ -23,11 +23,27 @@ $(document).ready(function() {
 				        }
 				    }
 				}
+			},
+			extensionNumber:{
+				remote:{
+					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng",
+   					type:"post",
+   					dataType: "json", 
+    				data:{
+	    				extensionNumber:function() {
+				            return $("#extensionNumber").val();
+				        	}
+						}
+   					
+				}
 			}
 		},
 		messages:{
 			nickname:{
 				remote:"该花名已被占用"
+			},
+			extensionNumber:{
+				remote:"请填写正确的格式"
 			}
 		},
 		submitHandler: function(form){
@@ -54,29 +70,6 @@ $(document).ready(function() {
 	$("#groupId").on("change",function(event){
 		changGroupType();
 	});
-	
-	//验证座机号的格式
-	  	$("#extensionNumber").blur(function(){
-	  			 $.ajax({
-	  					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng?extensionNumber="+$("#extensionNumber").val(),
-	   					type:"GET",
-	    				data:{},
-	   					success:function(data){
-	   					  if("false"==data){
-	    					  $("#extensionNumber").val("");
-	   						  $("#validNumber").html("请填写正确的座机号");
-	  					  }
-	  					  if("OK"==data){
-		 					   $("#validNumber").html("");
-	   					  }
-	   					},
-	   					error : function(XMLHttpRequest, textStatus, errorThrown){
-	   	                    //通常情况下textStatus和errorThrown只有其中一个包含信息
-	   	                    alert("验证失败:"+textStatus);
-	   	                 }
-	   				});
-	  	});
-	 
 	
 });
 
