@@ -75,6 +75,8 @@
 				<th>催回金额</th>
 				<th>绩效催回金额</th>
 				<th>催回本金（含续期）</th>
+				<th>未还款任务数</th>
+				<th>未还款本金</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -116,7 +118,12 @@
 				<td>
 					${sMisDunningTaskMonthReport.finishedanddelaycorpusamount}
 				</td>
-				
+				<td>
+					${sMisDunningTaskMonthReport.unfinishedtask}
+				</td>
+				<td>
+					${sMisDunningTaskMonthReport.unfinishedcorpusamount }
+				</td>
 			</tr>
 		</c:forEach>
 		</tbody>
