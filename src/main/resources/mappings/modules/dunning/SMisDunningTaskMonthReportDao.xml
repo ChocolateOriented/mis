@@ -48,6 +48,9 @@
 			<if test="name != null and name != ''">
 				AND a.name = #{name}
 			</if>
+			<if test="createDate != null">
+				AND DATE_FORMAT(a.createdate, '%Y%m%d') = DATE_FORMAT(#{createDate}, '%Y%m%d')
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
