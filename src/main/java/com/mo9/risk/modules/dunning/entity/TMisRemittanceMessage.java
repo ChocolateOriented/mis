@@ -8,6 +8,8 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
+import com.thinkgem.jeesite.util.NumberUtil;
 
 /**
  * 财务确认汇款信息Entity
@@ -27,7 +29,13 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private Date financialtime;		// 财务确认时间
 	private String remittanceimg;		// 汇款图片
 	private String dealcode;
-	private String remark;    // 
+	private String remark;    // 备注
+	// 支付宝交易号
+	private String jiaoyiNumber;   
+	// 入账状态
+	private String accountStatus; 
+	
+	
 	
 	public TMisRemittanceMessage() {
 		super();
@@ -38,6 +46,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 
 	@Length(min=1, max=11, message="dbid长度必须介于 1 和 11 之间")
+//	@ExcelField(title="登录名", align=2, sort=30)
 	public String getDbid() {
 		return dbid;
 	}
@@ -47,6 +56,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 	
 	@Length(min=0, max=128, message="汇款人姓名长度必须介于 0 和 128 之间")
+	@ExcelField(title="对方名称",type=0, align=2, sort=5)
 	public String getRemittancename() {
 		return remittancename;
 	}
@@ -56,6 +66,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="入账时间",type=0, align=2, sort=2)
 	public Date getRemittancetime() {
 		return remittancetime;
 	}
@@ -67,12 +78,17 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public Double getRemittanceamount() {
 		return remittanceamount;
 	}
-
+	
+	@ExcelField(title="收入（+元）",type=0, align=2, sort=4)
+	public String getRemittanceamountText() {
+		return null != this.remittanceamount ? NumberUtil.formatTosepara(this.remittanceamount) : "";
+	}
 	public void setRemittanceamount(Double remittanceamount) {
 		this.remittanceamount = remittanceamount;
 	}
 	
 	@Length(min=0, max=64, message="汇款渠道长度必须介于 0 和 64 之间")
+	@ExcelField(title="支付渠道",type=0, align=2, sort=3)
 	public String getRemittancechannel() {
 		return remittancechannel;
 	}
@@ -82,6 +98,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 	
 	@Length(min=0, max=64, message="汇款帐号长度必须介于 0 和 64 之间")
+	@ExcelField(title="对方账户",type=0, align=2, sort=6)
 	public String getRemittanceaccount() {
 		return remittanceaccount;
 	}
@@ -91,6 +108,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 	
 	@Length(min=0, max=128, message="财务确认人长度必须介于 0 和 128 之间")
+	@ExcelField(title="上传人",type=0, align=2, sort=10)
 	public String getFinancialuser() {
 		return financialuser;
 	}
@@ -100,6 +118,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="上传时间",type=0, align=2, sort=9)
 	public Date getFinancialtime() {
 		return financialtime;
 	}
@@ -107,6 +126,39 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setFinancialtime(Date financialtime) {
 		this.financialtime = financialtime;
 	}
+	
+	public String getDealcode() {
+		return dealcode;
+	}
+
+	public void setDealcode(String dealcode) {
+		this.dealcode = dealcode;
+	}
+	@ExcelField(title="备注",type=0, align=2, sort=7)
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	@ExcelField(title="交易流水号",type=0, align=2, sort=1)
+	public String getJiaoyiNumber() {
+		return jiaoyiNumber;
+	}
+
+	public void setJiaoyiNumber(String jiaoyiNumber) {
+		this.jiaoyiNumber = jiaoyiNumber;
+	}
+	@ExcelField(title="入账状态",type=0, align=2, sort=8)
+	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
+	}
+	
 	
 	public String getRemittanceimg() {
 		return remittanceimg;
@@ -116,20 +168,13 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceimg = remittanceimg;
 	}
 
-	public String getDealcode() {
-		return dealcode;
-	}
-
-	public void setDealcode(String dealcode) {
-		this.dealcode = dealcode;
-	}
-
-	public String getRemark() {
-		return remark;
-	}
-
-	public void setRemark(String remark) {
-		this.remark = remark;
+	@Override
+	public String toString() {
+		return "TMisRemittanceMessage [dbid=" + dbid + ", remittancename=" + remittancename + ", remittancetime="
+				+ remittancetime + ", remittanceamount=" + remittanceamount + ", remittancechannel=" + remittancechannel
+				+ ", remittanceaccount=" + remittanceaccount + ", financialuser=" + financialuser + ", financialtime="
+				+ financialtime + ", dealcode=" + dealcode + ", remark=" + remark + ", jiaoyiNumber=" + jiaoyiNumber
+				+ ", accountStatus=" + accountStatus + "]";
 	}
 
 	
