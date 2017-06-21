@@ -93,7 +93,15 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.dunningordernumber = dunningordernumber;
 	}
 	
-	@ExcelField(title="催回订单数", type=1, align=2, sort=7)
+	@ExcelField(title="Q0剩余应催订单数", type=1, align=2, sort=7)
+	public Integer getUnfinishedtask() {
+		return unfinishedtask;
+	}
+	public void setUnfinishedtask(Integer unfinishedtask) {
+		this.unfinishedtask = unfinishedtask;
+	}
+
+	@ExcelField(title="催回订单数", type=1, align=2, sort=8)
 	public Integer getFinishedordernumber() {
 		return finishedordernumber;
 	}
@@ -101,7 +109,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.finishedordernumber = finishedordernumber;
 	}
 
-	@ExcelField(title="应催本金", type=1, align=2, sort=8)
+	@ExcelField(title="应催本金", type=1, align=2, sort=9)
 	public BigDecimal getDunningcorpusamount() {
 		return dunningcorpusamount;
 	}
@@ -109,7 +117,16 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.dunningcorpusamount = dunningcorpusamount;
 	}
 
-	@ExcelField(title="催回本金", type=1, align=2, sort=9)
+	@ExcelField(title="Q0剩余应催本金", type=1, align=2, sort=10)
+	public BigDecimal getUnfinishedcorpusamount() {
+		return unfinishedcorpusamount;
+	}
+
+	public void setUnfinishedcorpusamount(BigDecimal unfinishedcorpusamount) {
+		this.unfinishedcorpusamount = unfinishedcorpusamount;
+	}
+
+	@ExcelField(title="催回本金", type=1, align=2, sort=11)
 	public BigDecimal getFinishedcorpusamount() {
 		return finishedcorpusamount;
 	}
@@ -117,7 +134,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.finishedcorpusamount = finishedcorpusamount;
 	}
 	
-	@ExcelField(title="催回本金+延期收益", type=1, align=2, sort=10)
+	@ExcelField(title="催回本金+延期收益", type=1, align=2, sort=12)
 	public BigDecimal getFinishedAndDelayAmount() {
 		return finishedAndDelayAmount;
 	}
@@ -126,7 +143,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.finishedAndDelayAmount = finishedAndDelayAmount;
 	}
 
-	@ExcelField(title="应催金额", type=1, align=2, sort=11)
+	@ExcelField(title="应催金额", type=1, align=2, sort=13)
 	public BigDecimal getAmount() {
 		return amount;
 	}
@@ -134,7 +151,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.amount = amount;
 	}
 
-	@ExcelField(title="催回金额", type=1, align=2, sort=12)
+	@ExcelField(title="催回金额", type=1, align=2, sort=14)
 	public BigDecimal getCreditamount() {
 		return creditamount;
 	}
@@ -142,7 +159,7 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 		this.creditamount = creditamount;
 	}
 	
-	@ExcelField(title="催回本金(含续期)", type=1, align=2, sort=13)
+	@ExcelField(title="催回本金(含续期)", type=1, align=2, sort=15)
 	public BigDecimal getFinishedanddelaycorpusamount() {
 		return finishedanddelaycorpusamount;
 	}
@@ -157,24 +174,6 @@ public class SMisDunningTaskMonthReport extends DataEntity<SMisDunningTaskMonthR
 
 	public void setDatetime(Date datetime) {
 		this.datetime = datetime;
-	}
-
-	@ExcelField(title="未还款任务数", type=1, align=2, sort=14)
-	public Integer getUnfinishedtask() {
-		return unfinishedtask;
-	}
-
-	public void setUnfinishedtask(Integer unfinishedtask) {
-		this.unfinishedtask = unfinishedtask;
-	}
-
-	@ExcelField(title="未还款本金", type=1, align=2, sort=15)
-	public BigDecimal getUnfinishedcorpusamount() {
-		return unfinishedcorpusamount;
-	}
-
-	public void setUnfinishedcorpusamount(BigDecimal unfinishedcorpusamount) {
-		this.unfinishedcorpusamount = unfinishedcorpusamount;
 	}
 
 }
