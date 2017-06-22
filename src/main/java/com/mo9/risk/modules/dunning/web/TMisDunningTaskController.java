@@ -948,6 +948,18 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载用户信息页面
+	 * @param buyerId
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "getBuyerIdCardImg")
+	@ResponseBody
+	public String getBuyerIdCardImg(String buyerId) {
+		return tMisDunningTaskService.findBuyerIdCardImg(buyerId);
+	}
+	
+	/**
+	 * 加载用户信息页面
 	 * @param tMisDunningTask
 	 * @param model
 	 * @return

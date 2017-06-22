@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,8 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 @Transactional(readOnly = true)
 @Lazy(false)
 public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, TMisDunningDeduct> {
+	
+	public static final ConcurrentHashMap<String, Long> dealcodeMap = new ConcurrentHashMap<String, Long>();
 	
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;

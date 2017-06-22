@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,6 +48,8 @@ public class TMisDunningDeductController extends BaseController {
 	
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
+	
+	private static Logger logger = Logger.getLogger(TMisDunningDeductController.class);
 	
 	@RequiresPermissions("dunning:tMisDunningDeduct:view")
 	@RequestMapping(value = {"list", ""})
@@ -122,8 +125,35 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		tMisDunningDeduct.setDealcode(dealcode);
-		String deductcode = tMisDunningDeductService.saveRecord(tMisDunningDeduct);
+		long timestamp = System.currentTimeMillis();
+		Long value = TMisDunningDeductService.dealcodeMap.putIfAbsent(dealcode, timestamp);
+		
+		//已存在订单号，有效期3分钟
+		if (value != null && timestamp - value < 180 * 1000) {
+			result.put("result", "NO");
+			result.put("msg", "当前订单代扣处理中，请勿发起代扣");
+			return result;
+		}
+		
+		String deductcode = null;
+		try {
+			if (!tMisDunningDeductService.preCheckStatus(dealcode)) {
+				result.put("result", "NO");
+				result.put("msg", "当前订单代扣处理中，请勿发起代扣");
+				return result;
+			}
+			
+			tMisDunningDeduct.setDealcode(dealcode);
+			deductcode = tMisDunningDeductService.saveRecord(tMisDunningDeduct);
+		} catch (Exception e) {
+			logger.warn(e);
+			result.put("result", "NO");
+			result.put("msg", "保存记录失败");
+			return result;
+		} finally {
+			TMisDunningDeductService.dealcodeMap.remove(dealcode);
+		}
+		
 		if (deductcode == null || "".equals(deductcode)) {
 			result.put("result", "NO");
 			result.put("msg", "保存记录失败");

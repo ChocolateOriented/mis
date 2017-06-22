@@ -289,4 +289,10 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
 	
+	/**
+	 * 查询用户身份证影像资料
+	 * @return
+	 */
+	public String findBuyerIdCardImg(String buyerid);
+	
 }

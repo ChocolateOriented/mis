@@ -56,8 +56,8 @@
 		//按钮点击统计
 		function btnStatistics(doc, btn) {
 			$.post("${ctx}/dunning/tMisBtnStatistics/save",
-					{buyerid: "${buyerId}", buyername: "${personalInfo.realName}", dealcode: "${dealcode}", pagename: doc.title, btnid: $(btn).prop('id'), btnname: $(btn).val()},
-					function(data) {});
+				{buyerid: "${buyerId}", buyername: "${personalInfo.realName}", dealcode: "${dealcode}", pagename: doc.title, btnid: $(btn).prop('id'), btnname: $(btn).val()},
+				function(data) {});
 		}
 		
 		//打开代扣页面前验证
@@ -87,6 +87,21 @@
 			$("#changeMobile").prop("disabled", true);
 			$("#changeBankcard").prop("disabled", true);
 		}
+		
+		function getBuyerIdCardImg() {
+			$.get("${ctx}/dunning/tMisDunningTask/getBuyerIdCardImg", {buyerId: "${buyerId}"}, function(data) {
+				if (!data) {
+					$.jBox.tip("身份证影像资料不存在", "warning");
+					return;
+				}
+				$.jBox.open("iframe:https://riskadmin.mo9.com/file/showPic.a?fileId=" + data, "手持身份证", 800, 700, {
+					buttons: {},
+					loaded: function (h) {
+						$(".jbox-content", document).css("overflow-y", "hidden");
+					}
+				});
+			})
+		}
 	</script>
 </head>
 <body>
@@ -104,6 +119,9 @@
 				<input <c:if test="${'payoff' eq status }">disabled</c:if> id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"  
 				 name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactMobile="${personalInfo.mobile}" contactstype="self"  method="Sms" type="button" value="短信" />
 				
+				<shiro:hasPermission name="dunning:tMisDunningImage:view">
+					<input id="butnIdCardImg" style="padding:0px 8px 0px 8px;font-size:13px;" onclick="getBuyerIdCardImg()" class="btn btn-primary" type="button" value="手持身份证" />
+				</shiro:hasPermission>
 			</td>
 			<td>姓名：${personalInfo.realName}(${personalInfo.sex})(${not empty personalInfo.marital ? personalInfo.marital eq 'Y' ? "已婚" : "未婚" : "未获取"})</td>
 			<td>身份证：${personalInfo.idcard}</td>
