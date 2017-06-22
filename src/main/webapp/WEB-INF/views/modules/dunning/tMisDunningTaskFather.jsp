@@ -119,7 +119,7 @@
 				<input <c:if test="${'payoff' eq status }">disabled</c:if> id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"  
 				 name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactMobile="${personalInfo.mobile}" contactstype="self"  method="Sms" type="button" value="短信" />
 				
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+				<shiro:hasPermission name="dunning:tMisDunningImage:view">
 					<input id="butnIdCardImg" style="padding:0px 8px 0px 8px;font-size:13px;" onclick="getBuyerIdCardImg()" class="btn btn-primary" type="button" value="手持身份证" />
 				</shiro:hasPermission>
 			</td>
