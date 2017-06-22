@@ -2606,5 +2606,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return Pattern.matches(regex, phoneNumber);
 	}
 	
+	/**
+	 * 查询用户身份证影像资料
+	 * @param buyerid
+	 * @return
+	 */
+	public String findBuyerIdCardImg(String buyerid) {
+		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
+	}
 	
 }

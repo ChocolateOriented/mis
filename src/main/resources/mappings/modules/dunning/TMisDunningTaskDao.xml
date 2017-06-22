@@ -1850,5 +1850,12 @@
 	        AND o.buyer_id is not null
     </select>
 	
+	<select id="findBuyerIdCardImg" resultType="String">
+        SELECT
+	        i.img_filed3
+        FROM t_risk_buyer_idcard AS i
+        WHERE
+	        i.buyer_id = #{buyerid}
+    </select>
 
 </mapper>
