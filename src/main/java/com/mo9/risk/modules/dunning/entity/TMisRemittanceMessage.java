@@ -30,10 +30,10 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private String remittanceimg;		// 汇款图片
 	private String dealcode;
 	private String remark;    // 备注
-	// 支付宝交易号
-	private String jiaoyiNumber;   
+	// 支付宝流水号
+	private String alipaySerialNumber;   
 	// 入账状态
-	private String accountStatus; 
+	private AccountStatus accountStatus; 
 	
 	
 	
@@ -143,19 +143,19 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remark = remark;
 	}
 	@ExcelField(title="交易流水号",type=0, align=2, sort=1)
-	public String getJiaoyiNumber() {
-		return jiaoyiNumber;
+	public String getAlipaySerialNumber() {
+		return alipaySerialNumber;
 	}
 
-	public void setJiaoyiNumber(String jiaoyiNumber) {
-		this.jiaoyiNumber = jiaoyiNumber;
+	public void setAlipaySerialNumber(String alipaySerialNumber) {
+		this.alipaySerialNumber = alipaySerialNumber;
 	}
 	@ExcelField(title="入账状态",type=0, align=2, sort=8)
-	public String getAccountStatus() {
+	public AccountStatus getAccountStatus() {
 		return accountStatus;
 	}
 
-	public void setAccountStatus(String accountStatus) {
+	public void setAccountStatus(AccountStatus accountStatus) {
 		this.accountStatus = accountStatus;
 	}
 	
@@ -168,14 +168,46 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceimg = remittanceimg;
 	}
 
+	
+
 	@Override
 	public String toString() {
 		return "TMisRemittanceMessage [dbid=" + dbid + ", remittancename=" + remittancename + ", remittancetime="
 				+ remittancetime + ", remittanceamount=" + remittanceamount + ", remittancechannel=" + remittancechannel
 				+ ", remittanceaccount=" + remittanceaccount + ", financialuser=" + financialuser + ", financialtime="
-				+ financialtime + ", dealcode=" + dealcode + ", remark=" + remark + ", jiaoyiNumber=" + jiaoyiNumber
-				+ ", accountStatus=" + accountStatus + "]";
+				+ financialtime + ", remittanceimg=" + remittanceimg + ", dealcode=" + dealcode + ", remark=" + remark
+				+ ", alipaySerialNumber=" + alipaySerialNumber + ", accountStatus=" + accountStatus + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((alipaySerialNumber == null) ? 0 : alipaySerialNumber.hashCode());
+		result = prime * result + ((remittancechannel == null) ? 0 : remittancechannel.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		TMisRemittanceMessage other = (TMisRemittanceMessage) obj;
+		if (alipaySerialNumber == null) {
+			if (other.alipaySerialNumber != null)
+				return false;
+		} else if (!alipaySerialNumber.equals(other.alipaySerialNumber))
+			return false;
+		if (remittancechannel == null) {
+			if (other.remittancechannel != null)
+				return false;
+		} else if (!remittancechannel.equals(other.remittancechannel))
+			return false;
+		return true;
+	}
+
+	
 
 	
 	

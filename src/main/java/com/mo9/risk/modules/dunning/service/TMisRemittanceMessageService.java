@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,22 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	
 	public TMisRemittanceMessage  findRemittanceMesListByDealcode(String code){
 		return misRemittanceMessageDao.findRemittanceMesListByDealcode(code);
+	}
+	
+	@Transactional(readOnly = false)
+	public int fileUpload(LinkedList<TMisRemittanceMessage> tMisRemittanceList) {
+		int  same=0;
+		
+		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findByList(tMisRemittanceList);
+		same=trMList.size();
+		if(trMList.size()>0&&trMList!=null){
+			boolean removeAll = tMisRemittanceList.removeAll(trMList);
+		}
+		if(tMisRemittanceList.size()>0&&tMisRemittanceList!=null){
+			int saveNum = misRemittanceMessageDao.saveList(tMisRemittanceList);
+			
+		}
+		return same;
 	}
 	
 }

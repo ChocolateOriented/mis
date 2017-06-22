@@ -15,7 +15,9 @@
 		a.remittanceimg AS "remittanceimg",
 		a.dealcode AS "dealcode",
 		a.remark AS "remark",
-		a.createdate AS "createDate"
+		a.createdate AS "createDate",
+		a.alipaySerialNumber AS "alipaySerialNumber",
+		a.accountStatus AS "accountStatus"
 	</sql>
 	
 	<sql id="tMisRemittanceMessageJoins">
@@ -96,7 +98,9 @@
 			remittanceimg,
 			dealcode,
 			remark,
-			createDate
+			createDate,
+			alipaySerialNumber,
+			accountStatus
 		) VALUES (
 			#{id},
 			#{remittancename},
@@ -109,7 +113,9 @@
 			#{remittanceimg},
 			#{dealcode},
 			#{remark},
-			#{createDate}
+			#{createDate},
+			#{alipaySerialNumber},
+			#{accountStatus}
 		)
 	</insert>
 	
@@ -123,7 +129,9 @@
 			financialuser = #{financialuser},
 			financialtime = #{financialtime},
 			remittanceimg = #{remittanceimg},
-			remark = #{remark}
+			remark = #{remark},
+			alipaySerialNumber = #{alipaySerialNumber},
+			accountStatus = #{accountStatus}
 		WHERE id = #{id}
 	</update>
 	
@@ -131,5 +139,60 @@
 		DELETE FROM t_mis_remittance_message
 		WHERE id = #{id}
 	</update>
+	
+	<select id="findByList" resultType="TMisRemittanceMessage">
+			select 
+			<include refid="tMisRemittanceMessageColumns"/>
+			from t_mis_remittance_message a
+			where 
+			alipaySerialNumber  in
+			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
+			   #{tMisRemittanceMessage.alipaySerialNumber} 
+			</foreach>
+			and
+			remittancechannel ="aliPay"
+	</select>
+	
+	
+	<insert id="saveList" parameterType="java.util.List">
+		insert into t_mis_remittance_message
+		(
+			id,
+			remittancename,
+			remittancetime,
+			remittanceamount,
+			remittancechannel,
+			remittanceaccount,
+			financialuser,
+			financialtime,
+			remittanceimg,
+			dealcode,
+			remark,
+			createDate,
+			alipaySerialNumber,
+			accountStatus
+		)
+		values
+		<foreach collection="list" index="index" item="item" separator="," >
+		(
+			#{item.id},
+			#{item.remittancename},
+			#{item.remittancetime},
+			#{item.remittanceamount},
+			#{item.remittancechannel},
+			#{item.remittanceaccount},
+			#{item.financialuser},
+			#{item.financialtime},
+			#{item.remittanceimg},
+			#{item.dealcode},
+			#{item.remark},
+			#{item.createDate},
+			#{item.alipaySerialNumber},
+			#{item.accountStatus}
+		)
+		</foreach>
+		
+	
+	</insert>
 	
 </mapper>
