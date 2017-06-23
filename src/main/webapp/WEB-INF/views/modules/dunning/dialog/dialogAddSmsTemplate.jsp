@@ -219,7 +219,7 @@
 
 	</ul>
 	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
-		
+		<input type="hidden" name="invalid" value="t"/>
 		<div class="control-group">
 			<label class="control-label">英文模板名称：</label>
 			<div class="controls">

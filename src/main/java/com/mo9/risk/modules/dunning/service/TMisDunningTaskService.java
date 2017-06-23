@@ -2485,6 +2485,29 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							if ("wordText".equals(smsTemplate.getSmsType())) {
 								Map<String, String> params = new HashMap<String, String>();
 								params.put("mobile", dunningOrder.getMobile());// 发送手机号
+								// snc版本 固定值:"2.0";
+								params.put("snc_version", "2.0");
+								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+								params.put("biz_sys", "MIS");
+								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+								params.put("biz_type", "3");
+								// 客户端产品名称
+								// 例："mo9wallet","feishudai","feishudaiPro"
+								if (smsTemplate.getSmsCotent().contains("${platform}")) {
+									if (null != dunningOrder.getPlatformExt()
+											&& !"".equals(dunningOrder.getPlatformExt())) {
+										if (dunningOrder.getPlatformExt().contains("feishudai")) {
+											params.put("product_name", "feishudai");
+										} else {
+											params.put("product_name", "mo9wallet");
+										}
+									} else {
+										params.put("product_name", "mo9wallet");
+									}
+
+								} else {
+									params.put("product_name", "mo9wallet");
+								}
 								// 模板填充的map
 								Map<String, Object> map = tMisContantRecordService.getCotentValue(
 										smsTemplate.getSmsCotent(), buyerInfeo, dunningOrder.getPlatformExt(),
@@ -2509,11 +2532,32 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								String englishTemplateName = smsTemplate.getEnglishTemplateName();
 								params.put("template_name", englishTemplateName);// 模板名称
 								params.put("template_tags", "CN");// 模板标识
+								// snc版本 固定值:"2.0";
+								params.put("snc_version", "2.0");
+								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+								params.put("biz_sys", "MIS");
+								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+								params.put("biz_type", "3");
+								if (smsTemplate.getSmsCotent().contains("${platform}")) {
+									if (null != dunningOrder.getPlatformExt()
+											&& !"".equals(dunningOrder.getPlatformExt())) {
+										if (dunningOrder.getPlatformExt().contains("feishudai")) {
+											params.put("product_name", "feishudai");
+										} else {
+											params.put("product_name", "mo9wallet");
+										}
+									} else {
+										params.put("product_name", "mo9wallet");
+									}
+
+								} else {
+									params.put("product_name", "mo9wallet");
+								}
 								Thread.sleep(100);
 								MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, params,
 										BaseResponse.class);
 							}
-
+							
 							logger.info(
 									"系统发送,给订单号为:" + dunningOrder.getDealcode() + ",用户电话为:" + dunningOrder.getMobile()
 											+ ",发送短信成功.模板名为:" + smsTemplate.getTemplateName() + ",该模板发送的第" + i + "条");
