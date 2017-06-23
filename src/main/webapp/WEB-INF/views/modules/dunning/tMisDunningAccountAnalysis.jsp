@@ -44,7 +44,10 @@ function closeSubmitting() {
 	$.jBox.closeTip();
 }
 </script>
+<style type="text/css" >
 
+.bor{border:1px dashed #F00;width:300px;height:60px;margin-top:10px} 
+</style>
 </head>
 <body>
      <input type="hidden" id="message" value="${message}" />
@@ -55,7 +58,7 @@ function closeSubmitting() {
 			对账渠道 <input type="radio" value="aliPay" name="aliPay"
 				checked="checked" />支付宝
 		</div>
-		<div >
+		<div class="bor">
 
 			对账文件 ：<input id="file" type="file" name="file"  class="input-xlarge required " />
 		</div>
