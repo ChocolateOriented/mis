@@ -33,10 +33,9 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	// 支付宝交易号
 	private String jiaoyiNumber;   
 	// 入账状态
-	private String accountStatus; 
-	
-	
-	
+	private String accountStatus;
+	private RemittanceTag remittanceTag;		//入账标签
+
 	public TMisRemittanceMessage() {
 		super();
 	}
@@ -168,6 +167,15 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceimg = remittanceimg;
 	}
 
+	public RemittanceTag getRemittanceTag() {
+		return remittanceTag;
+	}
+
+	public void setRemittanceTag(
+			RemittanceTag remittanceTag) {
+		this.remittanceTag = remittanceTag;
+	}
+
 	@Override
 	public String toString() {
 		return "TMisRemittanceMessage [dbid=" + dbid + ", remittancename=" + remittancename + ", remittancetime="
@@ -177,7 +185,9 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 				+ ", accountStatus=" + accountStatus + "]";
 	}
 
-	
-	
+	public enum RemittanceTag{
+		REPAYMENT_SELF,//本人还款
+		REPAYMENT_THIRD//第三方还款
+	}
 	
 }

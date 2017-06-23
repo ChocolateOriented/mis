@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.util.RegexUtil;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -2598,10 +2599,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			return false;
 		}
 		if(type==1){
-			 regex="^1[0-9]{10}$";
+			 regex= RegexUtil.REGEX_MOBILE;
 		}
 		if(type==2){
-			 regex = "^(\\d{3,4}-)?\\d{6,8}$";
+			 regex = RegexUtil.REGEX_PHONE;
 		}
 		return Pattern.matches(regex, phoneNumber);
 	}

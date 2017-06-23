@@ -131,5 +131,21 @@
 		DELETE FROM t_mis_remittance_message
 		WHERE id = #{id}
 	</update>
-	
+
+	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="">
+		SELECT
+		o.dealcode AS "dealcode",
+		b.mobile AS "mobile"
+		FROM
+		t_risk_order AS o
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		WHERE
+		o.merchant_id = 7
+		AND o.`status`= 'payment'
+		AND b.mobile IN
+		<foreach collection="mobiles" index="mobile" open="(" separator="," close=")">
+			#{mobile}
+		</foreach>
+	</select>
+
 </mapper>

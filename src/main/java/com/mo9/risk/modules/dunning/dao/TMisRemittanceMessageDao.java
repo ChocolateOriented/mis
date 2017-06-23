@@ -3,9 +3,12 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 财务确认汇款信息DAO接口
@@ -16,5 +19,6 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage> {
 	
 	public TMisRemittanceMessage findRemittanceMesListByDealcode(String code);
-	
+
+	List<DunningOrder> findPaymentOrderByMobile(Set<String> mobiles);
 }
