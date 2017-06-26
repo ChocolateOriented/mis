@@ -25,12 +25,12 @@ public class TMisRemittanceExcel extends DataEntity<TMisRemittanceExcel> {
 	// 入账时间
 	private String remittancetime;
 	// 支付宝交易号
-	private String jiaoyiNumber;  
+	private String alipayRemittanceNumber ;  
 	//支付宝流水号
-	private String serialNumber;  
+	private String alipaySerialNumber;  
 	//商户订单号
 	private String commercialOrderNumber;  
-	//服务类型
+	//财务类型
 	private String serveType;  
 	//收入(+元)
 	private Double remittanceamount;
@@ -70,18 +70,18 @@ public class TMisRemittanceExcel extends DataEntity<TMisRemittanceExcel> {
 		this.remittancetime = remittancetime;
 	}
 	@ExcelField(title="支付宝交易号",type=0, align=2, sort=30)
-	public String getJiaoyiNumber() {
-		return jiaoyiNumber;
+	public String getAlipayRemittanceNumber() {
+		return alipayRemittanceNumber;
 	}
-	public void setJiaoyiNumber(String jiaoyiNumber) {
-		this.jiaoyiNumber = jiaoyiNumber;
+	public void setAlipayRemittanceNumber(String alipayRemittanceNumber) {
+		this.alipayRemittanceNumber = alipayRemittanceNumber;
 	}
 	@ExcelField(title="支付宝流水号",type=0, align=2, sort=40)
-	public String getSerialNumber() {
-		return serialNumber;
+	public String getAlipaySerialNumber() {
+		return alipaySerialNumber;
 	}
-	public void setSerialNumber(String serialNumber) {
-		this.serialNumber = serialNumber;
+	public void setAlipaySerialNumber(String alipaySerialNumber) {
+		this.alipaySerialNumber = alipaySerialNumber;
 	}
 	@ExcelField(title="商户订单号",type=0, align=2, sort=50)
 	public String getCommercialOrderNumber() {
@@ -90,7 +90,7 @@ public class TMisRemittanceExcel extends DataEntity<TMisRemittanceExcel> {
 	public void setCommercialOrderNumber(String commercialOrderNumber) {
 		this.commercialOrderNumber = commercialOrderNumber;
 	}
-	@ExcelField(title="服务类型",type=0, align=2, sort=60)
+	@ExcelField(title="财务类型",type=0, align=2, sort=60)
 	public String getServeType() {
 		return serveType;
 	}
@@ -188,14 +188,14 @@ public class TMisRemittanceExcel extends DataEntity<TMisRemittanceExcel> {
 	}
 	@Override
 	public String toString() {
-		return "TMisRemittanceExcel [dbid=" + dbid + ", remittancetime=" + remittancetime + ", jiaoyiNumber="
-				+ jiaoyiNumber + ", serialNumber=" + serialNumber + ", commercialOrderNumber=" + commercialOrderNumber
-				+ ", serveType=" + serveType + ", remittanceamount=" + remittanceamount + ", outPay=" + outPay
-				+ ", payBalance=" + payBalance + ", serverPay=" + serverPay + ", remittancechannel=" + remittancechannel
-				+ ", conProduct=" + conProduct + ", remittanceaccount=" + remittanceaccount + ", remittancename="
-				+ remittancename + ", blankOrder=" + blankOrder + ", productName=" + productName + ", remark=" + remark
-				+ "]";
-	}  
+		return "TMisRemittanceExcel [dbid=" + dbid + ", remittancetime=" + remittancetime + ", alipayRemittanceNumber="
+				+ alipayRemittanceNumber + ", alipaySerialNumber=" + alipaySerialNumber + ", commercialOrderNumber="
+				+ commercialOrderNumber + ", serveType=" + serveType + ", remittanceamount=" + remittanceamount
+				+ ", outPay=" + outPay + ", payBalance=" + payBalance + ", serverPay=" + serverPay
+				+ ", remittancechannel=" + remittancechannel + ", conProduct=" + conProduct + ", remittanceaccount="
+				+ remittanceaccount + ", remittancename=" + remittancename + ", blankOrder=" + blankOrder
+				+ ", productName=" + productName + ", remark=" + remark + "]";
+	}
 	
 	
 	

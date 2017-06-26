@@ -11,10 +11,9 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
-import java.util.Map;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +65,23 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	public TMisRemittanceMessage  findRemittanceMesListByDealcode(String code){
 		return misRemittanceMessageDao.findRemittanceMesListByDealcode(code);
 	}
+
+	@Transactional(readOnly = false)
+	public int fileUpload(LinkedList<TMisRemittanceMessage> tMisRemittanceList) {
+		int  same=0;
+
+		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findByList(tMisRemittanceList);
+		same=trMList.size();
+		if(trMList.size()>0&&trMList!=null){
+			boolean removeAll = tMisRemittanceList.removeAll(trMList);
+		}
+		if(tMisRemittanceList.size()>0&&tMisRemittanceList!=null){
+			int saveNum = misRemittanceMessageDao.saveList(tMisRemittanceList);
+
+		}
+		return same;
+	}
+
 
 	@Transactional(readOnly = false)
 	public void autoAudit(List<TMisRemittanceMessage> remittanceMessages){
