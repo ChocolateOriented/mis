@@ -145,12 +145,12 @@
 			<include refid="tMisRemittanceMessageColumns"/>
 			from t_mis_remittance_message a
 			where
-			remittanceSerialNumber  in
+			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
 			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>
 			and
-			remittancechannel = #{remittancechannel}
+			a.remittancechannel = #{channel}
 	</select>
 
 

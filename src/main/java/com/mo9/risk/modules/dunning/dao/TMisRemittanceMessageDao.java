@@ -28,7 +28,7 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	List<DunningOrder> findPaymentOrderByMobile(Set<String> mobiles);
 
-	public List<TMisRemittanceMessage> findByList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
+	public List<TMisRemittanceMessage> findByList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList,@Param("channel")String channel);
 
 	public int saveList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
 

@@ -122,7 +122,7 @@ public class TMisRemittanceMessageController extends BaseController {
 			sucess++;
 		}
 
-		same = tMisRemittanceMessageService.fileUpload(tMisRemittanceList);
+		same = tMisRemittanceMessageService.fileUpload(tMisRemittanceList,channel);
 		String message = "";
 		if (same == 0) {
 			if (fail == 0) {

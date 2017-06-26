@@ -63,10 +63,10 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	}
 
 	@Transactional(readOnly = false)
-	public int fileUpload(LinkedList<TMisRemittanceMessage> tMisRemittanceList) {
+	public int fileUpload(LinkedList<TMisRemittanceMessage> tMisRemittanceList,String channel) {
 		int  same=0;
 
-		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findByList(tMisRemittanceList);
+		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findByList(tMisRemittanceList,channel);
 		same=trMList.size();
 		if(trMList.size()>0&&trMList!=null){
 			boolean removeAll = tMisRemittanceList.removeAll(trMList);
