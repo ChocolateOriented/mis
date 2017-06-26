@@ -1806,6 +1806,37 @@
 				WHERE id = #{item.id}
 		 </foreach>
     </update>
+    
+ 	<select id="findAtuoQ0Dealcode" resultType="string">
+ 	 SELECT
+		o.dealcode
+		FROM t_risk_order AS o
+		WHERE o.type = 'loan'
+			AND o.merchant_id = 7
+			AND o.`status` = 'payment'
+			AND DATEDIFF(curdate(), o.repayment_time) = #{day}
+			AND NOT EXISTS  (
+			SELECT
+					DISTINCT buyer_id
+				FROM t_risk_order AS o1
+				WHERE o1.type = 'loan'
+					AND o1.merchant_id = 7
+					AND o1.`status` = 'payoff'
+					AND o.buyer_id = o1.buyer_id
+					AND DATEDIFF(DATE(o1.payoff_time), DATE(o1.repayment_time)) > #{payoffday}
+			)
+			AND EXISTS (
+				SELECT
+					1
+				FROM t_risk_order AS o2
+				WHERE o2.type = 'loan'
+					and o2.merchant_id = 7
+					and o2.`status` in ('payment', 'payoff')
+					and o2.buyer_id = o.buyer_id
+				group by o2.buyer_id
+				HAVING count(1) > 1
+			);
+	</select>
    
 <!-- 	new自动分配 - end 	    -->
 

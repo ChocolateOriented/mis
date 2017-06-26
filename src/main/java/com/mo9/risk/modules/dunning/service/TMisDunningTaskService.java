@@ -92,6 +92,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  内部催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
 	public static final Integer DUNNING_COMMISSIONER_PERMISSIONS = 1;    //  催收专员
+//	public static final Integer DUNNING_SUPERVISION_MANAGER_PERMISSIONS =  100001;    //  催收监理经理
+//	public static final Integer DUNNING_SUPERVISION_PERMISSIONS =  10001;    //  催收监理
+//	public static final Integer DUNNING_GROUP_PERMISSIONS =   1001;         //  催收
+	
+	public static final String  AUTOQ0_ID_1 = "autoQ0_id_1";
+	public static final String  AUTOQ0_NAME_1 = "autoQ0机器人1号";
 	
 	public static final String  C0 = "Q0";      //  提醒0-0
 	public static final String  C_P1 = "Q1";	 
@@ -1647,6 +1653,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
 				Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
 				
+				/**  * auto Q0 队列 begin */
+				String autoQ0 = DictUtils.getDictValue("autoQ0","Scheduled","false");
+				Map<String, String> atuoQ0DealcodeMap = new HashMap<String, String>();
+				List<TMisDunningTask> atuoDunningTasks = new ArrayList<TMisDunningTask>();
+				List<TMisDunningTaskLog> atuoQ0DunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+				if(autoQ0.equals("true")){
+					List<String> atuoQ0Dealcodes = tMisDunningTaskDao.findAtuoQ0Dealcode(begin_Q0,"1");
+					logger.info("findAtuoQ0Dealcode-autoQ0查询历史借款逾期小于1天的用户订单" +atuoQ0Dealcodes.size()  + "条"  + new Date());
+					for(String atuoQ0Dealcode : atuoQ0Dealcodes){
+						atuoQ0DealcodeMap.put(atuoQ0Dealcode, atuoQ0Dealcode);
+					}
+				}
+				/** * auto Q0 队列 end  */
+				
 				for(TMisDunningTaskLog dunningTaskLog : newDunningTaskLogs){
 					/**
 					 * 本次迁徙该移入的周期段
@@ -1656,6 +1676,18 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 						continue;
 					}
+					
+					/**  * auto Q0 队列 begin  */
+					if(autoQ0.equals("true") && C0.equals(dict) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+//						logger.info("autoQ0查询历史借款逾期小于1天的用户订单"  + new Date());
+						TMisDunningTask autoDunningTask = this.autoCreateNewDunningTask(dunningTaskLog, dict);
+						TMisDunningTaskLog autoDunningTaskLog = this.autoCreateNewDunningTaskLog(dunningTaskLog, autoDunningTask);
+						atuoDunningTasks.add(autoDunningTask);
+						atuoQ0DunningTaskLogs.add(autoDunningTaskLog);
+						continue;
+					}
+					/** * auto Q0 队列 end  */
+					
 					/**
 					 * 创建任务 
 					  */
@@ -1672,6 +1704,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					inDunningTaskLogsMap.put(dunningTask.getId(), dunningTaskLog);
 				}
+				/**  * auto Q0 队列 begin  */
+				if(autoQ0.equals("true")){
+					tMisDunningTaskDao.batchinsertTask(atuoDunningTasks);
+					tMisDunningTaskLogDao.batchInsertTaskLog(atuoQ0DunningTaskLogs);
+				}
+				/** * auto Q0 队列 end  */
+				
 				/**  新增任务Log集合   */
 				List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
 				/** 
@@ -1734,6 +1773,49 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	}
 	
+	/**
+	 * 创建autoQ0任务
+	 * @return TMisDunningTask
+	 */
+	private TMisDunningTask autoCreateNewDunningTask(TMisDunningTaskLog autoTaskLog,Dict dict) throws Exception{
+		Date now = new Date();
+		TMisDunningTask autoTask = new TMisDunningTask();
+		autoTask.setId(IdGen.uuid());
+		autoTask.setDunningpeopleid(AUTOQ0_ID_1);
+		autoTask.setDunningpeoplename(AUTOQ0_NAME_1);
+		autoTask.setDealcode(autoTaskLog.getDealcode());
+		autoTask.setCapitalamount(autoTaskLog.getCorpusamount());
+		autoTask.setBegin(toDate(now));
+		autoTask.setEnd(null);
+		autoTask.setDunningcycle(dict.getLabel());
+		int min = !("").equals(dict.getValue().split("_")[0]) ?  Integer.parseInt(dict.getValue().split("_")[0]) : 0 ;
+		int max = !("").equals(dict.getValue().split("_")[1]) ?  Integer.parseInt(dict.getValue().split("_")[1]) : 0 ;
+		autoTask.setDunningperiodbegin(min);
+		autoTask.setDunningperiodend(max);
+		autoTask.setDunnedamount(0);
+		autoTask.setIspayoff(false);
+		autoTask.setReliefamount(0);
+		autoTask.setDunningtaskstatus(TMisDunningTask.STATUS_DUNNING);
+		autoTask.setRepaymentTime(new java.sql.Date(autoTaskLog.getRepaymenttime().getTime()));
+		autoTask.setCreateBy(new User("auto_admin"));
+		autoTask.setCreateDate(new Date());
+		return autoTask;
+	}
+	
+	/**
+	 * 创建autoQ0任务log
+	 * @return TMisDunningTasklog
+	 */
+	private TMisDunningTaskLog autoCreateNewDunningTaskLog(TMisDunningTaskLog autoTaskLog,TMisDunningTask autoDunningTask) throws Exception{
+		autoTaskLog.setTaskid(autoDunningTask.getId());
+		autoTaskLog.setBehaviorstatus("in");
+		autoTaskLog.setDunningpeopleid(autoDunningTask.getDunningpeopleid());
+		autoTaskLog.setDunningpeoplename(autoDunningTask.getDunningpeoplename());
+		autoTaskLog.setDunningcycle(autoDunningTask.getDunningcycle());
+		autoTaskLog.setCreateDate(new Date());
+		autoTaskLog.setCreateBy(new User("auto_admin"));
+		return autoTaskLog;
+	}
 	
 	/**
 	 * 根据逾期天数，返回该月该日的归属队列
