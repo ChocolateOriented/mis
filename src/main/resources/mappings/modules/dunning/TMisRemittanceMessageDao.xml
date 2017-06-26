@@ -150,7 +150,7 @@
 			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>
 			and
-			remittancechannel ="aliPay"
+			remittancechannel = #{remittancechannel}
 	</select>
 
 
@@ -196,7 +196,7 @@
 	</insert>
 
 
-	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="">
+	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.Set">
 		SELECT
 		o.dealcode AS "dealcode",
 		b.mobile AS "mobile"
