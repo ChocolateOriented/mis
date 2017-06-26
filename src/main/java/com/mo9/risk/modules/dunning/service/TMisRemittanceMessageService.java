@@ -3,25 +3,21 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
-import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.util.RegexUtil;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.service.CrudService;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 
 /**
  * 财务确认汇款信息Service
@@ -113,10 +109,6 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 			if (StringUtils.isNoneBlank(mobile)){//备注包含手机号
 				containMobileInRemarkMap.put(mobile,remittanceMessage);
 				containMobileInRemark.add(remittanceMessage);
-
-				DunningUserInfo userInfo = new DunningUserInfo();
-				userInfo.setMobile(mobile);
-				remittanceMessage.setUserInfo(userInfo);
 				continue;
 			}
 			//备注不包含手机号

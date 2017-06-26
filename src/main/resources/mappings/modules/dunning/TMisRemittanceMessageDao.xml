@@ -16,7 +16,7 @@
 		a.dealcode AS "dealcode",
 		a.remark AS "remark",
 		a.createdate AS "createDate",
-		a.alipaySerialNumber AS "alipaySerialNumber",
+		a.remittanceSerialNumber AS "remittanceSerialNumber",
 		a.accountStatus AS "accountStatus"
 	</sql>
 	
@@ -99,7 +99,7 @@
 			dealcode,
 			remark,
 			createDate,
-			alipaySerialNumber,
+			remittanceSerialNumber,
 			accountStatus
 		) VALUES (
 			#{id},
@@ -114,7 +114,7 @@
 			#{dealcode},
 			#{remark},
 			#{createDate},
-			#{alipaySerialNumber},
+			#{remittanceSerialNumber},
 			#{accountStatus}
 		)
 	</insert>
@@ -130,7 +130,7 @@
 			financialtime = #{financialtime},
 			remittanceimg = #{remittanceimg},
 			remark = #{remark},
-			alipaySerialNumber = #{alipaySerialNumber},
+			remittanceSerialNumber = #{remittanceSerialNumber},
 			accountStatus = #{accountStatus}
 		WHERE id = #{id}
 	</update>
@@ -145,9 +145,9 @@
 			<include refid="tMisRemittanceMessageColumns"/>
 			from t_mis_remittance_message a
 			where
-			alipaySerialNumber  in
+			remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
-			   #{tMisRemittanceMessage.alipaySerialNumber}
+			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>
 			and
 			remittancechannel ="aliPay"
@@ -169,7 +169,7 @@
 			dealcode,
 			remark,
 			createDate,
-			alipaySerialNumber,
+			remittanceSerialNumber,
 			accountStatus
 		)
 		values
@@ -187,7 +187,7 @@
 			#{item.dealcode},
 			#{item.remark},
 			#{item.createDate},
-			#{item.alipaySerialNumber},
+			#{item.remittanceSerialNumber},
 			#{item.accountStatus}
 		)
 		</foreach>

@@ -30,14 +30,8 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private String remittanceimg;		// 汇款图片
 	private String dealcode;
 	private String remark;    // 备注
-	// 支付宝流水号
-	private String alipaySerialNumber;
-	// 入账状态
-	private AccountStatus accountStatus;
-	
-	
-	
-	private String accountStatus;
+	private String remittanceSerialNumber;// 汇款流水号
+	private AccountStatus accountStatus;// 入账状态
 	private RemittanceTag remittanceTag;		//入账标签
 
 	public TMisRemittanceMessage() {
@@ -145,14 +139,16 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+
 	@ExcelField(title="交易流水号",type=0, align=2, sort=1)
-	public String getAlipaySerialNumber() {
-		return alipaySerialNumber;
+	public String getRemittanceSerialNumber() {
+		return remittanceSerialNumber;
 	}
 
-	public void setAlipaySerialNumber(String alipaySerialNumber) {
-		this.alipaySerialNumber = alipaySerialNumber;
+	public void setRemittanceSerialNumber(String remittanceSerialNumber) {
+		this.remittanceSerialNumber = remittanceSerialNumber;
 	}
+
 	@ExcelField(title="入账状态",type=0, align=2, sort=8)
 	public AccountStatus getAccountStatus() {
 		return accountStatus;
@@ -182,46 +178,73 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 
 	@Override
 	public String toString() {
-		return "TMisRemittanceMessage [dbid=" + dbid + ", remittancename=" + remittancename + ", remittancetime="
-				+ remittancetime + ", remittanceamount=" + remittanceamount + ", remittancechannel=" + remittancechannel
-				+ ", remittanceaccount=" + remittanceaccount + ", financialuser=" + financialuser + ", financialtime="
-				+ financialtime + ", remittanceimg=" + remittanceimg + ", dealcode=" + dealcode + ", remark=" + remark
-				+ ", alipaySerialNumber=" + alipaySerialNumber + ", accountStatus=" + accountStatus + "]";
+		return "TMisRemittanceMessage{" +
+				"dbid='" + dbid + '\'' +
+				", remittancename='" + remittancename + '\'' +
+				", remittancetime=" + remittancetime +
+				", remittanceamount=" + remittanceamount +
+				", remittancechannel='" + remittancechannel + '\'' +
+				", remittanceaccount='" + remittanceaccount + '\'' +
+				", financialuser='" + financialuser + '\'' +
+				", financialtime=" + financialtime +
+				", remittanceimg='" + remittanceimg + '\'' +
+				", dealcode='" + dealcode + '\'' +
+				", remark='" + remark + '\'' +
+				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
+				", accountStatus=" + accountStatus +
+				", remittanceTag=" + remittanceTag +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		TMisRemittanceMessage that = (TMisRemittanceMessage) o;
+
+		if (remittancechannel != null ? !remittancechannel.equals(that.remittancechannel)
+				: that.remittancechannel != null) {
+			return false;
+		}
+		return remittanceSerialNumber != null ? remittanceSerialNumber.equals(that.remittanceSerialNumber)
+				: super.equals(that);
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((alipaySerialNumber == null) ? 0 : alipaySerialNumber.hashCode());
-		result = prime * result + ((remittancechannel == null) ? 0 : remittancechannel.hashCode());
+		result = 31 * result + (remittancechannel != null ? remittancechannel.hashCode() : 0);
+		result = 31 * result + (remittanceSerialNumber != null ? remittanceSerialNumber.hashCode() : 0);
 		return result;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-
-		TMisRemittanceMessage other = (TMisRemittanceMessage) obj;
-		if (alipaySerialNumber == null) {
-			if (other.alipaySerialNumber != null)
-				return false;
-		} else if (!alipaySerialNumber.equals(other.alipaySerialNumber))
-			return false;
-		if (remittancechannel == null) {
-			if (other.remittancechannel != null)
-				return false;
-		} else if (!remittancechannel.equals(other.remittancechannel))
-			return false;
-		return true;
-	}
-
-
-
+	/**
+	 * @Description 还款标签
+	 * @author jxli
+	 * @version 2017/6/23
+	 */
 	public enum RemittanceTag{
 		REPAYMENT_SELF,//本人还款
 		REPAYMENT_THIRD//第三方还款
+	}
+
+	/**
+	 * 入账状态
+	 * @author jwchi
+	 */
+	public enum AccountStatus {
+		NOT_AUDIT("未查账"),
+		COMPLETE_AUDIT("已查账"),
+		FINISH("已完成");
+		AccountStatus(String desc) {
+			this.desc = desc;
+		}
+
+		public final String desc;
 	}
 	
 }

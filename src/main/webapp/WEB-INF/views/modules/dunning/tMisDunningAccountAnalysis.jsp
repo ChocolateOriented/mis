@@ -46,28 +46,26 @@ function closeSubmitting() {
 </script>
 <style type="text/css" >
 
-.bor{border:1px dashed #F00;width:300px;height:60px;margin-top:10px} 
+.bor{border:1px dashed #F00;width:300px;height:60px;margin-top:10px}
 </style>
 </head>
 <body>
-     <input type="hidden" id="message" value="${message}" />
-	<form id="inputForm" action="${ctx}/dunning/tMisDunningAccountAnalysis/fileUpload" method="post" enctype="multipart/form-data"  >
-		<div>
-		
-	
-			对账渠道 <input type="radio" value="aliPay" name="aliPay"
-				checked="checked" />支付宝
-		</div>
-		<div class="bor">
+<input type="hidden" id="message" value="${message}"/>
+<form id="inputForm" action="${ctx}/dunning/tMisRemittanceMessage/fileUpload" method="post"
+	  enctype="multipart/form-data">
+	<div>
+		对账渠道
+		<input type="radio" value="aliPay" name="aliPay" checked="checked"/>支付宝
+	</div>
 
-			对账文件 ：<input id="file" type="file" name="file"  class="input-xlarge required " />
-		</div>
+	<div class="bor">
+		对账文件 ：<input id="file" type="file" name="file" class="input-xlarge required "/>
+	</div>
 
-		<div>
-
-			<input type="submit"  id="save"  value="确定上传" />
-			 <input type="button" id="remove" value="取消" />
-		</div>
-	</form>
+	<div>
+		<input type="submit" id="save" value="确定上传"/>
+		<input type="button" id="remove" value="取消"/>
+	</div>
+</form>
 </body>
 </html>
