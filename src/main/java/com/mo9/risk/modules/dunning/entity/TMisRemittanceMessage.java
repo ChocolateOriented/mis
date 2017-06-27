@@ -245,6 +245,11 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		}
 
 		public final String desc;
+
+		public String getDesc() {
+			return desc;
+		}
+		
 	}
 	
 }
