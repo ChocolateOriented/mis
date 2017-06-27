@@ -1678,7 +1678,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					
 					/**  * auto Q0 队列 begin  */
-					if(autoQ0.equals("true") && C0.equals(dict) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+					if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
 //						logger.info("autoQ0查询历史借款逾期小于1天的用户订单"  + new Date());
 						TMisDunningTask autoDunningTask = this.autoCreateNewDunningTask(dunningTaskLog, dict);
 						TMisDunningTaskLog autoDunningTaskLog = this.autoCreateNewDunningTaskLog(dunningTaskLog, autoDunningTask);
@@ -1704,10 +1704,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					inDunningTaskLogsMap.put(dunningTask.getId(), dunningTaskLog);
 				}
+				
 				/**  * auto Q0 队列 begin  */
-				if(autoQ0.equals("true")){
+				if(autoQ0.equals("true") && !atuoDunningTasks.isEmpty() && !atuoQ0DunningTaskLogs.isEmpty()){
 					tMisDunningTaskDao.batchinsertTask(atuoDunningTasks);
+					logger.info("保存autoQ0任务" + atuoDunningTasks.size()  + "条"  + new Date());
 					tMisDunningTaskLogDao.batchInsertTaskLog(atuoQ0DunningTaskLogs);
+					logger.info("保存autoQ0任务log" + atuoQ0DunningTaskLogs.size()  + "条"  + new Date());
 				}
 				/** * auto Q0 队列 end  */
 				
