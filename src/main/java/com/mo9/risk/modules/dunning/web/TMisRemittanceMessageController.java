@@ -7,6 +7,7 @@ import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author 徐盛
  * @version 2016-08-11
  */
+@EnableAsync
 @Controller
 @RequestMapping(value = "${adminPath}/dunning/tMisRemittanceMessage")
 public class TMisRemittanceMessageController extends BaseController {
@@ -46,8 +49,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	 * 跳转账目解析页面
 	 */
 	@RequestMapping(value = "analysis")
-	public String AccountAnalysis(HttpServletRequest request, HttpServletResponse response,
-			Model model, String message) {
+	public String AccountAnalysis(Model model, String message) {
 		model.addAttribute("message", message);
 		return "modules/dunning/tMisDunningAccountAnalysis";
 	}
@@ -58,7 +60,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequestMapping(value = "fileUpload")
 	public String fileUpload(MultipartFile file, String channel, RedirectAttributes redirectAttributes) {
-		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/analysis";
+		String redirectUrl = "redirect:analysis";
 		if (null == file || StringUtils.isBlank(channel)){
 			redirectAttributes.addAttribute("message", "参数错误");
 			return redirectUrl;
@@ -80,7 +82,8 @@ public class TMisRemittanceMessageController extends BaseController {
 		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList);
 		int total = tMisRemittanceList.size();
 		int same = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel);
-		//TODO 调用自动匹配
+		//调用自动查账
+		tMisRemittanceMessageService.autoAuditAfterFinancialtime(DateUtils.parseDate(DateUtils.getDate()));
 
 		//上传结果信息
 		StringBuilder message = new StringBuilder();
@@ -94,7 +97,8 @@ public class TMisRemittanceMessageController extends BaseController {
 			message.append(String.format(",重复%d条数据",same));
 		}
 		message.append(errorMsg);
-		redirectAttributes.addAttribute("message",message);
+		logger.info(message.toString());
+		redirectAttributes.addAttribute("message",message.toString());
 		return redirectUrl;
 	}
 }

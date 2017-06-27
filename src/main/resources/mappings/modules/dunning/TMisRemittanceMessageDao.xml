@@ -5,19 +5,19 @@
 	<sql id="tMisRemittanceMessageColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
-		a.remittancename AS "remittancename",
-		a.remittancetime AS "remittancetime",
-		a.remittanceamount AS "remittanceamount",
-		a.remittancechannel AS "remittancechannel",
-		a.remittanceaccount AS "remittanceaccount",
-		a.financialuser AS "financialuser",
-		a.financialtime AS "financialtime",
-		a.remittanceimg AS "remittanceimg",
+		a.remittancename AS "remittanceName",
+		a.remittancetime AS "remittanceTime",
+		a.remittanceamount AS "remittanceAmount",
+		a.remittancechannel AS "remittanceChannel",
+		a.remittanceaccount AS "remittanceAccount",
+		a.financialuser AS "financialUser",
+		a.financialtime AS "financialTime",
 		a.dealcode AS "dealcode",
 		a.remark AS "remark",
 		a.createdate AS "createDate",
 		a.remittanceSerialNumber AS "remittanceSerialNumber",
-		a.accountStatus AS "accountStatus"
+		a.accountStatus AS "accountStatus",
+		a.remittanceTag AS "remittanceTag"
 	</sql>
 	
 	<sql id="tMisRemittanceMessageJoins">
@@ -84,62 +84,6 @@
 		ORDER BY a.createdate DESC limit  1 
 	</select>
 	
-	
-	<insert id="insert">
-		INSERT INTO t_mis_remittance_message(
-			id,
-			remittancename,
-			remittancetime,
-			remittanceamount,
-			remittancechannel,
-			remittanceaccount,
-			financialuser,
-			financialtime,
-			remittanceimg,
-			dealcode,
-			remark,
-			createDate,
-			remittanceSerialNumber,
-			accountStatus
-		) VALUES (
-			#{id},
-			#{remittancename},
-			#{remittancetime},
-			#{remittanceamount},
-			#{remittancechannel},
-			#{remittanceaccount},
-			#{financialuser},
-			#{financialtime},
-			#{remittanceimg},
-			#{dealcode},
-			#{remark},
-			#{createDate},
-			#{remittanceSerialNumber},
-			#{accountStatus}
-		)
-	</insert>
-	
-	<update id="update">
-		UPDATE t_mis_remittance_message SET 	
-			remittancename = #{remittancename},
-			remittancetime = #{remittancetime},
-			remittanceamount = #{remittanceamount},
-			remittancechannel = #{remittancechannel},
-			remittanceaccount = #{remittanceaccount},
-			financialuser = #{financialuser},
-			financialtime = #{financialtime},
-			remittanceimg = #{remittanceimg},
-			remark = #{remark},
-			remittanceSerialNumber = #{remittanceSerialNumber},
-			accountStatus = #{accountStatus}
-		WHERE id = #{id}
-	</update>
-	
-	<update id="delete">
-		DELETE FROM t_mis_remittance_message
-		WHERE id = #{id}
-	</update>
-
 	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
 			<include refid="tMisRemittanceMessageColumns"/>
@@ -153,7 +97,6 @@
 			a.remittancechannel = #{channel}
 	</select>
 
-
 	<insert id="saveList" parameterType="java.util.List">
 		insert into t_mis_remittance_message
 		(
@@ -165,30 +108,32 @@
 			remittanceaccount,
 			financialuser,
 			financialtime,
-			remittanceimg,
 			dealcode,
 			remark,
 			createDate,
 			remittanceSerialNumber,
-			accountStatus
+			accountStatus,
+			updateDate,
+			updateby
 		)
 		values
 		<foreach collection="list" index="index" item="item" separator="," >
 		(
 			#{item.id},
-			#{item.remittancename},
-			#{item.remittancetime},
-			#{item.remittanceamount},
-			#{item.remittancechannel},
-			#{item.remittanceaccount},
-			#{item.financialuser},
-			#{item.financialtime},
-			#{item.remittanceimg},
+			#{item.remittanceName},
+			#{item.remittanceTime},
+			#{item.remittanceAmount},
+			#{item.remittanceChannel},
+			#{item.remittanceAccount},
+			#{item.financialUser},
+			#{item.financialTime},
 			#{item.dealcode},
 			#{item.remark},
 			#{item.createDate},
 			#{item.remittanceSerialNumber},
-			#{item.accountStatus}
+			#{item.accountStatus},
+			#{item.updateDate},
+			#{item.updateBy.id}
 		)
 		</foreach>
 
@@ -196,7 +141,7 @@
 	</insert>
 
 
-	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.Set">
+	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
 		SELECT
 		o.dealcode AS "dealcode",
 		b.mobile AS "mobile",
@@ -210,7 +155,7 @@
 		AND o.`status`= 'payment'
 		AND o.type = 'loan'
 		AND b.mobile IN
-		<foreach collection="mobiles" index="mobile" open="(" separator="," close=")">
+		<foreach collection="list" index="mobile" open="(" separator="," close=")">
 			#{mobile}
 		</foreach>
 	</select>
@@ -222,9 +167,24 @@
 				updatedate = now(),
 				updateby = "sys",
 				dealcode = #{item.dealcode},
-				accountStatus = #{item.accountStatus}
+				accountStatus = #{item.accountStatus},
+				remittanceTag = #{item.remittanceTag}
 			</set>
 			WHERE id = #{item.id}
 		</foreach>
 	</update>
+
+	<select id="findAfterFinancialTimeNotAuditList" resultType="TMisRemittanceMessage">
+		SELECT
+			<include refid="tMisRemittanceMessageColumns"/>
+		FROM
+			t_mis_remittance_message AS a
+		WHERE
+			accountStatus = "NOT_AUDIT"
+		<if test="date != null">
+			<![CDATA[
+      	AND a.financialtime > #{date}
+      ]]>
+		</if>
+	</select>
 </mapper>

@@ -8,6 +8,7 @@ import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.RemittanceTag;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -26,6 +27,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,20 +95,30 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	}
 
 	/**
+	 * @Description 财务上传时间在参数之后的汇款自动查账
+	 * @param date
+	 * @return void
+	 */
+	@Async
+	@Transactional(readOnly = false)
+	public void autoAuditAfterFinancialtime(Date date) {
+		List<TMisRemittanceMessage> list = dao.findAfterFinancialTimeNotAuditList(date);
+		this.autoAudit(list);
+	}
+	/**
 	 * @Description 自动查账, 借款订单与汇款信息匹配
 	 * 若汇款信息备注中有手机号, 则使用备注手机号匹配未还款订单
 	 * 备注中无手机号的 + 备注手机号未匹配成功的汇款信息, 若账号为手机号使用账号进行匹配
 	 * @param remittanceMessages
 	 *   需要查账的汇款信息
-	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage>
-	 *   匹配成功的汇款信息
 	 */
 	@Transactional(readOnly = false)
-	public List<TMisRemittanceMessage> autoAudit(List<TMisRemittanceMessage> remittanceMessages){
+	public void autoAudit(List<TMisRemittanceMessage> remittanceMessages){
 		if (null == remittanceMessages || remittanceMessages.size()== 0 ){
 			logger.info("汇款信息为空, 未进行自动查账");
-			return null;
+			return ;
 		}
+		logger.info("开始自动匹配,汇款信息共"+remittanceMessages.size()+"条");
 		//获取备注中包含手机号的汇款信息
 		HashMap<String,TMisRemittanceMessage> containMobileInRemarkMap = new HashMap<String, TMisRemittanceMessage>(remittanceMessages.size());
 		for (TMisRemittanceMessage remittanceMessage: remittanceMessages ) {
@@ -125,7 +137,7 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 			}
 		}
 		List<TMisRemittanceMessage> successMatchByRemark = this.matchOrderWithMobil(containMobileInRemarkMap);
-
+		logger.info("通过备注匹配成功:"+successMatchByRemark.size()+"条");
 		//使用作为账号的手机号匹配(备注匹配失败 + 备注中不包含手机号)
 		Collection<TMisRemittanceMessage> containMobileInRemark = containMobileInRemarkMap.values();
 		remittanceMessages.removeAll(containMobileInRemark);
@@ -141,30 +153,14 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 				continue;
 			}
 			//检查账号是否使手机号
-			String account = remittanceMessage.getRemittanceaccount();
+			String account = remittanceMessage.getRemittanceAccount();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_MOBILE,account);
 			if (StringUtils.isNotBlank(mobile)){
 				accountIsMobileMap.put(mobile,remittanceMessage);
 			}
 		}
 		List<TMisRemittanceMessage> successMatchByAccount = this.matchOrderWithMobil(containMobileInRemarkMap);
-
-		List<TMisRemittanceMessage> successMatch = new ArrayList<TMisRemittanceMessage>(successMatchByAccount.size()+successMatchByRemark.size());
-		successMatch.addAll(successMatchByRemark);
-		successMatch.addAll(successMatchByAccount);
-		return successMatch ;
-
-		/**
-		 * TODO 还款标签
-		 * 备注中姓名与借款人姓名比对
-		 * 	不等>不打标签
-		 * 	相等>账户名与借款人姓名比对
-		 * 		相等>本人还款
-		 * 		不相等>第三方还款
-		 */
-		//本人还款
-		//第三方还款
-		//不确定
+		logger.info("通过账号匹配成功:"+successMatchByAccount.size()+"条");
 	}
 
 	/**
@@ -175,16 +171,16 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	@Transactional(readOnly = false)
 	public List<TMisRemittanceMessage> matchOrderWithMobil(HashMap<String, TMisRemittanceMessage> containMobileMap) {
 		if (null == containMobileMap){
-			return null;
+			return new ArrayList<TMisRemittanceMessage>();
 		}
 		Set<String> mobiles = containMobileMap.keySet();
 		if (mobiles.size()==0){
-			return null;
+			return new ArrayList<TMisRemittanceMessage>();
 		}
 		//通过手机号批量查询未还款订单的用户信息
-		List<DunningOrder> orders = dao.findPaymentOrderByMobile(mobiles);
+		List<DunningOrder> orders = dao.findPaymentOrderByMobile(new ArrayList<String>(mobiles));
 		if (orders ==null || orders.size()==0){
-			return null;
+			return new ArrayList<TMisRemittanceMessage>();
 		}
 
 		//匹配订单
@@ -200,7 +196,7 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 			}
 			remittanceMessage.setDealcode(order.getDealcode());
 			remittanceMessage.setAccountStatus(AccountStatus.COMPLETE_AUDIT);
-			this.addTemittanceTag(remittanceMessage,order);
+			this.autoAddTemittanceTag(remittanceMessage,order);
 			successMatchList.add(remittanceMessage);
 		}
 		dao.batchUpdateMatched(successMatchList);
@@ -208,13 +204,30 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	}
 
 	/**
-	 * @Description 对还款行为打标签
+	 * @Description 自动对还款行为打标签
 	 * @param remittanceMessage
 	 * @param order
 	 * @return void
 	 */
-	private void addTemittanceTag(TMisRemittanceMessage remittanceMessage, DunningOrder order) {
-
+	private void autoAddTemittanceTag(TMisRemittanceMessage remittanceMessage, DunningOrder order) {
+		String realName = order.getRealname();
+		if (StringUtils.isBlank(realName)){
+			return;
+		}
+		//如果账户姓名等于借款人姓名则标记本人还款
+		String remittanceAccount = remittanceMessage.getRemittanceAccount();
+		if (realName.equals(remittanceAccount)){
+			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_SELF);
+			return;
+		}
+		//账户名不等, 若备注中包含借款人姓名则标记第三方还款
+		String remark = remittanceMessage.getRemark();
+		if (StringUtils.isBlank(remark)){
+			return;
+		}
+		if (remark.contains(realName)){
+			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_THIRD);
+		}
 	}
 
 	/**
@@ -237,7 +250,7 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 			try{
 				BeanValidators.validateWithException(validator, trExcel);
 			}catch(ConstraintViolationException ex){
-				errorMsg.append("数据不符合规范:流水号为" + trExcel.getAlipaySerialNumber()+"<br/>");
+				errorMsg.append("数据不符合规范:流水号为" + trExcel.getAlipaySerialNumber()+"。");
 				fail++;
 				continue;
 			}
@@ -246,25 +259,26 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 			try {
 				parseTime = sd.parse(trExcel.getRemittancetime());
 			} catch (ParseException e) {
-				errorMsg.append("时间格式错误:流水号为" + trExcel.getAlipaySerialNumber()+"<br/>");
+				errorMsg.append("时间格式错误:流水号为" + trExcel.getAlipaySerialNumber()+"。");
 				fail++;
 				continue;
 			}
 
 			TMisRemittanceMessage trMessage = new TMisRemittanceMessage();
-			trMessage.setRemittancetime(parseTime);
+			trMessage.setRemittanceTime(parseTime);
 			trMessage.setRemittanceSerialNumber(trExcel.getAlipaySerialNumber());
-			trMessage.setRemittancechannel("alipay");
-			trMessage.setRemittanceamount(trExcel.getRemittanceamount());
-			trMessage.setRemittancename(trExcel.getRemittancename());
-			trMessage.setRemittanceaccount(trExcel.getRemittanceaccount());
+			trMessage.setRemittanceChannel("alipay");
+			trMessage.setRemittanceAmount(trExcel.getRemittanceamount());
+			trMessage.setRemittanceName(trExcel.getRemittancename());
+			trMessage.setRemittanceAccount(trExcel.getRemittanceaccount());
 			trMessage.setRemark(trExcel.getRemark());
 			trMessage.setAccountStatus(AccountStatus.NOT_AUDIT);
-			trMessage.setFinancialtime(uploadDate);
-			trMessage.setFinancialuser(UserUtils.getUser().getName());
+			trMessage.setFinancialTime(uploadDate);
+			trMessage.setFinancialUser(UserUtils.getUser().getName());
 			trMessage.preInsert();
 			validData.add(trMessage);
 		}
-		return fail > 0 ? ",失败"+fail+"条,失败原因:<br/>" + errorMsg : "";
+		return fail > 0 ? ",失败"+fail+"条,失败原因:" + errorMsg : "";
 	}
+
 }

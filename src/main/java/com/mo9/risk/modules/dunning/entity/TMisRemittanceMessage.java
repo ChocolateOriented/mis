@@ -3,13 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
-import org.hibernate.validator.constraints.Length;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
-import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.util.NumberUtil;
+import java.util.Date;
 
 /**
  * 财务确认汇款信息Entity
@@ -20,14 +15,13 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	
 	private static final long serialVersionUID = 1L;
 	private String dbid;		// dbid
-	private String remittancename;		// 汇款人姓名
-	private Date remittancetime;		// 汇款时间
-	private Double remittanceamount;		// 金额
-	private String remittancechannel;		// 汇款渠道
-	private String remittanceaccount;		// 汇款帐号
-	private String financialuser;		// 财务确认人
-	private Date financialtime;		// 财务确认时间
-	private String remittanceimg;		// 汇款图片
+	private String remittanceName;		// 汇款人姓名
+	private Date remittanceTime;		// 汇款时间
+	private Double remittanceAmount;		// 金额
+	private String remittanceChannel;		// 汇款渠道
+	private String remittanceAccount;		// 汇款帐号
+	private String financialUser;		// 财务确认人
+	private Date financialTime;		// 财务确认时间
 	private String dealcode;
 	private String remark;    // 备注
 	private String remittanceSerialNumber;// 汇款流水号
@@ -42,8 +36,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		super(id);
 	}
 
-	@Length(min=1, max=11, message="dbid长度必须介于 1 和 11 之间")
-//	@ExcelField(title="登录名", align=2, sort=30)
 	public String getDbid() {
 		return dbid;
 	}
@@ -51,79 +43,63 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setDbid(String dbid) {
 		this.dbid = dbid;
 	}
-	
-	@Length(min=0, max=128, message="汇款人姓名长度必须介于 0 和 128 之间")
-	@ExcelField(title="对方名称",type=0, align=2, sort=5)
-	public String getRemittancename() {
-		return remittancename;
+
+	public String getRemittanceName() {
+		return remittanceName;
 	}
 
-	public void setRemittancename(String remittancename) {
-		this.remittancename = remittancename;
-	}
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@ExcelField(title="入账时间",type=0, align=2, sort=2)
-	public Date getRemittancetime() {
-		return remittancetime;
+	public void setRemittanceName(String remittanceName) {
+		this.remittanceName = remittanceName;
 	}
 
-	public void setRemittancetime(Date remittancetime) {
-		this.remittancetime = remittancetime;
-	}
-	
-	public Double getRemittanceamount() {
-		return remittanceamount;
-	}
-	
-	@ExcelField(title="收入（+元）",type=0, align=2, sort=4)
-	public String getRemittanceamountText() {
-		return null != this.remittanceamount ? NumberUtil.formatTosepara(this.remittanceamount) : "";
-	}
-	public void setRemittanceamount(Double remittanceamount) {
-		this.remittanceamount = remittanceamount;
-	}
-	
-	@Length(min=0, max=64, message="汇款渠道长度必须介于 0 和 64 之间")
-	@ExcelField(title="支付渠道",type=0, align=2, sort=3)
-	public String getRemittancechannel() {
-		return remittancechannel;
+	public Date getRemittanceTime() {
+		return remittanceTime;
 	}
 
-	public void setRemittancechannel(String remittancechannel) {
-		this.remittancechannel = remittancechannel;
-	}
-	
-	@Length(min=0, max=64, message="汇款帐号长度必须介于 0 和 64 之间")
-	@ExcelField(title="对方账户",type=0, align=2, sort=6)
-	public String getRemittanceaccount() {
-		return remittanceaccount;
+	public void setRemittanceTime(Date remittanceTime) {
+		this.remittanceTime = remittanceTime;
 	}
 
-	public void setRemittanceaccount(String remittanceaccount) {
-		this.remittanceaccount = remittanceaccount;
-	}
-	
-	@Length(min=0, max=128, message="财务确认人长度必须介于 0 和 128 之间")
-	@ExcelField(title="上传人",type=0, align=2, sort=10)
-	public String getFinancialuser() {
-		return financialuser;
+	public Double getRemittanceAmount() {
+		return remittanceAmount;
 	}
 
-	public void setFinancialuser(String financialuser) {
-		this.financialuser = financialuser;
-	}
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@ExcelField(title="上传时间",type=0, align=2, sort=9)
-	public Date getFinancialtime() {
-		return financialtime;
+	public void setRemittanceAmount(Double remittanceAmount) {
+		this.remittanceAmount = remittanceAmount;
 	}
 
-	public void setFinancialtime(Date financialtime) {
-		this.financialtime = financialtime;
+	public String getRemittanceChannel() {
+		return remittanceChannel;
 	}
-	
+
+	public void setRemittanceChannel(String remittanceChannel) {
+		this.remittanceChannel = remittanceChannel;
+	}
+
+	public String getRemittanceAccount() {
+		return remittanceAccount;
+	}
+
+	public void setRemittanceAccount(String remittanceAccount) {
+		this.remittanceAccount = remittanceAccount;
+	}
+
+	public String getFinancialUser() {
+		return financialUser;
+	}
+
+	public void setFinancialUser(String financialUser) {
+		this.financialUser = financialUser;
+	}
+
+	public Date getFinancialTime() {
+		return financialTime;
+	}
+
+	public void setFinancialTime(Date financialTime) {
+		this.financialTime = financialTime;
+	}
+
 	public String getDealcode() {
 		return dealcode;
 	}
@@ -131,7 +107,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setDealcode(String dealcode) {
 		this.dealcode = dealcode;
 	}
-	@ExcelField(title="备注",type=0, align=2, sort=7)
 	public String getRemark() {
 		return remark;
 	}
@@ -140,7 +115,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remark = remark;
 	}
 
-	@ExcelField(title="交易流水号",type=0, align=2, sort=1)
 	public String getRemittanceSerialNumber() {
 		return remittanceSerialNumber;
 	}
@@ -149,7 +123,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceSerialNumber = remittanceSerialNumber;
 	}
 
-	@ExcelField(title="入账状态",type=0, align=2, sort=8)
 	public AccountStatus getAccountStatus() {
 		return accountStatus;
 	}
@@ -158,15 +131,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.accountStatus = accountStatus;
 	}
 	
-	
-	public String getRemittanceimg() {
-		return remittanceimg;
-	}
-
-	public void setRemittanceimg(String remittanceimg) {
-		this.remittanceimg = remittanceimg;
-	}
-
 	public RemittanceTag getRemittanceTag() {
 		return remittanceTag;
 	}
@@ -180,14 +144,13 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public String toString() {
 		return "TMisRemittanceMessage{" +
 				"dbid='" + dbid + '\'' +
-				", remittancename='" + remittancename + '\'' +
-				", remittancetime=" + remittancetime +
-				", remittanceamount=" + remittanceamount +
-				", remittancechannel='" + remittancechannel + '\'' +
-				", remittanceaccount='" + remittanceaccount + '\'' +
-				", financialuser='" + financialuser + '\'' +
-				", financialtime=" + financialtime +
-				", remittanceimg='" + remittanceimg + '\'' +
+				", remittanceName='" + remittanceName + '\'' +
+				", remittanceTime=" + remittanceTime +
+				", remittanceAmount=" + remittanceAmount +
+				", remittanceChannel='" + remittanceChannel + '\'' +
+				", remittanceAccount='" + remittanceAccount + '\'' +
+				", financialUser='" + financialUser + '\'' +
+				", financialTime=" + financialTime +
 				", dealcode='" + dealcode + '\'' +
 				", remark='" + remark + '\'' +
 				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
@@ -207,8 +170,8 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 
 		TMisRemittanceMessage that = (TMisRemittanceMessage) o;
 
-		if (remittancechannel != null ? !remittancechannel.equals(that.remittancechannel)
-				: that.remittancechannel != null) {
+		if (remittanceChannel != null ? !remittanceChannel.equals(that.remittanceChannel)
+				: that.remittanceChannel != null) {
 			return false;
 		}
 		return remittanceSerialNumber != null ? remittanceSerialNumber.equals(that.remittanceSerialNumber)
@@ -218,7 +181,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();
-		result = 31 * result + (remittancechannel != null ? remittancechannel.hashCode() : 0);
+		result = 31 * result + (remittanceChannel != null ? remittanceChannel.hashCode() : 0);
 		result = 31 * result + (remittanceSerialNumber != null ? remittanceSerialNumber.hashCode() : 0);
 		return result;
 	}

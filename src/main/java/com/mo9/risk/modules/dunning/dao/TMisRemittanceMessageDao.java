@@ -4,17 +4,12 @@
 package com.mo9.risk.modules.dunning.dao;
 
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
-
-import java.util.LinkedList;
+import java.util.Date;
 import java.util.List;
-
 import org.apache.ibatis.annotations.Param;
-
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import java.util.List;
-import java.util.Set;
 
 /**
  * 财务确认汇款信息DAO接口
@@ -26,11 +21,13 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	
 	public TMisRemittanceMessage findRemittanceMesListByDealcode(String code);
 
-	List<DunningOrder> findPaymentOrderByMobile(Set<String> mobiles);
+	List<DunningOrder> findPaymentOrderByMobile(List<String> mobiles);
 
 	public List<TMisRemittanceMessage> findBySerialNumbers(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList,@Param("channel")String channel);
 
 	public int saveList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
 
 	void batchUpdateMatched(List<TMisRemittanceMessage> successMatchList);
+
+	List<TMisRemittanceMessage> findAfterFinancialTimeNotAuditList(Date date);
 }
