@@ -140,12 +140,12 @@
 		WHERE id = #{id}
 	</update>
 
-	<select id="findByList" resultType="TMisRemittanceMessage">
+	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
 			<include refid="tMisRemittanceMessageColumns"/>
 			from t_mis_remittance_message a
 			where
-			remittanceSerialNumber  in
+			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
 			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>

@@ -80,8 +80,8 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 	 * @return int
 	 */
 	@Transactional(readOnly = false)
-	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList,String chanel) {
-		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList,chanel);
+	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList,String channel) {
+		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList,channel);
 		int same=trMList.size();
 		if(trMList.size()>0&&trMList!=null){
 			tMisRemittanceList.removeAll(trMList);
