@@ -89,18 +89,9 @@
 		}
 		
 		function getBuyerIdCardImg() {
-			$.get("${ctx}/dunning/tMisDunningTask/getBuyerIdCardImg", {buyerId: "${buyerId}"}, function(data) {
-				if (!data) {
-					$.jBox.tip("身份证影像资料不存在", "warning");
-					return;
-				}
-				$.jBox.open("iframe:https://riskadmin.mo9.com/file/showPic.a?fileId=" + data, "手持身份证", 800, 700, {
-					buttons: {},
-					loaded: function (h) {
-						$(".jbox-content", document).css("overflow-y", "hidden");
-					}
-				});
-			})
+			$.jBox.open("<img src='${ctx}/dunning/tMisDunningTask/showBuyerIdCardImg?buyerId=${buyerId}'/>", "手持身份证", 800, 700, {
+				buttons: {}
+			});
 		}
 	</script>
 </head>

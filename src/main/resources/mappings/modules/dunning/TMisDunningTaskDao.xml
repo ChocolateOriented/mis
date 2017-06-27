@@ -893,6 +893,17 @@
                 #{item}
             </foreach>
         </if>
+        <if test="groupIds != null">
+            AND p.groupId in
+			<if test="groupIds.size == 0">
+				('')
+			</if>
+			<if test="groupIds.size > 0">
+	            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+	                #{groupId}
+	            </foreach>
+			</if>
+        </if>
         <if test="mobile != null and mobile != ''">
                 <!-- 			     # 手机号码 -->
                 AND b.mobile LIKE concat('%',#{mobile},'%')
@@ -1371,6 +1382,17 @@
 				WHERE Field1 = 'active'
 		        <if test="group != null and group.id != null and group.id !=''">
 					AND groupid = #{group.id}
+		        </if>
+		        <if test="group != null and group.groupIds != null">
+		        	AND groupid IN
+					<if test="group.groupIds.size == 0">
+						('')
+					</if>
+					<if test="group.groupIds.size > 0">
+						<foreach item="item" collection="group.groupIds" open="(" close=")" separator=",">
+							#{item}
+						</foreach>
+					</if>
 		        </if>
 				) AS p
 			LEFT JOIN (

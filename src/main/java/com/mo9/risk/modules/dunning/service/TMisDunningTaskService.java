@@ -36,6 +36,7 @@ import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
+import com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
@@ -56,6 +57,7 @@ import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -88,6 +90,7 @@ import com.thinkgem.jeesite.util.ListSortUtil;
 public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMisDunningTask> {
 
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
+	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
 	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
 	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  内部催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
@@ -116,6 +119,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	private TMisDunningTaskLogDao tMisDunningTaskLogDao;
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
+	@Autowired
+	private TMisDunningGroupDao tMisDunningGroupDao;
 	@Autowired
 	private TMisDunnedHistoryDao tMisDunnedHistoryDao;
 	
@@ -800,6 +805,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			if(("财务主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
 				permissions = 1000;
 			}
+			if(("催收监理").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
+				permissions = 10000;
+				break;
+			}
 		}
 		return permissions;
 	}
@@ -894,6 +903,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
+		}
+		if(DUNNING_SUPERVISOR == permissions){
+			TMisDunningGroup group = new TMisDunningGroup();
+			group.setSupervisor(UserUtils.getUser());
+			List<String> groupIds = tMisDunningGroupDao.findSupervisorGroupList(group);
+			entity.setGroupIds(groupIds);
 		}
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");

@@ -69,6 +69,17 @@
 			<if test="group != null and group.id != null and group.id !='' ">
 				AND a.`groupId` = #{group.id}
 			</if>
+			<if test="group != null and group.groupIds != null">
+				AND a.`groupId` IN
+				<if test="group.groupIds.size == 0">
+					('')
+				</if>
+				<if test="group.groupIds.size > 0">
+					<foreach item="groupId" collection="group.groupIds" open="(" close=")" separator=",">
+						#{groupId}
+					</foreach>
+				</if>
+			</if>
 			<if test="group != null and group.queryTypes != null and group.queryTypes.size != 0 ">
 				AND g.type in 
 				<foreach item="item" index="index" collection="group.queryTypes" open="(" separator="," close=")">
@@ -95,6 +106,17 @@
 			a.Invalid = 't'
 		<if test="group != null and group.id != null and group.id !='' ">
 			AND a.`groupId` = #{group.id}
+		</if>
+		<if test="group != null and group.groupIds != null">
+			AND a.`groupId` IN
+			<if test="group.groupIds.size == 0">
+				('')
+			</if>
+			<if test="group.groupIds.size > 0">
+				<foreach item="item" collection="group.groupIds" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
 		</if>
 		<if test="nickname != null and nickname != ''">
 			AND a.nickname LIKE concat('%',#{nickname},'%')
