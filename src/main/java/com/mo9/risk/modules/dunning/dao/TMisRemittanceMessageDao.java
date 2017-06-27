@@ -32,5 +32,4 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	public int saveList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
 
-	void batchUpdateMatched(List<TMisRemittanceMessage> successMatchList);
 }

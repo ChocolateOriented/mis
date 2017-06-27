@@ -7,31 +7,29 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	closeSubmitting();
-//    $("#inputForm").validate({
-	   
-// 	   submitHandler: function(form){
-// 			loading('loading');
-// 			form.submit();
-// 		}
-//    });
-// 	   closeLoading();
+   $("#inputForm").submit(function(){
+	 
+		 if(!$("#inputForm").valid()){
+			 return false;
+		 }else{
+				
+			submitting() ;
+		 }
+   });
 	
 	
 	$("#remove").click(function(){
 		
 		$("#file").val("");
 	});
-	$("#save").click(function(){
-		
-		$("#save").attr("disabled" ,true);
-		
-		submitting() ;
-	});
+	
 	
 	if($("#message").val()){
 		$.jBox.tip($("#message").val());
 		$("#message").val("");
 	}
+	
+	
 	
 });
 
@@ -43,29 +41,36 @@ function closeSubmitting() {
 	$.jBox.tip.mess = null;
 	$.jBox.closeTip();
 }
+
 </script>
 <style type="text/css" >
-
-.bor{border:1px dashed #F00;width:300px;height:60px;margin-top:10px}
+.div{ margin:0 auto; width:400px; height:100px; }
+input.bor {border:1px dashed #444444;width:300px;height:160px;margin-top:10px}  
+.divp{padding:20px 180px;}
 </style>
 </head>
 <body>
-<input type="hidden" id="message" value="${message}"/>
-<form id="inputForm" action="${ctx}/dunning/tMisRemittanceMessage/fileUpload" method="post"
-	  enctype="multipart/form-data">
-	<div>
-		对账渠道
-		<input type="radio" value="aliPay" name="aliPay" checked="checked"/>支付宝
-	</div>
+     <input type="hidden" id="message" value="${message}" />
+	<form  id="inputForm" action="${ctx}/dunning/tMisRemittanceMessage/fileUpload" method="post" enctype="multipart/form-data"  >
 
-	<div class="bor">
-		对账文件 ：<input id="file" type="file" name="file" class="input-xlarge required "/>
-	</div>
+		<div class="control-group divp" >
+			<label class="control-label">对账渠道 	</label>
+			<input type="radio" value="aliPay" name="channel" checked="checked" />支付宝
+		</div>
+		<div class="control-group divp">
+			<label class="control-label">对账文件</label>
+            <input   id="file" type="file" name="file"  class="input-xlarge required bor divp " />
+            <div class=" divp" >
+               <font color="red">可拖拽至虚线框上传</font>    
+            </div>
+			
+		</div>
 
-	<div>
-		<input type="submit" id="save" value="确定上传"/>
-		<input type="button" id="remove" value="取消"/>
-	</div>
-</form>
+		<div class="control-group  divp"> 
+			<input type="submit" class="btn btn-primary" id="save"  value="确定上传" />
+			<input type="button" class="btn btn-primary" id="remove" value="取消" />
+		</div>
+		
+	</form>
 </body>
 </html>

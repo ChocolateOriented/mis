@@ -140,7 +140,7 @@
 		WHERE id = #{id}
 	</update>
 
-	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
+	<select id="findByList" resultType="TMisRemittanceMessage">
 			select
 			<include refid="tMisRemittanceMessageColumns"/>
 			from t_mis_remittance_message a
@@ -150,7 +150,7 @@
 			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>
 			and
-			remittancechannel = #{chanel}
+			a.remittancechannel = #{channel}
 	</select>
 
 
