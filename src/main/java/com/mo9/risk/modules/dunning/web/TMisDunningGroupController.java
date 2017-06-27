@@ -1,5 +1,7 @@
 package com.mo9.risk.modules.dunning.web;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -106,5 +109,48 @@ public class TMisDunningGroupController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
 	}
 	
+	/**
+	 * @Description: 分配催收小组页面
+	 */
+	@RequiresPermissions("dunning:TMisDunningGroup:edit")
+	@RequestMapping(value = "distribution")
+	public String distribution(HttpServletRequest request, Model model) {
+		String groups = request.getParameter("groups");
+		if (groups != null) {
+			String[] groupsArr = groups.split(",");
+			model.addAttribute("groups", groupsArr);
+		}
+		model.addAttribute("users", tMisDunningGroupService.findUserList());
+		return "modules/dunning/dialog/dialogGroupDistribution";
+	}
 	
+	/**
+	 * @Description: 保存分配催收小组
+	 */
+	@RequiresPermissions("dunning:TMisDunningGroup:edit")
+	@RequestMapping(value = "saveDistribution")
+	@ResponseBody
+	public String saveDistribution(TMisDunningGroup tMisDunningGroup, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
+		tMisDunningGroupService.saveDistribution(tMisDunningGroup);
+		addMessage(redirectAttributes, "分配催收小组成功");
+		return "OK";
+	}
+	
+	/**
+	 * @Description: 重置催收小组监理
+	 */
+	@RequiresPermissions("dunning:TMisDunningGroup:edit")
+	@RequestMapping(value = "resetSupervisor")
+	public String resetSupervisor(TMisDunningGroup tMisDunningGroup, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
+		String groups = request.getParameter("groups");
+		if (groups == null) {
+			addMessage(redirectAttributes, "重置催收小组监理失败");
+			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
+		}
+		
+		String[] groupsArr = groups.split(",");
+		tMisDunningGroup.setGroupIds(Arrays.asList(groupsArr));
+		tMisDunningGroupService.resetSupervisorGroup(tMisDunningGroup);
+		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
+	}
 }

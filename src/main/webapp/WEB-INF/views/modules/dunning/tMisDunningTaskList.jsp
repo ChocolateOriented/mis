@@ -7,6 +7,16 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			var groups = [];
+			if ("${supervisorLimit}" == "true") {
+				var groupOptions = $("#groupList")[0].options;
+				for (var i = 0; i < groupOptions.length; i++) {
+					if (groupOptions[i].value) {
+						groups.push(groupOptions[i].value);
+					}
+				}
+			}
+			
 			 $("a").click(function(){
 				$("a").css("color","");
 				$(this).css("color","#FF8C00");
@@ -29,7 +39,9 @@
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
 			        	var groupId=$("#groupList").val(); 
-		            	return {'group.id': groupId , nickname:term};
+		            	return {'group.id': groupId, 
+		            		'group.groupIds': groups.toString(),
+		            		nickname:term};
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	return { results: data };
