@@ -19,7 +19,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author 徐盛
  * @version 2016-08-11
  */
-public class TMisRemittanceExcel extends DataEntity<TMisRemittanceExcel> {
+public class AlipayRemittanceExcel extends DataEntity<AlipayRemittanceExcel> {
 
 	private static final long serialVersionUID = 1L;
 

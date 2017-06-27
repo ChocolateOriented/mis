@@ -3,24 +3,17 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceExcel;
+import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
-import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -65,90 +58,43 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequestMapping(value = "fileUpload")
 	public String fileUpload(MultipartFile file, String channel, RedirectAttributes redirectAttributes) {
-		ImportExcel ei = null;
-		List<TMisRemittanceExcel> list = null;
+		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/analysis";
+		if (null == file || StringUtils.isBlank(channel)){
+			redirectAttributes.addAttribute("message", "参数错误");
+			return redirectUrl;
+		}
+		//解析上传Excel
+		List<AlipayRemittanceExcel> list ;
 		logger.info("正在接析文件:" + file.getOriginalFilename());
 		try {
-			ei = new ImportExcel(file, 1, 0);
-			list = ei.getDataList(TMisRemittanceExcel.class);
+			ImportExcel ei = new ImportExcel(file, 1, 0);
+			list = ei.getDataList(AlipayRemittanceExcel.class);
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
 			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误");
-			return "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/analysis";
+			return redirectUrl;
 		}
 
-//		tMisRemittanceMessageService.saveBy
+		//校验,保存汇款信息
 		LinkedList<TMisRemittanceMessage> tMisRemittanceList = new LinkedList<TMisRemittanceMessage>();
-		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		//记录解析成功的条数
-		int sucess = 0;
-		//记录解析失败的条数
-		int fail = 0;
-		//记录重复的数据
-		int same = 0;
-		Date uploadDate = new Date();
-		for (TMisRemittanceExcel trExcel : list) {
-			if (!"转账".equals(trExcel.getServeType())) {
-				continue;
-			}
-			try{
-				BeanValidators.validateWithException(validator, trExcel);
-			}catch(ConstraintViolationException ex){
-				fail++;
-				continue;
-			}
+		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList);
+		int total = tMisRemittanceList.size();
+		int same = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel);
+		//TODO 调用自动匹配
 
-			Date parseTime = null;
-			try {
-				parseTime = sd.parse(trExcel.getRemittancetime());
-			} catch (ParseException e) {
-				logger.warn("时间格式错误:流水号为" + trExcel.getAlipaySerialNumber());
-				fail++;
-				continue;
-			}
-			TMisRemittanceMessage trMessage = new TMisRemittanceMessage();
-			trMessage.setRemittancetime(parseTime);
-			trMessage.setRemittanceSerialNumber(trExcel.getAlipaySerialNumber());
-			trMessage.setRemittancechannel(channel);
-			trMessage.setRemittanceamount(trExcel.getRemittanceamount());
-			trMessage.setRemittancename(trExcel.getRemittancename());
-			trMessage.setRemittanceaccount(trExcel.getRemittanceaccount());
-			trMessage.setRemark(trExcel.getRemark());
-			trMessage.setAccountStatus(AccountStatus.NOT_AUDIT);
-			trMessage.setFinancialtime(uploadDate);
-			trMessage.setFinancialuser(UserUtils.getUser().getName());
-			trMessage.preInsert();
-			tMisRemittanceList.add(trMessage);
-			sucess++;
+		//上传结果信息
+		StringBuilder message = new StringBuilder();
+		if (StringUtils.isBlank(errorMsg)){
+			message.append("上传完成");
+		}else {
+			message.append("上传失败");
 		}
-
-		same = tMisRemittanceMessageService.fileUpload(tMisRemittanceList);
-		String message = "";
-		if (same == 0) {
-			if (fail == 0) {
-				message = String.format("上传完成，共导入%d/%d条数据", sucess, sucess);
-				redirectAttributes.addAttribute("message", message);
-			}
-
-			if (fail > 0) {
-				message = String.format("上传失败，共导入%d/%d条数据", sucess, sucess + fail);
-				redirectAttributes.addAttribute("message", message);
-
-			}
+		message.append(String.format(",共导入%d/%d条数据",total-same,total));
+		if(same>0){
+			message.append(String.format(",重复%d条数据",same));
 		}
-		if (same > 0) {
-			if (fail == 0) {
-				message = String.format("上传完成，共导入%d/%d条数据,重复%d条数据", sucess - same, sucess, same);
-				redirectAttributes.addAttribute("message", message);
-			}
-
-			if (fail > 0) {
-				message = String.format("上传失败，共导入%d/%d条数据,重复%d条数据", sucess - same, sucess + fail, same);
-				redirectAttributes.addAttribute("message", message);
-
-			}
-		}
-
-		return "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/analysis";
+		message.append(errorMsg);
+		redirectAttributes.addAttribute("message",message);
+		return redirectUrl;
 	}
 }

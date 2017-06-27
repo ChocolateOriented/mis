@@ -140,7 +140,7 @@
 		WHERE id = #{id}
 	</update>
 
-	<select id="findByList" resultType="TMisRemittanceMessage">
+	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
 			<include refid="tMisRemittanceMessageColumns"/>
 			from t_mis_remittance_message a
@@ -150,7 +150,7 @@
 			   #{tMisRemittanceMessage.remittanceSerialNumber}
 			</foreach>
 			and
-			remittancechannel = #{remittancechannel}
+			remittancechannel = #{chanel}
 	</select>
 
 
@@ -199,17 +199,32 @@
 	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.Set">
 		SELECT
 		o.dealcode AS "dealcode",
-		b.mobile AS "mobile"
+		b.mobile AS "mobile",
+		idc.real_name AS "realname"
 		FROM
 		t_risk_order AS o
 		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
 		WHERE
 		o.merchant_id = 7
 		AND o.`status`= 'payment'
+		AND o.type = 'loan'
 		AND b.mobile IN
 		<foreach collection="mobiles" index="mobile" open="(" separator="," close=")">
 			#{mobile}
 		</foreach>
 	</select>
 
+	<update id="batchUpdateMatched" >
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE t_mis_remittance_message
+			<set>
+				updatedate = now(),
+				updateby = "sys",
+				dealcode = #{item.dealcode},
+				accountStatus = #{item.accountStatus}
+			</set>
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
 </mapper>
