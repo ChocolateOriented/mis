@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-<title>手动分配</title>
+<title>分配监理</title>
 <meta name="decorator" content="default"/>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -53,12 +53,11 @@
 			</select>
 			<span class="help-inline"><font color="red">*</font></span>
 		</div>
-		<input style="display:none;" name="name" value="123" path=""/>
 		<c:forEach items="${groups}" var="group" varStatus="vs">
  			<input style="display:none;" name="groupIds" value="${group}"/>
  		</c:forEach>
 		<div class="form-actions">
-			<input id="distributionSave" class="btn btn-primary" type="submit" value="分配"/>&nbsp;
+			<input id="distributionSave" class="btn btn-primary" type="button" value="分配"/>&nbsp;
  			<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
 		</div>
 	</form:form>
