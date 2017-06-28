@@ -59,23 +59,6 @@
 		</choose>
 	</select>
 	
-	<select id="findAllList" resultType="TMisRemittanceMessage">
-		SELECT 
-			<include refid="tMisRemittanceMessageColumns"/>
-		FROM t_mis_remittance_message a
-		<include refid="tMisRemittanceMessageJoins"/>
-		<where>
-			
-		</where>		
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-			</otherwise>
-		</choose>
-	</select>
-	
 	<select id="findRemittanceMesListByDealcode" resultType="TMisRemittanceMessage">
 		SELECT 
 			<include refid="tMisRemittanceMessageColumns"/>
@@ -208,14 +191,14 @@
     			and m.remittancetime <=#{enddealtime}
       		 ]]>
 		</if>
-		<if test=" entity.remittanceamount!= null and  entity.remittanceamount!= ''">
-			and m.remittanceamount =#{entity.remittanceamount}
+		<if test=" entity.remittanceAmount!= null and  entity.remittanceAmount!= ''">
+			and m.remittanceamount =#{entity.remittanceAmount}
 		</if>
-		<if test=" entity.remittanceaccount!= null and  entity.remittanceaccount!= ''">
-			and m.remittanceaccount =#{entity.remittanceaccount}
+		<if test=" entity.remittanceAccount!= null and  entity.remittanceAccount!= ''">
+			and m.remittanceaccount =#{entity.remittanceAccount}
 		</if>
-		<if test=" entity.remittancename!= null and  entity.remittancename!= ''">
-			and m.remittancename =#{entity.remittancename}
+		<if test=" entity.remittanceName!= null and  entity.remittanceName!= ''">
+			and m.remittancename =#{entity.remittanceName}
 		</if>
 		<if test=" entity.accountStatus!= null and  entity.accountStatus!= ''">
 			and m.accountStatus =#{entity.accountStatus}

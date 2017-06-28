@@ -191,8 +191,18 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	 * @version 2017/6/23
 	 */
 	public enum RemittanceTag{
-		REPAYMENT_SELF,//本人还款
-		REPAYMENT_THIRD//第三方还款
+		REPAYMENT_SELF("本人还款"),
+		REPAYMENT_THIRD("第三方还款");
+
+		RemittanceTag(String desc) {
+			this.desc = desc;
+		}
+
+		public final String desc;
+
+		public String getDesc() {
+			return desc;
+		}
 	}
 
 	/**

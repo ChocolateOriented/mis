@@ -5,7 +5,6 @@ package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;

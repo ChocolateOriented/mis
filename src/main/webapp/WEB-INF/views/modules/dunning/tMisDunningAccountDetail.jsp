@@ -44,14 +44,14 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			<li><label>交易金额</label>
-				<form:input path="remittanceamount"  htmlEscape="false" maxlength="128" class="input-medium"/>
+				<form:input path="remittanceAmount"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			<li><label>对方账户</label>
-				<form:input path="remittanceaccount"  htmlEscape="false" maxlength="128" class="input-medium"/>
+				<form:input path="remittanceAccount"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			
 			<li><label>对方姓名</label>
-				<form:input  path="remittancename"  htmlEscape="false" maxlength="128" class="input-medium" />
+				<form:input  path="remittanceName"  htmlEscape="false" maxlength="128" class="input-medium" />
 			</li>
 			
 			<li><label>入账状态</label>
@@ -95,19 +95,19 @@
 					 ${tmessage.remittanceSerialNumber } 
 				</td>
 				<td>
-					 <fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/>
+					 <fmt:formatDate value="${tmessage.remittanceTime }" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
-					 ${tmessage.remittancechannel } 
+					 ${tmessage.remittanceChannel }
 				</td>
 				<td>
-					 ${tmessage.remittanceamount } 
+					 ${tmessage.remittanceAmount }
 				</td>
 				<td>
-					  ${tmessage.remittancename }  
+					  ${tmessage.remittanceName }
 				</td>
 				<td>
-					 ${tmessage.remittanceaccount} 
+					 ${tmessage.remittanceAccount}
 				</td>
 				<td>
 					  ${tmessage.remark }  
@@ -119,7 +119,7 @@
 					  ${tmessage.createDate }  
 				</td>
 				<td>
-					  ${tmessage.financialuser }  
+					  ${tmessage.financialUser }
 				</td>
 				
 				</tr>
