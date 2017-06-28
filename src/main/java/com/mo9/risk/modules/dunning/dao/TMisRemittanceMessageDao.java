@@ -7,6 +7,7 @@ import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
+
 import java.util.Date;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
@@ -28,6 +29,8 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	public int saveList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
 
 	void batchUpdateMatched(List<TMisRemittanceMessage> successMatchList);
+
+	public List<TMisRemittanceMessage> findAccountPageList(@Param("entity") TMisRemittanceMessage entity, @Param("begindealtime") Date begindealtime,@Param("enddealtime") Date enddealtime);
 
 	List<TMisRemittanceMessage> findAfterFinancialTimeNotAuditList(Date date);
 }

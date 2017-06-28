@@ -83,7 +83,7 @@
 			WHERE a.dealcode = #{dealcode}
 		ORDER BY a.createdate DESC limit  1 
 	</select>
-	
+
 	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
 			<include refid="tMisRemittanceMessageColumns"/>
@@ -96,6 +96,7 @@
 			and
 			a.remittancechannel = #{channel}
 	</select>
+
 
 	<insert id="saveList" parameterType="java.util.List">
 		insert into t_mis_remittance_message
@@ -186,5 +187,40 @@
       	AND a.financialtime > #{date}
       ]]>
 		</if>
+	</select>
+
+	<select id="findAccountPageList" resultType="TMisRemittanceMessage">
+		select
+		*
+		from
+		t_mis_remittance_message m
+		<where>
+		<if test=" entity.remittanceSerialNumber!= null and  entity.remittanceSerialNumber!= ''">
+			and m.remittanceSerialNumber =#{entity.remittanceSerialNumber}
+		</if>
+		<if test=" begindealtime!= null and  begindealtime!= ''">
+			 <![CDATA[
+    			and m.remittancetime >= #{begindealtime}
+      		 ]]>
+		</if>
+		<if test=" enddealtime!= null and  enddealtime!= ''">
+			 <![CDATA[
+    			and m.remittancetime <=#{enddealtime}
+      		 ]]>
+		</if>
+		<if test=" entity.remittanceamount!= null and  entity.remittanceamount!= ''">
+			and m.remittanceamount =#{entity.remittanceamount}
+		</if>
+		<if test=" entity.remittanceaccount!= null and  entity.remittanceaccount!= ''">
+			and m.remittanceaccount =#{entity.remittanceaccount}
+		</if>
+		<if test=" entity.remittancename!= null and  entity.remittancename!= ''">
+			and m.remittancename =#{entity.remittancename}
+		</if>
+		<if test=" entity.accountStatus!= null and  entity.accountStatus!= ''">
+			and m.accountStatus =#{entity.accountStatus}
+		</if>
+		</where>
+
 	</select>
 </mapper>

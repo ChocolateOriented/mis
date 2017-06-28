@@ -5,12 +5,17 @@ package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
+import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
+
+import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -100,5 +105,19 @@ public class TMisRemittanceMessageController extends BaseController {
 		logger.info(message.toString());
 		redirectAttributes.addAttribute("message",message.toString());
 		return redirectUrl;
+	}
+	
+	/**
+	 * 跳转对公明细
+	 */
+	@RequestMapping(value = "detail")
+	public String detail(TMisRemittanceMessage tMService,Date begindealtime,Date enddealtime,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMService,begindealtime,enddealtime);
+		model.addAttribute("page",page);
+		AccountStatus[] values = AccountStatus.values();
+		List<AccountStatus> asList = Arrays.asList(values);
+		model.addAttribute("statusList", asList);
+		model.addAttribute("tMisRemittanceMessage", new TMisRemittanceMessage());
+		return "modules/dunning/tMisDunningAccountDetail";
 	}
 }

@@ -281,4 +281,18 @@ public class TMisRemittanceMessageService extends CrudService<TMisRemittanceMess
 		return fail > 0 ? ",失败"+fail+"条,失败原因:" + errorMsg : "";
 	}
 
+		/**
+		 * 查询所有的对公明细
+		 * @param page
+		 * @param enddealtime
+		 * @param begindealtime
+		 * @param tMService
+		 * @return
+		 */
+	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page,
+			TMisRemittanceMessage entity, Date begindealtime, Date enddealtime) {
+		entity.setPage(page);
+		page.setList(dao.findAccountPageList(entity,begindealtime,enddealtime));
+		return page;
+	}
 }
