@@ -4,15 +4,16 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
+import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
-
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -21,10 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -33,7 +34,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author 徐盛
  * @version 2016-08-11
  */
-@EnableAsync
 @Controller
 @RequestMapping(value = "${adminPath}/dunning/tMisRemittanceMessage")
 public class TMisRemittanceMessageController extends BaseController {
@@ -118,5 +118,24 @@ public class TMisRemittanceMessageController extends BaseController {
 		model.addAttribute("statusList", asList);
 		model.addAttribute("tMisRemittanceMessage", new TMisRemittanceMessage());
 		return "modules/dunning/tMisDunningAccountDetail";
+	}
+
+	/**
+	 * 查账入账
+	 */
+	@RequestMapping(value = "confirmList")
+	public String confirmList(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response){
+		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findconfirmList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
+		model.addAttribute("page",page);
+		return "modules/dunning/tMisRemittanceMessageConfirmList";
+	}
+
+	/**
+	 * 手工查账
+	 */
+	@RequestMapping(value = "findOrderByMobile")
+	@ResponseBody
+	public DunningOrder findOrderByMobile(String mobile){
+		return tMisRemittanceMessageService.findPaymentOrderByMobile(mobile);
 	}
 }

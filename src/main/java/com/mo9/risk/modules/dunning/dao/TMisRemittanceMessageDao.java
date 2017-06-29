@@ -22,7 +22,9 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	
 	public TMisRemittanceMessage findRemittanceMesListByDealcode(String code);
 
-	List<DunningOrder> findPaymentOrderByMobile(List<String> mobiles);
+	List<DunningOrder> findPaymentOrderByMobiles(List<String> mobiles);
+
+	List<DunningOrder> findPaymentOrderByMobile(String mobile);
 
 	public List<TMisRemittanceMessage> findBySerialNumbers(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList,@Param("channel")String channel);
 
@@ -33,4 +35,5 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	public List<TMisRemittanceMessage> findAccountPageList(@Param("entity") TMisRemittanceMessage entity, @Param("begindealtime") Date begindealtime,@Param("enddealtime") Date enddealtime);
 
 	List<TMisRemittanceMessage> findAfterFinancialTimeNotAuditList(Date date);
+
 }
