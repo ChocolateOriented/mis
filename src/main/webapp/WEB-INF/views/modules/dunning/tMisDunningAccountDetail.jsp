@@ -7,6 +7,12 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			
+			// 清空查询功能
+			 $("#empty").click(function(){
+       		 window.location.href="${ctx}/dunning/tMisRemittanceMessage/detail";
+			 }); 
+				
 		});
 		
 		function page(n,s){
@@ -21,7 +27,7 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/detail">催收任务列表</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/detail">入账对公明细</a></li>
 		
 		<span id="successRate" style="float:right;padding:8px;"></span>
 		
@@ -37,10 +43,10 @@
 			</li>
 			<li><label>交易时间</label>
 				<input name="begindealtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-<%-- 					value="<fmt:formatDate value="1997-12-12" pattern="yyyy-MM-dd"/>" --%>
+					value="<fmt:formatDate value="${TMisRemittanceMessage.begindealtime }" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
 				<input name="enddealtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-<%-- 					value="<fmt:formatDate value="1997-12-18" pattern="yyyy-MM-dd"/>" --%>
+					value="<fmt:formatDate value="${TMisRemittanceMessage.enddealtime}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			<li><label>交易金额</label>
@@ -71,6 +77,7 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
+				
 				<th>编号</th>
 				<th>交易流水号</th>
 				<th>交易时间</th>
@@ -116,7 +123,7 @@
 					  ${tmessage.accountStatus }  
 				</td>
 				<td>
-					  ${tmessage.createDate }  
+					<fmt:formatDate value="${tmessage.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/> 
 				</td>
 				<td>
 					  ${tmessage.financialUser }

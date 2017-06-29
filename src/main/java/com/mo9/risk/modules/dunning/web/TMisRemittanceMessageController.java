@@ -4,6 +4,8 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
@@ -24,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -53,7 +57,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	 * 跳转账目解析页面
 	 */
 	@RequestMapping(value = "analysis")
-	public String AccountAnalysis(Model model, String message) {
+	public String accountAnalysis(Model model, String message) {
 		model.addAttribute("message", message);
 		return "modules/dunning/tMisDunningAccountAnalysis";
 	}
@@ -105,18 +109,57 @@ public class TMisRemittanceMessageController extends BaseController {
 		redirectAttributes.addAttribute("message",message.toString());
 		return redirectUrl;
 	}
-	
+
 	/**
 	 * 跳转对公明细
 	 */
 	@RequestMapping(value = "detail")
-	public String detail(TMisRemittanceMessage tMService,Date begindealtime,Date enddealtime,Model model,HttpServletRequest request, HttpServletResponse response) {
-		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMService,begindealtime,enddealtime);
+	public String detail(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
 		model.addAttribute("page",page);
 		AccountStatus[] values = AccountStatus.values();
 		List<AccountStatus> asList = Arrays.asList(values);
 		model.addAttribute("statusList", asList);
-		model.addAttribute("tMisRemittanceMessage", new TMisRemittanceMessage());
+//		model.addAttribute("tMisRemittanceMessage", new TMisRemittanceMessage());
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
+	@ModelAttribute
+	public TMisRemittanceMessage get(@RequestParam(required=false) String id) {
+		TMisRemittanceMessage entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = tMisRemittanceMessageService.get(id);
+		}
+		if (entity == null){
+			entity = new TMisRemittanceMessage();
+		}
+		return entity;
+	}
+	/**
+	 * 跳转查账入账
+	 */
+	@RequestMapping(value = "confirmList")
+	public String accountTotal(TMisRemittanceMessagChecked tMisRemittanceMessagChecked,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagCheckedList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked); 
+		model.addAttribute("page",page);
+		model.addAttribute("childPage","${ctx}/dunning/tMisRemittanceMessage/checked");
+		return "modules/dunning/tMisDunningAccountTotal";
+	}
+	/**
+	 * 跳转已查账
+	 */
+	@RequestMapping(value = "checked")
+	public String accountChecked(Model model) {
+		
+		return "modules/dunning/tMisDunningAccountChecked";
+	}
+	/**
+	 * 跳转已完成
+	 */
+	@RequestMapping(value = "completed")
+	public String accountCompleted(Model model) {
+		
+		return "modules/dunning/tMisDunningAccountCompleted";
+	}
+
+	
 }

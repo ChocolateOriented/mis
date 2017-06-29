@@ -78,6 +78,7 @@
 			</foreach>
 			and
 			a.remittancechannel = #{channel}
+			
 	</select>
 
 
@@ -178,32 +179,120 @@
 		from
 		t_mis_remittance_message m
 		<where>
-		<if test=" entity.remittanceSerialNumber!= null and  entity.remittanceSerialNumber!= ''">
-			and m.remittanceSerialNumber =#{entity.remittanceSerialNumber}
+		<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
+			and m.remittanceSerialNumber =#{ remittanceSerialNumber}
 		</if>
+<!-- 		 <if test="begindealtime != null and enddealtime != null and begindealtime != '' and enddealtime != ''"> -->
+<!--                 AND  m.remittancetime BETWEEN #{begindealtime} AND #{enddealtime} -->
+<!--             </if> -->
 		<if test=" begindealtime!= null and  begindealtime!= ''">
 			 <![CDATA[
-    			and m.remittancetime >= #{begindealtime}
-      		 ]]>
+    			and m.remittancetime >= #{begindealtime} 
+   		 	]]> 
 		</if>
 		<if test=" enddealtime!= null and  enddealtime!= ''">
 			 <![CDATA[
-    			and m.remittancetime <=#{enddealtime}
-      		 ]]>
+     			and m.remittancetime <=#{enddealtime} 
+       		 ]]> 
 		</if>
-		<if test=" entity.remittanceAmount!= null and  entity.remittanceAmount!= ''">
-			and m.remittanceamount =#{entity.remittanceAmount}
+		<if test="  remittanceAmount!= null and   remittanceAmount!= ''">
+			and m.remittanceamount =#{ remittanceAmount}
 		</if>
-		<if test=" entity.remittanceAccount!= null and  entity.remittanceAccount!= ''">
-			and m.remittanceaccount =#{entity.remittanceAccount}
+		<if test="  remittanceAccount!= null and   remittanceAccount!= ''">
+			and m.remittanceaccount =#{ remittanceAccount}
 		</if>
-		<if test=" entity.remittanceName!= null and  entity.remittanceName!= ''">
-			and m.remittancename =#{entity.remittanceName}
+		<if test="  remittanceName!= null and   remittanceName!= ''">
+			and m.remittancename =#{ remittanceName}
 		</if>
-		<if test=" entity.accountStatus!= null and  entity.accountStatus!= ''">
-			and m.accountStatus =#{entity.accountStatus}
+		<if test="  accountStatus!= null and   accountStatus!= ''">
+			and m.accountStatus =#{ accountStatus}
 		</if>
 		</where>
-
+		
+		<choose>
+            <when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
+                ORDER BY ${ page.orderBy}
+            </when>
+            <otherwise>
+              
+            </otherwise>
+        </choose>
 	</select>
+	
+	<update id="updateList" parameterType="java.util.List">
+			<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE t_mis_remittance_message
+			<set>
+			id=#{item.id},
+			remittancename=#{item.remittanceName},                           
+			remittancetime=#{item.remittanceTime},
+			remittanceamount=#{item.remittanceAmount},
+			remittancechannel=#{item.remittanceChannel},
+			remittanceaccount=#{item.remittanceAccount},
+			financialuser=#{item.financialUser},
+			financialtime=#{item.financialTime},
+			dealcode=#{item.dealcode},
+			remark=#{item.remark},
+			createDate=#{item.createDate},
+			remittanceSerialNumber=#{item.remittanceSerialNumber},
+			accountStatus=#{item.accountStatus},
+			updateDate=#{item.updateDate},
+			updateby=#{item.updateBy.id}
+			
+			</set>
+			WHERE remittanceSerialNumber = #{item.remittanceSerialNumber} and accountStatus=#{channel}
+		</foreach>
+	
+	
+	</update>
+	<sql id="countRemainAmmount">
+    	CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
+    </sql>
+	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
+	
+	  select
+	  idc.real_name AS "realName",
+	  b.mobile AS "mobile",
+	  m.dealcode AS "dealcode",
+	  p.nickname AS "nickName"
+	  o.amount AS "amount",
+	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+	  <include refid="countRemainAmmount"/> AS "creditamount",
+	  m.remittanceSerialNumber AS "remittanceSerialNumber",
+	  m.checkedPeople AS "checkedPeople",
+	  o.status AS "orderStatus",
+	  m.RemittanceTag AS "remittanceTag",
+	  from
+	  t_mis_remittance_message m
+	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+	  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+      LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+      LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+      LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+	   WHERE
+		o.type = 'loan' 
+        AND o.merchant_id = 7
+		AND o.`status`IN ('payoff', 'payment' )
+		AND m.accountStatus="COMPLETE_AUDIT"
+		 <if test=" mobile!= null and  mobile!= ''">
+                AND b.mobile=#{mobile}
+        </if>
+		 <if test=" realName!= null and  realName!= ''">
+                AND idc.real_name=#{realName}
+        </if>
+		 <if test=" dealcode!= null and  dealcode!= ''">
+                AND m.dealcode=#{dealcode}
+        </if>
+		 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
+                AND m.remittanceSerialNumber=#{remittanceSerialNumber}
+        </if>
+		 <if test=" orderStatus!= null and  orderStatus!= ''">
+                AND o.status=#{orderStatus}
+        </if>
+		 <if test=" remittanceTag!= null and  remittanceTag!= ''">
+                AND m.remittanceTag=#{remittanceTag}
+        </if>
+	</select>
+	
+	
 </mapper>
