@@ -1,5 +1,6 @@
 /**
- * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights
+ * reserved.
  */
 package com.mo9.risk.modules.dunning.service;
 
@@ -85,11 +86,12 @@ public class TMisRemittanceMessageService extends
 	 * @return int
 	 */
 	@Transactional(readOnly = false)
-	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList,String channel) {
-		List<TMisRemittanceMessage> trMList=misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList,channel);
-		List<TMisRemittanceMessage> updateordList=new ArrayList<TMisRemittanceMessage>();
-		List<TMisRemittanceMessage> updateNewList=new ArrayList<TMisRemittanceMessage>();
-		if(trMList.size()>0&&trMList!=null){
+	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel) {
+		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao
+				.findBySerialNumbers(tMisRemittanceList, channel);
+		List<TMisRemittanceMessage> updateordList = new ArrayList<TMisRemittanceMessage>();
+		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
+		if (trMList.size() > 0 && trMList != null) {
 			for (TMisRemittanceMessage tMisRemittanceMessage : trMList) {
 				if (AccountStatus.NOT_AUDIT.equals(tMisRemittanceMessage.getAccountStatus())) {
 					updateordList.add(tMisRemittanceMessage);
@@ -104,7 +106,8 @@ public class TMisRemittanceMessageService extends
 //			}
 			for (int i = 0; i < updateordList.size(); i++) {
 				for (int j = 0; j < tMisRemittanceList.size(); j++) {
-					if(updateordList.get(i).getRemittanceSerialNumber().equals(tMisRemittanceList.get(j).getRemittanceSerialNumber())){
+					if (updateordList.get(i).getRemittanceSerialNumber()
+							.equals(tMisRemittanceList.get(j).getRemittanceSerialNumber())) {
 						updateNewList.add(tMisRemittanceList.get(j));
 					}
 				}
@@ -112,16 +115,16 @@ public class TMisRemittanceMessageService extends
 
 		}
 		tMisRemittanceList.removeAll(trMList);
-		if(tMisRemittanceList.size()>0&&tMisRemittanceList!=null){
+		if (tMisRemittanceList.size() > 0 && tMisRemittanceList != null) {
 			misRemittanceMessageDao.saveList(tMisRemittanceList);
 		}
-		if(updateNewList.size()>0&&updateNewList!=null){
+		if (updateNewList.size() > 0 && updateNewList != null) {
 			//更新数据相同但是状态为未查账的.
-			misRemittanceMessageDao.updateList(updateNewList,channel);
+			misRemittanceMessageDao.updateList(updateNewList, channel);
 		}
 
-		int updateNum=updateordList.size();
-		int sameNum=trMList.size()-updateNum;
+		int updateNum = updateordList.size();
+		int sameNum = trMList.size() - updateNum;
 		return trMList.size();
 	}
 
@@ -168,7 +171,8 @@ public class TMisRemittanceMessageService extends
 				containMobileInRemarkMap.put(mobile, remittanceMessage);
 			}
 		}
-		List<TMisRemittanceMessage> successMatchByRemark = this.matchOrderWithMobil(containMobileInRemarkMap);
+		List<TMisRemittanceMessage> successMatchByRemark = this
+				.matchOrderWithMobil(containMobileInRemarkMap);
 		logger.info("通过备注匹配成功:" + successMatchByRemark.size() + "条");
 
 		//使用作为账号的手机号匹配(备注匹配失败 + 备注中不包含手机号)
@@ -232,7 +236,9 @@ public class TMisRemittanceMessageService extends
 			if (remittanceMessage == null) {
 				continue;
 			}
-			logger.debug("订单:"+order.getDealcode()+"与汇款信息"+remittanceMessage.getRemittanceSerialNumber()+"匹配成功");
+			logger.debug(
+					"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
+							+ "匹配成功");
 			remittanceMessage.setDealcode(order.getDealcode());
 			remittanceMessage.setAccountStatus(AccountStatus.COMPLETE_AUDIT);
 			this.autoAddTemittanceTag(remittanceMessage, order);
@@ -321,30 +327,33 @@ public class TMisRemittanceMessageService extends
 		return fail > 0 ? ",失败" + fail + "条,失败原因:" + errorMsg : "";
 	}
 
-		/**
-		 * 查询所有的对公明细
-		 * @param page
-		 * @param enddealtime
-		 * @param begindealtime
-		 * @param tMService
-		 * @return
-		 */
-	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page,TMisRemittanceMessage entity) {
+	/**
+	 * 查询所有的对公明细
+	 * @param page
+	 * @param enddealtime
+	 * @param begindealtime
+	 * @param tMService
+	 * @return
+	 */
+	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page,
+			TMisRemittanceMessage entity) {
 		entity.setPage(page);
 		page.setList(dao.findAccountPageList(entity));
 		return page;
 	}
-			/**
-			 * 查询已查账的所有数据
-			 * @param page
-			 * @param tMisRemittanceMessagChecked
-			 * @return
-			 */
-		public Page<TMisRemittanceMessagChecked> findMessagCheckedList(Page<TMisRemittanceMessagChecked> page,
-				TMisRemittanceMessagChecked entity) {
-			entity.setPage(page);
-			return page;
-		}
+
+	/**
+	 * 查询已查账的所有数据
+	 * @param page
+	 * @param tMisRemittanceMessagChecked
+	 * @return
+	 */
+	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(
+			Page<TMisRemittanceMessagChecked> page,
+			TMisRemittanceMessagChecked entity) {
+		entity.setPage(page);
+		return page;
+	}
 
 	/**
 	 * @Description 通过电话查询未还款订单
@@ -353,7 +362,7 @@ public class TMisRemittanceMessageService extends
 	 */
 	public DunningOrder findPaymentOrderByMobile(String mobile) {
 		List<DunningOrder> dunningOrders = dao.findPaymentOrderByMobile(mobile);
-		if (dunningOrders != null && dunningOrders.size()>0){
+		if (dunningOrders != null && dunningOrders.size() > 0) {
 			return dunningOrders.get(0);
 		}
 		return null;

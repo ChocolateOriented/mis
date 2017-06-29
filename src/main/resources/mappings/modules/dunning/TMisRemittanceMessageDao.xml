@@ -272,9 +272,7 @@
 	
 	
 	</update>
-	<sql id="countRemainAmmount">
-    	CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
-    </sql>
+
 	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
 	
 	  select

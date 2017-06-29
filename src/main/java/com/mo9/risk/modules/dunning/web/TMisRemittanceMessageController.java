@@ -162,7 +162,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	}
 
 	/**
-	 * 手工查账
+	 * 通过电话查询订单
 	 */
 	@RequestMapping(value = "findOrderByMobile")
 	@ResponseBody
