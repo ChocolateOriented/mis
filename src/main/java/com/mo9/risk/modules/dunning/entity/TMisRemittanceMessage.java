@@ -4,6 +4,8 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+
 import java.util.Date;
 
 /**
@@ -27,6 +29,28 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private String remittanceSerialNumber;// 汇款流水号
 	private AccountStatus accountStatus;// 入账状态
 	private RemittanceTag remittanceTag;		//入账标签
+	
+	private Date begindealtime;//用来查询开始时间
+	
+	private Date enddealtime;//用来查询的结束时间
+	
+	
+
+	public Date getBegindealtime() {
+		return begindealtime;
+	}
+
+	public void setBegindealtime(Date begindealtime) {
+		this.begindealtime = begindealtime;
+	}
+
+	public Date getEnddealtime() {
+		return enddealtime;
+	}
+
+	public void setEnddealtime(Date enddealtime) {
+		this.enddealtime =  null != enddealtime ? DateUtils.endDate(enddealtime) : enddealtime;
+	}
 
 	public TMisRemittanceMessage() {
 		super();
