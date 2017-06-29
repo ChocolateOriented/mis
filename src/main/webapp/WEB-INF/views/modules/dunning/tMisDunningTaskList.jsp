@@ -39,9 +39,16 @@
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
 			        	var groupId=$("#groupList").val(); 
-		            	return {'group.id': groupId, 
-		            		'group.groupIds': groups.toString(),
-		            		nickname:term};
+			        	var param = {};
+			        	if ("${supervisorLimit}" == "true") {
+			        		param = {'group.id': groupId, 
+				            		'group.groupIds': groups.toString(),
+				            		nickname:term};
+			        	} else {
+			        		param = {'group.id': groupId, 
+				            		nickname:term};
+			        	}
+		            	return param;
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	return { results: data };
