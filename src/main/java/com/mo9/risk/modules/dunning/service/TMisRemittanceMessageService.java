@@ -10,7 +10,6 @@ import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.RemittanceTag;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -160,10 +159,11 @@ public class TMisRemittanceMessageService extends
 			if (null == remittanceMessage) {
 				continue;
 			}
+			//TODO 区分未查账信息
 			//只针对未查账订单
-			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
-				continue;
-			}
+//			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
+//				continue;
+//			}
 			//检查备注中是否包含手机号
 			String remark = remittanceMessage.getRemark();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_CONTAIN_MOBILE, remark);
@@ -188,9 +188,9 @@ public class TMisRemittanceMessageService extends
 				remittanceMessages.size());
 		for (TMisRemittanceMessage remittanceMessage : checkRemittanceAccountList) {
 			//只针对未查账订单
-			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
-				continue;
-			}
+//			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
+//				continue;
+//			}
 			//检查账号是否使手机号
 			String account = remittanceMessage.getRemittanceAccount();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_MOBILE, account);
@@ -239,12 +239,14 @@ public class TMisRemittanceMessageService extends
 			logger.debug(
 					"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
 							+ "匹配成功");
-			remittanceMessage.setDealcode(order.getDealcode());
-			remittanceMessage.setAccountStatus(AccountStatus.COMPLETE_AUDIT);
-			this.autoAddTemittanceTag(remittanceMessage, order);
-			successMatchList.add(remittanceMessage);
+			//TODO 查账完成生成comfirm数据
+//			remittanceMessage.setDealcode(order.getDealcode());
+//			remittanceMessage.setAccountStatus(AccountStatus.COMPLETE_AUDIT);
+//			this.autoAddTemittanceTag(remittanceMessage, order);
+//			successMatchList.add(remittanceMessage);
 		}
-		dao.batchUpdateMatched(successMatchList);
+
+//		dao.batchUpdateMatched(successMatchList);
 		return successMatchList;
 	}
 
@@ -259,10 +261,11 @@ public class TMisRemittanceMessageService extends
 		if (StringUtils.isBlank(realName)) {
 			return;
 		}
+		//TODO 入账标签打在comfirm表上
 		//如果账户姓名等于借款人姓名则标记本人还款
 		String remittanceName = remittanceMessage.getRemittanceName();
 		if (realName.equals(remittanceName)) {
-			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_SELF);
+//			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_SELF);
 			return;
 		}
 		//账户名不等, 若备注中包含借款人姓名则标记第三方还款
@@ -271,7 +274,7 @@ public class TMisRemittanceMessageService extends
 			return;
 		}
 		if (remark.contains(realName)) {
-			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_THIRD);
+//			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_THIRD);
 		}
 	}
 
@@ -318,7 +321,6 @@ public class TMisRemittanceMessageService extends
 			trMessage.setRemittanceName(trExcel.getRemittancename());
 			trMessage.setRemittanceAccount(trExcel.getRemittanceaccount());
 			trMessage.setRemark(trExcel.getRemark());
-			trMessage.setAccountStatus(AccountStatus.NOT_AUDIT);
 			trMessage.setFinancialTime(uploadDate);
 			trMessage.setFinancialUser(UserUtils.getUser().getName());
 			trMessage.preInsert();
@@ -329,10 +331,6 @@ public class TMisRemittanceMessageService extends
 
 	/**
 	 * 查询所有的对公明细
-	 * @param page
-	 * @param enddealtime
-	 * @param begindealtime
-	 * @param tMService
 	 * @return
 	 */
 	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page,
@@ -345,7 +343,6 @@ public class TMisRemittanceMessageService extends
 	/**
 	 * 查询已查账的所有数据
 	 * @param page
-	 * @param tMisRemittanceMessagChecked
 	 * @return
 	 */
 	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(
@@ -366,5 +363,15 @@ public class TMisRemittanceMessageService extends
 			return dunningOrders.get(0);
 		}
 		return null;
+	}
+
+	/**
+	 * @Description  查找未完成的汇款
+	 * @param remittanceChannel
+	 * @param remittanceSerialNumber
+	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage
+	 */
+	public List<TMisRemittanceMessage> findNotFinish(String remittanceChannel, String remittanceSerialNumber) {
+		return dao.findNotFinish(remittanceChannel,remittanceSerialNumber);
 	}
 }

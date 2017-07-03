@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 
@@ -27,15 +28,10 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private String dealcode;
 	private String remark;    // 备注
 	private String remittanceSerialNumber;// 汇款流水号
-	private AccountStatus accountStatus;// 入账状态
-	private RemittanceTag remittanceTag;		//入账标签
-	
+
 	private Date begindealtime;//用来查询开始时间
-	
 	private Date enddealtime;//用来查询的结束时间
 	
-	
-
 	public Date getBegindealtime() {
 		return begindealtime;
 	}
@@ -76,6 +72,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceName = remittanceName;
 	}
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getRemittanceTime() {
 		return remittanceTime;
 	}
@@ -147,23 +144,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceSerialNumber = remittanceSerialNumber;
 	}
 
-	public AccountStatus getAccountStatus() {
-		return accountStatus;
-	}
-
-	public void setAccountStatus(AccountStatus accountStatus) {
-		this.accountStatus = accountStatus;
-	}
-	
-	public RemittanceTag getRemittanceTag() {
-		return remittanceTag;
-	}
-
-	public void setRemittanceTag(
-			RemittanceTag remittanceTag) {
-		this.remittanceTag = remittanceTag;
-	}
-
 	@Override
 	public String toString() {
 		return "TMisRemittanceMessage{" +
@@ -178,8 +158,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 				", dealcode='" + dealcode + '\'' +
 				", remark='" + remark + '\'' +
 				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
-				", accountStatus=" + accountStatus +
-				", remittanceTag=" + remittanceTag +
 				'}';
 	}
 
@@ -209,44 +187,5 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		result = 31 * result + (remittanceSerialNumber != null ? remittanceSerialNumber.hashCode() : 0);
 		return result;
 	}
-	/**
-	 * @Description 还款标签
-	 * @author jxli
-	 * @version 2017/6/23
-	 */
-	public enum RemittanceTag{
-		REPAYMENT_SELF("本人还款"),
-		REPAYMENT_THIRD("第三方还款");
 
-		RemittanceTag(String desc) {
-			this.desc = desc;
-		}
-
-		public final String desc;
-
-		public String getDesc() {
-			return desc;
-		}
-	}
-
-	/**
-	 * 入账状态
-	 * @author jwchi
-	 */
-	public enum AccountStatus {
-		NOT_AUDIT("未查账"),
-		COMPLETE_AUDIT("已查账"),
-		FINISH("已完成");
-		AccountStatus(String desc) {
-			this.desc = desc;
-		}
-
-		public final String desc;
-
-		public String getDesc() {
-			return desc;
-		}
-		
-	}
-	
 }

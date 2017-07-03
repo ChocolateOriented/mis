@@ -3,12 +3,9 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
-import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import java.util.Date;
+import javax.validation.constraints.NotNull;
 
 /**
  * 汇款确认信息Entity
@@ -17,15 +14,18 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
  */
 public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	/**
-	 * --------------AUDIT确认流程(提交>审核)汇款状态--------------
+	 * --------------CHECK确认流程(提交>审核)汇款状态--------------
 	 */
 	public static final String CONFIRMSTATUS_CH_SUBMIT = "ch_submit";  //代表催收已提交财务待确认
 	public static final String CONFIRMSTATUS_CW_SUBMIT = "cw_submit";  //代表财务已提交催收待确认
 	public static final String CONFIRMSTATUS_CW_RETURN = "cw_return";  //代表财务已打回催收待重新提交
-	/**
-	 * --------------确认流程共用--------------
-	 */
 	public static final String CONFIRMSTATUS_CH_CONFIRM = "ch_confirm";  //代表催收最终已确认
+
+	/**
+	 * --------------CHECK确认流程(提交>审核)汇款状态--------------
+	 */
+	public static final String CONFIRMSTATUS_COMPLETE_AUDIT = "complete_audit";  //已查账
+	public static final String CONFIRMSTATUS_FINISH = "finish"; //已完成
 
 	private static final long serialVersionUID = 1L;
 	private Integer dbid;		// dbid
@@ -52,6 +52,7 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 
 	private ConfirmFlow confirmFlow;//确认流程
 	private String confirmstatus;		// 确认状态
+	private RemittanceTag remittanceTag;		//入账标签
 	private String dealcode;		// 订单号
 	private String Invalid;			// 删除标志
 
@@ -316,10 +317,37 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 		this.confirmFlow = confirmFlow;
 	}
 
-	public enum ConfirmFlow{
-		CHECK,//上传>查账
-		AUDIT//提交>审核
+	public RemittanceTag getRemittanceTag() {
+		return remittanceTag;
 	}
 
+	public void setRemittanceTag(
+			RemittanceTag remittanceTag) {
+		this.remittanceTag = remittanceTag;
+	}
 
+	public enum ConfirmFlow{
+		CHECK,//提交>审核
+		AUDIT//上传>查账
+	}
+
+	/**
+	 * @Description 还款标签
+	 * @author jxli
+	 * @version 2017/6/23
+	 */
+	public enum RemittanceTag{
+		REPAYMENT_SELF("本人还款"),
+		REPAYMENT_THIRD("第三方还款");
+
+		RemittanceTag(String desc) {
+			this.desc = desc;
+		}
+
+		public final String desc;
+
+		public String getDesc() {
+			return desc;
+		}
+	}
 }
