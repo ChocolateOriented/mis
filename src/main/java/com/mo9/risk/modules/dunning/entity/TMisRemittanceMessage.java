@@ -25,7 +25,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private String remittanceAccount;		// 汇款帐号
 	private String financialUser;		// 财务确认人
 	private Date financialTime;		// 财务确认时间
-	private String dealcode;
 	private String remark;    // 备注
 	private String remittanceSerialNumber;// 汇款流水号
 
@@ -121,13 +120,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.financialTime = financialTime;
 	}
 
-	public String getDealcode() {
-		return dealcode;
-	}
-
-	public void setDealcode(String dealcode) {
-		this.dealcode = dealcode;
-	}
 	public String getRemark() {
 		return remark;
 	}
@@ -155,7 +147,6 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 				", remittanceAccount='" + remittanceAccount + '\'' +
 				", financialUser='" + financialUser + '\'' +
 				", financialTime=" + financialTime +
-				", dealcode='" + dealcode + '\'' +
 				", remark='" + remark + '\'' +
 				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
 				'}';
