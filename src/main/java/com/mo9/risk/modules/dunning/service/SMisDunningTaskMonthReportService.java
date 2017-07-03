@@ -85,8 +85,6 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 
 		//获取截止到当前的月报
 		SMisDunningTaskMonthReport query = new SMisDunningTaskMonthReport();
-		String month = DateUtils.formatDate(new Date(), "yyyyMM");
-		query.setMonths(month);
 		query.setCreateDate(new Date());
 		List<SMisDunningTaskMonthReport> data = super.findList(query);
 
