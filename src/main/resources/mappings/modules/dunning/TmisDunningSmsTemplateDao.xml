@@ -13,7 +13,8 @@
 		s.SmsType AS "smsType",
 		s.AcceptType AS "acceptType",
 		s.SmsCotent AS "smsCotent",
-		s.sendReason AS "sendReason"
+		s.sendReason AS "sendReason",
+		s.invalid AS "invalid"
 	
 	</sql>
 	
@@ -22,6 +23,7 @@
 			<include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
 		WHERE s.id = #{id}
+		AND s.invalid="t"
 	</select>
 	<select id="getByName" resultType="TmisDunningSmsTemplate">
 		SELECT 
@@ -29,6 +31,7 @@
 		FROM t_mis_dunning_sms_template s
 		WHERE s.TemplateName = #{templateName}
 		AND s.SendMethod ="labourSend"
+		AND s.invalid="t"
 	</select>
 	<select id="getByEnglishName" resultType="TmisDunningSmsTemplate">
 		SELECT 
@@ -36,12 +39,14 @@
 		FROM t_mis_dunning_sms_template s
 		WHERE s.EnglishTemplateName = #{englishTemplateName}
 		AND s.SendMethod ="labourSend"
+		AND s.invalid="t"
 	</select>
 	
 	 <select id="findSmsPageList" resultType="TmisDunningSmsTemplate">
 	SELECT 
 	      <include refid="TmisDunningSmsTemplateColumns"/>
 		FROM t_mis_dunning_sms_template s
+		where s.invalid="t"
 	  <choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -62,7 +67,7 @@
 		s.SmsCotent AS "smsCotent"
 		FROM t_mis_dunning_sms_template s
 		WHERE
-	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend"
+	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend" and s.invalid="t"
 	
 
 	<if test=" acceptType =='self'">
@@ -80,6 +85,7 @@
 		FROM t_mis_dunning_sms_template s
 		WHERE
 	s.SendMethod="autosend"
+	AND s.invalid="t"
 	
 	</select>
 	
@@ -105,7 +111,8 @@
 			updateDate,
 			createBy,
 			updateBy,
-			sendReason
+			sendReason,
+			invalid
 		) VALUES (
 			#{id},
 			#{numbefore},
@@ -121,7 +128,8 @@
 			#{updateDate},
 			#{createBy.name},
 			#{updateBy.name},
-			#{sendReason}
+			#{sendReason},
+			#{invalid}
 		)
 	</insert>
 	
@@ -138,14 +146,18 @@
 			smsCotent = #{smsCotent},
 			updateDate = #{updateDate},
 			updateBy = #{updateBy.name},
-			sendReason = #{sendReason}
-			
-		WHERE id = #{id}
+			sendReason = #{sendReason},
+			invalid="t"
+		WHERE id = #{id} AND invalid="t"
 	</update>
 	
 	<delete id="delete">
-	   delete from t_mis_dunning_sms_template 
-	   WHERE id = #{id}
+	   update  t_mis_dunning_sms_template set 
+	   invalid="f",
+	   updateDate = #{updateDate},
+	   updateBy = #{updateBy.name}
+	   where id=#{id}
+	  
 	   
 	
 	

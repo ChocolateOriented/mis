@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,8 @@ import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 /**
  * 短信模板
  * 
@@ -162,6 +165,9 @@ public class TmisDunningSmsTemplateController extends BaseController{
 		if(tSTemplate==null){
 			return "改模板不存在";
 		}
+		tSTemplate.setUpdateDate(new Date());
+		User updateBy=UserUtils.getUser();
+		tSTemplate.setUpdateBy(updateBy);
 		tstService.delete(tSTemplate);
 		
 		return "OK";

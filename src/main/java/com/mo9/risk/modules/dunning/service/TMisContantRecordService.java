@@ -166,38 +166,80 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				
 				if ("wordText".equals(tMisContantRecord.getSmsType())) {
 					Map<String, String> params = new HashMap<String, String>();
-					params.put("mobile", tMisContantRecord.getContanttarget());// 发送手机号
-					//模板填充的map
+					// 发送手机号
+					params.put("mobile", tMisContantRecord.getContanttarget());
+					// snc版本 固定值:"2.0";
+					params.put("snc_version", "2.0");
+					// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+					params.put("biz_sys", "MIS");
+					// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+					params.put("biz_type", "3");
+					// 客户端产品名称 例："mo9wallet","feishudai","feishudaiPro"
 					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
-					 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-					 TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+					if (tdsTmplate.getSmsCotent().contains("${platform}")) {
+						if (null != order.getPlatformExt() && !"".equals(order.getPlatformExt())) {
+							if (order.getPlatformExt().contains("feishudai")) {
+								params.put("product_name", "feishudai");
+							} else {
+								params.put("product_name", "mo9wallet");
+							}
+						} else {
+							params.put("product_name", "mo9wallet");
+						}
+
+					} else {
+						params.put("product_name", "mo9wallet");
+					}
+
+					TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+					TRiskBuyerPersonalInfo buyerInfeo = tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
 							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
+					// 模板对应参数
 					params.put("template_data", new JacksonConvertor().serialize(map));
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
-					params.put("template_name",englishTemplateName );// 模板名称
-					params.put("template_tags", "CN");// 模板标识
-					 MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS,
-					 params, BaseResponse.class);
+					// 模板名称
+					params.put("template_name", englishTemplateName);
+					// 模板标识
+					params.put("template_tags", "CN");
+					MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);
 				}
 				if ("voice".equals(tMisContantRecord.getSmsType())) {
-					
+
 					Map<String, String> vparams = new HashMap<String, String>();
 					vparams.put("mobile", tMisContantRecord.getContanttarget());// 发送手机号
 					vparams.put("style", "voiceContent");// 固定值
-					//模板填充的map
+					// 模板填充的map
 					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
-					 TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
-					 TRiskBuyerPersonalInfo buyerInfeo= tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
-						Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
-								order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
+					TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+					TRiskBuyerPersonalInfo buyerInfeo = tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
+							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
 					vparams.put("template_data", new JacksonConvertor().serialize(map));
-//					String englishTemplateName = this.EnglishTemplateName(tMisContantRecord.getTemplateName());
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
-					vparams.put("template_name",englishTemplateName );// 模板名称
+					vparams.put("template_name", englishTemplateName);// 模板名称
 					vparams.put("template_tags", "CN");// 模板标识
-					 MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE,
-					 vparams, BaseResponse.class);
+					// snc版本 固定值:"2.0";
+					vparams.put("snc_version", "2.0");
+					// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+					vparams.put("biz_sys", "MIS");
+					// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+					vparams.put("biz_type", "3");
+					if (tdsTmplate.getSmsCotent().contains("${platform}")) {
+						if (null != order.getPlatformExt() && !"".equals(order.getPlatformExt())) {
+							if (order.getPlatformExt().contains("feishudai")) {
+								vparams.put("product_name", "feishudai");
+							} else {
+								vparams.put("product_name", "mo9wallet");
+							}
+						} else {
+							vparams.put("product_name", "mo9wallet");
+						}
+
+					} else {
+						vparams.put("product_name", "mo9wallet");
+					}
+					MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, vparams, BaseResponse.class);
 				}
 				 logger.info("给用户:"+tMisContantRecord.getContanttarget()+"发送短信成功，模板为:"+templateName+",内容为:"+tMisContantRecord.getContent());
 			}
@@ -527,97 +569,5 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	return map;
     }	
     
-//    public String EnglishTemplateName(String tName){
-//    	
-//    	if("对公账号信息".equals(tName)){
-//    		tName="mis_bank accounts";
-//    	}
-//    	if("P1逾期告知1".equals(tName)){
-//    		tName="mis_P1 overdue 1";
-//    	}
-//    	if("P1逾期告知2".equals(tName)){
-//    		tName="mis_P1 overdue 2";
-//    	}
-//    	if("寄催款通知书".equals(tName)){
-//    		tName="mis_letter of dunning";
-//    	}
-//    	if("拒接电话一次".equals(tName)){
-//    		tName="mis_call rejection_once";
-//    	}
-//    	if("拒接电话多次".equals(tName)){
-//    		tName="mis_call rejection";
-//    	}
-//    	if("M1第三方逾期提示".equals(tName)){
-//    		tName="mis_M1 hint_thirdparty";
-//    	}
-//    	if("P1逾期告知3".equals(tName)){
-//    		tName="mis_P1 reminder 3";
-//    	}
-//    	if("联系人或直系亲属".equals(tName)){
-//    		tName="mis_contacts";
-//    	}
-//    	if("屡次爽约提醒".equals(tName)){
-//    		tName="mis_break an appointment";
-//    	}
-//    	if("high broken".equals(tName)){
-//    		tName="mis_high broken";
-//    	}
-//    	if("寄律师函知会（前）".equals(tName)){
-//    		tName="mis_letter of attorney";
-//    	}
-//    	if("M2第三方逾期提示1".equals(tName)){
-//    		tName="mis_M2_overdue reminder 1";
-//    	}
-//    	if("M2第三方逾期提示2".equals(tName)){
-//    		tName="mis_M2 overdue reminder 2";
-//    	}
-//    	if("P2逾期提示2".equals(tName)){
-//    		tName="mis_P2 overdue reminder 2";
-//    	}
-//    	if("重度逾期警示1".equals(tName)){
-//    		tName="mis_severe reminder 1";
-//    	}
-//    	if("重度逾期警示2".equals(tName)){
-//    		tName="mis_severe reminder 2";
-//    	}
-//    	if("寄律师函知会（后）".equals(tName)){
-//    		tName="mis_letter of attorney_latter";
-//    	}
-//    	if("寄最终通知书".equals(tName)){
-//    		tName="mis_final notice";
-//    	}
-//    	if("P2逾期提示3".equals(tName)){
-//    		tName="mis_P2 overdue reminder 3";
-//    	}
-//    	if("P2逾期提示4".equals(tName)){
-//    		tName="mis_P2 overdue reminder 4";
-//    	}
-//    	if("P2逾期提示5".equals(tName)){
-//    		tName="mis_P2 overdue reminder 5";
-//    	}
-//    	if("P2逾期提示6".equals(tName)){
-//    		tName="mis_P2 overdue reminder 6";
-//    	}
-//    	if("P2逾期提示7".equals(tName)){
-//    		tName="mis_P2 overdue reminder 7";
-//    	}
-//    	if("联系人告知（诉讼）".equals(tName)){
-//    		tName="mis_contacts notice_litigation";
-//    	}
-//    	if("重度逾期警示3".equals(tName)){
-//    		tName="mis_severe reminder 3";
-//    	}
-//    	if("M3第三方逾期提示".equals(tName)){
-//    		tName="mis_M3_overdue reminder";
-//    	}
-//    	if("还款日前提示1".equals(tName)){
-//    		tName="mis_advance reminder 1";
-//    	}
-//    	if("还款日前提示2（低风险）".equals(tName)){
-//    		tName="mis_advance reminder 2";
-//    	}
-//    	
-//    
-//    	return tName;
-//    }
+
 }
