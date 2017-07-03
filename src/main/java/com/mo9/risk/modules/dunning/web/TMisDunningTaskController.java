@@ -8,9 +8,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -188,14 +192,20 @@ public class TMisDunningTaskController extends BaseController {
 		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 		int permissions = TMisDunningTaskService.getPermissions();
 		boolean groupLimit = false;
+		boolean supervisorLimit = false;
 		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
 			tMisDunningGroup.setLeader(UserUtils.getUser());
 			groupLimit = true;
+		}
+		if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
+			tMisDunningGroup.setSupervisor(UserUtils.getUser());
+			supervisorLimit = true;
 		}
 		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
 		model.addAttribute("groupLimit", groupLimit);
+		model.addAttribute("supervisorLimit", supervisorLimit);
 		return "modules/dunning/tMisDunningTaskList";
 	}
 	
@@ -947,15 +957,50 @@ public class TMisDunningTaskController extends BaseController {
 	}
 	
 	/**
-	 * 加载用户信息页面
+	 * 展示用户影像资料
 	 * @param buyerId
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "getBuyerIdCardImg")
-	@ResponseBody
-	public String getBuyerIdCardImg(String buyerId) {
-		return tMisDunningTaskService.findBuyerIdCardImg(buyerId);
+	@RequestMapping(value = "showBuyerIdCardImg")
+	public void showBuyerIdCardImg(HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String fileId = tMisDunningTaskService.findBuyerIdCardImg(buyerId);
+		String riskadminUrl = DictUtils.getDictValue("riskadmin", "orderUrl", "");
+		String url = riskadminUrl + "file/showPic.a?fileId=" + fileId;
+		InputStream input = null;
+		OutputStream output = null;
+		try {
+			URL httpUrl = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) httpUrl.openConnection();
+			connection.setRequestProperty("connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "image/jpg");
+			connection.setRequestProperty("accept", "*/*");
+			connection.connect();
+			
+			input = connection.getInputStream();
+			response.setContentType("image/jpg");
+			response.setHeader("Content-disposition", "filename=img_" + fileId + ".jpg");
+			output = response.getOutputStream();
+			int buf = 0;
+			while ((buf = input.read()) != -1) {
+				output.write(buf);
+			}
+			output.flush();
+		} catch (IOException e) {
+			actionlog.info("读取影像资料失败:" + e.getMessage());
+		} finally {
+			try {
+				if (input != null) {
+					input.close();
+				}
+				if (output != null) {
+					output.close();
+				}
+			} catch (IOException e) {
+				//nothing to do
+			}
+		}
 	}
 	
 	/**
@@ -1983,6 +2028,14 @@ public class TMisDunningTaskController extends BaseController {
 					dunningPeople.setGroup(people.getGroup());
 				}
 			}
+			if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
+				TMisDunningGroup group = new TMisDunningGroup();
+				group.setSupervisor(UserUtils.getUser());
+				List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+				group.setGroupIds(groupIds);
+				performanceDayReport.setGroup(group);
+				dunningPeople.setGroup(group);
+			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
@@ -2017,6 +2070,13 @@ public class TMisDunningTaskController extends BaseController {
 				if (people != null) {
 					performanceDayReport.setGroup(people.getGroup());
 				}
+			}
+			if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
+				TMisDunningGroup group = new TMisDunningGroup();
+				group.setSupervisor(UserUtils.getUser());
+				List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+				group.setGroupIds(groupIds);
+				performanceDayReport.setGroup(group);
 			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());

@@ -17,7 +17,10 @@
 
 	<sql id="tMisDunningGroupJoinsColumns">
 		,
-		u.name AS "leader.name"
+		u.name AS "leader.name",
+		(SELECT group_concat(distinct su.name) from sys_user su
+			JOIN t_mis_dunning_data_auth sg ON su.id = sg.peopleid
+			WHERE sg.groupid = a.id) AS "supervisor.name"
 	</sql>
 	<sql id="tMisDunningGroupJoins">
 		LEFT JOIN sys_user u on u.id = a.leaderId
@@ -50,6 +53,14 @@
 			</if>
 			<if test="leader != null and leader.id != null and leader.Id != ''">
 				AND a.leaderId = #{leader.id}
+			</if>
+			<if test="supervisor != null and supervisor.id != null and supervisor.Id != ''">
+				AND EXISTS (
+					SELECT 1
+					FROM t_mis_dunning_data_auth g
+					WHERE g.peopleid = #{supervisor.id}
+					AND g.groupid = a.id
+				)
 			</if>
 			<if test="leader != null and leader.name != null and leader.name != ''">
 				AND u.name LIKE concat('%', #{leader.name},'%')
@@ -115,4 +126,51 @@
 		WHERE id = #{id}
 	</update>
 	
+    <insert id="saveDistribution">
+		INSERT INTO t_mis_dunning_data_auth(
+			groupid,
+			peopleid,
+			createby,
+			createDate,
+			updateBy,
+			updateDate
+			)
+		<foreach item="groupId" collection="groupIds" separator=" union all ">
+			SELECT
+				#{groupId},
+				#{supervisor.id},
+				#{createBy.name},
+				#{createDate},
+				#{updateBy.name},
+				#{updateDate}
+		</foreach>
+	</insert>
+	
+	<select id="findSupervisorGroupList" resultType="String">
+		SELECT
+			distinct groupid 
+		FROM t_mis_dunning_data_auth g
+		WHERE g.peopleid = #{supervisor.id}
+	</select>
+	
+	<delete id="deleteSupervisorGroup">
+		DELETE
+		FROM t_mis_dunning_data_auth
+		<where>
+			<if test="id != null and id != ''">
+				AND groupid = #{id}
+			</if>
+			<if test="groupIds != null">
+				AND groupid IN
+				<if test="groupIds.size == 0">
+					('')
+				</if>
+				<if test="groupIds.size > 0">
+					<foreach item="groupId" collection="groupIds" open="(" close=")" separator=",">
+						#{groupId}
+					</foreach>
+				</if>
+			</if>
+		</where>
+	</delete>
 </mapper>

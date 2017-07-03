@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
@@ -63,6 +64,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private String dunningcycle;		// 催收周期(队列)
 	
 	private TMisDunningPeople dunningPeople ;
+	private List<String> groupIds;
 	
 	private Date outsourcingBeginDate ; //委外开始时间
 	private Date beginOutsourcingBeginDate ; //查询开始-委外开始时间
@@ -417,6 +419,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setDunningPeople(TMisDunningPeople dunningPeople) {
 		this.dunningPeople = dunningPeople;
+	}
+
+	public List<String> getGroupIds() {
+		return groupIds;
+	}
+
+	public void setGroupIds(List<String> groupIds) {
+		this.groupIds = groupIds;
 	}
 
 	public Double getBalance() {
