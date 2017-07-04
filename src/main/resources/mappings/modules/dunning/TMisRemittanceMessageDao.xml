@@ -85,8 +85,7 @@
 			a.remittancechannel = #{channel}
 			and
 			c.ConfirmFlow="AUDIT"
-			and 
-			a.RemittanceChannel=c.RemittanceChannel
+			
 	</select>
 
 
