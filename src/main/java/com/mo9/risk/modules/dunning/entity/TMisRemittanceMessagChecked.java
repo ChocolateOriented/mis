@@ -14,7 +14,7 @@ import java.util.Date;
  * @version 2016-08-11
  */
 public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessagChecked> {
-	
+	private static final long serialVersionUID = 1L;
 	// # 姓名
 	private String realName;
 	// # 手机号码
@@ -37,6 +37,21 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	private  String orderStatus;
 	//入账标签
 	private  String remittanceTag;
+	//入账类型
+	private  String payType;
+	// 入账时间
+	private Date remittancetime;
+	//收入(+元)
+	private Double remittanceamount;
+	//对方账户
+	private String remittanceaccount;
+	// 备注
+	private String remark;
+	// 上传人
+	private String financialUser;	
+	
+	// 入账人
+	private String completePeople;	
 	
 	public String getRealName() {
 		return realName;
@@ -103,6 +118,36 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	}
 	public void setRemittanceTag(String remittanceTag) {
 		this.remittanceTag = remittanceTag;
+	}
+	public Date getRemittancetime() {
+		return remittancetime;
+	}
+	public void setRemittancetime(Date remittancetime) {
+		this.remittancetime = remittancetime;
+	}
+	public Double getRemittanceamount() {
+		return remittanceamount;
+	}
+	public void setRemittanceamount(Double remittanceamount) {
+		this.remittanceamount = remittanceamount;
+	}
+	public String getRemittanceaccount() {
+		return remittanceaccount;
+	}
+	public void setRemittanceaccount(String remittanceaccount) {
+		this.remittanceaccount = remittanceaccount;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getFinancialUser() {
+		return financialUser;
+	}
+	public void setFinancialUser(String financialUser) {
+		this.financialUser = financialUser;
 	}
 	
 	

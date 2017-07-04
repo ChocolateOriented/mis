@@ -27,6 +27,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	private Date financialTime;		// 财务确认时间
 	private String remark;    // 备注
 	private String remittanceSerialNumber;// 汇款流水号
+	private String accountStatus;//用来做更新汇款信息
 
 	private Date begindealtime;//用来查询开始时间
 	private Date enddealtime;//用来查询的结束时间
@@ -135,21 +136,25 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setRemittanceSerialNumber(String remittanceSerialNumber) {
 		this.remittanceSerialNumber = remittanceSerialNumber;
 	}
+	
+	
+	public String getAccountStatus() {
+		return accountStatus;
+	}
 
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
+	}
+
+	
 	@Override
 	public String toString() {
-		return "TMisRemittanceMessage{" +
-				"dbid='" + dbid + '\'' +
-				", remittanceName='" + remittanceName + '\'' +
-				", remittanceTime=" + remittanceTime +
-				", remittanceAmount=" + remittanceAmount +
-				", remittanceChannel='" + remittanceChannel + '\'' +
-				", remittanceAccount='" + remittanceAccount + '\'' +
-				", financialUser='" + financialUser + '\'' +
-				", financialTime=" + financialTime +
-				", remark='" + remark + '\'' +
-				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
-				'}';
+		return "TMisRemittanceMessage [dbid=" + dbid + ", remittanceName=" + remittanceName + ", remittanceTime="
+				+ remittanceTime + ", remittanceAmount=" + remittanceAmount + ", remittanceChannel=" + remittanceChannel
+				+ ", remittanceAccount=" + remittanceAccount + ", financialUser=" + financialUser + ", financialTime="
+				+ financialTime + ", remark=" + remark + ", remittanceSerialNumber=" + remittanceSerialNumber
+				+ ", accountStatus=" + accountStatus + ", begindealtime=" + begindealtime + ", enddealtime="
+				+ enddealtime + "]";
 	}
 
 	@Override

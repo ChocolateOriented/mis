@@ -4,20 +4,51 @@
 <head>
 	<title id="title">已查账</title>
 	<meta name="decorator" content="default"/>
+
+  <script src="../static/layer.js "></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
-		
+		  
+		   
 		});
+
+			function ss(d){
+// 				  $( d ).next().dialog("open");
+// 				  $( d ).next().show("fast");
+				$(d).hover({
+					  type: 1,
+					  skin: 'layui-layer-rim', //加上边框
+					  area: ['420px', '240px'], //宽高
+					  content: 'html内容'
+					});
+			}
+			function dd(d){
+				  $( d ).next().hide( "slow" );
+			}
+		 function page(n, s) {
+		        if (n) window.parent.$("#pageNo").val(n);
+		        if (s) window.parent.$("#pageSize").val(s);
+		       window.parent. $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
+		       window.parent.$("#searchForm").submit();
+		        return false;
+		      }
+	
 	</script>
+<style type="text/css">
+.us{display:none;width:300px;height:160px;border:1px solid #000;
+padding:10px;position:relative;top:10px;left:50px;
+background-color:white;
+}
+</style>
 </head>
 <body>
 	<input type="hidden" id="childIfam" value="checked">
 	<ul class="nav nav-tabs">
-	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/checked">已查账</a></li>
-	<li ><a href="${ctx}/dunning/tMisRemittanceMessage/completed">已完成</a></li>
+	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>
+	<li ><a href="${ctx}/dunning/tMisRemittanceMessage/completed?child=true">已完成</a></li>
 	</ul> 
 	<sys:message content="${message}"/>
-	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+	<table id="accountTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
 				<th>编号</th>
@@ -40,7 +71,7 @@
 			</tr>
 		</thead>
 		<tbody>
-		<c:forEach items="${window.parent.page.list}" var="tmessage" varStatus="status">
+		<c:forEach items="${pagechecked.list}" var="tmessage" varStatus="status">
 			<tr>
 				
 				<td>
@@ -67,8 +98,22 @@
 				<td>
 					  ${tmessage.creditamount }  
 				</td>
-				<td>
-					  ${tmessage.remittanceSerialNumber }  
+				<td >
+					 <div id="serNumber"  onmouseover="ss(this)" onmouseout="dd(this)">
+						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
+						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
+						 </font>
+					</div>
+				    <div style="display:none" class="us">
+						   <div><font  color="red"> ${tmessage.remittanceSerialNumber }</font></div>
+						   <div>------------------------------------- </div>
+						   <div>交易时间:${tmessage.remittancetime }</div>
+						   <div>交易金额:${tmessage.remittanceamount }</div>
+						   <div>对方名称:${tmessage.remittanceaccount }</div>
+						   <div>对方账户:${tmessage.remark }</div>
+						   <div>备注:${tmessage.creditamount }</div>
+						   <div>上传人:${tmessage.financialUser }</div>
+				    </div>
 				</td>
 				<td>
 					  ${tmessage.checkedPeople }  
@@ -79,12 +124,21 @@
 				<td>
 					  ${tmessage.remittanceTag }  
 				</td>
-				
-				</tr>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				<input id="changeSms" onclick=""  class="btn btn-primary" type="button" value="入账"/>
+				<input id="delete" class="btn btn-primary" onclick=""  type="button" value="减免" />
+				</td>
+			</tr>
 		</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination">${pagechecked}</div>
 	
 </body>
 </html>
