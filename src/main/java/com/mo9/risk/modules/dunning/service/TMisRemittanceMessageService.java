@@ -7,14 +7,17 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 财务确认汇款信息Service
+ *
  * @author 徐盛
  * @version 2016-08-11
  */
@@ -43,6 +47,8 @@ public class TMisRemittanceMessageService extends
 
 	@Autowired
 	private TMisRemittanceMessageDao misRemittanceMessageDao;
+	@Autowired
+	private TMisRemittanceConfirmService remittanceConfirmService;
 	@Autowired
 	protected Validator validator;
 
@@ -80,9 +86,8 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @Description 去重并保存汇款信息
-	 * @param tMisRemittanceList
 	 * @return int
+	 * @Description 去重并保存汇款信息
 	 */
 	@Transactional(readOnly = false)
 	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel) {
@@ -92,9 +97,9 @@ public class TMisRemittanceMessageService extends
 		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
 		if (trMList.size() > 0 && trMList != null) {
 			for (TMisRemittanceMessage tMisRemittanceMessage : trMList) {
-				if (AccountStatus.NOT_AUDIT.equals(tMisRemittanceMessage.getAccountStatus())) {
-					updateordList.add(tMisRemittanceMessage);
-				}
+//				if (AccountStatus.NOT_AUDIT.equals(tMisRemittanceMessage.getAccountStatus())) {
+//					updateordList.add(tMisRemittanceMessage);
+//				}
 			}
 		}
 		if (updateordList.size() > 0 && updateordList != null) {
@@ -128,9 +133,8 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @Description 财务上传时间在参数之后的汇款自动查账
-	 * @param date
 	 * @return void
+	 * @Description 财务上传时间在参数之后的汇款自动查账
 	 */
 	@Transactional(readOnly = false)
 	public void autoAuditAfterFinancialtime(Date date) {
@@ -139,11 +143,8 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @Description 自动查账, 借款订单与汇款信息匹配
-	 * 若汇款信息备注中有手机号, 则使用备注手机号匹配未还款订单
-	 * 备注中无手机号的 + 备注手机号未匹配成功的汇款信息, 若账号为手机号使用账号进行匹配
-	 * @param remittanceMessages
-	 *   需要查账的汇款信息
+	 * @param remittanceMessages 需要查账的汇款信息
+	 * @Description 自动查账, 借款订单与汇款信息匹配 若汇款信息备注中有手机号, 则使用备注手机号匹配未还款订单 备注中无手机号的 + 备注手机号未匹配成功的汇款信息, 若账号为手机号使用账号进行匹配
 	 */
 	@Transactional(readOnly = false)
 	public void autoAudit(List<TMisRemittanceMessage> remittanceMessages) {
@@ -204,9 +205,8 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @Description 通过电话匹配订单
-	 * @param containMobileMap
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage>
+	 * @Description 通过电话匹配订单
 	 */
 	@Transactional(readOnly = false)
 	public List<TMisRemittanceMessage> matchOrderWithMobil(
@@ -225,8 +225,8 @@ public class TMisRemittanceMessageService extends
 		}
 
 		//匹配订单
-		List<TMisRemittanceMessage> successMatchList = new ArrayList<TMisRemittanceMessage>(
-				orders.size());
+		List<TMisRemittanceMessage> successMatchList = new ArrayList<TMisRemittanceMessage>(orders.size());
+		List<TMisRemittanceConfirm> confirms = new ArrayList<TMisRemittanceConfirm>(orders.size());
 		for (DunningOrder order : orders) {
 			if (order == null) {
 				continue;
@@ -239,50 +239,74 @@ public class TMisRemittanceMessageService extends
 			logger.debug(
 					"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
 							+ "匹配成功");
-			//TODO 查账完成生成comfirm数据
-//			remittanceMessage.setDealcode(order.getDealcode());
-//			remittanceMessage.setAccountStatus(AccountStatus.COMPLETE_AUDIT);
-//			this.autoAddTemittanceTag(remittanceMessage, order);
-//			successMatchList.add(remittanceMessage);
+
+			TMisRemittanceConfirm remittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
+			this.autoAddTemittanceTag(remittanceMessage, order, remittanceConfirm);
+
+			successMatchList.add(remittanceMessage);
+			confirms.add(remittanceConfirm);
 		}
 
-//		dao.batchUpdateMatched(successMatchList);
+		//生成remittanceConfirm
+		User user = new User();
+		user.setName("sys");
+		remittanceConfirmService.batchInsert(confirms, user);
 		return successMatchList;
 	}
 
 	/**
-	 * @Description 自动对还款行为打标签
-	 * @param remittanceMessage
-	 * @param order
-	 * @return void
+	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm
+	 * @Description 生成汇款确认信息
 	 */
-	private void autoAddTemittanceTag(TMisRemittanceMessage remittanceMessage, DunningOrder order) {
+	private TMisRemittanceConfirm createRemittanceConfirm(TMisRemittanceMessage remittanceMessage, DunningOrder order) {
+		TMisRemittanceConfirm remittanceConfirm = new TMisRemittanceConfirm();
+		remittanceConfirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT);
+		remittanceConfirm.setConfirmFlow(ConfirmFlow.AUDIT);
+
+		remittanceConfirm.setDealcode(order.getDealcode());
+		remittanceConfirm.setMobile(order.getMobile());
+		remittanceConfirm.setName(order.getRealname());
+		remittanceConfirm.setBuyerId(String.valueOf(order.getBuyerid()));
+
+		remittanceConfirm.setRemittancename(remittanceMessage.getRemittanceName());
+		remittanceConfirm.setRemittancetime(remittanceMessage.getRemittanceTime());
+		remittanceConfirm.setRemittanceamount(remittanceMessage.getRemittanceAmount());
+		remittanceConfirm.setRemittancechannel(remittanceMessage.getRemittanceChannel());
+		remittanceConfirm.setSerialnumber(remittanceMessage.getRemittanceSerialNumber());
+
+		return remittanceConfirm;
+	}
+
+	/**
+	 * @return void
+	 * @Description 自动对还款行为打标签
+	 */
+	private void autoAddTemittanceTag(TMisRemittanceMessage remittanceMessage, DunningOrder order,
+			TMisRemittanceConfirm remittanceConfirm) {
 		String realName = order.getRealname();
 		if (StringUtils.isBlank(realName)) {
 			return;
 		}
-		//TODO 入账标签打在comfirm表上
 		//如果账户姓名等于借款人姓名则标记本人还款
 		String remittanceName = remittanceMessage.getRemittanceName();
 		if (realName.equals(remittanceName)) {
-//			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_SELF);
+			remittanceConfirm.setRemittanceTag(RemittanceTag.REPAYMENT_SELF);
 			return;
 		}
-		//账户名不等, 若备注中包含借款人姓名则标记第三方还款
+		//账户名不等,查看备注
 		String remark = remittanceMessage.getRemark();
 		if (StringUtils.isBlank(remark)) {
 			return;
 		}
+		//若备注中包含借款人姓名则标记第三方还款
 		if (remark.contains(realName)) {
-//			remittanceMessage.setRemittanceTag(RemittanceTag.REPAYMENT_THIRD);
+			remittanceConfirm.setRemittanceTag(RemittanceTag.REPAYMENT_THIRD);
 		}
 	}
 
 	/**
-	 * @Description 获取有效支付宝汇款信息
-	 * @param srcData
-	 * @param validData
 	 * @return java.lang.String
+	 * @Description 获取有效支付宝汇款信息
 	 */
 	public String getValidRemittanceMessage(List<AlipayRemittanceExcel> srcData,
 			List<TMisRemittanceMessage> validData) {
@@ -331,10 +355,8 @@ public class TMisRemittanceMessageService extends
 
 	/**
 	 * 查询所有的对公明细
-	 * @return
 	 */
-	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page,
-			TMisRemittanceMessage entity) {
+	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page, TMisRemittanceMessage entity) {
 		entity.setPage(page);
 		page.setList(dao.findAccountPageList(entity));
 		return page;
@@ -342,23 +364,20 @@ public class TMisRemittanceMessageService extends
 
 	/**
 	 * 查询已查账的所有数据
-	 * @param page
-	 * @return
 	 */
-	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(
-			Page<TMisRemittanceMessagChecked> page,
-			TMisRemittanceMessagChecked entity) {
+	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(Page<TMisRemittanceMessagChecked> page, TMisRemittanceMessagChecked entity) {
 		entity.setPage(page);
 		return page;
 	}
 
 	/**
-	 * @Description 通过电话查询未还款订单
-	 * @param mobile
 	 * @return com.mo9.risk.modules.dunning.entity.DunningOrder
+	 * @Description 通过电话查询未还款订单
 	 */
 	public DunningOrder findPaymentOrderByMobile(String mobile) {
-		List<DunningOrder> dunningOrders = dao.findPaymentOrderByMobile(mobile);
+		DunningOrder order = new DunningOrder();
+		order.setMobile(mobile);
+		List<DunningOrder> dunningOrders = dao.findPaymentOrder(order);
 		if (dunningOrders != null && dunningOrders.size() > 0) {
 			return dunningOrders.get(0);
 		}
@@ -366,12 +385,50 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @Description  查找未完成的汇款
-	 * @param remittanceChannel
-	 * @param remittanceSerialNumber
 	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage
+	 * @Description 查找未完成的汇款
 	 */
-	public List<TMisRemittanceMessage> findNotFinish(String remittanceChannel, String remittanceSerialNumber) {
-		return dao.findNotFinish(remittanceChannel,remittanceSerialNumber);
+	public List<TMisRemittanceConfirm> findNotFinish(String remittanceChannel, String remittanceSerialNumber) {
+		return dao.findNotFinish(remittanceChannel, remittanceSerialNumber);
+	}
+
+	/**
+	 * @return boolean
+	 * @Description 手工查账
+	 */
+	public boolean handleAudit(TMisRemittanceConfirm remittanceConfirm) {
+		//查询订单
+		DunningOrder q_order = new DunningOrder();
+		q_order.setDealcode(remittanceConfirm.getDealcode());
+		List<DunningOrder> orders = dao.findPaymentOrder(q_order);
+		if (orders == null || orders.size() == 0) {
+			return false;
+		}
+		DunningOrder order = orders.get(0);
+		if (order == null) {
+			return false;
+		}
+
+		//查询汇款信息
+		TMisRemittanceMessage q_remittanceMessage = new TMisRemittanceMessage();
+		q_remittanceMessage.setRemittanceSerialNumber(remittanceConfirm.getSerialnumber());
+		q_remittanceMessage.setRemittanceChannel(remittanceConfirm.getRemittancechannel());
+		List<TMisRemittanceMessage> remittanceMessages = this.findList(q_remittanceMessage);
+		if (remittanceMessages == null || remittanceMessages.size() == 0) {
+			return false;
+		}
+		TMisRemittanceMessage remittanceMessage = remittanceMessages.get(0);
+		if (remittanceMessage == null) {
+			return false;
+		}
+
+		//生成TMisRemittanceConfirm
+		TMisRemittanceConfirm new_tMisRemittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
+		String id = remittanceConfirm.getId();
+		if (StringUtils.isNotBlank(id)){
+			new_tMisRemittanceConfirm.setId(id);
+		}
+		remittanceConfirmService.save(new_tMisRemittanceConfirm);
+		return true;
 	}
 }

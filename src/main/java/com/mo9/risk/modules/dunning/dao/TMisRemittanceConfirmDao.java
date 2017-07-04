@@ -91,5 +91,12 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return
 	 */
 	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm);
-	
+
+	/**
+	 * @Description 批量插入
+	 * @param confirms
+	 * @return void
+	 */
+	void batchInsert(List<TMisRemittanceConfirm> confirms);
+
 }

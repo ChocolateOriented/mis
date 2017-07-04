@@ -22,8 +22,10 @@
 		a.FinancialImg1 AS "FinancialImg1",
 		a.FinancialImg2 AS "FinancialImg2",
 		a.financialremark AS "financialremark",
+		a.confirmFlow AS "confirmFlow"
 		a.confirmstatus AS "confirmstatus",
 		a.dealcode AS "dealcode",
+		a.remittanceTag AS "remittanceTag",
 		a.buyerId AS "buyerId",
 		a.name AS "name",
 		a.mobile AS "mobile",
@@ -52,6 +54,7 @@
 <!-- 			<include refid="tMisRemittanceConfirmJoins"/> -->
 		<where>
 		   		a.Invalid = 't'
+					AND a.confirmFlow = 'CHECK'
 			<if test="remittancename != null and remittancename != ''">
 			    AND a.remittancename LIKE concat('%',#{remittancename},'%')
 			</if>
@@ -104,12 +107,12 @@
 		SELECT 
 			<include refid="tMisRemittanceConfirmColumns"/>
 		FROM t_mis_remittance_confirm a
-			WHERE a.dealcode = #{dealcode} and a.confirmstatus is not null
+			WHERE  a.confirmFlow = 'CHECK' AND a.dealcode = #{dealcode} and a.confirmstatus is not null
 		ORDER BY a.createdate DESC limit  1 
 	</select>
 	
 		
-	<insert id="insert">
+	<insert id="insert">/
 		INSERT INTO t_mis_remittance_confirm(
 			id,
 			remittancename,
@@ -119,6 +122,7 @@
 			ReceivablesImg1,
 			ReceivablesImg2,
 			remark,
+			confirmFlow,
 			confirmstatus,
 			dealcode,
 			createby,
@@ -128,7 +132,8 @@
 			mobile,
 			updateby,
 			updatedate,
-			serialnumber
+			serialnumber,
+
 		) VALUES (
 			#{id},
 			#{remittancename},
@@ -138,6 +143,7 @@
 			#{ReceivablesImg1},
 			#{ReceivablesImg2},
 			#{remark},
+			#{confirmFlow},
 			#{confirmstatus},
 			#{dealcode},
 			#{createBy.name},
@@ -150,7 +156,27 @@
 			#{serialnumber}
 		)
 	</insert>
-	
+
+	<update id="update">
+		UPDATE t_mis_remittance_confirm SET
+		remittancename = #{remittancename},
+		remittancetime = #{remittancetime},
+		remittanceamount = #{remittanceamount},
+		remittancechannel = #{remittancechannel},
+		ReceivablesImg1 = #{ReceivablesImg1},
+		ReceivablesImg2 = #{ReceivablesImg2},
+		remark = #{remark},
+		confirmFlow = #{confirmFlow},
+		confirmstatus = #{confirmstatus},
+		dealcode = #{dealcode},
+		buyerId = #{buyerId},
+		name = #{name},
+		mobile = #{mobile},
+		updateby = #{updateBy.name},
+		updatedate = #{updateDate},
+		serialnumber = #{serialnumber}
+		WHERE id = #{id}
+	</update>
 	
 	<update id="remittanceUpdate">
 		UPDATE t_mis_remittance_confirm SET 	
@@ -245,14 +271,14 @@
 		SELECT
 			count(*)
 		FROM t_mis_remittance_confirm a
-		WHERE a.serialnumber = #{serialnumber}
+		WHERE a.confirmFlow = 'CHECK' AND a.serialnumber = #{serialnumber}
 	</select>
 	
 	<select id="getFinancialserialnumber" resultType="int">
 		SELECT
 			count(*)
 		FROM t_mis_remittance_confirm a
-		WHERE a.financialserialnumber = #{financialserialnumber}
+		WHERE a.confirmFlow = 'CHECK' AND  a.financialserialnumber = #{financialserialnumber}
 	</select>
 	
 	
@@ -267,7 +293,8 @@
 			<include refid="tMisRemittanceConfirmColumns"/>
 		FROM t_mis_remittance_confirm a
 		<where>
-		   		a.Invalid = 't'
+			a.confirmFlow = 'CHECK' AND
+			a.Invalid = 't'
 			AND a.dealcode = #{dealcode}
 			<if test="confirmstatus != null and confirmstatus != ''">
 				AND a.confirmstatus = #{confirmstatus}
@@ -275,4 +302,51 @@
 		</where>
 		ORDER BY a.createDate desc
 	</select>
+
+	<!--提交审核流程-->
+	<insert id="batchInsert" parameterType="java.util.List">
+		INSERT INTO t_mis_remittance_confirm(
+		id,
+		remittancename,
+		remittancetime,
+		remittanceamount,
+		remittancechannel,
+		remark,
+		confirmFlow,
+		confirmstatus,
+		dealcode,
+		remittanceTag,
+		createby,
+		createdate,
+		buyerId,
+		name,
+		mobile,
+		updateby,
+		updatedate,
+		serialnumber,
+		)
+		values
+		<foreach collection="list" index="index" item="item" separator="," >
+			(
+			#{id},
+			#{remittancename},
+			#{remittancetime},
+			#{remittanceamount},
+			#{remittancechannel},
+			#{remark},
+			#{confirmFlow},
+			#{confirmstatus},
+			#{dealcode},
+			#{remittanceTag},
+			#{createBy.name},
+			#{createDate},
+			#{buyerId},
+			#{name},
+			#{mobile},
+			#{updateBy.name},
+			#{updateDate},
+			#{serialnumber}
+			)
+		</foreach>
+	</insert>
 </mapper>

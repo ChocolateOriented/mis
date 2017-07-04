@@ -3,7 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.math.BigDecimal;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,5 +185,22 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm){
 		return misRemittanceConfirmDao.findRelatedList(tMisRemittanceConfirm);
+	}
+
+	/**
+	 * @Description 批量插入
+	 * @param confirms
+	 * @return void
+	 */
+	public void batchInsert(List<TMisRemittanceConfirm> confirms,User user) {
+		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
+			remittanceConfirm.preInsert();
+			remittanceConfirm.setUpdateBy(user);
+			remittanceConfirm.setCreateBy(user);
+		}
+		dao.batchInsert(confirms);
+		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
+			tMisRemittanceConfirmLogService.saveLog(remittanceConfirm);
+		}
 	}
 }

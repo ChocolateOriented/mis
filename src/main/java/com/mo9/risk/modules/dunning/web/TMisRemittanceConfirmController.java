@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -140,6 +141,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		tMisRemittanceConfirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_CH_SUBMIT);
+		tMisRemittanceConfirm.setConfirmFlow(ConfirmFlow.CHECK);
 		tMisRemittanceConfirm.preUpdate();
 		if(tMisRemittanceConfirmService.getSerialnumber(tMisRemittanceConfirm.getSerialnumber()) > 0 && null != tMisRemittanceConfirm.getSerialnumber() && !tMisRemittanceConfirm.getSerialnumber().isEmpty()){
 			addMessage(redirectAttributes, "提示！汇款唯一标示重复,保存失败");

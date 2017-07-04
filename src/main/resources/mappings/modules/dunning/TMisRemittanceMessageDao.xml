@@ -134,6 +134,7 @@
 	<select id="findPaymentOrderByMobiles" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
 		SELECT
 		o.dealcode AS "dealcode",
+		o.buyer_id AS "buyer_id",
 		b.mobile AS "mobile",
 		idc.real_name AS "realname"
 		FROM
@@ -150,10 +151,11 @@
 		</foreach>
 	</select>
 
-	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
+	<select id="findPaymentOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
 		SELECT
 		idc.real_name AS "realname",
 		o.dealcode AS "dealcode",
+		o.buyer_id AS "buyer_id",
 		b.mobile AS "mobile",
 		o.amount AS "amount",
 		<include refid="countRemainAmmount"/> AS creditamount,
@@ -169,22 +171,13 @@
 		o.merchant_id = 7
 		AND o.`status`= 'payment'
 		AND o.type = 'loan'
-		AND b.mobile = #{mobile}
+		<if test="mobile!= null and mobile!= ''">
+			AND b.mobile = #{mobile}
+		</if>
+		<if test="dealcode!= null and dealcode!= ''">
+			AND o.dealcode = #{dealcode}
+		</if>
 	</select>
-
-	<update id="batchUpdateMatched" >
-		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
-			UPDATE t_mis_remittance_message
-			<set>
-				updateDate = now(),
-				updateby = "sys",
-				dealcode = #{item.dealcode},
-				accountStatus = #{item.accountStatus},
-				remittanceTag = #{item.remittanceTag}
-			</set>
-			WHERE id = #{item.id}
-		</foreach>
-	</update>
 
 	<select id="findAfterFinancialTimeNotAuditList" resultType="TMisRemittanceMessage">
 		SELECT
@@ -319,5 +312,30 @@
         </if>
 	</select>
 	
-	
+	<select id="findNotFinish" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm">
+		SELECT
+		c.id AS "id",
+		a.remittanceSerialNumber AS "serialnumber",
+		a.remittanceAccount AS "financialremittancename",
+		a.remittanceName AS "remittancename",
+		a.remittanceAmount AS "remittanceamount",
+		a.remittanceTime AS "remittancetime",
+		a.remark AS "remark"
+
+		FROM t_mis_remittance_message a
+		LEFT JOIN  t_mis_remittance_confirm c
+		ON a.remittanceSerialNumber = c.serialnumber
+		AND a.remittancechannel = c.remittancechannel
+		WHERE
+		c.dbid IS NULL
+		OR c.confirmstatus = "complete_audit"
+		<if test="remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
+			AND a.remittanceSerialNumber=#{remittanceSerialNumber}
+		</if>
+		<if test="remittanceChannel!= null and  remittanceChannel!= ''">
+			AND a.remittanceChannel=#{remittanceChannel}
+		</if>
+	</select>
+
+
 </mapper>

@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.dao;
 
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
@@ -25,7 +26,7 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	List<DunningOrder> findPaymentOrderByMobiles(List<String> mobiles);
 
-	List<DunningOrder> findPaymentOrderByMobile(String mobile);
+	List<DunningOrder> findPaymentOrder(DunningOrder order);
 
 	public List<TMisRemittanceMessage> findBySerialNumbers(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList,@Param("channel")String channel);
 
@@ -41,5 +42,5 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	public List<TMisRemittanceMessagChecked> findMessagCheckedList(TMisRemittanceMessagChecked entity);
 
-	List<TMisRemittanceMessage> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
+	List<TMisRemittanceConfirm> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
 }

@@ -4,20 +4,16 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
-import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -117,9 +113,9 @@ public class TMisRemittanceMessageController extends BaseController {
 	public String detail(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
 		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
 		model.addAttribute("page",page);
-		AccountStatus[] values = AccountStatus.values();
-		List<AccountStatus> asList = Arrays.asList(values);
-		model.addAttribute("statusList", asList);
+//		AccountStatus[] values = AccountStatus.values();
+//		List<AccountStatus> asList = Arrays.asList(values);
+//		model.addAttribute("statusList", asList);
 //		model.addAttribute("tMisRemittanceMessage", new TMisRemittanceMessage());
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
@@ -168,5 +164,43 @@ public class TMisRemittanceMessageController extends BaseController {
 	@ResponseBody
 	public DunningOrder findOrderByMobile(String mobile){
 		return tMisRemittanceMessageService.findPaymentOrderByMobile(mobile);
+	}
+
+	/**
+	 * 查询汇款信息通过渠道与流水号
+	 */
+	@RequestMapping(value = "findRemittance")
+	@ResponseBody
+	public TMisRemittanceConfirm findRemittance(String remittanceChannel,String remittanceSerialNumber){
+		List<TMisRemittanceConfirm> remittanceConfirmList = tMisRemittanceMessageService.findNotFinish(remittanceChannel,remittanceSerialNumber);
+		if (remittanceConfirmList !=null && remittanceConfirmList.size()>0){
+			return remittanceConfirmList.get(0);
+		}
+		return null;
+	}
+
+	/**
+	 * 手工查账
+	 */
+	@RequestMapping(value = "handleAudit")
+	@ResponseBody
+	public String handleAudit(TMisRemittanceConfirm remittanceConfirm){
+		if (remittanceConfirm == null){
+			return "参数不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getSerialnumber())){
+			return  "流水号不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getRemittancechannel())){
+			return  "渠道不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getDealcode())){
+			return  "订单号不能为空";
+		}
+		boolean success = tMisRemittanceMessageService.handleAudit(remittanceConfirm);
+		if (success){
+			return "success";
+		}
+		return "查账失败";
 	}
 }
