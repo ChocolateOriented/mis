@@ -4,26 +4,23 @@
 <head>
 	<title id="title">已查账</title>
 	<meta name="decorator" content="default"/>
-
-  <script src="../static/layer.js "></script>
+ 
 	<script type="text/javascript">
 		$(document).ready(function() {
-		  
-		   
+		
+			
+		
 		});
-
+ 			
 			function ss(d){
-// 				  $( d ).next().dialog("open");
-// 				  $( d ).next().show("fast");
-				$(d).hover({
-					  type: 1,
-					  skin: 'layui-layer-rim', //加上边框
-					  area: ['420px', '240px'], //宽高
-					  content: 'html内容'
-					});
+			 $(d).next().show();
+			
+			}
+			function s(){
+				var ss="nishi";
+				return ss;
 			}
 			function dd(d){
-				  $( d ).next().hide( "slow" );
 			}
 		 function page(n, s) {
 		        if (n) window.parent.$("#pageNo").val(n);
@@ -35,13 +32,18 @@
 	
 	</script>
 <style type="text/css">
-.us{display:none;width:300px;height:160px;border:1px solid #000;
-padding:10px;position:relative;top:10px;left:50px;
-background-color:white;
-}
 </style>
 </head>
 <body>
+
+
+  
+ 
+                
+                
+                
+                
+                
 	<input type="hidden" id="childIfam" value="checked">
 	<ul class="nav nav-tabs">
 	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>

@@ -14,9 +14,7 @@
 		a.financialtime AS "financialTime",
 		a.remark AS "remark",
 		a.createdate AS "createDate",
-		a.remittanceSerialNumber AS "remittanceSerialNumber",
-<!-- 		a.accountStatus AS "accountStatus", -->
-<!-- 		a.remittanceTag AS "remittanceTag" -->
+		a.remittanceSerialNumber AS "remittanceSerialNumber"
 	</sql>
 	
 	<sql id="tMisRemittanceMessageJoins">
@@ -185,8 +183,11 @@
 			<include refid="tMisRemittanceMessageColumns"/>
 		FROM
 			t_mis_remittance_message AS a
+			LEFT JOIN  t_mis_remittance_confirm AS c
+			ON a.remittanceSerialNumber = c.serialnumber
+			AND a.remittancechannel = c.remittancechannel
 		WHERE
-			accountStatus = "NOT_AUDIT"
+		c.dbid IS NULL
 		<if test="date != null">
 			<![CDATA[
       	AND a.financialtime > #{date}
@@ -243,7 +244,7 @@
 			and c.ConfirmStatus =#{ accountStatus}
 		</if>
 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
-			and c.ConfirmStatus not in("complete_audit","finish")
+			and c.id is null
 		</if>
 			and c.ConfirmFlow="AUDIT"
 		
@@ -301,10 +302,10 @@
 	  m.PayType AS "payType",
 	  m.RemittanceTime AS "remittancetime",
 	  m.RemittanceAmount AS "remittanceamount",
-	  m.RemittanceAccount AS "remittanceaccount",
+	  a.RemittanceAccount AS "remittanceaccount",
 	  m.Remark AS "remark",
 	  a.FinancialUser AS "financialUser",
-	  m.updateDate AS　"updateDate"
+	  m.updateDate AS "updateDate"
 	  from
 	  t_mis_remittance_confirm m
 	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
@@ -324,7 +325,7 @@
                 AND b.mobile=#{mobile}
         </if>
 		 <if test=" realName!= null and  realName!= ''">
-                AND  m.RemittanceNamee=#{realName}
+                AND  m.RemittanceName=#{realName}
         </if>
 		 <if test=" dealcode!= null and  dealcode!= ''">
                 AND m.dealcode=#{dealcode}
@@ -357,10 +358,10 @@
 	  m.PayType AS "payType",
 	  m.RemittanceTime AS "remittancetime",
 	  m.RemittanceAmount AS "remittanceamount",
-	  m.RemittanceAccount AS "remittanceaccount",
+	  a.RemittanceAccount AS "remittanceaccount",
 	  m.Remark AS "remark",
 	  a.FinancialUser AS "financialUser",
-	  m.updateDate AS　"updateDate"
+	  m.updateDate AS "updateDate"
 	  from
 	  t_mis_remittance_confirm m
 	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
