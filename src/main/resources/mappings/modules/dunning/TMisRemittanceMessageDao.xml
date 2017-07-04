@@ -72,6 +72,7 @@
 	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
 				a.remittanceSerialNumber AS "remittanceSerialNumber",
+				a.remittancechannel  AS "remittanceChannel",
 				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
 			LEFT JOIN t_mis_remittance_confirm AS c 
@@ -83,8 +84,7 @@
 			</foreach>
 			and
 			a.remittancechannel = #{channel}
-			and
-			c.ConfirmFlow="AUDIT"
+			
 			
 	</select>
 
@@ -254,7 +254,7 @@
                 ORDER BY ${ page.orderBy}
             </when>
             <otherwise>
-              
+              ORDER BY remittancetime desc
             </otherwise>
         </choose>
 	</select>
@@ -287,6 +287,8 @@
 	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
 	
 	  select
+	  o.buyer_id AS "buyerId",
+	  t.id AS "dunningtaskdbid",
 	  m.RemittanceName AS "realName",
 	  m.mobile AS "mobile",
 	  m.dealcode AS "dealcode",
@@ -338,6 +340,14 @@
 		 <if test=" remittanceTag!= null and  remittanceTag!= ''">
                 AND m.remittanceTag=#{remittanceTag}
         </if>
+        <choose>
+            <when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
+                ORDER BY ${ page.orderBy}
+            </when>
+            <otherwise>
+              ORDER BY updateDate desc
+            </otherwise>
+        </choose>
 	</select>
 	
 	<select id="findMessagCompletedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
@@ -394,6 +404,14 @@
 		 <if test=" remittanceTag!= null and  remittanceTag!= ''">
                 AND m.remittanceTag=#{remittanceTag}
         </if>
+        <choose>
+            <when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
+                ORDER BY ${ page.orderBy}
+            </when>
+            <otherwise>
+              ORDER BY updateDate desc
+            </otherwise>
+        </choose>
 	</select>
 	
 	<select id="findNotFinish" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm">

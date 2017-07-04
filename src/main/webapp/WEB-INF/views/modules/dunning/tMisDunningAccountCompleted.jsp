@@ -68,7 +68,7 @@
 					  ${tmessage.amount }  
 				</td>
 				<td>
-					 ${tmessage.modifyamount} 
+					  ${tmessage.modifyamount} 
 				</td>
 				<td>
 					  ${tmessage.creditamount }  
@@ -77,7 +77,7 @@
 					  ${tmessage.remittanceSerialNumber }  
 				</td>
 				<td>
-					  ${tmessage.checkedPeople }  
+					    
 				</td>
 				<td>
 					  ${tmessage.orderStatus }  
@@ -86,10 +86,14 @@
 					  ${tmessage.remittanceTag }  
 				</td>
 				<td>
+					  ${tmessage.payType } 
+				</td>
+				
+				<td>
+					 <fmt:formatDate value="${tmessage.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>   
 				</td>
 				<td>
-				</td>
-				<td>
+					  ${tmessage.completePeople }
 				</td>
 				
 			</tr>

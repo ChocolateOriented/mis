@@ -22,13 +22,30 @@
 			}
 			function dd(d){
 			}
-		 function page(n, s) {
+		  function page(n, s) {
 		        if (n) window.parent.$("#pageNo").val(n);
 		        if (s) window.parent.$("#pageSize").val(s);
 		       window.parent. $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
 		       window.parent.$("#searchForm").submit();
 		        return false;
-		      }
+		   }
+		 
+		   function collectionfunction(obj, width, height){
+				var dealcode = $(obj).attr("dealcode");
+				var buyerId = $(obj).attr("buyerId");
+				var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
+				var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode=" + dealcode+"&buyerId="+buyerId+"&dunningtaskdbid="+dunningtaskdbid;
+				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
+	               buttons: {
+	            	   },
+	                   submit: function (v, h, f) {
+
+	                   },
+	               loaded: function (h) {
+	                   $(".jbox-content", document).css("overflow-y", "hidden");
+	               }
+	         });
+		 }
 	
 	</script>
 <style type="text/css">
@@ -126,15 +143,20 @@
 				<td>
 					  ${tmessage.remittanceTag }  
 				</td>
+				
 				<td>
+					  ${tmessage.payType } 
+				</td>
+				
+				<td>
+					 <fmt:formatDate value="${tmessage.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>   
 				</td>
 				<td>
 				</td>
-				<td>
-				</td>
+				
 				<td>
 				<input id="changeSms" onclick=""  class="btn btn-primary" type="button" value="入账"/>
-				<input id="delete" class="btn btn-primary" onclick=""  type="button" value="减免" />
+				<input id="derate" class="btn btn-primary" onclick="collectionfunction(this)" buyerId="${tmessage.buyerId}" dunningtaskdbid="${tmessage.dunningtaskdbid}" dealcode="${tmessage.dealcode }"  type="button" value="减免" />
 				</td>
 			</tr>
 		</c:forEach>
