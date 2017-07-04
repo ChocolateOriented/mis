@@ -63,9 +63,9 @@
 			<li><label>入账状态</label>
 			<form:select  id="status" path="accountStatus" class="input-medium">
 				<form:option selected="selected" value="" label="全部状态"/>
-				<c:forEach items="${statusList}" var="status">
-				 	<form:option value="${status}" label="${status.desc}"/>
-				</c:forEach>
+				 <form:option value="not_audit" label="未查账"/>
+				 <form:option value="complete_audit" label="已查账"/>
+				 <form:option value="finish" label="已完成"/>
 			</form:select>
 			</li>
 			</br>

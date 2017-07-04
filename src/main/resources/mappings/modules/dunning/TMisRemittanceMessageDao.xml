@@ -12,12 +12,11 @@
 		a.remittanceaccount AS "remittanceAccount",
 		a.financialuser AS "financialUser",
 		a.financialtime AS "financialTime",
-		a.dealcode AS "dealcode",
 		a.remark AS "remark",
 		a.createdate AS "createDate",
 		a.remittanceSerialNumber AS "remittanceSerialNumber",
-		a.accountStatus AS "accountStatus",
-		a.remittanceTag AS "remittanceTag"
+<!-- 		a.accountStatus AS "accountStatus", -->
+<!-- 		a.remittanceTag AS "remittanceTag" -->
 	</sql>
 	
 	<sql id="tMisRemittanceMessageJoins">
@@ -74,8 +73,11 @@
 
 	<select id="findBySerialNumbers" resultType="TMisRemittanceMessage">
 			select
-			<include refid="tMisRemittanceMessageColumns"/>
+				a.remittanceSerialNumber AS "remittanceSerialNumber",
+				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
+			LEFT JOIN t_mis_remittance_confirm AS c 
+				ON a.remittanceSerialNumber = c.Serialnumber 
 			where
 			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
@@ -83,7 +85,10 @@
 			</foreach>
 			and
 			a.remittancechannel = #{channel}
-			
+			and
+			c.ConfirmFlow="AUDIT"
+			and 
+			a.RemittanceChannel=c.RemittanceChannel
 	</select>
 
 
@@ -98,16 +103,14 @@
 			remittanceaccount,
 			financialuser,
 			financialtime,
-			dealcode,
 			remark,
 			createDate,
 			remittanceSerialNumber,
-			accountStatus,
 			updateDate,
 			updateby
 		)
 		values
-		<foreach collection="list" index="index" item="item" separator="," >
+		<foreach collection="list" item="item" index="index"  separator="," >
 		(
 			#{item.id},
 			#{item.remittanceName},
@@ -117,13 +120,11 @@
 			#{item.remittanceAccount},
 			#{item.financialUser},
 			#{item.financialTime},
-			#{item.dealcode},
 			#{item.remark},
 			#{item.createDate},
 			#{item.remittanceSerialNumber},
-			#{item.accountStatus},
 			#{item.updateDate},
-			#{item.updateBy.id}
+			#{item.updateBy.name}
 		)
 		</foreach>
 
@@ -202,10 +203,24 @@
 
 	<select id="findAccountPageList" resultType="TMisRemittanceMessage">
 		select
-		*
+		m.dbid AS "dbid",
+		m.id AS "id",
+		m.remittancename AS "remittanceName",
+		m.remittancetime AS "remittanceTime",
+		m.remittanceamount AS "remittanceAmount",
+		m.remittancechannel AS "remittanceChannel",
+		m.remittanceaccount AS "remittanceAccount",
+		m.financialuser AS "financialUser",
+		m.financialtime AS "financialTime",
+		m.remark AS "remark",
+		m.createdate AS "createDate",
+		m.remittanceSerialNumber AS "remittanceSerialNumber"
 		from
 		t_mis_remittance_message m
+		LEFT JOIN t_mis_remittance_confirm AS c 
+				ON m.remittanceSerialNumber = c.Serialnumber 
 		<where>
+			and m.RemittanceChannel=c.RemittanceChannel
 		<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
 			and m.remittanceSerialNumber =#{ remittanceSerialNumber}
 		</if>
@@ -231,9 +246,14 @@
 		<if test="  remittanceName!= null and   remittanceName!= ''">
 			and m.remittancename =#{ remittanceName}
 		</if>
-		<if test="  accountStatus!= null and   accountStatus!= ''">
-			and m.accountStatus =#{ accountStatus}
+		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
+			and c.ConfirmStatus =#{ accountStatus}
 		</if>
+		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
+			and c.ConfirmStatus not in("complete_audit","finish")
+		</if>
+			and c.ConfirmFlow="AUDIT"
+		
 		</where>
 		
 		<choose>
@@ -246,10 +266,10 @@
         </choose>
 	</select>
 	
-	<update id="updateList" parameterType="java.util.List">
-			<foreach collection="list" item="item" index="index" open="" close="" separator=";">
-			UPDATE t_mis_remittance_message
-			<set>
+	<update id="updateList" >
+<!-- 			<foreach collection="list" item="item" index="index" open="" close="" separator=";"> -->
+			update t_mis_remittance_message
+<!-- 		<set> -->set
 			id=#{item.id},
 			remittancename=#{item.remittanceName},                           
 			remittancetime=#{item.remittanceTime},
@@ -258,17 +278,15 @@
 			remittanceaccount=#{item.remittanceAccount},
 			financialuser=#{item.financialUser},
 			financialtime=#{item.financialTime},
-			dealcode=#{item.dealcode},
 			remark=#{item.remark},
 			createDate=#{item.createDate},
 			remittanceSerialNumber=#{item.remittanceSerialNumber},
-			accountStatus=#{item.accountStatus},
 			updateDate=#{item.updateDate},
-			updateby=#{item.updateBy.id}
+			updateby=#{item.updateBy.name}
 			
-			</set>
-			WHERE remittanceSerialNumber = #{item.remittanceSerialNumber} and accountStatus=#{channel}
-		</foreach>
+<!-- 			</set> -->
+			WHERE remittanceSerialNumber = #{item.remittanceSerialNumber}  and RemittanceChannel=#{channel}
+<!-- 		</foreach> -->
 	
 	
 	</update>
@@ -276,40 +294,106 @@
 	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
 	
 	  select
-	  idc.real_name AS "realName",
-	  b.mobile AS "mobile",
+	  m.RemittanceName AS "realName",
+	  m.mobile AS "mobile",
 	  m.dealcode AS "dealcode",
-	  p.nickname AS "nickName"
+	  p.nickname AS "nickName",
 	  o.amount AS "amount",
 	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
 	  <include refid="countRemainAmmount"/> AS "creditamount",
-	  m.remittanceSerialNumber AS "remittanceSerialNumber",
-	  m.checkedPeople AS "checkedPeople",
+	  m.Serialnumber AS "remittanceSerialNumber",
+	  l.updateBy AS "checkedPeople",
 	  o.status AS "orderStatus",
 	  m.RemittanceTag AS "remittanceTag",
+	  m.PayType AS "payType",
+	  m.RemittanceTime AS "remittancetime",
+	  m.RemittanceAmount AS "remittanceamount",
+	  m.RemittanceAccount AS "remittanceaccount",
+	  m.Remark AS "remark",
+	  a.FinancialUser AS "financialUser",
+	  m.updateDate AS　"updateDate"
 	  from
-	  t_mis_remittance_message m
+	  t_mis_remittance_confirm m
 	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
 	  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-      LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-      LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Serialnumber 
+      LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
       LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-	   WHERE
+	  WHERE
 		o.type = 'loan' 
         AND o.merchant_id = 7
 		AND o.`status`IN ('payoff', 'payment' )
-		AND m.accountStatus="COMPLETE_AUDIT"
+		AND m.ConfirmStatus="complete_audit"
+		AND m.ConfirmFlow="AUDIT"
+		AND  m.updateDate=l.updateDate
+		AND a.RemittanceChannel=m.RemittanceChannel
 		 <if test=" mobile!= null and  mobile!= ''">
                 AND b.mobile=#{mobile}
         </if>
 		 <if test=" realName!= null and  realName!= ''">
-                AND idc.real_name=#{realName}
+                AND  m.RemittanceNamee=#{realName}
         </if>
 		 <if test=" dealcode!= null and  dealcode!= ''">
                 AND m.dealcode=#{dealcode}
         </if>
 		 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-                AND m.remittanceSerialNumber=#{remittanceSerialNumber}
+                AND m.Serialnumber=#{remittanceSerialNumber}
+        </if>
+		 <if test=" orderStatus!= null and  orderStatus!= ''">
+                AND o.status=#{orderStatus}
+        </if>
+		 <if test=" remittanceTag!= null and  remittanceTag!= ''">
+                AND m.remittanceTag=#{remittanceTag}
+        </if>
+	</select>
+	
+	<select id="findMessagCompletedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
+	
+	 select
+	  m.RemittanceName AS "realName",
+	  m.mobile AS "mobile",
+	  m.dealcode AS "dealcode",
+	  p.nickname AS "nickName",
+	  o.amount AS "amount",
+	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+	  <include refid="countRemainAmmount"/> AS "creditamount",
+	  m.Serialnumber AS "remittanceSerialNumber",
+	  l.updateBy AS "completePeople",
+	  o.status AS "orderStatus",
+	  m.RemittanceTag AS "remittanceTag",
+	  m.PayType AS "payType",
+	  m.RemittanceTime AS "remittancetime",
+	  m.RemittanceAmount AS "remittanceamount",
+	  m.RemittanceAccount AS "remittanceaccount",
+	  m.Remark AS "remark",
+	  a.FinancialUser AS "financialUser",
+	  m.updateDate AS　"updateDate"
+	  from
+	  t_mis_remittance_confirm m
+	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+	  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Serialnumber 
+      LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
+      LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+	  WHERE
+		o.type = 'loan' 
+        AND o.merchant_id = 7
+		AND o.`status`IN ('payoff', 'payment' )
+		AND m.ConfirmStatus="finsh"
+		AND m.ConfirmFlow="AUDIT"
+		AND  m.updateDate=l.updateDate
+		AND a.RemittanceChannel=m.RemittanceChannel
+		 <if test=" mobile!= null and  mobile!= ''">
+                AND b.mobile=#{mobile}
+        </if>
+		 <if test=" realName!= null and  realName!= ''">
+                AND  m.RemittanceNamee=#{realName}
+        </if>
+		 <if test=" dealcode!= null and  dealcode!= ''">
+                AND m.dealcode=#{dealcode}
+        </if>
+		 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
+                AND m.Serialnumber=#{remittanceSerialNumber}
         </if>
 		 <if test=" orderStatus!= null and  orderStatus!= ''">
                 AND o.status=#{orderStatus}

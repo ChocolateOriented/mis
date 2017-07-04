@@ -9,7 +9,7 @@ import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
+//import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage.AccountStatus;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -86,23 +86,17 @@ public class TMisRemittanceMessageService extends
 	 */
 	@Transactional(readOnly = false)
 	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel) {
-		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao
-				.findBySerialNumbers(tMisRemittanceList, channel);
+		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList, channel);
 		List<TMisRemittanceMessage> updateordList = new ArrayList<TMisRemittanceMessage>();
 		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
 		if (trMList.size() > 0 && trMList != null) {
 			for (TMisRemittanceMessage tMisRemittanceMessage : trMList) {
-				if (AccountStatus.NOT_AUDIT.equals(tMisRemittanceMessage.getAccountStatus())) {
+				if (StringUtils.isEmpty(tMisRemittanceMessage.getAccountStatus())) {
 					updateordList.add(tMisRemittanceMessage);
 				}
 			}
 		}
 		if (updateordList.size() > 0 && updateordList != null) {
-//			for (TMisRemittanceMessage ordMessage : updateordList) {
-//				for (TMisRemittanceMessage tMisRemittanceMessage : tMisRemittanceList) {
-//					updateNewList.add(tMisRemittanceMessage);
-//				}
-//			}
 			for (int i = 0; i < updateordList.size(); i++) {
 				for (int j = 0; j < tMisRemittanceList.size(); j++) {
 					if (updateordList.get(i).getRemittanceSerialNumber()
@@ -119,7 +113,10 @@ public class TMisRemittanceMessageService extends
 		}
 		if (updateNewList.size() > 0 && updateNewList != null) {
 			//更新数据相同但是状态为未查账的.
-			misRemittanceMessageDao.updateList(updateNewList, channel);
+			for (TMisRemittanceMessage tMisRemittanceMessage : updateNewList) {
+				
+				misRemittanceMessageDao.updateList(tMisRemittanceMessage, channel);
+			}
 		}
 
 		int updateNum = updateordList.size();
@@ -341,14 +338,17 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * 查询已查账的所有数据
+	 * 查询已查账的huozhe yiwanchengde 所有数据
 	 * @param page
 	 * @return
 	 */
-	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(
-			Page<TMisRemittanceMessagChecked> page,
-			TMisRemittanceMessagChecked entity) {
+	public Page<TMisRemittanceMessagChecked> findMessagList(Page<TMisRemittanceMessagChecked> page,TMisRemittanceMessagChecked entity,String childPage) {
 		entity.setPage(page);
+		if ("completed".equals(childPage)) {
+			page.setList(dao.findMessagCompletedList(entity));	
+		}else{
+			page.setList(dao.findMessagCheckedList(entity));
+		}
 		return page;
 	}
 

@@ -2,25 +2,33 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title >已完成</title>
+	<title id="title">已完成</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
 		
 		});
+		
+		 function page(n, s) {
+		        if (n) window.parent.$("#pageNo").val(n);
+		        if (s) window.parent.$("#pageSize").val(s);
+		       window.parent. $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=completed");
+		       window.parent.$("#searchForm").submit();
+		        return false;
+		      }
 	</script>
 </head>
 <body>
 	<input type="hidden" id="childIfam" value="completed">
 	<ul class="nav nav-tabs">
-	<li><a href="${ctx}/dunning/tMisRemittanceMessage/checked">已查账</a></li>
-	<li  class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/completed">已完成</a></li>
+	<li ><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>
+	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/completed?child=true">已完成</a></li>
 	</ul> 
 	<sys:message content="${message}"/>
-	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+	<table id="accountTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th>编号2</th>
+				<th>编号</th>
 				<th>姓名</th>
 				<th>手机号</th>
 				<th>订单编号</th>
@@ -35,53 +43,60 @@
 				<th>入账类型</th>
 				<th>更新时间</th>
 				<th>入账人</th>
-				
-				
 			</tr>
 		</thead>
 		<tbody>
-<%-- 		<c:forEach items="${page.list}" var="tmessage" varStatus="status"> --%>
-<!-- 			<tr> -->
+		<c:forEach items="${pagecompleted.list}" var="tmessage" varStatus="status">
+			<tr>
 				
-<!-- 				<td> -->
-<%-- 				 	${status.count} --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					 ${tmessage.remittanceSerialNumber }  --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					 <fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/> --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					 ${tmessage.remittancechannel }  --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					 ${tmessage.remittanceamount }  --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					  ${tmessage.remittancename }   --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					 ${tmessage.remittanceaccount}  --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					  ${tmessage.remark }   --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					  ${tmessage.accountStatus }   --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					  ${tmessage.createDate }   --%>
-<!-- 				</td> -->
-<!-- 				<td> -->
-<%-- 					  ${tmessage.financialuser }   --%>
-<!-- 				</td> -->
+				<td>
+				 	${status.count}
+				</td>
+				<td>
+					 ${tmessage.realName } 
+				</td>
+				<td>
+				 	${tmessage.mobile } 
+				</td>
+				<td>
+					 ${tmessage.dealcode } 
+				</td>
+				<td>
+					 ${tmessage.nickName } 
+				</td>
+				<td>
+					  ${tmessage.amount }  
+				</td>
+				<td>
+					 ${tmessage.modifyamount} 
+				</td>
+				<td>
+					  ${tmessage.creditamount }  
+				</td>
+				<td>
+					  ${tmessage.remittanceSerialNumber }  
+				</td>
+				<td>
+					  ${tmessage.checkedPeople }  
+				</td>
+				<td>
+					  ${tmessage.orderStatus }  
+				</td>
+				<td>
+					  ${tmessage.remittanceTag }  
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
 				
-<!-- 				</tr> -->
-<%-- 		</c:forEach> --%>
+			</tr>
+		</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination">${pagecompleted}</div>
 	
 </body>
 </html>

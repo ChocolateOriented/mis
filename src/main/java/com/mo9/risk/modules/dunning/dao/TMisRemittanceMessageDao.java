@@ -37,9 +37,11 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	List<TMisRemittanceMessage> findAfterFinancialTimeNotAuditList(Date date);
 
-	public void updateList(@Param("list") List<TMisRemittanceMessage> updateList,@Param("channel")String channel);
+	public void updateList(@Param("item") TMisRemittanceMessage tMisRemittanceMessage,@Param("channel")String channel);
 
 	public List<TMisRemittanceMessagChecked> findMessagCheckedList(TMisRemittanceMessagChecked entity);
-
+	
 	List<TMisRemittanceMessage> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
+	
+	public List<TMisRemittanceMessagChecked> findMessagCompletedList(TMisRemittanceMessagChecked entity);
 }

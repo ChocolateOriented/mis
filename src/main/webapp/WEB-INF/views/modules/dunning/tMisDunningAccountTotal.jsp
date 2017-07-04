@@ -8,6 +8,7 @@
     <script type="text/javascript">
       var content = null;
       $(document).ready(function () {
+    	
         var queryOrderTemplate = $("#queryOrderTemplate").html();
         content = {
           state1: {
@@ -41,20 +42,19 @@
             }
           }
         };
+        
+    	// 清空查询功能
+		 $("#empty").click(function(){
+			var sss = window.frames["ifm"].document.getElementById("childIfam").value;
+  		 	window.location.href="${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss;
+		 }); 
+			
       });
       function page(n, s) {
         if (n) $("#pageNo").val(n);
         if (s) $("#pageSize").val(s);
         var sss = window.frames["ifm"].document.getElementById("childIfam").value;
-        alert(sss);
-        if ("checked" == sss) {
-          $("#ifm").attr("src", "${ctx}/dunning/tMisRemittanceMessage/checked");
-          $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList");
-        }
-        if ("completed" == sss) {
-          $("#ifm").attr("src", "${ctx}/dunning/tMisRemittanceMessage/completed");
-          $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList");
-        }
+        $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss);
         $("#searchForm").submit();
         return false;
       }
@@ -96,23 +96,23 @@
 </head>
 <body>
 <ul class="nav nav-tabs">
-    <li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/detail">查账入账</a></li>
+    <li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/confirmList">查账入账</a></li>
 
     <span id="successRate" style="float:right;padding:8px;"></span>
 
 </ul>
 
 <sys:message content="${message}"/>
-<form:form id="searchForm" modelAttribute="TMisRemittanceMessage" method="post"
+<form:form id="searchForm" modelAttribute="TMisRemittanceMessagChecked" method="post"
            class="breadcrumb form-search">
     <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
     <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
     <ul class="ul-form">
         <li><label>手机号</label>
-            <form:input path="dealcode" htmlEscape="false" class="input-medium"/>
+            <form:input path="mobile" htmlEscape="false" class="input-medium"/>
         </li>
         <li><label>对方姓名</label>
-            <form:input path="dealcode" htmlEscape="false" maxlength="128" class="input-medium"/>
+            <form:input path="realName" htmlEscape="false" maxlength="128" class="input-medium"/>
         </li>
         <li><label>订单编号</label>
             <form:input path="dealcode" htmlEscape="false" maxlength="128" class="input-medium"/>
@@ -122,24 +122,22 @@
         </li>
 
         <li><label>订单状态</label>
-            <form:select id="status" path="dealcode" class="input-medium">
+            <form:select id="status" path="orderStatus" class="input-medium">
                 <form:option selected="selected" value="" label="全部状态"/>
-                <%-- 				<c:forEach items="" var=""> --%>
-                <%-- 				 	<form:option value="" label=""/> --%>
-                <%-- 				</c:forEach> --%>
-            </form:select>
+                <form:option value="payment" label="未还清"/>
+                <form:option value="payoff" label="已还清"/>
+           	</form:select>
         </li>
         <li><label>入账标签</label>
-            <form:select id="status" path="dealcode" class="input-medium">
+            <form:select id="status" path="remittanceTag" class="input-medium">
                 <form:option selected="selected" value="" label="全部状态"/>
                 <%-- 				<c:forEach items="" var=""> --%>
                 <%-- 				 	<form:option value="" label=""/> --%>
                 <%-- 				</c:forEach> --%>
             </form:select>
         </li>
-        </br>
-        <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"
-                                onclick="return page();"/></li>
+      
+        <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/></li>
         <li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
     </ul>
 </form:form>
@@ -147,7 +145,14 @@
 <div><a onclick="openHandAudit()" class="btn btn-primary btn-large">+查账申请</a></div>
 
 <br/>
-<iframe id="ifm" name="ifm" frameborder="0" src="${childPage}" style="width:100%;height:600px;">
+<iframe id="ifm" name="ifm" frameborder="0"
+ <c:if test="${childPage eq 'completed'}">
+  src="${ctx}/dunning/tMisRemittanceMessage/completed"
+</c:if> 
+ <c:if test="${childPage ne 'completed'}">
+  src="${ctx}/dunning/tMisRemittanceMessage/checked"
+</c:if> 
+style="width:100%;height:600px;">
 </iframe>
 <%--查账信息--%>
 <form>
