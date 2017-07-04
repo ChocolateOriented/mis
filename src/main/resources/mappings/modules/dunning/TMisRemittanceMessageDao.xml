@@ -14,9 +14,7 @@
 		a.financialtime AS "financialTime",
 		a.remark AS "remark",
 		a.createdate AS "createDate",
-		a.remittanceSerialNumber AS "remittanceSerialNumber",
-<!-- 		a.accountStatus AS "accountStatus", -->
-<!-- 		a.remittanceTag AS "remittanceTag" -->
+		a.remittanceSerialNumber AS "remittanceSerialNumber"
 	</sql>
 	
 	<sql id="tMisRemittanceMessageJoins">
@@ -185,8 +183,11 @@
 			<include refid="tMisRemittanceMessageColumns"/>
 		FROM
 			t_mis_remittance_message AS a
+			LEFT JOIN  t_mis_remittance_confirm AS c
+			ON a.remittanceSerialNumber = c.serialnumber
+			AND a.remittancechannel = c.remittancechannel
 		WHERE
-			accountStatus = "NOT_AUDIT"
+		c.dbid IS NULL
 		<if test="date != null">
 			<![CDATA[
       	AND a.financialtime > #{date}

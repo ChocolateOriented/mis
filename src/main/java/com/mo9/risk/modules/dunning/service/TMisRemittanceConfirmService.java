@@ -193,6 +193,9 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return void
 	 */
 	public void batchInsert(List<TMisRemittanceConfirm> confirms,User user) {
+		if (null == confirms || confirms.size()==0){
+			return;
+		}
 		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
 			remittanceConfirm.preInsert();
 			remittanceConfirm.setUpdateBy(user);

@@ -157,11 +157,6 @@ public class TMisRemittanceMessageService extends
 			if (null == remittanceMessage) {
 				continue;
 			}
-			//TODO 区分未查账信息
-			//只针对未查账订单
-//			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
-//				continue;
-//			}
 			//检查备注中是否包含手机号
 			String remark = remittanceMessage.getRemark();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_CONTAIN_MOBILE, remark);
@@ -169,8 +164,7 @@ public class TMisRemittanceMessageService extends
 				containMobileInRemarkMap.put(mobile, remittanceMessage);
 			}
 		}
-		List<TMisRemittanceMessage> successMatchByRemark = this
-				.matchOrderWithMobil(containMobileInRemarkMap);
+		List<TMisRemittanceMessage> successMatchByRemark = this.matchOrderWithMobil(containMobileInRemarkMap);
 		logger.info("通过备注匹配成功:" + successMatchByRemark.size() + "条");
 
 		//使用作为账号的手机号匹配(备注匹配失败 + 备注中不包含手机号)
@@ -185,10 +179,6 @@ public class TMisRemittanceMessageService extends
 		HashMap<String, TMisRemittanceMessage> accountIsMobileMap = new HashMap<String, TMisRemittanceMessage>(
 				remittanceMessages.size());
 		for (TMisRemittanceMessage remittanceMessage : checkRemittanceAccountList) {
-			//只针对未查账订单
-//			if (AccountStatus.NOT_AUDIT != remittanceMessage.getAccountStatus()) {
-//				continue;
-//			}
 			//检查账号是否使手机号
 			String account = remittanceMessage.getRemittanceAccount();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_MOBILE, account);

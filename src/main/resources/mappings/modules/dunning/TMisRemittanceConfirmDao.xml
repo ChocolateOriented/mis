@@ -323,29 +323,29 @@
 		mobile,
 		updateby,
 		updatedate,
-		serialnumber,
+		serialnumber
 		)
 		values
 		<foreach collection="list" index="index" item="item" separator="," >
 			(
-			#{id},
-			#{remittancename},
-			#{remittancetime},
-			#{remittanceamount},
-			#{remittancechannel},
-			#{remark},
-			#{confirmFlow},
-			#{confirmstatus},
-			#{dealcode},
-			#{remittanceTag},
-			#{createBy.name},
-			#{createDate},
-			#{buyerId},
-			#{name},
-			#{mobile},
-			#{updateBy.name},
-			#{updateDate},
-			#{serialnumber}
+			#{item.id},
+			#{item.remittancename},
+			#{item.remittancetime},
+			#{item.remittanceamount},
+			#{item.remittancechannel},
+			#{item.remark},
+			#{item.confirmFlow},
+			#{item.confirmstatus},
+			#{item.dealcode},
+			#{item.remittanceTag},
+			#{item.createBy.name},
+			#{item.createDate},
+			#{item.buyerId},
+			#{item.name},
+			#{item.mobile},
+			#{item.updateBy.name},
+			#{item.updateDate},
+			#{item.serialnumber}
 			)
 		</foreach>
 	</insert>
