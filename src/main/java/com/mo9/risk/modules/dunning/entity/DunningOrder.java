@@ -467,7 +467,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	}
 
 	public void setEndpromisepaydate(Date endpromisepaydate) {
-		this.endpromisepaydate = endpromisepaydate;
+		this.endpromisepaydate =  null != endpromisepaydate ? DateUtils.endDate(endpromisepaydate) : endpromisepaydate;
 	}
 
 	public Date getNextfollowdate() {
@@ -491,7 +491,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	}
 
 	public void setEndnextfollowdate(Date endnextfollowdate) {
-		this.endnextfollowdate = endnextfollowdate;
+		this.endnextfollowdate =  null != endnextfollowdate ? DateUtils.endDate(endnextfollowdate) : endnextfollowdate;
 	}
 	
 	
