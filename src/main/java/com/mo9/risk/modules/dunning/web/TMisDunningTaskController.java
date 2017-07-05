@@ -2020,22 +2020,6 @@ public class TMisDunningTaskController extends BaseController {
 	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			int permissions = TMisDunningTaskService.getPermissions();
-			if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
-				TMisDunningPeople people = tMisDunningPeopleService.get(UserUtils.getUser().getId());
-				if (people != null) {
-					performanceDayReport.setGroup(people.getGroup());
-					dunningPeople.setGroup(people.getGroup());
-				}
-			}
-			if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
-				TMisDunningGroup group = new TMisDunningGroup();
-				group.setSupervisor(UserUtils.getUser());
-				List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
-				group.setGroupIds(groupIds);
-				performanceDayReport.setGroup(group);
-				dunningPeople.setGroup(group);
-			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
 			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
@@ -2064,20 +2048,6 @@ public class TMisDunningTaskController extends BaseController {
     public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			int permissions = TMisDunningTaskService.getPermissions();
-			if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
-				TMisDunningPeople people = tMisDunningPeopleService.get(UserUtils.getUser().getId());
-				if (people != null) {
-					performanceDayReport.setGroup(people.getGroup());
-				}
-			}
-			if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
-				TMisDunningGroup group = new TMisDunningGroup();
-				group.setSupervisor(UserUtils.getUser());
-				List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
-				group.setGroupIds(groupIds);
-				performanceDayReport.setGroup(group);
-			}
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
             String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
