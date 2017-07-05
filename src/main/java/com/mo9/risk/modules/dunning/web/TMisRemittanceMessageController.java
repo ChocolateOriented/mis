@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.web;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
@@ -14,6 +15,8 @@ import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
+
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -146,7 +149,10 @@ public class TMisRemittanceMessageController extends BaseController {
 		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,childPage);
 		HttpSession session = request.getSession();
 		session.setAttribute("page", page);
+		RemittanceTag[] values = RemittanceTag.values();
+		List<RemittanceTag> remittanceTagList = Arrays.asList(values);
 		model.addAttribute("childPage",childPage);
+		model.addAttribute("remittanceTagList",remittanceTagList);
 		return "modules/dunning/tMisDunningAccountTotal";
 	}
 	/**

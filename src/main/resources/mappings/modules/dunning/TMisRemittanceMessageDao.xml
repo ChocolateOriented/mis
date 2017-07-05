@@ -213,10 +213,12 @@
 		m.remittanceSerialNumber AS "remittanceSerialNumber"
 		from
 		t_mis_remittance_message m
+		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 		LEFT JOIN t_mis_remittance_confirm AS c 
 				ON m.remittanceSerialNumber = c.Serialnumber 
+		</if>
 		<where>
-			and m.RemittanceChannel=c.RemittanceChannel
+			
 		<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
 			and m.remittanceSerialNumber =#{ remittanceSerialNumber}
 		</if>
@@ -244,11 +246,12 @@
 		</if>
 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 			and c.ConfirmStatus =#{ accountStatus}
-		</if>
-		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
-			and c.id is null
-		</if>
 			and c.ConfirmFlow="AUDIT"
+			and m.RemittanceChannel=c.RemittanceChannel
+		</if>
+<!-- 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'"> -->
+<!-- 			and c.id is null -->
+<!-- 		</if> -->
 		
 		</where>
 		
@@ -308,7 +311,7 @@
 	  m.RemittanceTime AS "remittancetime",
 	  m.RemittanceAmount AS "remittanceamount",
 	  a.RemittanceAccount AS "remittanceaccount",
-	  m.Remark AS "remark",
+	  a.Remark AS "remark",
 	  a.FinancialUser AS "financialUser",
 	  m.updateDate AS "updateDate"
 	  from
@@ -372,7 +375,7 @@
 	  m.RemittanceTime AS "remittancetime",
 	  m.RemittanceAmount AS "remittanceamount",
 	  a.RemittanceAccount AS "remittanceaccount",
-	  m.Remark AS "remark",
+	  a.Remark AS "remark",
 	  a.FinancialUser AS "financialUser",
 	  m.updateDate AS "updateDate"
 	  from
