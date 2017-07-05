@@ -876,7 +876,7 @@
         WHERE
 		o.type = 'loan' 
         AND o.merchant_id = 7
-		AND o.`status` IN ('payoff', 'payment' )   
+		AND o.`status` IN ('payoff', 'payment' )
         <if test="dealcode != null and dealcode != ''">
                 AND o.dealcode = #{dealcode}
         </if>
@@ -916,16 +916,16 @@
         <if test="telremark != null and telremark != ''">
                 <!-- 			     # 催收备注    -->
                 AND t.telremark  LIKE concat('%',#{telremark},'%') 
-        </if>  
+        </if>
         <if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
             <![CDATA[
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
-						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) >= #{beginOverduedays} 
+						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) >= #{beginOverduedays}
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
-						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) <= #{endOverduedays}   
-			  ]]> 
+						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) <= #{endOverduedays}
+			  ]]>
         </if>
-        
+
         <if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
                 <!-- 			    # 到期还款日期-->
                 AND o.repayment_time BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
@@ -1828,7 +1828,7 @@
 				WHERE id = #{item.id}
 		 </foreach>
     </update>
-    
+
  	<select id="findAtuoQ0Dealcode" resultType="string">
  	 SELECT
 		o.dealcode
@@ -1859,7 +1859,7 @@
 				HAVING count(1) > 1
 			);
 	</select>
-   
+
 <!-- 	new自动分配 - end 	    -->
 
 	<select id="findallAtuoSms" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
@@ -1887,22 +1887,22 @@
         AND DATEDIFF(CURDATE(), o.repayment_time)  BETWEEN #{numbefore} AND #{numafter}
      
     </select>
-    
-	
+
+
 	<select id="findBuyeridByNewTask" resultType="String">
         SELECT
 	        o.buyer_id
         FROM t_mis_dunning_task AS t
 	        LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
         WHERE
-			o.type = 'loan' 
+			o.type = 'loan'
 	        AND o.merchant_id = 7
-			AND o.status = 'payment' 
+			AND o.status = 'payment'
 	        AND t.dunningtaskstatus ='dunning'
 	        AND DATEDIFF(curdate(), o.repayment_time) = #{day}
 	        AND o.buyer_id is not null
     </select>
-	
+
 	<select id="findBuyerIdCardImg" resultType="String">
         SELECT
 	        i.img_filed3

@@ -977,7 +977,7 @@ public class TMisDunningTaskController extends BaseController {
 			connection.setRequestProperty("Content-Type", "image/jpg");
 			connection.setRequestProperty("accept", "*/*");
 			connection.connect();
-			
+
 			input = connection.getInputStream();
 			response.setContentType("image/jpg");
 			response.setHeader("Content-disposition", "filename=img_" + fileId + ".jpg");
@@ -1002,7 +1002,7 @@ public class TMisDunningTaskController extends BaseController {
 			}
 		}
 	}
-	
+
 	/**
 	 * 加载用户信息页面
 	 * @param tMisDunningTask
@@ -1474,7 +1474,7 @@ public class TMisDunningTaskController extends BaseController {
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
-		
+
 		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount,tfHistory);
 		return "OK";
 	}
@@ -2022,7 +2022,7 @@ public class TMisDunningTaskController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
+			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
@@ -2030,11 +2030,11 @@ public class TMisDunningTaskController extends BaseController {
 			e.printStackTrace();
 			return "error";
 		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "modules/dunning/performanceDayReportList";
 	}
-	
+
 	/**
 	 * 催收日表
 	 * @param user
