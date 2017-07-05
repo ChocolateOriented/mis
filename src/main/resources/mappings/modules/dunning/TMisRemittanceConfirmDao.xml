@@ -112,7 +112,7 @@
 	</select>
 	
 		
-	<insert id="insert">/
+	<insert id="insert">
 		INSERT INTO t_mis_remittance_confirm(
 			id,
 			remittancename,
@@ -132,7 +132,7 @@
 			mobile,
 			updateby,
 			updatedate,
-			serialnumber,
+			serialnumber
 
 		) VALUES (
 			#{id},

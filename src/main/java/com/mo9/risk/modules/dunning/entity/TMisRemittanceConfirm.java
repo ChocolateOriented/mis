@@ -326,6 +326,41 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 		this.remittanceTag = remittanceTag;
 	}
 
+	@Override
+	public String toString() {
+		return "TMisRemittanceConfirm{" +
+				"dbid=" + dbid +
+				", remittancename='" + remittancename + '\'' +
+				", remittancetime=" + remittancetime +
+				", remittanceamount=" + remittanceamount +
+				", remittancechannel='" + remittancechannel + '\'' +
+				", ReceivablesImg1='" + ReceivablesImg1 + '\'' +
+				", ReceivablesImg2='" + ReceivablesImg2 + '\'' +
+				", payamount=" + payamount +
+				", paytype='" + paytype + '\'' +
+				", remark='" + remark + '\'' +
+				", serialnumber='" + serialnumber + '\'' +
+				", financialremittancename='" + financialremittancename + '\'' +
+				", accounttime=" + accounttime +
+				", accountamount=" + accountamount +
+				", financialremittancechannel='" + financialremittancechannel + '\'' +
+				", FinancialImg1='" + FinancialImg1 + '\'' +
+				", FinancialImg2='" + FinancialImg2 + '\'' +
+				", financialremark='" + financialremark + '\'' +
+				", financialserialnumber='" + financialserialnumber + '\'' +
+				", confirmFlow=" + confirmFlow +
+				", confirmstatus='" + confirmstatus + '\'' +
+				", remittanceTag=" + remittanceTag +
+				", dealcode='" + dealcode + '\'' +
+				", Invalid='" + Invalid + '\'' +
+				", buyerId='" + buyerId + '\'' +
+				", name='" + name + '\'' +
+				", mobile='" + mobile + '\'' +
+				", beginupdatetime=" + beginupdatetime +
+				", endupdatetime=" + endupdatetime +
+				'}';
+	}
+
 	public enum ConfirmFlow{
 		CHECK,//提交>审核
 		AUDIT//上传>查账

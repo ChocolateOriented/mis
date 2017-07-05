@@ -39,17 +39,17 @@
 		FROM t_mis_remittance_message a
 		<include refid="tMisRemittanceMessageJoins"/>
 		<where>
-			<if test="remittancename != null and remittancename != ''">
-				AND a.remittancename = #{remittancename}
+			<if test="remittanceName != null and remittanceName != ''">
+				AND a.remittancename = #{remittanceName}
 			</if>
-			<if test="remittancetime != null and remittancetime != ''">
-				AND a.remittancetime = #{remittancetime}
+			<if test="remittanceTime != null and remittanceTime != ''">
+				AND a.remittancetime = #{remittanceTime}
 			</if>
-			<if test="remittancechannel != null and remittancechannel != ''">
-				AND a.remittancechannel = #{remittancechannel}
+			<if test="remittanceChannel != null and remittanceChannel != ''">
+				AND a.remittancechannel = #{remittanceChannel}
 			</if>
-			<if test="financialuser != null and financialuser != ''">
-				AND a.financialuser = #{financialuser}
+			<if test="financialUser != null and financialUser != ''">
+				AND a.financialuser = #{financialUser}
 			</if>
 		</where>
 		<choose>
@@ -411,15 +411,12 @@
 		ON a.remittanceSerialNumber = c.serialnumber
 		AND a.remittancechannel = c.remittancechannel
 		WHERE
-		c.dbid IS NULL
-		OR c.confirmstatus = "complete_audit"
-		<if test="remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-			AND a.remittanceSerialNumber=#{remittanceSerialNumber}
-		</if>
-		<if test="remittanceChannel!= null and  remittanceChannel!= ''">
-			AND a.remittanceChannel=#{remittanceChannel}
-		</if>
+		(
+			c.dbid IS NULL
+			OR c.confirmstatus = "complete_audit"
+		)
+		AND a.remittanceSerialNumber=#{remittanceSerialNumber}
+		AND a.remittanceChannel=#{remittanceChannel}
 	</select>
-
 
 </mapper>

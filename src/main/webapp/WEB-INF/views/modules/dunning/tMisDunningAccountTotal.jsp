@@ -7,6 +7,7 @@
     <meta name="decorator" content="default"/>
     <script type="text/javascript">
       var content = null;
+      var auditComiting = false;
       $(document).ready(function () {
 
         var queryOrderTemplate = $("#queryOrderTemplate").html();
@@ -14,9 +15,7 @@
         var auditComfirm = $("#auditComfirm").html();
         content = {
           state1: {
-//            content: queryOrderTemplate,
-//            content: queryRemittanceMessage,
-            content: auditComfirm,
+            content: queryOrderTemplate,
             buttons: {'下一步': 1, '清空': 0},
             buttonsFocus: 0,
             submit: function (v, h, f) {
@@ -48,13 +47,16 @@
                 return false; // close the window
               }
               else {//下一步
-                var auditRemittanceId = $("#auditRemittanceId").val();
-                if (auditRemittanceId == ""){
+                var serialNumber = $("#auditRemittanceSerialNumber").val();
+                if (serialNumber == ""){
                   jBox.tip("请先查寻交易信息");
                   return false;
                 }
-                $.jBox.nextState(); //go forward
-                // 或 $.jBox.goToState('state2')
+                $.jBox.nextState();
+                var remittanceConfirm = $("#auditRemittanceId").data("target");
+                var orderMsg = $("#auditDealcode").data("target");
+                formLoad($(".jbox-container").find("#orderMsgComfirm"),orderMsg);
+                formLoad($(".jbox-container").find("#remittanceMsgComfirm"),remittanceConfirm);
               }
               return false;
             }
@@ -67,14 +69,26 @@
               if (v == 0) {
                 return true; // close the window
               }
-              else {//查账
+              if (auditComiting){
+                jBox.tip("正在查账请稍后");
+                return false;
+              } else {//查账
                 var auditRemittanceTag = $("#auditRemittanceTag").val();
                 if (auditRemittanceTag == ""){
                   jBox.tip("请先选择入账标签");
                   return false;
                 }
+                auditComiting = true ;
                 //发送查账请求
-                $.post("")
+                $.post("${ctx}/dunning/tMisRemittanceMessage/handleAudit",$("#auditForm").serialize(),function (msg) {
+                  auditComiting = false ;
+                  if ("success" == msg){
+                    $.jBox.close();
+                    jBox.tip("查账成功");
+                    return ;
+                  }
+                  $.jBox.tip(msg);
+                });
               }
               return false;
             }
@@ -127,6 +141,7 @@
               }
               //查到了填充值
               $("#auditDealcode").val(orderMsg.dealcode);
+              $("#auditDealcode").data("target",orderMsg);
               var orderMsgForm = $(".jbox-container").find("#orderMsg");
               formLoad(orderMsgForm,orderMsg);
               orderMsgForm.find("[name='dunningPeople_nickname']").val(orderMsg.dunningPeople.nickname);
@@ -181,6 +196,7 @@
       //填充汇款信息
       function setRemittance(remittanceConfirm){
         $("#auditRemittanceId").val(remittanceConfirm.id);
+        $("#auditRemittanceId").data("target",remittanceConfirm)
         $("#auditRemittanceSerialNumber").val(remittanceConfirm.serialnumber);
         var remittanceMsgForm = $(".jbox-container").find("#remittanceMsg");
         formLoad(remittanceMsgForm,remittanceConfirm);
@@ -288,8 +304,9 @@
 style="width:100%;height:600px;">
 </iframe>
 <%--查账信息--%>
-<form>
+<form id="auditForm">
     <input type="hidden" id="auditDealcode" name="dealcode">
+    <input type="hidden" name="remittancechannel" value="aliPay">
     <input type="hidden" id="auditRemittanceId" name="id">
     <input type="hidden" id="auditRemittanceSerialNumber" name="serialnumber">
     <input type="hidden" id="auditRemittanceTag" name="remittanceTag">
@@ -413,15 +430,79 @@ style="width:100%;height:600px;">
                 <div class="span2" style="color: #2fa4e7">③ 查账</div>
             </div>
         </h3>
-        <div class="row" id="btnGroup">
-            <div class="span2 text-center" style="line-height: 45px">入账标签</div>
-            <div class="span2"><a class="btn btn-large" id="REPAYMENT_SELF" onclick="addTag('REPAYMENT_SELF')">本人还款</a></div>
-            <div class="span2"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
+        <div class="row-fluid" id="btnGroup">
+            <div class="span2 offset1 text-center" style="line-height: 45px">入账标签</div>
+            <div class="span3"><a class="btn btn-large" id="REPAYMENT_SELF" onclick="addTag('REPAYMENT_SELF')">本人还款</a></div>
+            <div class="span3"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
         </div>
 
-        <div class="row">
-            <div id="auditRemittanceData" class="span6"></div>
-            <div id="auditOrderData" class="span6"></div>
+        <div class="row-fluid text-right" style="margin-top: 30px">
+            <div id="auditRemittanceData" class="span5 offset1" style="border: 2px solid black;padding-top: 20px">
+                <h4>
+                    <div class="row-fluid">
+                        <div class="span4" style="color: #2fa4e7">订单信息</div>
+                    </div>
+                </h4>
+                <form class="form-horizontal" id="orderMsgComfirm">
+                    <div class="row-fluid">
+                        <div class="span4">订单号</div>
+                        <div class="span8">
+                            <input name="dealcode" style="border: none;background-color: inherit;" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">姓名</div>
+                        <div class="span8">
+                            <input name="realname" style="border: none;background-color: inherit" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">手机号</div>
+                        <div class="span8">
+                            <input name="mobile" style="border: none;background-color: inherit" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">应催金额</div>
+                        <div class="span8" style="text-align: left">
+                            <input name="creditamount" style="border: none;background-color: inherit;width: 100px;" readonly>（元）
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="auditOrderData" class="span5" style="border: 2px solid black;padding-top: 20px">
+                <h4>
+                    <div class="row-fluid">
+                        <div class="span4" style="color: #2fa4e7">交易信息</div>
+                    </div>
+                </h4>
+                <form class="form-horizontal" id="remittanceMsgComfirm">
+                    <div class="row-fluid">
+                        <div class="span4">交易流水号</div>
+                        <div class="span8">
+                            <input name="serialnumber" style="border: none;background-color: inherit" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">对方姓名</div>
+                        <div class="span8">
+                            <input name="remittancename" style="border: none;background-color: inherit" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">对方账号</div>
+                        <div class="span8">
+                            <input name="financialremittancename" style="border: none;background-color: inherit" readonly>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">交易金额</div>
+                        <div class="span8" style="text-align: left">
+                            <input name="remittanceamount" style="border: none;background-color: inherit;width: 100px;" readonly>（元）
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

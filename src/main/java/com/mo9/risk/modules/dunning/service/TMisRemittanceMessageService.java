@@ -390,6 +390,7 @@ public class TMisRemittanceMessageService extends
 	 * @return boolean
 	 * @Description 手工查账
 	 */
+	@Transactional
 	public boolean handleAudit(TMisRemittanceConfirm remittanceConfirm) {
 		//查询订单
 		DunningOrder q_order = new DunningOrder();
@@ -422,6 +423,7 @@ public class TMisRemittanceMessageService extends
 		if (StringUtils.isNotBlank(id)){
 			new_tMisRemittanceConfirm.setId(id);
 		}
+		System.out.println(new_tMisRemittanceConfirm);
 		remittanceConfirmService.save(new_tMisRemittanceConfirm);
 		return true;
 	}
