@@ -4,63 +4,67 @@
 <head>
 	<title id="title">已查账</title>
 	<meta name="decorator" content="default"/>
- 
 	<script type="text/javascript">
 		$(document).ready(function() {
-		
 			
 		
 		});
- 			
-			function ss(d){
-			 $(d).next().show();
-			
-			}
-			function s(){
-				var ss="nishi";
-				return ss;
-			}
-			function dd(d){
-			}
-		  function page(n, s) {
-		        if (n) window.parent.$("#pageNo").val(n);
-		        if (s) window.parent.$("#pageSize").val(s);
-		       window.parent. $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
-		       window.parent.$("#searchForm").submit();
-		        return false;
-		   }
-		 
-		   function collectionfunction(obj, width, height){
-				var dealcode = $(obj).attr("dealcode");
-				var buyerId = $(obj).attr("buyerId");
-				var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
-				var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode=" + dealcode+"&buyerId="+buyerId+"&dunningtaskdbid="+dunningtaskdbid;
-				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
-	               buttons: {
-	            	   },
-	                   submit: function (v, h, f) {
+		function showDetail(obj) {
+			$(".suspense").css("display", "none");
+			$(obj).children(".suspense").css("display", "block");
+		}
+		
+		function hideDetail() {
+			var e = window.event || arguments.callee.caller.arguments[0];
+			var toElem = e.toElement || e.relatedTarget;
+			if (toElem.className != "suspense");
+			$(".suspense").css("display", "none");
+		}
+		
+		
+		function page(n, s) {
+			if (n) window.parent.$("#pageNo").val(n);
+			if (s) window.parent.$("#pageSize").val(s);
+			window.parent.$("#searchForm").attr("action","${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
+			window.parent.$("#searchForm").submit();
+			return false;
+		}
 
-	                   },
-	               loaded: function (h) {
-	                   $(".jbox-content", document).css("overflow-y", "hidden");
-	               }
-	         });
-		 }
-	
+		function collectionfunction(obj, width, height) {
+			var dealcode = $(obj).attr("dealcode");
+			var buyerId = $(obj).attr("buyerId");
+			var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
+			var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode="+ dealcode+ "&buyerId="+ buyerId+ "&dunningtaskdbid="+ dunningtaskdbid;
+			$.jBox.open("iframe:" + url, $(obj).attr("value"), width || 600,
+					height || 430, {
+						buttons : {},
+						submit : function(v, h, f) {
+
+						},
+						loaded : function(h) {
+							$(".jbox-content", document).css("overflow-y",
+									"hidden");
+						}
+					});
+		}
 	</script>
 <style type="text/css">
-</style>
+				.suspense {
+				z-index:10000;
+				position:absolute;
+				top:10px;
+				left:10px;
+				height:200px;
+				width:300px;
+				background-color:white;
+				opacity:0.9;
+				border:solid red 1px;
+				border-radius:5px;
+				outline:none;
+			}
+		</style>
 </head>
 <body>
-
-
-  
- 
-                
-                
-                
-                
-                
 	<input type="hidden" id="childIfam" value="checked">
 	<ul class="nav nav-tabs">
 	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>
@@ -118,21 +122,21 @@
 					  ${tmessage.creditamount }  
 				</td>
 				<td >
-					 <div id="serNumber"  onmouseover="ss(this)" onmouseout="dd(this)">
+					 <div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
 						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
 						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
 						 </font>
+					    <div class="suspense" style="display:none;" tabindex="0">
+<%-- 							   <div><font  color="red"> ${tmessage.remittanceSerialNumber }</font></div> --%>
+							   <div><font  color="red">------------------------------------------------</font></div>
+							   <div>交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+							   <div>交易金额:${tmessage.remittanceamount }</div>
+							   <div>对方名称:${tmessage.realName }</div>
+							   <div>对方账户:${tmessage.remittanceaccount }</div>
+							   <div>备注:${tmessage.remark }</div>
+							   <div>上传人:${tmessage.financialUser }</div>
+					    </div>
 					</div>
-				    <div style="display:none" class="us">
-						   <div><font  color="red"> ${tmessage.remittanceSerialNumber }</font></div>
-						   <div>------------------------------------- </div>
-						   <div>交易时间:${tmessage.remittancetime }</div>
-						   <div>交易金额:${tmessage.remittanceamount }</div>
-						   <div>对方名称:${tmessage.remittanceaccount }</div>
-						   <div>对方账户:${tmessage.remark }</div>
-						   <div>备注:${tmessage.creditamount }</div>
-						   <div>上传人:${tmessage.financialUser }</div>
-				    </div>
 				</td>
 				<td>
 					  ${tmessage.checkedPeople }  
