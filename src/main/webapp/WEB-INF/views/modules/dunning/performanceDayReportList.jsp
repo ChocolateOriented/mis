@@ -9,11 +9,47 @@
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出催收员工日报数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/performanceDayReportExport");
+						$("#searchForm").attr("action","${ctx}/dunning/report/performanceDayReportExport");
 						$("#searchForm").submit();
 					}
 				},{buttonsFocus:1});
 				top.$('.jbox-body .jbox-icon').css('top','55px');
+			});
+			
+			//组与花名联动查询
+			$("#groupList").on("change",function(){
+				$("#dunningPeople").select2("val", null);
+			});
+			
+			$("#dunningPeople").select2({//
+			    ajax: {
+			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
+			        dataType: 'json',
+			        quietMillis: 250,
+			        data: function (term, page) {//查询参数 ,term为输入字符
+			        	var groupId=$("#groupList").val(); 
+		            	return {'group.id': groupId , name:term};
+			        },
+			        results: function (data, page) {//选择要显示的数据
+                      var resultsData = [] ;
+                      resultsData[0] = {id:null,name:"全部人员"};
+                      for (var i = 0; i < data.length; i++) {
+                        resultsData[i+1] = {id:data[i].name,name:data[i].name};
+                      }
+                      return { results: resultsData };
+			        },
+			        cache: true
+			    },
+			    formatResult:formatPeopleList, //选择显示字段
+			    formatSelection:formatPeopleList, //选择选中后填写字段
+			    initSelection: function(element, callback) {//回显
+                  var name=$(element).val();
+                  if (name=="") {
+                    return;
+                  }
+                  callback({id:name,name:name})
+			    },
+		        width:170
 			});
 			
 		});
@@ -21,17 +57,26 @@
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
 			if(s) $("#pageSize").val(s);
-			$("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/findPerformanceDayReport");
+			$("#searchForm").attr("action","${ctx}/dunning/report/findPerformanceDayReport");
 			$("#searchForm").submit();
         	return false;
         }
+
+		//格式化peopleList选项
+		function formatPeopleList( item ){
+			var name = item.name ;
+			if(name == null || name ==''){
+				name = "空" ;
+			}
+			return name ;
+		}
 	</script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisDunningTask/findPerformanceDayReport">催收员工日报</a></li>
+		<li class="active"><a href="${ctx}/dunning/report/findPerformanceDayReport">催收员工日报</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="performanceDayReport" action="${ctx}/dunning/tMisDunningTask/findPerformanceDayReport" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="performanceDayReport" action="${ctx}/dunning/report/findPerformanceDayReport" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
@@ -45,25 +90,33 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			
-			<li><label>催款员：</label>
-				<form:select id="personnel"  path="personnel" class="input-medium" >
-					<form:option selected="selected" value="" label="全部人员"/>
-					<form:options items="${dunningPeoples}" itemLabel="name" itemValue="name" htmlEscape="false" />
-				</form:select>
-			</li>
-			
 			<li><label>催收队列：</label>
 				<form:select path="dunningCycle" class="input-medium" >
 					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('dunningCycle1')}" itemLabel="label" itemValue="label" htmlEscape="false"/>
 				</form:select>
 			</li>
-<!-- 			<li><label>催收周期：</label> -->
-<%-- 				<form:input  path="begin"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  /> --%>
-<!-- 				-  -->
-<%-- 				<form:input  path="end"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   /> --%>
-<!-- 			</li> -->
-			
+			<li>
+				<label>催收小组：</label>
+				<form:select id="groupList" path="group.id" class="input-medium">
+				<form:option value="">全部</form:option>
+					<!-- 添加组类型为optgroup -->
+					<c:forEach items="${groupTypes}" var="type">
+						<optgroup label="${type.value}">
+							<!-- 添加类型对应的小组 -->
+							<c:forEach items="${groupList}" var="item">
+								<c:if test="${item.type == type.key}">
+									<option value="${item.id}" <c:if test="${performanceDayReport.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
+								</c:if>
+							</c:forEach>
+						</optgroup>
+					</c:forEach>
+				</form:select>
+			</li>
+			<li>
+				<label>催收人：</label>
+				<form:input id="dunningPeople" path="personnel" type="hidden" />
+			</li>
 			
 			<li class="btns">
 			<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" />

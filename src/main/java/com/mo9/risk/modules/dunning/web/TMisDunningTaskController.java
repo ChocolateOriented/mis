@@ -977,7 +977,7 @@ public class TMisDunningTaskController extends BaseController {
 			connection.setRequestProperty("Content-Type", "image/jpg");
 			connection.setRequestProperty("accept", "*/*");
 			connection.connect();
-			
+
 			input = connection.getInputStream();
 			response.setContentType("image/jpg");
 			response.setHeader("Content-disposition", "filename=img_" + fileId + ".jpg");
@@ -1002,7 +1002,7 @@ public class TMisDunningTaskController extends BaseController {
 			}
 		}
 	}
-	
+
 	/**
 	 * 加载用户信息页面
 	 * @param tMisDunningTask
@@ -1474,7 +1474,7 @@ public class TMisDunningTaskController extends BaseController {
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
-		
+
 		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount,tfHistory);
 		return "OK";
 	}
@@ -2006,60 +2006,5 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceMonthReport?repage";
     }
-	
-	/**
-	 * 催收绩效日表
-	 * @param performanceMonthReport
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
-	@RequestMapping(value = {"findPerformanceDayReport", ""})
-	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
-		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
-			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-			Page<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
-			model.addAttribute("dunningPeoples", dunningPeoples);
-			model.addAttribute("page", page);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "error";
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-		return "modules/dunning/performanceDayReportList";
-	}
-	
-	/**
-	 * 催收日表
-	 * @param user
-	 * @param request
-	 * @param response
-	 * @param redirectAttributes
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
-    @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
-    public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
-			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-            String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
-            List<PerformanceDayReport> page = tMisDunningTaskService.findPerformanceDayReport(performanceDayReport);
-    		new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
-    		return null;
-		} catch (Exception e) {
-			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
-    }
-	
+
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao">
-    
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+
 	<sql id="tMisDunningPeopleColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
@@ -33,7 +34,7 @@
 		LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
 	</sql>
     
-	<select id="get" resultType="TMisDunningPeople">
+	<select id="get" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
@@ -42,7 +43,7 @@
 		WHERE a.id = #{id}
 	</select>
 	
-	<select id="findList" resultType="TMisDunningPeople">
+	<select id="findList" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
@@ -100,6 +101,7 @@
 	<select id="findOptionList" resultType="TMisDunningPeople">
 		SELECT
 			a.`nickname` ,
+			a.`name` ,
 			a.`id`
 		FROM t_mis_dunning_people a
 		WHERE 
@@ -118,12 +120,15 @@
 				</foreach>
 			</if>
 		</if>
+		<if test="name != null and name != ''">
+			AND a.name LIKE concat('%',#{name},'%')
+		</if>
 		<if test="nickname != null and nickname != ''">
 			AND a.nickname LIKE concat('%',#{nickname},'%')
 		</if>
 	</select>
 	
-	<select id="findAllList" resultType="TMisDunningPeople">
+	<select id="findAllList" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
@@ -141,7 +146,7 @@
 		</choose>
 	</select>
 	
-	<select id="findUserList" resultType="com.thinkgem.jeesite.modules.sys.entity.User">
+	<select id="findUserList" resultType="com.thinkgem.jeesite.modules.sys.entity.User" useCache="false">
 		SELECT 
 			u.*
 			FROM sys_user u
@@ -150,7 +155,7 @@
 			p.id is NULL  and u.del_flag = 0
 	</select>
 
-	<select id="findDunningPeopleByType" resultType="TMisDunningPeople">
+	<select id="findDunningPeopleByType" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
@@ -158,7 +163,7 @@
 		WHERE a.dunningpeopletype = #{peopleType} and a.Invalid = 't'
 	</select>	
 		
-	<select id="findDunningPeopleCycleByIds" resultType="TMisDunningPeople">
+	<select id="findDunningPeopleCycleByIds" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			a.begin AS "begin",
 			a.end AS "end"
@@ -170,7 +175,7 @@
 		GROUP BY  BEGIN,END 
 	</select>	
 	
-	<select id="findDunningPeopleGroupby" resultType="TMisDunningPeople">
+	<select id="findDunningPeopleGroupby" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			a.begin AS "begin",
 			a.end AS "end"
@@ -244,14 +249,14 @@
 		WHERE id = #{id}
 	</update>
 
-	<select id="findByPeriod" resultType="TMisDunningPeople" parameterType="map">
+	<select id="findByPeriod" resultType="TMisDunningPeople" parameterType="map" useCache="false">
 	    <!-- 只显示未删除的催收人员  -->
 		select * from t_mis_dunning_people where auto = 't' and Invalid = 't' and begin = #{BEGIN} and end = #{END} 
 		<!-- and DunningPeopleType=#{PEOPLE_TYPE}  -->
 	</select>
 	
 	
-	<select id="findPeopleBybeginEnd" resultType="TMisDunningPeople">
+	<select id="findPeopleBybeginEnd" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
@@ -261,7 +266,7 @@
 		</if>
 	</select>
 	
-	<select id="findPeopleByDunningcycle" resultType="TMisDunningPeople">
+	<select id="findPeopleByDunningcycle" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
@@ -269,7 +274,7 @@
 <!-- 		AND a.DunningCycle LIKE concat('%',#{dunningcycle},'%') -->
 	</select>	
 	
-	<select id="findPeopleByDistributionDunningcycle" resultType="TMisDunningPeople">
+	<select id="findPeopleByDistributionDunningcycle" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
@@ -289,7 +294,7 @@
         </foreach>
 	</update>
 	
-	 <select id="findPeoplesByids" resultType="TMisDunningPeople">
+	 <select id="findPeoplesByids" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
@@ -303,7 +308,7 @@
         </foreach>
 	</select>
 	
-	 <select id="checkNicknameUnique" resultType="Boolean">
+	 <select id="checkNicknameUnique" resultType="Boolean" useCache="false">
 		SELECT 
 			IF(COUNT(*)=0,TRUE,FALSE)AS result
 		FROM t_mis_dunning_people a

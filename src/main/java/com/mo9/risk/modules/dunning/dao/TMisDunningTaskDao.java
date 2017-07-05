@@ -157,13 +157,6 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	public List<PerformanceMonthReport> findPerformanceMonthReport(PerformanceMonthReport performanceMonthReport);
 	
 	/**
-	 * 催收绩效月报
-	 * @param performanceMonthReport
-	 * @return
-	 */
-	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceDayReport);
-	
-	/**
 	 * 查询催收人员正在催收的任务量
 	 * @param dunningpeopleid
 	 * @return

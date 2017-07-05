@@ -42,7 +42,7 @@ public class SMisDunningProductivePowerDailyReport extends DataEntity<SMisDunnin
 	private BigDecimal ptpAmountPercent;		// 承诺还款占比_逾期金额
 	private BigDecimal ptpCorpusAmountPerent;		// 承诺还款占比_本金
 	private Integer payoffUser;		// 还款户数
-	private BigDecimal payoffCorpusAmount;		// 还夸的总本金
+	private BigDecimal payoffCorpusAmount;		// 还款的总本金
 	private BigDecimal payoffAmount;		// 还款总金额
 	private String groupId ; //催收员所属组
 	private Date beginCreateTime;		// 开始 日期时间
@@ -242,7 +242,7 @@ public class SMisDunningProductivePowerDailyReport extends DataEntity<SMisDunnin
 		this.payoffUser = payoffUser;
 	}
 	
-	@ExcelField(title="还夸的总本金",  type=1, align=2, sort=21)
+	@ExcelField(title="还款的总本金",  type=1, align=2, sort=21)
 	public BigDecimal getPayoffCorpusAmount() {
 		return payoffCorpusAmount;
 	}

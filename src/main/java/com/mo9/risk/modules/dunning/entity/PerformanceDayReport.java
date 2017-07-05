@@ -25,7 +25,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	private Long telnum;
 	private Long smsnum;
 	private TMisDunningGroup group;
-	
+
 	
 //	@ExcelField(title="日期", type=1, align=2, sort=1)
 //	public Date getDatetime() {
