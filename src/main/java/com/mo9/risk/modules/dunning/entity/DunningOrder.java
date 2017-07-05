@@ -76,7 +76,16 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private String platformExt ; //金融产品
 	private String extensionNumber ; //fengjihao
+	
+	
+	private Date promisepaydate; 	// 到期还款时间
+	private Date beginpromisepaydate ; //查询开始-到期还款时间
+	private Date endpromisepaydate ; //查询结束-到期还款时间
+	private Date nextfollowdate; 	// 下次跟进时间
+	private Date beginnextfollowdate ; //查询开始-下次跟进时间
+	private Date endnextfollowdate ; //查询结束-下次跟进时间
 
+	
 	public String getPlatformExt() {
 		return platformExt;
 	}
@@ -436,5 +445,55 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setBalance(Double balance) {
 		this.balance = balance;
 	}
+
+	public Date getPromisepaydate() {
+		return promisepaydate;
+	}
+
+	public void setPromisepaydate(Date promisepaydate) {
+		this.promisepaydate = promisepaydate;
+	}
+
+	public Date getBeginpromisepaydate() {
+		return beginpromisepaydate;
+	}
+
+	public void setBeginpromisepaydate(Date beginpromisepaydate) {
+		this.beginpromisepaydate = beginpromisepaydate;
+	}
+
+	public Date getEndpromisepaydate() {
+		return endpromisepaydate;
+	}
+
+	public void setEndpromisepaydate(Date endpromisepaydate) {
+		this.endpromisepaydate = endpromisepaydate;
+	}
+
+	public Date getNextfollowdate() {
+		return nextfollowdate;
+	}
+
+	public void setNextfollowdate(Date nextfollowdate) {
+		this.nextfollowdate = nextfollowdate;
+	}
+
+	public Date getBeginnextfollowdate() {
+		return beginnextfollowdate;
+	}
+
+	public void setBeginnextfollowdate(Date beginnextfollowdate) {
+		this.beginnextfollowdate = beginnextfollowdate;
+	}
+
+	public Date getEndnextfollowdate() {
+		return endnextfollowdate;
+	}
+
+	public void setEndnextfollowdate(Date endnextfollowdate) {
+		this.endnextfollowdate = endnextfollowdate;
+	}
+	
+	
 	
 }

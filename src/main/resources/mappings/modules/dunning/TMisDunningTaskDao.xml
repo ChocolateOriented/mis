@@ -942,9 +942,13 @@
         <if test="dunningtaskstatus != null and dunningtaskstatus != ''">
             AND t.dunningtaskstatus = #{dunningtaskstatus}
         </if>
-        <!-- 			# 导出批次号时间  -->
-        <if test="beginOuterfiletime != null and endOuterfiletime != null and beginOuterfiletime != '' and endOuterfiletime != ''">
-            AND o.outerfiletime BETWEEN #{beginOuterfiletime} AND #{endOuterfiletime}
+        <!-- 			# 跟进日期  -->
+        <if test="beginnextfollowdate != null and endnextfollowdate != null and beginnextfollowdate != '' and endnextfollowdate != ''">
+            AND o.nextfollowdate BETWEEN #{beginnextfollowdate} AND #{endnextfollowdate}
+        </if>
+        <!-- 			# PTP 时间  -->
+        <if test="beginpromisepaydate != null and endpromisepaydate != null and beginpromisepaydate != '' and endpromisepaydate != ''">
+            AND o.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
         </if>
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -1808,5 +1812,12 @@
         WHERE
 	        i.buyer_id = #{buyerid}
     </select>
+    
+	<update id="updatePromisePayDateAndNextFollowDate">
+		UPDATE t_mis_dunning_task SET 	
+			PromisePayDate = #{promisepaydate},
+			nextfollowdate = #{nextfollowdate}
+		WHERE dealcode = #{dealcode}
+	</update>
 
 </mapper>

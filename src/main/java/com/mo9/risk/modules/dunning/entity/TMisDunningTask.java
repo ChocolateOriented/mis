@@ -70,6 +70,9 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private Date outsourcingbegindate;		// 委外手分时间
 	private Date outsourcingenddate;		// 委外截止时间
 	
+	private Date promisepaydate; 	// 到期还款时间
+	private Date nextfollowdate; 	// 下次跟进时间
+	
 	public TMisDunningTask() {
 		super();
 	}
@@ -280,6 +283,22 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 
 	public void setOutsourcingenddate(Date outsourcingenddate) {
 		this.outsourcingenddate = outsourcingenddate;
+	}
+	
+	public Date getPromisepaydate() {
+		return promisepaydate;
+	}
+
+	public void setPromisepaydate(Date promisepaydate) {
+		this.promisepaydate = promisepaydate;
+	}
+
+	public Date getNextfollowdate() {
+		return nextfollowdate;
+	}
+
+	public void setNextfollowdate(Date nextfollowdate) {
+		this.nextfollowdate = nextfollowdate;
 	}
 	
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")

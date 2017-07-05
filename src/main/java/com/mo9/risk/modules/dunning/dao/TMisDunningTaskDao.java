@@ -294,4 +294,11 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public List<String> findAtuoQ0Dealcode(@Param("day")String day,@Param("payoffday")String payoffday);
 	
+	/**
+	 * 
+	 * @param dealcode
+	 * @return
+	 */
+	public int updatePromisePayDateAndNextFollowDate(@Param("dealcode")String dealcode,@Param("promisepaydate")Date promisepaydate,@Param("nextfollowdate")Date  nextfollowdate);
+	
 }

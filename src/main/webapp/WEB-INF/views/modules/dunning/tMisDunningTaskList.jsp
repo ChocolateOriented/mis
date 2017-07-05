@@ -462,17 +462,6 @@
 				<form:input  path="endOverduedays"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   />
 			</li>
 			
-<!-- 			<li><label>任务状态</label> -->
-<%-- 			<form:select id="dunningtaskstatus"   path="dunningtaskstatus"  class="input-medium"> --%>
-<%-- 				<form:option selected="selected" value="" label="全部状态"/> --%>
-<%-- 				<form:option value="dunning" label="正在催收"/> --%>
-<%-- 				<form:option value="expired" label="超出催收周期未催回"/> --%>
-<%-- 				<form:option value="finished" label="催收周期内已还清"/> --%>
-<%-- 				<form:option value="transfer" label="同期转移"/> --%>
-<%-- 			</form:select></li> --%>
-			
-<!-- 			</ul> -->
-<!-- 			<ul class="ul-form"> -->
 			<li><label>还清日期</label>
 				<input name="beginPayofftime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${dunningOrder.beginPayofftime}" pattern="yyyy-MM-dd"/>"
@@ -490,21 +479,25 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			
-<!-- 			</ul> -->
-<!-- 			<ul class="ul-form"> -->
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-				<li>
-				<label >导出批次</label>
-<!-- 				<input name="outerfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" -->
-<%-- 					value="<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd"/>" --%>
-<!-- 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> -->
-					<input name="beginOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-						value="<fmt:formatDate value="${dunningOrder.beginOuterfiletime}" pattern="yyyy-MM-dd"/>"
-						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-					<input name="endOuterfiletime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-						value="<fmt:formatDate value="${dunningOrder.endOuterfiletime}" pattern="yyyy-MM-dd"/>"
-						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
-				</li>
+			<li><label>PTP时间</label>
+				<input name="beginpromisepaydate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginpromisepaydate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endpromisepaydate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endpromisepaydate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+			
+			<li><label>跟进日期</label>
+				<input name="beginnextfollowdate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginnextfollowdate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endnextfollowdate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endnextfollowdate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+			
+			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 				<li>
 					<label>催收小组：</label>
 					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
@@ -528,39 +521,39 @@
 					<label >催款人</label>
 					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</li>
-				</shiro:hasPermission>
+			</shiro:hasPermission>
 				
 						
-				<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
-				<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
+			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">  --%>
 <!-- 					<li class="btns"><input id="dunningExport" class="btn btn-primary" type="button" value="导出列表" /></li> -->
 <%-- 				</shiro:hasPermission>  --%>
-				<shiro:hasPermission name="dunning:tMisDunningTask:exportFile"> 
-					<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" />
-					<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>
-				</shiro:hasPermission> 
-				<li class="clearfix"></li>
-			</ul>
+			<shiro:hasPermission name="dunning:tMisDunningTask:exportFile"> 
+				<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" />
+				<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>
+			</shiro:hasPermission> 
+			<li class="clearfix"></li>
+		</ul>
 	</form:form>
 	
-<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview"> --%>
-<!-- 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/> -->
-<%-- 	</shiro:hasPermission> --%>
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
 		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
 	</shiro:hasPermission>
+<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview"> --%>
+<!-- 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/> -->
+<%-- 	</shiro:hasPermission> --%>
 	
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"  disabled="disabled"/>
-	</shiro:hasPermission>
+<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview"> --%>
+<!-- 		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"  disabled="disabled"/> -->
+<%-- 	</shiro:hasPermission> --%>
 	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 	
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"  disabled="disabled"/>
-	</shiro:hasPermission>
+<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview"> --%>
+<!-- 		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"  disabled="disabled"/> -->
+<%-- 	</shiro:hasPermission> --%>
 	
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
@@ -598,10 +591,8 @@
 				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
 				<th>最近催收</th>
 				<th>还清日期</th>
-				<th>订单编号</th>
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-					<th>导出批次</th>
-				</shiro:hasPermission>
+				<th>跟进日期</th>
+				<th>PTP时间</th>
 <!-- 				<th>任务状态</th> -->
 <!-- 				<th>操作</th> -->
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
@@ -655,11 +646,6 @@
 					${dunningOrder.dunningPeople.nickname}
 				</td>
 				
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
-				<td>
-					<fmt:formatDate value="${dunningOrder.deadline}" pattern="yyyy-MM-dd"/>
-				</td>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
 				
 				<td>
 					<fmt:formatDate value="${dunningOrder.dunningtime}" pattern="yyyy-MM-dd HH:mm"/>
@@ -673,11 +659,14 @@
 					${dunningOrder.dealcode}
 <!-- 					</a> -->
 				</td>
-				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-					<td>
-						<fmt:formatDate value="${dunningOrder.outerfiletime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-					</td>
-				</shiro:hasPermission>
+				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
+				<td>
+					<fmt:formatDate value="${dunningOrder.nextfollowdate}" pattern="yyyy-MM-dd"/>
+				</td>
+				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
+				<td>
+					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
 				
 <!-- 				<td> -->
 <%-- 					${dunningOrder.dunningtaskstatusText} --%>

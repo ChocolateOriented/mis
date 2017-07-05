@@ -87,6 +87,7 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 		tMisDunnedConclusion.setDunningcycle(task.getDunningcycle());
 		save(tMisDunnedConclusion);
 		tMisDunnedConclusionDao.updateTelAction(tMisDunnedConclusion);
+		tMisDunningTaskDao.updatePromisePayDateAndNextFollowDate(dealcode,tMisDunnedConclusion.getPromisepaydate(),tMisDunnedConclusion.getNextfollowdate());
 		return true;
 	}
 
