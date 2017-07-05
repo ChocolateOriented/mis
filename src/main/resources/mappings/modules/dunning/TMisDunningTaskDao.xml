@@ -866,7 +866,9 @@
         t.id AS dunningtaskdbid,
         t.telremark AS telremark,
         o.outerfiletime AS outerfiletime,
-        t.dunningcycle AS dunningcycle
+        t.dunningcycle AS dunningcycle,
+        t.nextfollowdate as nextfollowdate,
+        t.promisepaydate as promisepaydate
         FROM
         t_mis_dunning_task AS t
 		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
@@ -944,11 +946,11 @@
         </if>
         <!-- 			# 跟进日期  -->
         <if test="beginnextfollowdate != null and endnextfollowdate != null and beginnextfollowdate != '' and endnextfollowdate != ''">
-            AND o.nextfollowdate BETWEEN #{beginnextfollowdate} AND #{endnextfollowdate}
+            AND t.nextfollowdate BETWEEN #{beginnextfollowdate} AND #{endnextfollowdate}
         </if>
         <!-- 			# PTP 时间  -->
         <if test="beginpromisepaydate != null and endpromisepaydate != null and beginpromisepaydate != '' and endpromisepaydate != ''">
-            AND o.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
+            AND t.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
         </if>
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
