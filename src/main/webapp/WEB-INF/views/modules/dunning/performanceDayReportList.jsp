@@ -31,33 +31,23 @@
 		            	return {'group.id': groupId , name:term};
 			        },
 			        results: function (data, page) {//选择要显示的数据
-			        	return { results: data };
+                      var resultsData = [] ;
+                      resultsData[0] = {id:null,name:"全部人员"};
+                      for (var i = 0; i < data.length; i++) {
+                        resultsData[i+1] = {id:data[i].name,name:data[i].name};
+                      }
+                      return { results: resultsData };
 			        },
 			        cache: true
 			    },
 			    formatResult:formatPeopleList, //选择显示字段
 			    formatSelection:formatPeopleList, //选择选中后填写字段
 			    initSelection: function(element, callback) {//回显
-			    	var id = $(element).val();
-		            if (id == "") {
-		            	return;
-		            }
-	            	//根据组查询选项
-	                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
-	                    data: function(){
-	                    	var groupId = $("#groupList").val();     	
-                    		return {groupId:groupId}             	
-	                    },
-	                    dataType: "json"
-	                }).done(function(data) {
-	                	for ( var item in data) {
-	                		//若回显ids里包含选项则选中
-							if (id == data[item].id) {
-			                	callback(data[item])
-			                	return ;
-							}
-						}
-	                });
+                  var name=$(element).val();
+                  if (name=="") {
+                    return;
+                  }
+                  callback({id:name,name:name})
 			    },
 		        width:170
 			});
@@ -108,7 +98,7 @@
 			</li>
 			<li>
 				<label>催收小组：</label>
-				<form:select id="groupList" path="groupId" class="input-medium">
+				<form:select id="groupList" path="group.id" class="input-medium">
 				<form:option value="">全部</form:option>
 					<!-- 添加组类型为optgroup -->
 					<c:forEach items="${groupTypes}" var="type">
@@ -116,13 +106,13 @@
 							<!-- 添加类型对应的小组 -->
 							<c:forEach items="${groupList}" var="item">
 								<c:if test="${item.type == type.key}">
-									<option value="${item.id}" <c:if test="${performanceDayReport.groupId == item.id }">selected="selected"</c:if>>${item.name}</option>
+									<option value="${item.id}" <c:if test="${performanceDayReport.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
 								</c:if>
 							</c:forEach>
 						</optgroup>
 					</c:forEach>
-				</form:select></li>
-			<li>			
+				</form:select>
+			</li>
 			<li>
 				<label>催收人：</label>
 				<form:input id="dunningPeople" path="personnel" type="hidden" />

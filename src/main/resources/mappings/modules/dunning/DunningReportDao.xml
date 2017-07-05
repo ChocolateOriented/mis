@@ -64,47 +64,52 @@
 	</select>
 	
     <!-- 工作日报 -->
-    <select id="findPerformanceDayReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceDayReport">
+	<select id="findPerformanceDayReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceDayReport">
 
-			SELECT
-				#{datetimestart} AS datetimestart, 
-				#{datetimeend}  AS datetimeend, 
-				<choose>
-					<when test="dunningCycle != null and dunningCycle != ''">
-						#{dunningCycle} AS DunningCycle,
-					</when>
-					<otherwise>
-						t.DunningCycle AS DunningCycle,
-					</otherwise>
-				</choose>
-				p.Name AS personnel, 
-				IFNULL(t.payoffAmount, 0) AS payamount,
-				IFNULL(t.payoffOrder, 0) AS payorder,
-				IFNULL(r.tel, 0) AS telnum,
-				IFNULL(r.sms, 0) AS smsnum
-			FROM (
-				SELECT
-					ID,
-					NAME,
-					DunningCycle
-				FROM t_mis_dunning_people
-				WHERE Field1 = 'active'
-		        <if test="personnel != null and personnel != ''">
-		            AND Id = #{personnel}
-		        </if>
-		        <if test="groupId != null and groupId != ''">
-					AND groupId = #{groupId}
-		        </if>
-		        <if test="dunningCycle != null and dunningCycle != ''">
-					AND dunningCycle LIKE concat('%',#{dunningCycle},'%')
-		        </if>
-				) AS p
-			LEFT JOIN (
-				SELECT
-					t.DunningCycle,
-					t.DunningPeopleId,
-			
-   			<![CDATA[
+		SELECT
+		#{datetimestart} AS datetimestart,
+		#{datetimeend}  AS datetimeend,
+		<choose>
+			<when test="dunningCycle != null and dunningCycle != ''">
+				#{dunningCycle} AS DunningCycle,
+			</when>
+			<otherwise>
+				t.DunningCycle AS DunningCycle,
+			</otherwise>
+		</choose>
+		p.Name AS personnel,
+		IFNULL(t.payoffAmount, 0) AS payamount,
+		IFNULL(t.payoffOrder, 0) AS payorder,
+		IFNULL(r.tel, 0) AS telnum,
+		IFNULL(r.sms, 0) AS smsnum
+		FROM (
+		SELECT
+		ID,
+		NAME,
+		DunningCycle
+		FROM t_mis_dunning_people
+		WHERE Field1 = 'active'
+		<if test="group != null and group.id != null and group.id !=''">
+			AND groupid = #{group.id}
+		</if>
+		<if test="group != null and group.groupIds != null">
+			AND groupid IN
+			<if test="group.groupIds.size == 0">
+				('')
+			</if>
+			<if test="group.groupIds.size > 0">
+				<foreach item="item" collection="group.groupIds" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</if>
+		) AS p
+		LEFT JOIN (
+		SELECT
+		t.DunningCycle,
+		t.DunningPeopleId,
+
+		<![CDATA[
 					SUM(
 						CASE
 							WHEN IFNULL(o.delay_days, 0) > 0
@@ -116,18 +121,18 @@
 					) AS payoffAmount,
 					# 还清任务数
 					COUNT(1) AS payoffOrder
-				FROM t_mis_dunning_task AS t 
+				FROM t_mis_dunning_task AS t
 				LEFT JOIN t_risk_order AS o ON o.dealcode = t.Dealcode
-			
-				WHERE t.DunningTaskStatus = 'finished' 
-					  AND DATE(t.CreateDate) <= #{datetimeend} 
+
+				WHERE t.DunningTaskStatus = 'finished'
+					  AND DATE(t.CreateDate) <= #{datetimeend}
  		 	]]>
-					  AND o.type = 'loan'
-					  AND o.merchant_id = 7
-					  AND o.status = 'payoff'
-					  <if test="dunningCycle != null and dunningCycle != ''">
-						AND  t.dunningCycle = #{dunningCycle}
-					  </if>
+		AND o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o.status = 'payoff'
+		<if test="dunningCycle != null and dunningCycle != ''">
+			AND  t.dunningCycle = #{dunningCycle}
+		</if>
 		<![CDATA[
 					  AND DATE(o.payoff_time) >= #{datetimestart}
 					  AND DATE(o.payoff_time) <= #{datetimeend}
@@ -137,21 +142,27 @@
 				SELECT
 					DATE(CreateDate) AS CreateTime,
 					DunningPeopleName,
-			
+
 					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS Tel,
-			
+
 					SUM(CASE WHEN COntantType = 'sms' THEN 1 ELSE 0 END) AS Sms
 				FROM
 					t_mis_contant_record
 				WHERE DATE(CreateDate) >= #{datetimestart} AND DATE(CreateDate) <= #{datetimeend}
 				GROUP BY DunningPeopleName
-			) AS r ON p.Id = r.DunningPeopleName 
-			
+			) AS r ON p.Id = r.DunningPeopleName
+
 		]]>
-	<!-- 		WHERE t.DunningPeriodBegin is not null AND t.DunningPeriodEnd is not null -->
+		<!-- 		WHERE t.DunningPeriodBegin is not null AND t.DunningPeriodEnd is not null -->
 		<where>
-        </where>
+			<if test="personnel != null and personnel != ''">
+				AND p.Name LIKE concat('%',#{personnel},'%')
+			</if>
+			<if test="dunningCycle != null and dunningCycle != ''">
+				AND  p.dunningCycle LIKE concat('%',#{dunningCycle},'%')
+			</if>
+		</where>
 		ORDER BY DunningCycle
- 	</select>
+	</select>
 	
 </mapper>

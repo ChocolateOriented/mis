@@ -125,24 +125,25 @@ public class DunningReportController extends BaseController {
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
 	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport); 
+			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
+			model.addAttribute("groupList", groupService.findList(new TMisDunningGroup()));
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "error";
 		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "modules/dunning/performanceDayReportList";
 	}
 	
 	/**
-	 * 催收日表
+	 * 催收绩效日报导出
 	 * @param user
 	 * @param request
 	 * @param response
@@ -153,17 +154,17 @@ public class DunningReportController extends BaseController {
     @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
     public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("dataSource_read");  
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
 			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-            String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
-            List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
-    		new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
-    		return null;
+			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
+			List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
+			new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
+			return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
 		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
     }

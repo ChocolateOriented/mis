@@ -25,7 +25,6 @@
 			$("#dunningPeopleName").select2({//
 			    ajax: {
 			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
-			        dataType: 'json',
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
 			        	var groupId=$("#groupList").val(); 
@@ -33,12 +32,13 @@
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	var resultsData = [] ;
+                      	resultsData[0] = {id:null,name:"全部人员"};
 			        	for (var i = 0; i < data.length; i++) {
-			        		resultsData[i] = {id:data[i].name,name:data[i].name};
+			        		resultsData[i+1] = {id:data[i].name,name:data[i].name};
 						}
 			        	return { results: resultsData };
 			        },
-			        cache: true
+			        cache: true,
 			    },
 			    formatResult:formatPeopleList, //选择显示字段
 			    formatSelection:formatPeopleList, //选择选中后填写字段
