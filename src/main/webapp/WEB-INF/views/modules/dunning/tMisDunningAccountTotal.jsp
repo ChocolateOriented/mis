@@ -144,7 +144,9 @@
               $("#auditDealcode").data("target",orderMsg);
               var orderMsgForm = $(".jbox-container").find("#orderMsg");
               formLoad(orderMsgForm,orderMsg);
-              orderMsgForm.find("[name='dunningPeople_nickname']").val(orderMsg.dunningPeople.nickname);
+              if (orderMsg.dunningPeople != null){
+                orderMsgForm.find("[name='dunningPeople_nickname']").val(orderMsg.dunningPeople.nickname);
+              }
               orderMsgForm.find("#orderData").show(300);
             }, "json");
       }
@@ -435,7 +437,6 @@ style="width:100%;height:600px;">
             <div class="span3"><a class="btn btn-large" id="REPAYMENT_SELF" onclick="addTag('REPAYMENT_SELF')">本人还款</a></div>
             <div class="span3"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
         </div>
-
         <div class="row-fluid text-right" style="margin-top: 30px">
             <div id="auditRemittanceData" class="span5 offset1" style="border: 2px solid black;padding-top: 20px">
                 <h4>

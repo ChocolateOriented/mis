@@ -423,7 +423,7 @@ public class TMisRemittanceMessageService extends
 		if (StringUtils.isNotBlank(id)){
 			new_tMisRemittanceConfirm.setId(id);
 		}
-		System.out.println(new_tMisRemittanceConfirm);
+		new_tMisRemittanceConfirm.setRemittanceTag(remittanceConfirm.getRemittanceTag());
 		remittanceConfirmService.save(new_tMisRemittanceConfirm);
 		return true;
 	}

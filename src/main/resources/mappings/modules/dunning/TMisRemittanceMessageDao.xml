@@ -48,6 +48,9 @@
 			<if test="remittanceChannel != null and remittanceChannel != ''">
 				AND a.remittancechannel = #{remittanceChannel}
 			</if>
+			<if test="remittanceSerialNumber != null and remittanceSerialNumber != ''">
+				AND a.remittanceSerialNumber = #{remittanceSerialNumber}
+			</if>
 			<if test="financialUser != null and financialUser != ''">
 				AND a.financialuser = #{financialUser}
 			</if>
@@ -287,6 +290,7 @@
 	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
 	
 	  select
+		m.id AS "remittanceConfirmId",
 	  m.RemittanceName AS "realName",
 	  m.mobile AS "mobile",
 	  m.dealcode AS "dealcode",

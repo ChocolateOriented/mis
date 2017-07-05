@@ -133,7 +133,7 @@
 				<td>
 				</td>
 				<td>
-				<input id="changeSms" onclick=""  class="btn btn-primary" type="button" value="入账"/>
+				<input id="changeSms" onclick="recorded('${tmessage.remittanceConfirmId}')"  class="btn btn-primary" type="button" value="入账"/>
 				<input id="delete" class="btn btn-primary" onclick=""  type="button" value="减免" />
 				</td>
 			</tr>
