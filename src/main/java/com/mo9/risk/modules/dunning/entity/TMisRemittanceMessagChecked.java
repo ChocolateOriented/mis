@@ -53,7 +53,11 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	
 	// 入账人
 	private String completePeople;	
-	
+	// buyer_id
+	private String buyerId;
+	// dunningtaskdbid
+	private String dunningtaskdbid;
+
 	public String getRealName() {
 		return realName;
 	}
@@ -150,6 +154,32 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	public void setFinancialUser(String financialUser) {
 		this.financialUser = financialUser;
 	}
+	public String getPayType() {
+		return payType;
+	}
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+	public String getCompletePeople() {
+		return completePeople;
+	}
+	public void setCompletePeople(String completePeople) {
+		this.completePeople = completePeople;
+	}
+	public String getBuyerId() {
+		return buyerId;
+	}
+	public void setBuyerId(String buyerId) {
+		this.buyerId = buyerId;
+	}
+	public String getDunningtaskdbid() {
+		return dunningtaskdbid;
+	}
+	public void setDunningtaskdbid(String dunningtaskdbid) {
+		this.dunningtaskdbid = dunningtaskdbid;
+	}
+
+	
 
 	public String getRemittanceConfirmId() {
 		return remittanceConfirmId;
