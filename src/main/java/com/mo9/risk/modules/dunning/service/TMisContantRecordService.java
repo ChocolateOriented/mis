@@ -173,7 +173,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
 					params.put("biz_sys", "MIS");
 					// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
-					params.put("biz_type", "3");
+					params.put("biz_type", "dunning");
 					// 客户端产品名称 例："mo9wallet","feishudai","feishudaiPro"
 					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
 					if (tdsTmplate.getSmsCotent().contains("${platform}")) {
@@ -224,7 +224,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
 					vparams.put("biz_sys", "MIS");
 					// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
-					vparams.put("biz_type", "3");
+					vparams.put("biz_type", "dunning");
 					if (tdsTmplate.getSmsCotent().contains("${platform}")) {
 						if (null != order.getPlatformExt() && !"".equals(order.getPlatformExt())) {
 							if (order.getPlatformExt().contains("feishudai")) {

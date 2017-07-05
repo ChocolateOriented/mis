@@ -2590,7 +2590,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
 								params.put("biz_sys", "MIS");
 								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
-								params.put("biz_type", "3");
+								params.put("biz_type", "dunning");
 								// 客户端产品名称
 								// 例："mo9wallet","feishudai","feishudaiPro"
 								if (smsTemplate.getSmsCotent().contains("${platform}")) {
@@ -2637,7 +2637,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
 								params.put("biz_sys", "MIS");
 								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
-								params.put("biz_type", "3");
+								params.put("biz_type", "dunning");
 								if (smsTemplate.getSmsCotent().contains("${platform}")) {
 									if (null != dunningOrder.getPlatformExt()
 											&& !"".equals(dunningOrder.getPlatformExt())) {
