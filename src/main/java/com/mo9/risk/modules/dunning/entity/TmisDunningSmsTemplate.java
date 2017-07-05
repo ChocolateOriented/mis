@@ -46,6 +46,20 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	
 	private String  sendReason;   //可逾期天数设定参数
 	
+	//用来做软删
+	private String invalid ;
+	
+	
+	public String getInvalid() {
+		return invalid;
+	}
+
+
+	public void setInvalid(String invalid) {
+		this.invalid = invalid;
+	}
+
+
 	public String getEnglishTemplateName() {
 		return englishTemplateName;
 	}

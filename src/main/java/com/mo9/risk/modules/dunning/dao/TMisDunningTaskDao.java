@@ -289,4 +289,16 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
 	
+	/**
+	 * 查询用户身份证影像资料
+	 * @return
+	 */
+	public String findBuyerIdCardImg(String buyerid);
+	
+	/**
+	 * atuoq0  催收预提醒订单的优质老用户（历史逾期1天内还清）
+	 * @return
+	 */
+	public List<String> findAtuoQ0Dealcode(@Param("day")String day,@Param("payoffday")String payoffday);
+	
 }

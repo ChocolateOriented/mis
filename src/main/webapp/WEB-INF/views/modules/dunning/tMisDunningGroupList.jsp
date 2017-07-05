@@ -11,6 +11,45 @@
 		$("#searchForm").submit();
 		return false;
 	}
+	
+	function distributionGroup() {
+		var groups = [];
+		$("input[name='groups']:checked").each(function() {
+			groups.push($(this).attr('value'));
+		});
+		
+		if (groups.length == 0) {
+			$.jBox.tip("请勾选需分配的小组", "warning");
+			return;
+		}
+		
+		$.jBox.open("iframe:${ctx}/dunning/tMisDunningGroup/distribution?groups=" + groups, "分配监理" , 500, 350, {            
+            buttons: {},
+            loaded: function (h) {
+                $(".jbox-content", document).css("overflow-y", "hidden");
+            }
+     	});
+	}
+	
+	function allGroup() {
+		var checked = $("#allGroup").prop('checked');
+		$("input[name='groups']").each(function() {
+			$(this).prop('checked', checked);
+		});
+	}
+	
+	function resetSupervisor() {
+		var groups = [];
+		$("input[name='groups']:checked").each(function() {
+			groups.push($(this).attr('value'));
+		});
+		
+		if (groups.length == 0) {
+			$.jBox.tip("请勾选需重置的小组", "warning");
+			return;
+		}
+		confirmx('确定要重置已分配的监理吗？', "${ctx}/dunning/tMisDunningGroup/resetSupervisor?groups=" + groups);
+	}
 </script>
 </head>
 <body>
@@ -39,6 +78,10 @@
 				</form:select>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
+				<li class="btns"><input id="distribution" class="btn btn-primary" type="button" value="分配监理" onclick="distributionGroup();"/></li>
+				<li class="btns"><input id="reset" class="btn btn-primary" type="button" value="重置监理" onclick="resetSupervisor();"/></li>
+			</shiro:hasPermission>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
@@ -46,9 +89,13 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
+				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
+				<th width="20px"><input type="checkbox" id="allGroup" onclick="allGroup();"/></th>
+				</shiro:hasPermission>
 				<th>组名</th>
 				<th>组长名</th>
 				<th>组类型</th>
+				<th>监理</th>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<th>操作</th>
 				</shiro:hasPermission>
@@ -57,6 +104,11 @@
 		<tbody>
 		<c:forEach items="${page.list}" var="tMisDunningGroup">
 			<tr>
+				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
+				<td width="20px">
+					<input type="checkbox" name="groups" value="${tMisDunningGroup.id}"/>
+				</td>
+				</shiro:hasPermission>
 				<td>
 					${tMisDunningGroup.name}
 				</td>
@@ -65,6 +117,16 @@
 				</td>
 				<td>
 					${groupTypes[tMisDunningGroup.type]}
+				</td>
+				<td title="${tMisDunningGroup.supervisor.name}">
+					<c:choose>  
+						<c:when test="${fn:length(tMisDunningGroup.supervisor.name) > 15}">  
+							<c:out value="${fn:substring(tMisDunningGroup.supervisor.name, 0, 15)}..." />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${tMisDunningGroup.supervisor.name}" />
+						</c:otherwise>  
+					</c:choose>
 				</td>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<td>

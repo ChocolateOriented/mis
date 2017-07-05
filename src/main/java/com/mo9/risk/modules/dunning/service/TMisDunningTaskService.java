@@ -36,6 +36,7 @@ import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
+import com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
@@ -56,6 +57,7 @@ import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -88,10 +90,17 @@ import com.thinkgem.jeesite.util.ListSortUtil;
 public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMisDunningTask> {
 
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
+	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
 	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
 	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  内部催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
 	public static final Integer DUNNING_COMMISSIONER_PERMISSIONS = 1;    //  催收专员
+//	public static final Integer DUNNING_SUPERVISION_MANAGER_PERMISSIONS =  100001;    //  催收监理经理
+//	public static final Integer DUNNING_SUPERVISION_PERMISSIONS =  10001;    //  催收监理
+//	public static final Integer DUNNING_GROUP_PERMISSIONS =   1001;         //  催收
+	
+	public static final String  AUTOQ0_ID_1 = "autoQ0_id_1";
+	public static final String  AUTOQ0_NAME_1 = "autoQ0机器人1号";
 	
 	public static final String  C0 = "Q0";      //  提醒0-0
 	public static final String  C_P1 = "Q1";	 
@@ -110,6 +119,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	private TMisDunningTaskLogDao tMisDunningTaskLogDao;
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
+	@Autowired
+	private TMisDunningGroupDao tMisDunningGroupDao;
 	@Autowired
 	private TMisDunnedHistoryDao tMisDunnedHistoryDao;
 	
@@ -794,6 +805,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			if(("财务主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
 				permissions = 1000;
 			}
+			if(("催收监理").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
+				permissions = 10000;
+				break;
+			}
 		}
 		return permissions;
 	}
@@ -888,6 +903,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
+		}
+		if(DUNNING_SUPERVISOR == permissions){
+			TMisDunningGroup group = new TMisDunningGroup();
+			group.setSupervisor(UserUtils.getUser());
+			List<String> groupIds = tMisDunningGroupDao.findSupervisorGroupList(group);
+			entity.setGroupIds(groupIds);
 		}
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
@@ -1430,7 +1451,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		sortList.sort(dicts, "label", "desc"); 
 		
 		for(Dict dict : dicts){
-			if(!dict.getLabel().equals(P4_P5)){
+			if(!dict.getLabel().equals(P4_P5) && !dict.getLabel().equals(P3_P4)){
 				String begin = dict.getValue().split("_")[0];
 				String end = dict.getValue().split("_")[1];
 				
@@ -1647,6 +1668,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
 				Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
 				
+				/**  * auto Q0 队列 begin */
+				String autoQ0 = DictUtils.getDictValue("autoQ0","Scheduled","false");
+				Map<String, String> atuoQ0DealcodeMap = new HashMap<String, String>();
+				List<TMisDunningTask> atuoDunningTasks = new ArrayList<TMisDunningTask>();
+				List<TMisDunningTaskLog> atuoQ0DunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+				if(autoQ0.equals("true")){
+					List<String> atuoQ0Dealcodes = tMisDunningTaskDao.findAtuoQ0Dealcode(begin_Q0,"1");
+					logger.info("findAtuoQ0Dealcode-autoQ0查询历史借款逾期小于1天的用户订单" +atuoQ0Dealcodes.size()  + "条"  + new Date());
+					for(String atuoQ0Dealcode : atuoQ0Dealcodes){
+						atuoQ0DealcodeMap.put(atuoQ0Dealcode, atuoQ0Dealcode);
+					}
+				}
+				/** * auto Q0 队列 end  */
+				
 				for(TMisDunningTaskLog dunningTaskLog : newDunningTaskLogs){
 					/**
 					 * 本次迁徙该移入的周期段
@@ -1656,6 +1691,18 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 						continue;
 					}
+					
+					/**  * auto Q0 队列 begin  */
+					if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+//						logger.info("autoQ0查询历史借款逾期小于1天的用户订单"  + new Date());
+						TMisDunningTask autoDunningTask = this.autoCreateNewDunningTask(dunningTaskLog, dict);
+						TMisDunningTaskLog autoDunningTaskLog = this.autoCreateNewDunningTaskLog(dunningTaskLog, autoDunningTask);
+						atuoDunningTasks.add(autoDunningTask);
+						atuoQ0DunningTaskLogs.add(autoDunningTaskLog);
+						continue;
+					}
+					/** * auto Q0 队列 end  */
+					
 					/**
 					 * 创建任务 
 					  */
@@ -1672,6 +1719,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					inDunningTaskLogsMap.put(dunningTask.getId(), dunningTaskLog);
 				}
+				
+				/**  * auto Q0 队列 begin  */
+				if(autoQ0.equals("true") && !atuoDunningTasks.isEmpty() && !atuoQ0DunningTaskLogs.isEmpty()){
+					tMisDunningTaskDao.batchinsertTask(atuoDunningTasks);
+					logger.info("保存autoQ0任务" + atuoDunningTasks.size()  + "条"  + new Date());
+					tMisDunningTaskLogDao.batchInsertTaskLog(atuoQ0DunningTaskLogs);
+					logger.info("保存autoQ0任务log" + atuoQ0DunningTaskLogs.size()  + "条"  + new Date());
+				}
+				/** * auto Q0 队列 end  */
+				
 				/**  新增任务Log集合   */
 				List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
 				/** 
@@ -1734,6 +1791,49 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	}
 	
+	/**
+	 * 创建autoQ0任务
+	 * @return TMisDunningTask
+	 */
+	private TMisDunningTask autoCreateNewDunningTask(TMisDunningTaskLog autoTaskLog,Dict dict) throws Exception{
+		Date now = new Date();
+		TMisDunningTask autoTask = new TMisDunningTask();
+		autoTask.setId(IdGen.uuid());
+		autoTask.setDunningpeopleid(AUTOQ0_ID_1);
+		autoTask.setDunningpeoplename(AUTOQ0_NAME_1);
+		autoTask.setDealcode(autoTaskLog.getDealcode());
+		autoTask.setCapitalamount(autoTaskLog.getCorpusamount());
+		autoTask.setBegin(toDate(now));
+		autoTask.setEnd(null);
+		autoTask.setDunningcycle(dict.getLabel());
+		int min = !("").equals(dict.getValue().split("_")[0]) ?  Integer.parseInt(dict.getValue().split("_")[0]) : 0 ;
+		int max = !("").equals(dict.getValue().split("_")[1]) ?  Integer.parseInt(dict.getValue().split("_")[1]) : 0 ;
+		autoTask.setDunningperiodbegin(min);
+		autoTask.setDunningperiodend(max);
+		autoTask.setDunnedamount(0);
+		autoTask.setIspayoff(false);
+		autoTask.setReliefamount(0);
+		autoTask.setDunningtaskstatus(TMisDunningTask.STATUS_DUNNING);
+		autoTask.setRepaymentTime(new java.sql.Date(autoTaskLog.getRepaymenttime().getTime()));
+		autoTask.setCreateBy(new User("auto_admin"));
+		autoTask.setCreateDate(new Date());
+		return autoTask;
+	}
+	
+	/**
+	 * 创建autoQ0任务log
+	 * @return TMisDunningTasklog
+	 */
+	private TMisDunningTaskLog autoCreateNewDunningTaskLog(TMisDunningTaskLog autoTaskLog,TMisDunningTask autoDunningTask) throws Exception{
+		autoTaskLog.setTaskid(autoDunningTask.getId());
+		autoTaskLog.setBehaviorstatus("in");
+		autoTaskLog.setDunningpeopleid(autoDunningTask.getDunningpeopleid());
+		autoTaskLog.setDunningpeoplename(autoDunningTask.getDunningpeoplename());
+		autoTaskLog.setDunningcycle(autoDunningTask.getDunningcycle());
+		autoTaskLog.setCreateDate(new Date());
+		autoTaskLog.setCreateBy(new User("auto_admin"));
+		return autoTaskLog;
+	}
 	
 	/**
 	 * 根据逾期天数，返回该月该日的归属队列
@@ -2485,6 +2585,29 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							if ("wordText".equals(smsTemplate.getSmsType())) {
 								Map<String, String> params = new HashMap<String, String>();
 								params.put("mobile", dunningOrder.getMobile());// 发送手机号
+								// snc版本 固定值:"2.0";
+								params.put("snc_version", "2.0");
+								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+								params.put("biz_sys", "MIS");
+								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+								params.put("biz_type", "dunning");
+								// 客户端产品名称
+								// 例："mo9wallet","feishudai","feishudaiPro"
+								if (smsTemplate.getSmsCotent().contains("${platform}")) {
+									if (null != dunningOrder.getPlatformExt()
+											&& !"".equals(dunningOrder.getPlatformExt())) {
+										if (dunningOrder.getPlatformExt().contains("feishudai")) {
+											params.put("product_name", "feishudai");
+										} else {
+											params.put("product_name", "mo9wallet");
+										}
+									} else {
+										params.put("product_name", "mo9wallet");
+									}
+
+								} else {
+									params.put("product_name", "mo9wallet");
+								}
 								// 模板填充的map
 								Map<String, Object> map = tMisContantRecordService.getCotentValue(
 										smsTemplate.getSmsCotent(), buyerInfeo, dunningOrder.getPlatformExt(),
@@ -2509,11 +2632,32 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								String englishTemplateName = smsTemplate.getEnglishTemplateName();
 								params.put("template_name", englishTemplateName);// 模板名称
 								params.put("template_tags", "CN");// 模板标识
+								// snc版本 固定值:"2.0";
+								params.put("snc_version", "2.0");
+								// 业务名称 例："JHJJ","FXYL","XWHF","MIS";
+								params.put("biz_sys", "MIS");
+								// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
+								params.put("biz_type", "dunning");
+								if (smsTemplate.getSmsCotent().contains("${platform}")) {
+									if (null != dunningOrder.getPlatformExt()
+											&& !"".equals(dunningOrder.getPlatformExt())) {
+										if (dunningOrder.getPlatformExt().contains("feishudai")) {
+											params.put("product_name", "feishudai");
+										} else {
+											params.put("product_name", "mo9wallet");
+										}
+									} else {
+										params.put("product_name", "mo9wallet");
+									}
+
+								} else {
+									params.put("product_name", "mo9wallet");
+								}
 								Thread.sleep(100);
 								MsfClient.instance().requestFromServer(ServiceAddress.SNC_VOICE, params,
 										BaseResponse.class);
 							}
-
+							
 							logger.info(
 									"系统发送,给订单号为:" + dunningOrder.getDealcode() + ",用户电话为:" + dunningOrder.getMobile()
 											+ ",发送短信成功.模板名为:" + smsTemplate.getTemplateName() + ",该模板发送的第" + i + "条");
@@ -2606,5 +2750,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return Pattern.matches(regex, phoneNumber);
 	}
 	
+	/**
+	 * 查询用户身份证影像资料
+	 * @param buyerid
+	 * @return
+	 */
+	public String findBuyerIdCardImg(String buyerid) {
+		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
+	}
 	
 }

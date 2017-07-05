@@ -22,4 +22,21 @@ public interface TMisDunningGroupDao extends CrudDao<TMisDunningGroup> {
 	 */
 	List<User> findUserList();
 	
+	/**
+	 * @Description: 保存分配催收小组
+	 * @return
+	 */
+	int saveDistribution(TMisDunningGroup tMisDunningGroup);
+	
+	/**
+	 * @Description: 查询监理下的小组
+	 * @return
+	 */
+	List<String> findSupervisorGroupList(TMisDunningGroup tMisDunningGroup);
+	
+	/**
+	 * @Description: 删除监理小组关系
+	 * @return
+	 */
+	int deleteSupervisorGroup(TMisDunningGroup tMisDunningGroup);
 }

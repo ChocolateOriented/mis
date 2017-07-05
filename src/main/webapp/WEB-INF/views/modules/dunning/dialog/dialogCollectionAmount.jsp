@@ -107,9 +107,11 @@
 					${tMisReliefamountHistory.derateReason.derateReasonName}
 				</td>
 				<td>
-					<label name="remark"  title="<c:if test='${fn:length(tMisReliefamountHistory.remarks)>15}'> ${tMisReliefamountHistory.remarks}</c:if>"
-					style="width:100px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">
-						     ${tMisReliefamountHistory.remarks}
+					<label name="remark"  title="<c:if test='${fn:length(tMisReliefamountHistory.remarks)>6}'> ${tMisReliefamountHistory.remarks}</c:if>">
+<!-- 					style="width:100px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;"> -->
+						 <c:if test='${fn:length(tMisReliefamountHistory.remarks)>6}'>${ fn:substring(tMisReliefamountHistory.remarks,0,6)}...</c:if>
+						 <c:if test='${fn:length(tMisReliefamountHistory.remarks)<=6}'>${tMisReliefamountHistory.remarks}</c:if>
+						 
 					</label>
 				</td>
 			</tr>

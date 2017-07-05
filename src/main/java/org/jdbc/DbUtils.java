@@ -330,7 +330,7 @@ public class DbUtils {
 				" contact_id," +
 				" contact_type," +
 				" location," +
-				" COUNT(1) AS contact_number," +
+				" IFNULL(SUM(begin_date), 0) AS contact_number," +
 				" SUM(times) AS times" +
 				" FROM t_risk_buyer_contact_records" +
 				" WHERE buyer_id =  '" + buyerId + "'" +
