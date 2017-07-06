@@ -93,7 +93,7 @@ public class TMisRemittanceMessageService extends
 	 * @Description 去重并保存汇款信息
 	 */
 	@Transactional(readOnly = false)
-	public int saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel) {
+	public String saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel,List<Integer> listNum) {
 		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList, channel);
 		List<TMisRemittanceMessage> updateordList = new ArrayList<TMisRemittanceMessage>();
 		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
@@ -126,10 +126,12 @@ public class TMisRemittanceMessageService extends
 				misRemittanceMessageDao.updateList(tMisRemittanceMessage, channel);
 			}
 		}
-
+		
 		int updateNum = updateordList.size();
 		int sameNum = trMList.size() - updateNum;
-		return trMList.size();
+		listNum.add(sameNum);
+		listNum.add(updateNum);
+		return "重复" + sameNum + "条,更新 " + updateNum + "条。";
 	}
 
 	/**
@@ -299,7 +301,7 @@ public class TMisRemittanceMessageService extends
 	 * @Description 获取有效支付宝汇款信息
 	 */
 	public String getValidRemittanceMessage(List<AlipayRemittanceExcel> srcData,
-			List<TMisRemittanceMessage> validData) {
+			List<TMisRemittanceMessage> validData,List<Integer> listNum) {
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		//记录解析失败的条数
 		int fail = 0;
@@ -340,7 +342,9 @@ public class TMisRemittanceMessageService extends
 			trMessage.preInsert();
 			validData.add(trMessage);
 		}
-		return fail > 0 ? ",失败" + fail + "条,失败原因:" + errorMsg : "";
+		listNum.add(validData.size()+fail);
+		listNum.add(fail);
+		return fail > 0 ? "失败" + fail + "条,失败原因:" + errorMsg : "";
 	}
 
 	/**

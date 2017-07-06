@@ -25,7 +25,8 @@ $(document).ready(function() {
 	
 	
 	if($("#message").val()){
-		$.jBox.tip($("#message").val());
+		$.jBox.alert($("#message").val(),"上传结果");
+		
 		$("#message").val("");
 	}
 	

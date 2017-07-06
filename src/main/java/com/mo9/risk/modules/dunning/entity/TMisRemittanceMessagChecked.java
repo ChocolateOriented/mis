@@ -16,8 +16,10 @@ import java.util.Date;
 public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessagChecked> {
 	private static final long serialVersionUID = 1L;
 	private String remittanceConfirmId;
-	// # 姓名
+	// # 借款人姓名
 	private String realName;
+	// # 汇款人姓名
+	private String remittanceName;
 	// # 手机号码
 	private String mobile;
 	// # 订单编号
@@ -179,8 +181,12 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 		this.dunningtaskdbid = dunningtaskdbid;
 	}
 
-	
-
+	public String getRemittanceName() {
+		return remittanceName;
+	}
+	public void setRemittanceName(String remittanceName) {
+		this.remittanceName = remittanceName;
+	}
 	public String getRemittanceConfirmId() {
 		return remittanceConfirmId;
 	}

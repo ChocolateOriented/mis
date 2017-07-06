@@ -91,20 +91,17 @@
         $(obj).children(".suspense").css("display", "block");
       }
 
-      function hideDetail() {
-        var e = window.event || arguments.callee.caller.arguments[0];
-        var toElem = e.toElement || e.relatedTarget;
-        if (toElem.className != "suspense");
-        $(".suspense").css("display", "none");
-      }
+		function hideDetail() {
+			$(".suspense").css("display", "none");
+		}
 
-      function page(n, s) {
-        if (n) window.parent.$("#pageNo").val(n);
-        if (s) window.parent.$("#pageSize").val(s);
-        window.parent.$("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
-        window.parent.$("#searchForm").submit();
-        return false;
-      }
+		function page(n, s) {
+			if (n) window.parent.$("#pageNo").val(n);
+			if (s) window.parent.$("#pageSize").val(s);
+			window.parent.$("#searchForm").attr("action","${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
+			window.parent.$("#searchForm").submit();
+			return false;
+		}
 
       function collectionfunction(obj, width, height) {
         var dealcode = $(obj).attr("dealcode");
@@ -183,20 +180,26 @@
       }
 	</script>
 	<style type="text/css">
-		.suspense {
-			z-index: 10000;
-			position: absolute;
-			top: 10px;
-			left: 10px;
-			height: 200px;
-			width: 300px;
-			background-color: white;
-			opacity: 0.9;
-			border: solid red 1px;
-			border-radius: 5px;
-			outline: none;
-		}
+				.suspense {
+				z-index:10000;
+				position:absolute;
+				top:10px;
+				left:10px;
+				height:200px;
+				width:250px;
+				background-color:white;
+				opacity:0.9;
+				border:solid red 1px;
+				border-radius:5px;
+				outline:none;
+				padding-left:20px;
+				padding-top:20px;
+				}
+				.beautif{
+				padding-bottom:10px;
+				}
 	</style>
+
 </head>
 <body>
 	<input type="hidden" id="childIfam" value="checked">
@@ -256,19 +259,17 @@
 					  ${tmessage.remainAmmount }
 				</td>
 				<td >
-					 <div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+					<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
 						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
 						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
 						 </font>
-					    <div class="suspense" style="display:none;" tabindex="0">
-<%-- 							   <div><font  color="red"> ${tmessage.remittanceSerialNumber }</font></div> --%>
-							   <div><font  color="red">------------------------------------------------</font></div>
-							   <div>交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
-							   <div>交易金额:${tmessage.remittanceamount }</div>
-							   <div>对方名称:${tmessage.realName }</div>
-							   <div>对方账户:${tmessage.remittanceaccount }</div>
-							   <div>备注:${tmessage.remark }</div>
-							   <div>上传人:${tmessage.financialUser }</div>
+					    <div class="suspense" style="display:none; " tabindex="0">
+							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>
+							   <div class="beautif">对方名称:${tmessage.remittanceName }</div>
+							   <div class="beautif">对方账户:${tmessage.remittanceaccount }</div>
+							   <div class="beautif">备注:${tmessage.remark }</div>
+							   <div class="beautif">上传人:${tmessage.financialUser }</div>
 					    </div>
 					</div>
 				</td>
@@ -276,10 +277,20 @@
 					  ${tmessage.checkedPeople }  
 				</td>
 				<td>
-					  ${tmessage.orderStatus }  
+					  <c:if test="${tmessage.orderStatus eq 'payment'}">
+					  	 未还清
+					  </c:if>
+					  <c:if test="${tmessage.orderStatus eq 'payoff'}">
+					  	 已还清
+					  </c:if>
 				</td>
 				<td>
-					  ${tmessage.remittanceTag }  
+					  <c:if test="${tmessage.remittanceTag eq 'REPAYMENT_THIRD'}">
+					  	第三方还款
+					  </c:if>
+					  <c:if test="${tmessage.remittanceTag eq 'REPAYMENT_SELF'}">
+					  	本人还款
+					  </c:if>
 				</td>
 
 				<td>

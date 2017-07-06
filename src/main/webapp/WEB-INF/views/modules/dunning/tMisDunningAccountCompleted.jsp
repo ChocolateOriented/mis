@@ -8,7 +8,15 @@
 		$(document).ready(function() {
 		
 		});
-		
+		function showDetail(obj) {
+			$(".suspense").css("display", "none");
+			$(obj).children(".suspense").css("display", "block");
+		}
+
+		function hideDetail() {
+			$(".suspense").css("display", "none");
+		}
+
 		 function page(n, s) {
 		        if (n) window.parent.$("#pageNo").val(n);
 		        if (s) window.parent.$("#pageSize").val(s);
@@ -17,6 +25,26 @@
 		        return false;
 		      }
 	</script>
+	<style type="text/css">
+				.suspense {
+				z-index:10000;
+				position:absolute;
+				top:10px;
+				left:10px;
+				height:200px;
+				width:250px;
+				background-color:white;
+				opacity:0.9;
+				border:solid red 1px;
+				border-radius:5px;
+				outline:none;
+				padding-left:20px;
+				padding-top:20px;
+				}
+				.beautif{
+				padding-bottom:10px;
+				}
+	</style>
 </head>
 <body>
 	<input type="hidden" id="childIfam" value="completed">
@@ -74,16 +102,38 @@
 					  ${tmessage.remainAmmount }
 				</td>
 				<td>
-					  ${tmessage.remittanceSerialNumber }  
+					<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
+						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
+						 </font>
+					    <div class="suspense" style="display:none; " tabindex="0">
+							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>
+							   <div class="beautif">对方名称:${tmessage.remittanceName }</div>
+							   <div class="beautif">对方账户:${tmessage.remittanceaccount }</div>
+							   <div class="beautif">备注:${tmessage.remark }</div>
+							   <div class="beautif">上传人:${tmessage.financialUser }</div>
+					    </div>
+					</div>
 				</td>
 				<td>
 					    
 				</td>
 				<td>
-					  ${tmessage.orderStatus }  
+					  <c:if test="${tmessage.orderStatus eq 'payment'}">
+					  	 未还清
+					  </c:if>  
+					  <c:if test="${tmessage.orderStatus eq 'payoff'}">
+					  	 已还清
+					  </c:if>  
 				</td>
 				<td>
-					  ${tmessage.remittanceTag }  
+					  <c:if test="${tmessage.remittanceTag eq 'REPAYMENT_THIRD'}">
+					  	第三方还款
+					  </c:if>  
+					  <c:if test="${tmessage.remittanceTag eq 'REPAYMENT_SELF'}">
+					  	本人还款
+					  </c:if>  
 				</td>
 				<td>
 					  ${tmessage.payType } 

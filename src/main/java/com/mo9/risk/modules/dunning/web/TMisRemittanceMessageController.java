@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.web;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
@@ -14,6 +15,9 @@ import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -84,24 +88,27 @@ public class TMisRemittanceMessageController extends BaseController {
 		}
 
 		//校验,保存汇款信息
+		List<Integer> listNum=new ArrayList<Integer>();
 		LinkedList<TMisRemittanceMessage> tMisRemittanceList = new LinkedList<TMisRemittanceMessage>();
-		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList);
-		int total = tMisRemittanceList.size();
-		int same = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel);
+		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList,listNum);
+		String sameUpdateNum = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel,listNum);
 		//调用自动查账
 		tMisRemittanceMessageService.autoAuditAfterFinancialtime(DateUtils.parseDate(DateUtils.getDate()));
 
 		//上传结果信息
 		StringBuilder message = new StringBuilder();
+		int total=listNum.get(0);
+		int fail=listNum.get(1);
+		int same=listNum.get(2);
+		int updateNUm=listNum.get(3);
 		if (StringUtils.isBlank(errorMsg)){
 			message.append("上传完成");
 		}else {
 			message.append("上传失败");
 		}
-		message.append(String.format(",共导入%d/%d条数据",total-same,total));
-		if(same>0){
-			message.append(String.format(",重复%d条数据",same));
-		}
+		message.append(String.format(",共导入%d/%d条数据。",total-fail-same-updateNUm,total));
+		
+		message.append(sameUpdateNum);
 		message.append(errorMsg);
 		logger.info(message.toString());
 		redirectAttributes.addAttribute("message",message.toString());
@@ -146,7 +153,10 @@ public class TMisRemittanceMessageController extends BaseController {
 		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,childPage);
 		HttpSession session = request.getSession();
 		session.setAttribute("page", page);
+		RemittanceTag[] values = RemittanceTag.values();
+		List<RemittanceTag> remittanceTagList = Arrays.asList(values);
 		model.addAttribute("childPage",childPage);
+		model.addAttribute("remittanceTagList",remittanceTagList);
 		return "modules/dunning/tMisDunningAccountTotal";
 	}
 	/**

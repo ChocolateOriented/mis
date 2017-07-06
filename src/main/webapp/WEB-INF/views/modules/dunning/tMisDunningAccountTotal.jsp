@@ -246,6 +246,7 @@
           form.find("[name='"+name+"'][value='"+value+"']").attr("checked",true);
         }
       }
+    
     </script>
 
 </head>
@@ -272,9 +273,9 @@
         <li><label>订单编号</label>
             <form:input path="dealcode" htmlEscape="false" maxlength="128" class="input-medium"/>
         </li>
-        <li><label>交易流水号</label>
-            <form:input path="remittanceSerialNumber" htmlEscape="false" class="input-medium"/>
-        </li>
+<!--         <li><label>交易流水号</label> -->
+<%--             <form:input path="remittanceSerialNumber" htmlEscape="false" class="input-medium"/> --%>
+<!--         </li> -->
 
         <li><label>订单状态</label>
             <form:select id="status" path="orderStatus" class="input-medium">
@@ -286,9 +287,9 @@
         <li><label>入账标签</label>
             <form:select id="status" path="remittanceTag" class="input-medium">
                 <form:option selected="selected" value="" label="全部状态"/>
-                <%-- 				<c:forEach items="" var=""> --%>
-                <%-- 				 	<form:option value="" label=""/> --%>
-                <%-- 				</c:forEach> --%>
+                				<c:forEach items="${remittanceTagList}" var="remittanceTag">
+                				 	<form:option value="${remittanceTag}" label="${remittanceTag.desc}"/>
+                				</c:forEach>
             </form:select>
         </li>
 
