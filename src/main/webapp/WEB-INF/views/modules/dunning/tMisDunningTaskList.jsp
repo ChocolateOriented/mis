@@ -591,6 +591,7 @@
 				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
 				<th>最近催收</th>
 				<th>还清日期</th>
+				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
 <!-- 				<th>任务状态</th> -->
@@ -654,10 +655,10 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.payofftime}" pattern="yyyy-MM-dd HH:mm"/>
 				</td>
-<%-- 				<td>
-					<a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}"   >
+				<td>
+					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}"   > --%>
 					${dunningOrder.dealcode}
-				</td> --%>
+				</td>
 				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
 				<td>
 					<fmt:formatDate value="${dunningOrder.nextfollowdate}" pattern="yyyy-MM-dd"/>
