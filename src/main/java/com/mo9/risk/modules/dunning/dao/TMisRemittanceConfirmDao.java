@@ -100,4 +100,10 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 */
 	void batchInsert(@Param("list")List<TMisRemittanceConfirm> confirms);
 
+	/**
+	 * @Description 查账流程--入账
+	 * @param confirm
+	 * @return void
+	 */
+	void auditConfrimUpdate(TMisRemittanceConfirm confirm);
 }

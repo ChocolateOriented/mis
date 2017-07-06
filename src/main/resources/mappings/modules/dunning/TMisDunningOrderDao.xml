@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao">
+
+	<!--计算剩余待还金额  t_risk_order AS o -->
+	<sql id="countRemainAmmount">
+		CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
+	</sql>
+
+	<sql id="tMisDunningOrderBaseColumns">
+		o.id AS "id",
+		o.dealcode AS "dealcode",
+		o.buyer_id AS "buyer_id",
+		o.amount AS "amount",
+		o.status AS "status",
+		<include refid="countRemainAmmount"/> AS remainAmmount
+	</sql>
+
+	<select id="findOrderByDealcode" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+      <include refid="tMisDunningOrderBaseColumns"/>
+		FROM
+      t_risk_order AS o
+		WHERE
+      o.dealcode = #{dealcode}
+	</select>
+
+	<select id="findPaymentOrderByMobiles" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
+		SELECT
+		o.dealcode AS "dealcode",
+		o.buyer_id AS "buyer_id",
+		b.mobile AS "mobile",
+		idc.real_name AS "realname"
+		FROM
+		t_risk_order AS o
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		WHERE
+		o.merchant_id = 7
+		AND o.`status`= 'payment'
+		AND o.type = 'loan'
+		AND b.mobile IN
+		<foreach collection="list" item="mobile" open="(" separator="," close=")">
+			#{mobile}
+		</foreach>
+	</select>
+
+	<select id="findPaymentOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+		idc.real_name AS "realname",
+		o.dealcode AS "dealcode",
+		o.buyer_id AS "buyer_id",
+		b.mobile AS "mobile",
+		o.amount AS "amount",
+		<include refid="countRemainAmmount"/> AS creditamount,
+		DATEDIFF(CURDATE(), o.repayment_time) AS overduedays,
+		p.`nickname` AS `dunningPeople.nickname`
+		FROM
+		t_risk_order AS o
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+		WHERE
+		o.merchant_id = 7
+		AND o.`status`= 'payment'
+		AND o.type = 'loan'
+		<if test="mobile!= null and mobile!= ''">
+			AND b.mobile = #{mobile}
+		</if>
+		<if test="dealcode!= null and dealcode!= ''">
+			AND o.dealcode = #{dealcode}
+		</if>
+	</select>
+</mapper>

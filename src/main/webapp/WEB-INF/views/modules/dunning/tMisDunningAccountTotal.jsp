@@ -110,8 +110,11 @@
         $("#searchForm").submit();
         return false;
       }
-      //===================手工查账======================
+      /**
+       * ===================手工查账======================
+       */
       function openHandAudit() {
+        auditComiting = false;
         restOrder();
         restRemittance();
         resetTag();
@@ -216,6 +219,7 @@
         $("#auditRemittanceTag").val(null);
         $(".jbox-container").find("#btnGroup a").removeClass("btn-primary");
       }
+
 
       //将数据值与inputname对应的表单回显
       function formLoad(form,data) {

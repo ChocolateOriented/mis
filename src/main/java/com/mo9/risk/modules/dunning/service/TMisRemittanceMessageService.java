@@ -7,6 +7,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
@@ -49,6 +50,8 @@ public class TMisRemittanceMessageService extends
 	private TMisRemittanceMessageDao misRemittanceMessageDao;
 	@Autowired
 	private TMisRemittanceConfirmService remittanceConfirmService;
+	@Autowired
+	private TMisDunningOrderService dunningOrderService;
 	@Autowired
 	protected Validator validator;
 
@@ -206,7 +209,7 @@ public class TMisRemittanceMessageService extends
 			return new ArrayList<TMisRemittanceMessage>();
 		}
 		//通过手机号批量查询未还款订单的用户信息
-		List<DunningOrder> orders = dao.findPaymentOrderByMobiles(new ArrayList<String>(mobiles));
+		List<DunningOrder> orders = dunningOrderService.findPaymentOrderByMobiles(new ArrayList<String>(mobiles));
 		if (orders == null || orders.size() == 0) {
 			return new ArrayList<TMisRemittanceMessage>();
 		}
@@ -371,7 +374,7 @@ public class TMisRemittanceMessageService extends
 	public DunningOrder findPaymentOrderByMobile(String mobile) {
 		DunningOrder order = new DunningOrder();
 		order.setMobile(mobile);
-		List<DunningOrder> dunningOrders = dao.findPaymentOrder(order);
+		List<DunningOrder> dunningOrders = dunningOrderService.findPaymentOrder(order);
 		if (dunningOrders != null && dunningOrders.size() > 0) {
 			return dunningOrders.get(0);
 		}
@@ -395,7 +398,7 @@ public class TMisRemittanceMessageService extends
 		//查询订单
 		DunningOrder q_order = new DunningOrder();
 		q_order.setDealcode(remittanceConfirm.getDealcode());
-		List<DunningOrder> orders = dao.findPaymentOrder(q_order);
+		List<DunningOrder> orders = dunningOrderService.findPaymentOrder(q_order);
 		if (orders == null || orders.size() == 0) {
 			return false;
 		}
@@ -426,5 +429,11 @@ public class TMisRemittanceMessageService extends
 		new_tMisRemittanceConfirm.setRemittanceTag(remittanceConfirm.getRemittanceTag());
 		remittanceConfirmService.save(new_tMisRemittanceConfirm);
 		return true;
+	}
+	/**
+	 * 获取汇款确认信息
+	 */
+	public TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId) {
+		return dao.findRemittanceMessagChecked(remittanceConfirmId);
 	}
 }

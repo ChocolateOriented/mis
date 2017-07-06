@@ -131,55 +131,6 @@
 
 	</insert>
 
-
-	<select id="findPaymentOrderByMobiles" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
-		SELECT
-		o.dealcode AS "dealcode",
-		o.buyer_id AS "buyer_id",
-		b.mobile AS "mobile",
-		idc.real_name AS "realname"
-		FROM
-		t_risk_order AS o
-		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
-		WHERE
-		o.merchant_id = 7
-		AND o.`status`= 'payment'
-		AND o.type = 'loan'
-		AND b.mobile IN
-		<foreach collection="list" item="mobile" open="(" separator="," close=")">
-			#{mobile}
-		</foreach>
-	</select>
-
-	<select id="findPaymentOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
-		SELECT
-		idc.real_name AS "realname",
-		o.dealcode AS "dealcode",
-		o.buyer_id AS "buyer_id",
-		b.mobile AS "mobile",
-		o.amount AS "amount",
-		<include refid="countRemainAmmount"/> AS creditamount,
-		DATEDIFF(CURDATE(), o.repayment_time) AS overduedays,
-		p.`nickname` AS `dunningPeople.nickname`
-		FROM
-		t_risk_order AS o
-		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
-		LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-		WHERE
-		o.merchant_id = 7
-		AND o.`status`= 'payment'
-		AND o.type = 'loan'
-		<if test="mobile!= null and mobile!= ''">
-			AND b.mobile = #{mobile}
-		</if>
-		<if test="dealcode!= null and dealcode!= ''">
-			AND o.dealcode = #{dealcode}
-		</if>
-	</select>
-
 	<select id="findAfterFinancialTimeNotAuditList" resultType="TMisRemittanceMessage">
 		SELECT
 			<include refid="tMisRemittanceMessageColumns"/>
@@ -299,7 +250,7 @@
 	  p.nickname AS "nickName",
 	  o.amount AS "amount",
 	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-	  <include refid="countRemainAmmount"/> AS "creditamount",
+	  <include refid="countRemainAmmount"/> AS "remainAmmount",
 	  m.Serialnumber AS "remittanceSerialNumber",
 	  l.updateBy AS "checkedPeople",
 	  o.status AS "orderStatus",
@@ -363,7 +314,7 @@
 	  p.nickname AS "nickName",
 	  o.amount AS "amount",
 	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-	  <include refid="countRemainAmmount"/> AS "creditamount",
+	  <include refid="countRemainAmmount"/> AS "remainAmmount",
 	  m.Serialnumber AS "remittanceSerialNumber",
 	  l.updateBy AS "completePeople",
 	  o.status AS "orderStatus",
@@ -384,7 +335,7 @@
       LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
 	  WHERE
 		o.type = 'loan' 
-        AND o.merchant_id = 7
+    AND o.merchant_id = 7
 		AND o.`status`IN ('payoff', 'payment' )
 		AND m.ConfirmStatus="finsh"
 		AND m.ConfirmFlow="AUDIT"
@@ -417,7 +368,25 @@
             </otherwise>
         </choose>
 	</select>
-	
+
+	<select id="findRemittanceMessagChecked" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
+		select
+		m.id AS "remittanceConfirmId",
+		<include refid="countRemainAmmount"/> AS "remainAmmount",
+		m.RemittanceTag AS "remittanceTag",
+		m.RemittanceAmount AS "remittanceamount"
+		from
+		t_mis_remittance_confirm m
+		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+		WHERE
+		o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o.`status` = 'payment'
+		AND m.ConfirmStatus="complete_audit"
+		AND m.ConfirmFlow="AUDIT"
+		AND m.id=#{remittanceConfirmId}
+	</select>
+
 	<select id="findNotFinish" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm">
 		SELECT
 		c.id AS "id",

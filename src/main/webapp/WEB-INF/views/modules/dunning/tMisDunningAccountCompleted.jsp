@@ -71,7 +71,7 @@
 					  ${tmessage.modifyamount} 
 				</td>
 				<td>
-					  ${tmessage.creditamount }  
+					  ${tmessage.remainAmmount }
 				</td>
 				<td>
 					  ${tmessage.remittanceSerialNumber }  

@@ -27,6 +27,12 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	public static final String CONFIRMSTATUS_COMPLETE_AUDIT = "complete_audit";  //已查账
 	public static final String CONFIRMSTATUS_FINISH = "finish"; //已完成
 
+	/**
+	 * 还款类型
+	 */
+	public static final String PAYTYPE_LOAN = "loan"; //还清
+	public static final String PAYTYPE_PARTIAL = "partial"; //部分还款
+
 	private static final long serialVersionUID = 1L;
 	private Integer dbid;		// dbid
 	

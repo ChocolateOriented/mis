@@ -24,10 +24,6 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	
 	public TMisRemittanceMessage findRemittanceMesListByDealcode(String code);
 
-	List<DunningOrder> findPaymentOrderByMobiles(List<String> mobiles);
-
-	List<DunningOrder> findPaymentOrder(DunningOrder order);
-
 	public List<TMisRemittanceMessage> findBySerialNumbers(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList,@Param("channel")String channel);
 
 	public int saveList(@Param("list") List<TMisRemittanceMessage> tMisRemittanceList);
@@ -45,4 +41,6 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 	List<TMisRemittanceConfirm> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
 
 	public List<TMisRemittanceMessagChecked> findMessagCompletedList(TMisRemittanceMessagChecked entity);
+
+	TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId);
 }

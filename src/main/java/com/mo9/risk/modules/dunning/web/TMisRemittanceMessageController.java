@@ -235,4 +235,14 @@ public class TMisRemittanceMessageController extends BaseController {
 		}
 		return "查账失败";
 	}
+
+
+	/**
+	 * 获取汇款确认信息
+	 */
+	@RequestMapping(value = "findRemittanceMessagChecked")
+	@ResponseBody
+	public TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId){
+		return tMisRemittanceMessageService.findRemittanceMessagChecked(remittanceConfirmId);
+	}
 }

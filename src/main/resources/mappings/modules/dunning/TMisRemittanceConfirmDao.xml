@@ -22,7 +22,7 @@
 		a.FinancialImg1 AS "FinancialImg1",
 		a.FinancialImg2 AS "FinancialImg2",
 		a.financialremark AS "financialremark",
-		a.confirmFlow AS "confirmFlow"
+		a.confirmFlow AS "confirmFlow",
 		a.confirmstatus AS "confirmstatus",
 		a.dealcode AS "dealcode",
 		a.remittanceTag AS "remittanceTag",
@@ -207,7 +207,16 @@
 			updatedate = #{updateDate}
 		WHERE id = #{id}
 	</update>
-			
+
+	<update id="auditConfrimUpdate">
+		UPDATE t_mis_remittance_confirm SET
+			paytype = #{paytype},
+			confirmstatus = #{confirmstatus},
+			remittanceTag = #(remittanceTag);
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
 	
 	<update id="confirmationMergeUpdate">
 		UPDATE t_mis_remittance_confirm SET 	

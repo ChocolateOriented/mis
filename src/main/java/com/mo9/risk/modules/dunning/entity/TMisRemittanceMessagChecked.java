@@ -29,7 +29,7 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	// #减免金额
 	private Double modifyamount;
 	// #应催金额
-	private Double creditamount;
+	private Double remainAmmount;
 	//交易流水号
 	private  String remittanceSerialNumber;
 	//查账人
@@ -94,11 +94,11 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	public void setModifyamount(Double modifyamount) {
 		this.modifyamount = modifyamount;
 	}
-	public Double getCreditamount() {
-		return creditamount;
+	public Double getRemainAmmount() {
+		return remainAmmount;
 	}
-	public void setCreditamount(Double creditamount) {
-		this.creditamount = creditamount;
+	public void setRemainAmmount(Double remainAmmount) {
+		this.remainAmmount = remainAmmount;
 	}
 	public String getRemittanceSerialNumber() {
 		return remittanceSerialNumber;
