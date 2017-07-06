@@ -295,8 +295,9 @@
 	  select
 	  o.buyer_id AS "buyerId",
 	  t.id AS "dunningtaskdbid",
-		m.id AS "remittanceConfirmId",
-	  m.RemittanceName AS "realName",
+	  m.id AS "remittanceConfirmId",
+	  m.name AS "realName",
+	  m.RemittanceName AS "RemittanceName",
 	  m.mobile AS "mobile",
 	  m.dealcode AS "dealcode",
 	  p.nickname AS "nickName",
@@ -360,7 +361,8 @@
 	<select id="findMessagCompletedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
 	
 	 select
-	  m.RemittanceName AS "realName",
+	  m.name AS "realName",
+	  m.RemittanceName AS "remittanceName",
 	  m.mobile AS "mobile",
 	  m.dealcode AS "dealcode",
 	  p.nickname AS "nickName",

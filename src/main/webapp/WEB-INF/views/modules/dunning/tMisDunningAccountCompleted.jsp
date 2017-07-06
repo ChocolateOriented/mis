@@ -14,9 +14,6 @@
 		}
 
 		function hideDetail() {
-			var e = window.event || arguments.callee.caller.arguments[0];
-			var toElem = e.toElement || e.relatedTarget;
-			if (toElem.className != "suspense");
 			$(".suspense").css("display", "none");
 		}
 
@@ -112,7 +109,7 @@
 					    <div class="suspense" style="display:none; " tabindex="0">
 							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
 							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>
-							   <div class="beautif">对方名称:${tmessage.realName }</div>
+							   <div class="beautif">对方名称:${tmessage.remittanceName }</div>
 							   <div class="beautif">对方账户:${tmessage.remittanceaccount }</div>
 							   <div class="beautif">备注:${tmessage.remark }</div>
 							   <div class="beautif">上传人:${tmessage.financialUser }</div>
