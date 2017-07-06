@@ -164,12 +164,10 @@
         //重置已查到的订单
         restRemittance();
         var serialNumber = $(".jbox-container").find("#inputRemittanceSerialNumber").val();
-        console.info($(".jbox-container").find("#inputRemittanceSerialNumber"));
         if (null == serialNumber || serialNumber == "") {
           jBox.tip("请输入流水号");
           return;
         }
-        console.info("serialNumber"+serialNumber);
         $.post("${ctx}/dunning/tMisRemittanceMessage/findRemittance",{remittanceSerialNumber:serialNumber,remittanceChannel: "aliPay"},
             function (remittanceConfirm) {
               //没查到给提示
@@ -232,7 +230,6 @@
         }
       }
       function valuAtion(form,name,value){
-        console.info(name+value);
         if(form.length<1){
           return;
         }

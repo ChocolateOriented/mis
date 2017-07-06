@@ -137,7 +137,6 @@
         //获取remittanceConfirm
         $.post("${ctx}/dunning/tMisRemittanceMessage/findRemittanceMessagChecked", {remittanceConfirmId: remittanceConfirmId},
             function (remittanceConfirm) {
-              console.info(remittanceConfirm);
               $("#recordedForm").data("target", remittanceConfirm);
               if (remittanceConfirm.remittanceTag == null || "" == remittanceConfirm.remittanceTag) {
                 needTag = true;
