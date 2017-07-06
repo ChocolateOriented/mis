@@ -1511,7 +1511,9 @@
 				    updatedate = now(),
 				    updateby = #{item.updateBy.id},
 					end = now(),
-					dunningtaskstatus = #{item.dunningtaskstatus}
+					dunningtaskstatus = #{item.dunningtaskstatus},
+					nextfollowdate = null,
+					promisepaydate = null
 				</set>
 				WHERE id = #{item.id}
 		 </foreach>
