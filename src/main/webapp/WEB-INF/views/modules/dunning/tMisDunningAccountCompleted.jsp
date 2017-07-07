@@ -60,7 +60,7 @@
 				<th>姓名</th>
 				<th>手机号</th>
 				<th>订单编号</th>
-				<th>崔收入</th>
+				<th>催收人</th>
 				<th>欠款金额</th>
 				<th>减免金额</th>
 				<th>应还金额</th>
@@ -117,6 +117,7 @@
 					</div>
 				</td>
 				<td>
+				 	${tmessage.checkedPeople}
 					    
 				</td>
 				<td>
@@ -136,7 +137,12 @@
 					  </c:if>  
 				</td>
 				<td>
-					  ${tmessage.payType } 
+					  <c:if test="${tmessage.payType eq 'loan'}">
+					  	还清
+					  </c:if>  
+					  <c:if test="${tmessage.payType eq 'partial'}">
+					  	部分还款
+					  </c:if>  
 				</td>
 				
 				<td>
