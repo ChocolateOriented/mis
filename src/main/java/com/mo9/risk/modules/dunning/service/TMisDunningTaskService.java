@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.util.RegexUtil;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -1463,7 +1464,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		String type = getDunningCycleType();
 		List<Dict> dicts = DictUtils.getDictList(type);
 		for(Dict dict : dicts){
-			System.out.println(dict.getLabel());
 			dict.getValue();
 //			if(){
 //				
@@ -2275,19 +2275,19 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
         int month = Calendar.MAY;  
         int date = 1;  
         calendar.set(year, month, date);  
-        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);  
-        System.out.println("Max Day: " + maxDay);  
-        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);  
-        System.out.println("Min Day: " + minDay);  
+        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+				logger.debug("Max Day: " + maxDay);
+        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+				logger.debug("Min Day: " + minDay);
   
         for (int i = minDay +1; i <= maxDay; i++) {  
-            calendar.set(year, month, i);  
-            System.out.println("Day: " + calendar.getTime().toLocaleString());  
+            calendar.set(year, month, i);
+						logger.debug("Day: " + calendar.getTime().toLocaleString());
 //        	int datenum = calendar.get(Calendar.DATE);
 //        	System.out.println(datenum);
             int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
 //        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-        	System.out.println(s);
+						logger.debug(s);
         }  
 //      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
 		
@@ -2722,10 +2722,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			return false;
 		}
 		if(type==1){
-			 regex="^1[0-9]{10}$";
+			 regex= RegexUtil.REGEX_MOBILE;
 		}
 		if(type==2){
-			 regex = "^(\\d{3,4}-)?\\d{6,8}$";
+			 regex = RegexUtil.REGEX_PHONE;
 		}
 		return Pattern.matches(regex, phoneNumber);
 	}

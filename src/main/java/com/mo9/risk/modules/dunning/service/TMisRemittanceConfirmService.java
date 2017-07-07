@@ -3,17 +3,31 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
+import com.mo9.risk.modules.dunning.entity.TMisPaid;
+import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
+import com.mo9.risk.util.GetRequest;
+import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -29,10 +43,15 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 
 	@Autowired
 	private TMisRemittanceConfirmDao misRemittanceConfirmDao;
-	
 	@Autowired
 	private TMisRemittanceConfirmLogService tMisRemittanceConfirmLogService;
-	
+	@Autowired
+	private RiskOrderManager riskOrderManager ;
+	@Autowired
+	private TMisDunningTaskDao tMisDunningTaskDao;
+	@Autowired
+	private TMisDunningTaskLogDao dunningTaskLogDao;
+
 	public TMisRemittanceConfirm get(String id) {
 		return super.get(id);
 	}
@@ -185,5 +204,104 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm){
 		return misRemittanceConfirmDao.findRelatedList(tMisRemittanceConfirm);
+	}
+
+	/**
+	 * @Description 批量插入
+	 * @param confirms
+	 * @return void
+	 */
+	public void batchInsert(List<TMisRemittanceConfirm> confirms,User user) {
+		if (null == confirms || confirms.size()==0){
+			return;
+		}
+		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
+			remittanceConfirm.preInsert();
+			remittanceConfirm.setUpdateBy(user);
+			remittanceConfirm.setCreateBy(user);
+		}
+		dao.batchInsert(confirms);
+		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
+			tMisRemittanceConfirmLogService.saveLog(remittanceConfirm);
+		}
+	}
+
+	/**
+	 * @Description  提交审核流程--入账
+	 * @param paid
+	 * @param isMergeRepayment
+	 * @param confirmid
+	 * @param platform
+	 * @param relatedId
+	 * @return java.lang.String
+	 */
+	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
+		String dealcode = paid.getDealcode();
+		String paychannel = paid.getPaychannel();
+		String remark = paid.getRemark();
+
+		String paidType = paid.getPaidType();
+		String paidAmount = paid.getPaidAmount();
+		String delayDay = paid.getDelayDay();
+
+		BigDecimal remittanceamount = new BigDecimal(paidAmount);
+		if(platform.equals("app")){
+			//do nothing
+		}else{
+			remittanceamount = remittanceamount.multiply(BigDecimal.valueOf(100));
+		}
+
+		if ("1".equals(isMergeRepayment)) {
+			List<String> relatedIds = new ArrayList<String>(Arrays.asList(relatedId));
+			this.confirmationMergeUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM), relatedIds);
+		} else {
+			this.confirmationUpdate(new TMisRemittanceConfirm(confirmid, paidType, Double.parseDouble(paidAmount), TMisRemittanceConfirm.CONFIRMSTATUS_CH_CONFIRM));
+		}
+
+		/**
+		 * 部分还款，生成部分还款任务日志
+		 */
+		if("partial".equals(paidType)){
+			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+			dunningTaskLog.setBehaviorstatus("partial");
+			dunningTaskLog.setCreateDate(new Date());
+			dunningTaskLog.setCreateBy(new User("auto_admin"));
+			dunningTaskLogDao.insert(dunningTaskLog);
+//						dunningTaskLog.setCreateDate(new Date());
+		}
+
+		//回调江湖救急接口
+		JSONObject repJson = riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
+		String resultCode = repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
+		if (StringUtils.isBlank(resultCode) || !"200".equals(resultCode)) {
+			//抛异常回滚
+			throw new ServiceException("订单接口回调失败,失败信息" + repJson.toString());
+		}
+
+		String msg = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
+		return msg;
+}
+
+	/**
+	 * @Description 提交查账流程--入账
+	 * @param confirm
+	 * @return void
+	 */
+	@Transactional
+	public void auditConfrim(TMisRemittanceConfirm confirm) throws IOException {
+		//更新汇款确认信息
+		confirm.preUpdate();
+		confirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_FINISH);
+		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
+		tMisRemittanceConfirmLogService.saveLog(confirm);
+
+		//回调江湖救急接口
+		String delayDay = "7";
+		JSONObject repJson = riskOrderManager.repay(confirm.getDealcode(),confirm.getRemittancechannel(),confirm.getRemark(),confirm.getPaytype(), new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		String resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
+		if(StringUtils.isBlank(resultCode) || !"200".equals(resultCode)){
+			//抛异常回滚
+			throw new ServiceException("订单接口回调失败,失败信息"+repJson.toString());
+		}
 	}
 }

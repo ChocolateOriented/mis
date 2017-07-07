@@ -3,12 +3,9 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
-import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import java.util.Date;
+import javax.validation.constraints.NotNull;
 
 /**
  * 汇款确认信息Entity
@@ -17,22 +14,25 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
  */
 public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	/**
-	 * 代表催收已提交财务待确认
+	 * --------------CHECK确认流程(提交>审核)汇款状态--------------
 	 */
-	public static final String CONFIRMSTATUS_CH_SUBMIT = "ch_submit"; 
+	public static final String CONFIRMSTATUS_CH_SUBMIT = "ch_submit";  //代表催收已提交财务待确认
+	public static final String CONFIRMSTATUS_CW_SUBMIT = "cw_submit";  //代表财务已提交催收待确认
+	public static final String CONFIRMSTATUS_CW_RETURN = "cw_return";  //代表财务已打回催收待重新提交
+	public static final String CONFIRMSTATUS_CH_CONFIRM = "ch_confirm";  //代表催收最终已确认
+
 	/**
-	 *  代表财务已提交催收待确认
+	 * --------------CHECK确认流程(提交>审核)汇款状态--------------
 	 */
-	public static final String CONFIRMSTATUS_CW_SUBMIT = "cw_submit";  
+	public static final String CONFIRMSTATUS_COMPLETE_AUDIT = "complete_audit";  //已查账
+	public static final String CONFIRMSTATUS_FINISH = "finish"; //已完成
+
 	/**
-	 *  代表财务已打回催收待重新提交
+	 * 还款类型
 	 */
-	public static final String CONFIRMSTATUS_CW_RETURN = "cw_return";
-	/**
-	 *  代表催收最终已确认
-	 */
-	public static final String CONFIRMSTATUS_CH_CONFIRM = "ch_confirm";    
-	
+	public static final String PAYTYPE_LOAN = "loan"; //还清
+	public static final String PAYTYPE_PARTIAL = "partial"; //部分还款
+
 	private static final long serialVersionUID = 1L;
 	private Integer dbid;		// dbid
 	
@@ -55,11 +55,14 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 	private String FinancialImg2; 			// 财务上传图片
 	private String financialremark;					// 备注
 	private String financialserialnumber;	// 财务汇款流水号
-	
+
+	private ConfirmFlow confirmFlow;//确认流程
 	private String confirmstatus;		// 确认状态
+	private RemittanceTag remittanceTag;		//入账标签
 	private String dealcode;		// 订单号
-	
 	private String Invalid;			// 删除标志
+
+
 	/**
 	 * 用户id
 	 */
@@ -231,7 +234,7 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 		return confirmstatus;
 	}
 	public String getConfirmstatusText() {
-		return CONFIRMSTATUS_CH_SUBMIT.equals(this.confirmstatus) ?  "催收已提交" : 
+		return CONFIRMSTATUS_CH_SUBMIT.equals(this.confirmstatus) ?  "催收已提交" :
 				  CONFIRMSTATUS_CW_SUBMIT.equals(this.confirmstatus) ?  "财务已确认" :
 					 CONFIRMSTATUS_CW_RETURN.equals(this.confirmstatus) ?  "财务已打回" :
 						CONFIRMSTATUS_CH_CONFIRM.equals(this.confirmstatus) ?  "已完成" :"";
@@ -312,6 +315,80 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 		this.financialserialnumber = financialserialnumber;
 	}
 
-	
-	
+	public ConfirmFlow getConfirmFlow() {
+		return confirmFlow;
+	}
+
+	public void setConfirmFlow(ConfirmFlow confirmFlow) {
+		this.confirmFlow = confirmFlow;
+	}
+
+	public RemittanceTag getRemittanceTag() {
+		return remittanceTag;
+	}
+
+	public void setRemittanceTag(
+			RemittanceTag remittanceTag) {
+		this.remittanceTag = remittanceTag;
+	}
+
+	@Override
+	public String toString() {
+		return "TMisRemittanceConfirm{" +
+				"dbid=" + dbid +
+				", remittancename='" + remittancename + '\'' +
+				", remittancetime=" + remittancetime +
+				", remittanceamount=" + remittanceamount +
+				", remittancechannel='" + remittancechannel + '\'' +
+				", ReceivablesImg1='" + ReceivablesImg1 + '\'' +
+				", ReceivablesImg2='" + ReceivablesImg2 + '\'' +
+				", payamount=" + payamount +
+				", paytype='" + paytype + '\'' +
+				", remark='" + remark + '\'' +
+				", serialnumber='" + serialnumber + '\'' +
+				", financialremittancename='" + financialremittancename + '\'' +
+				", accounttime=" + accounttime +
+				", accountamount=" + accountamount +
+				", financialremittancechannel='" + financialremittancechannel + '\'' +
+				", FinancialImg1='" + FinancialImg1 + '\'' +
+				", FinancialImg2='" + FinancialImg2 + '\'' +
+				", financialremark='" + financialremark + '\'' +
+				", financialserialnumber='" + financialserialnumber + '\'' +
+				", confirmFlow=" + confirmFlow +
+				", confirmstatus='" + confirmstatus + '\'' +
+				", remittanceTag=" + remittanceTag +
+				", dealcode='" + dealcode + '\'' +
+				", Invalid='" + Invalid + '\'' +
+				", buyerId='" + buyerId + '\'' +
+				", name='" + name + '\'' +
+				", mobile='" + mobile + '\'' +
+				", beginupdatetime=" + beginupdatetime +
+				", endupdatetime=" + endupdatetime +
+				'}';
+	}
+
+	public enum ConfirmFlow{
+		CHECK,//提交>审核
+		AUDIT//上传>查账
+	}
+
+	/**
+	 * @Description 还款标签
+	 * @author jxli
+	 * @version 2017/6/23
+	 */
+	public enum RemittanceTag{
+		REPAYMENT_SELF("本人还款"),
+		REPAYMENT_THIRD("第三方还款");
+
+		RemittanceTag(String desc) {
+			this.desc = desc;
+		}
+
+		public final String desc;
+
+		public String getDesc() {
+			return desc;
+		}
+	}
 }

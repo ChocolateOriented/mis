@@ -48,8 +48,8 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	
 	//用来做软删
 	private String invalid ;
-	
-	
+
+
 	public String getInvalid() {
 		return invalid;
 	}

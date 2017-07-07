@@ -9,7 +9,7 @@ import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import com.thinkgem.jeesite.util.NumberUtil;
 
 public class DunningOrder  extends DataEntity<DunningOrder>{
-	
+	private static final long serialVersionUID = -133278239542076425L;
 	/**
 	 *  --------------------------催款任务状态----------------------------------------------
 	 */
@@ -23,19 +23,16 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	 */
 	public static final String STATUS_PAYOFF = "payoff"; //已还清
 	public static final String STATUS_PAYMENT = "payment";  //未还清
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -133278239542076425L;
-	
+
 	private Integer buyerid;
 	private String realname;// # 姓名
 	private String dealcode;// # 订单编号
 	private String mobile;// # 手机号码
 	private Double amount;// # 欠款金额
 	private Double balance;// # 还款金额
-	private Double creditamount;// # 应催金额
+	@Deprecated
+	private Double creditamount;// # 应催金额 改用字段remainAmmount
+	private Double remainAmmount;//剩余待还金额,应催金额
 	private Date repaymenttime;// # 到期还款日期
 	private Integer overduedays;// # 逾期天数
 	private String status;// # 订单状态 payoff 已还清 payment
@@ -65,7 +62,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private TMisDunningPeople dunningPeople ;
 	private List<String> groupIds;
-	
+
 	private Date outsourcingBeginDate ; //委外开始时间
 	private Date beginOutsourcingBeginDate ; //查询开始-委外开始时间
 	private Date endOutsourcingBeginDate ; //查询结束-委外开始时间
@@ -76,8 +73,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private String platformExt ; //金融产品
 	private String extensionNumber ; //fengjihao
-	
-	
+
+
 	private Date promisepaydate; 	// 到期还款时间
 	private Date beginpromisepaydate ; //查询开始-到期还款时间
 	private Date endpromisepaydate ; //查询结束-到期还款时间
@@ -85,7 +82,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date beginnextfollowdate ; //查询开始-下次跟进时间
 	private Date endnextfollowdate ; //查询结束-下次跟进时间
 
-	
+
 	public String getPlatformExt() {
 		return platformExt;
 	}
@@ -135,7 +132,6 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setEndOutsourcingEndDate(Date endOutsourcingEndDate) {
 		this.endOutsourcingEndDate =  null != endOutsourcingEndDate ? DateUtils.endDate(endOutsourcingEndDate) : endOutsourcingEndDate;
 	}
-
 	public Date getOutsourcingBeginDate() {
 		return outsourcingBeginDate;
 	}
@@ -446,6 +442,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.balance = balance;
 	}
 
+	public Double getRemainAmmount() {
+		return remainAmmount;
+	}
+
+	public void setRemainAmmount(Double remainAmmount) {
+		this.remainAmmount = remainAmmount;
+	}
+
 	public Date getPromisepaydate() {
 		return promisepaydate;
 	}
@@ -493,7 +497,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setEndnextfollowdate(Date endnextfollowdate) {
 		this.endnextfollowdate =  null != endnextfollowdate ? DateUtils.endDate(endnextfollowdate) : endnextfollowdate;
 	}
-	
-	
-	
+
+
+
 }

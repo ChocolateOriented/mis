@@ -73,11 +73,11 @@ public class TRiskBuyerContactRecordsService {
 			DbUtils dbUtils = new DbUtils();
 			List<TRiskBuyerContactRecords> contactRecordsList = null;
 			try {
-				System.out.println("通话记录buyerId切源查询:" + buyerId);
+				logger.info("通话记录buyerId切源查询:" + buyerId);
 				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
-				System.out.println("通话记录条数："+contactRecordsList.size());
+				logger.info("通话记录条数："+contactRecordsList.size());
 			} catch (Exception e) {
-				System.out.println("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
+				logger.info("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
 				e.printStackTrace();
 			}
 			if(!contactRecordsList.isEmpty()){

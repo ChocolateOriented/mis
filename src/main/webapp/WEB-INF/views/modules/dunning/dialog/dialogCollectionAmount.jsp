@@ -16,7 +16,11 @@
  	                    success : function(data) {
  	                        if (data == "OK") {
  	                            alert("保存成功");
+ 	                            if( "checked"==window.parent.window.$("#childIfam").val()){
+ 	                            	 window.parent.location.href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true";	
+ 	                            }else{
  	                            window.parent.location.href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}";
+ 	                        	}
  	                            window.parent.window.jBox.close();            //关闭子窗体
  	                        } else {
  	                            alert("减免失败"+data);

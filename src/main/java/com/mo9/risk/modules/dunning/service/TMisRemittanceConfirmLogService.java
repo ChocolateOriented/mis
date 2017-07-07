@@ -77,5 +77,4 @@ public class TMisRemittanceConfirmLogService extends CrudService<TMisRemittanceC
 			saveLog(id);
 		}
 	}
-
 }

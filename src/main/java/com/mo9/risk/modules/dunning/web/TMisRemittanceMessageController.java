@@ -3,14 +3,27 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
+import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
+import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
+import com.thinkgem.jeesite.common.web.BaseController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
+import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,16 +31,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
-import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
-import com.mo9.risk.util.FileUpload;
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.common.web.BaseController;
 
 /**
  * 财务确认汇款信息Controller
@@ -40,7 +46,79 @@ public class TMisRemittanceMessageController extends BaseController {
 
 	@Autowired
 	private TMisRemittanceMessageService tMisRemittanceMessageService;
-	
+
+	/**
+	 * 跳转账目解析页面
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:analysis")
+	@RequestMapping(value = "analysis")
+	public String accountAnalysis(Model model, String message) {
+		model.addAttribute("message", message);
+		return "modules/dunning/tMisDunningAccountAnalysis";
+	}
+
+	/**
+	 * @return java.lang.String
+	 * @Description 导入文件
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:analysis")
+	@RequestMapping(value = "fileUpload")
+	public String fileUpload(MultipartFile file, String channel, RedirectAttributes redirectAttributes) {
+		String redirectUrl = "redirect:analysis";
+		if (null == file || StringUtils.isBlank(channel)){
+			redirectAttributes.addAttribute("message", "参数错误");
+			return redirectUrl;
+		}
+		//解析上传Excel
+		List<AlipayRemittanceExcel> list ;
+		logger.info("正在接析文件:" + file.getOriginalFilename());
+		try {
+			ImportExcel ei = new ImportExcel(file, 1, 0);
+			list = ei.getDataList(AlipayRemittanceExcel.class);
+			logger.info("完成接析文件:" + file.getOriginalFilename());
+		} catch (Exception e) {
+			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误");
+			return redirectUrl;
+		}
+
+		//校验,保存汇款信息
+		List<Integer> listNum=new ArrayList<Integer>();
+		LinkedList<TMisRemittanceMessage> tMisRemittanceList = new LinkedList<TMisRemittanceMessage>();
+		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList,listNum);
+		String sameUpdateNum = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel,listNum);
+		//调用自动查账
+		tMisRemittanceMessageService.autoAuditAfterFinancialtime(DateUtils.parseDate(DateUtils.getDate()));
+
+		//上传结果信息
+		StringBuilder message = new StringBuilder();
+		int total=listNum.get(0);
+		int fail=listNum.get(1);
+		int same=listNum.get(2);
+		int updateNUm=listNum.get(3);
+		if (StringUtils.isBlank(errorMsg)){
+			message.append("上传完成");
+		}else {
+			message.append("上传失败");
+		}
+		message.append(String.format(",共导入%d/%d条数据。",total-fail-same-updateNUm,total));
+		
+		message.append(sameUpdateNum);
+		message.append(errorMsg);
+		logger.info(message.toString());
+		redirectAttributes.addAttribute("message",message.toString());
+		return redirectUrl;
+	}
+
+	/**
+	 * 跳转对公明细
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
+	@RequestMapping(value = "detail")
+	public String detail(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
+		model.addAttribute("page",page);
+		return "modules/dunning/tMisDunningAccountDetail";
+	}
 	@ModelAttribute
 	public TMisRemittanceMessage get(@RequestParam(required=false) String id) {
 		TMisRemittanceMessage entity = null;
@@ -52,90 +130,128 @@ public class TMisRemittanceMessageController extends BaseController {
 		}
 		return entity;
 	}
-	
-	@RequiresPermissions("dunning:tMisRemittanceMessage:view")
-	@RequestMapping(value = {"list", ""})
-	public String list(TMisRemittanceMessage tMisRemittanceMessage, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findPage(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage); 
-		model.addAttribute("page", page);
-		return "modules/dunning/tMisRemittanceMessageList";
+
+	@ModelAttribute
+	public TMisRemittanceMessagChecked getMessagChecked() {
+		TMisRemittanceMessagChecked entity = null;
+
+		entity = new TMisRemittanceMessagChecked();
+
+		return entity;
 	}
 
-	@RequiresPermissions("dunning:tMisRemittanceMessage:view")
-	@RequestMapping(value = "form")
-	public String form( String buyerId,String dealcode,String dunningtaskdbid,boolean hasContact,TMisRemittanceMessage tMisRemittanceMessage, Model model, HttpServletRequest request,HttpServletResponse response) {
-		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
-			return "views/error/500";
+	/**
+	 * 跳转查账入账
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
+	@RequestMapping(value = "confirmList")
+	public String accountTotal(TMisRemittanceMessagChecked tMisRemittanceMessagChecked,String childPage,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,childPage);
+		HttpSession session = request.getSession();
+		session.setAttribute("page", page);
+		RemittanceTag[] values = RemittanceTag.values();
+		List<RemittanceTag> remittanceTagList = Arrays.asList(values);
+		model.addAttribute("childPage",childPage);
+		model.addAttribute("remittanceTagList",remittanceTagList);
+		return "modules/dunning/tMisDunningAccountTotal";
+	}
+	/**
+	 * 跳转已查账
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
+	@RequestMapping(value = "checked")
+	public String accountChecked(String child,TMisRemittanceMessagChecked tMisRemittanceMessagChecked,Model model,HttpServletRequest request, HttpServletResponse response) {
+		if(StringUtils.isNotEmpty(child)){
+			Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,"checked");
+			model.addAttribute("pagechecked",page);
+		}else{
+		HttpSession session = request.getSession();
+		model.addAttribute("pagechecked",session.getAttribute("page"));
 		}
-//		String tomcaturl = "http://localhost:8089/remittanceimg/";
-//		String tomcaturl = "/home/gamaxwin/deploy/img/mo9Debt/";
-		TMisRemittanceMessage misRemittanceMessage = tMisRemittanceMessageService.findRemittanceMesListByDealcode(dealcode);
-		model.addAttribute("TMisRemittanceMessage", null != misRemittanceMessage ? misRemittanceMessage : new TMisRemittanceMessage());
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("buyerId", buyerId);
-		model.addAttribute("dealcode", dealcode);
-		model.addAttribute("filePath",null != misRemittanceMessage ?
-				!"".equals(misRemittanceMessage.getRemittanceimg())?  misRemittanceMessage.getRemittanceimg():""  : "");
-		model.addAttribute("hasContact", hasContact);
-		return "modules/dunning/tMisRemittanceMessageForm";
+		return "modules/dunning/tMisDunningAccountChecked";
 	}
-
-	@RequiresPermissions("dunning:tMisRemittanceMessage:edit")
-	@RequestMapping(value = "save")
-	public String save(String financialuser,String buyerId,String dealcode,String dunningtaskdbid, HttpServletRequest request, HttpServletResponse response, TMisRemittanceMessage tMisRemittanceMessage, Model model, RedirectAttributes redirectAttributes) {
-		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
-			return "views/error/500";
+	/**
+	 * 跳转已完成
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
+	@RequestMapping(value = "completed")
+	public String accountCompleted(String child, TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model,
+			HttpServletRequest request, HttpServletResponse response) {
+		if (StringUtils.isNotEmpty(child)) {
+			Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,"completed");
+			model.addAttribute("pagecompleted",page);
+		} else {
+			HttpSession session = request.getSession();
+			model.addAttribute("pagecompleted", session.getAttribute("page"));
 		}
-		tMisRemittanceMessageService.insert(tMisRemittanceMessage);
-//		tMisRemittanceMessageService.save(tMisRemittanceMessage);
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("buyerId", buyerId);
-		model.addAttribute("dealcode", dealcode);
-		addMessage(redirectAttributes, "保存财务确认汇款信息成功");
-		return "redirect:"+Global.getAdminPath()+"/dunning/tMisRemittanceMessage/form?buyerId="+buyerId+"&dealcode="+dealcode+"&dunningtaskdbid="+dunningtaskdbid;
+
+		return "modules/dunning/tMisDunningAccountCompleted";
 	}
-	
-	
-    @RequestMapping(value = "/uploadImage")  
-    public String  upload(@RequestParam("file") MultipartFile file,Model model,TMisRemittanceMessage tMisRemittanceMessage, String buyerId,String dealcode,String dunningtaskdbid,
-    					 HttpServletRequest request, HttpServletResponse response) throws IOException {
-//    	String UPLOAD_PATH = "C:/apache-tomcat-7.0.65.war/webapps/remittanceimg/";//这个是图片保存在服务器上的地址目录
-    	String UPLOAD_PATH = "/home/gamaxwin/deploy/img/mo9Debt/";
-    	String fileName = new Date().getTime()+"RemittanceMesssage"+ file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.')); 
-        String filePath = FileUpload.uploadFile(file,fileName,UPLOAD_PATH, request);  
-        model.addAttribute("TMisRemittanceMessage", tMisRemittanceMessage);
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("buyerId", buyerId);
-		model.addAttribute("dealcode", dealcode);
-        model.addAttribute("filePath", filePath);
-        model.addAttribute("uploadpath", UPLOAD_PATH);
-        model.addAttribute("fileName", fileName);
-        return "modules/dunning/tMisRemittanceMessageForm";
-       
-    } 
-    
-    @RequestMapping(value = "/downloadImage")  
-    public void download(String fileName,String filePath,HttpServletResponse response) throws IOException {  
-        OutputStream os = response.getOutputStream();  
-        try {  
-            response.reset();  
-            response.setContentType("image/jpg;charset=utf-8");  
-            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);  
-            os.write(FileUtils.readFileToByteArray(FileUpload.getFile(fileName,filePath)));  
-            os.flush();  
-        } finally {  
-            if (os != null) {  
-                os.close();  
-            }  
-        }  
-    } 
-	
-	@RequiresPermissions("dunning:tMisRemittanceMessage:edit")
-	@RequestMapping(value = "delete")
-	public String delete(TMisRemittanceMessage tMisRemittanceMessage, RedirectAttributes redirectAttributes) {
-		tMisRemittanceMessageService.delete(tMisRemittanceMessage);
-		addMessage(redirectAttributes, "删除财务确认汇款信息成功");
-		return "redirect:"+Global.getAdminPath()+"/dunning/tMisRemittanceMessage/?repage";
+	/**
+	 * 悬乎流水号显示详细信息
+	 */
+	@RequestMapping(value = "accountDetail")
+	public String accountDetail(String child, TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		return "modules/dunning/dialog/dialogAddSmsTemplate";
 	}
 
+	/**
+	 * 通过电话查询订单
+	 */
+	@RequestMapping(value = "findOrderByMobile")
+	@ResponseBody
+	public DunningOrder findOrderByMobile(String mobile){
+		return tMisRemittanceMessageService.findPaymentOrderByMobile(mobile);
+	}
+
+	/**
+	 * 查询汇款信息通过渠道与流水号
+	 */
+	@RequestMapping(value = "findRemittance")
+	@ResponseBody
+	public TMisRemittanceConfirm findRemittance(String remittanceChannel,String remittanceSerialNumber){
+		List<TMisRemittanceConfirm> remittanceConfirmList = tMisRemittanceMessageService.findNotFinish(remittanceChannel,remittanceSerialNumber);
+		if (remittanceConfirmList !=null && remittanceConfirmList.size()>0){
+			return remittanceConfirmList.get(0);
+		}
+		return null;
+	}
+
+	/**
+	 * 手工查账
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:handleAudit")
+	@RequestMapping(value = "handleAudit")
+	@ResponseBody
+	public String handleAudit(TMisRemittanceConfirm remittanceConfirm){
+		if (remittanceConfirm == null){
+			return "参数不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getSerialnumber())){
+			return  "流水号不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getRemittancechannel())){
+			return  "渠道不能为空";
+		}
+		if (StringUtils.isBlank(remittanceConfirm.getDealcode())){
+			return  "订单号不能为空";
+		}
+		boolean success = tMisRemittanceMessageService.handleAudit(remittanceConfirm);
+		if (success){
+			return "success";
+		}
+		return "查账失败";
+	}
+
+
+	/**
+	 * 获取汇款确认信息
+	 */
+	@RequestMapping(value = "findRemittanceMessagChecked")
+	@ResponseBody
+	public TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId){
+		return tMisRemittanceMessageService.findRemittanceMessagChecked(remittanceConfirmId);
+	}
 }
