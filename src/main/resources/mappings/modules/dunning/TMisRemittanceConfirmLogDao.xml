@@ -126,7 +126,9 @@
 			invalid,
 			serialnumber,
 			financialserialnumber,
-			comfirmid
+			comfirmid,
+			confirmFlow,
+			remittanceTag
 		) VALUES (
 			#{id},
 			#{remittancename},
@@ -157,7 +159,9 @@
 			#{invalid},
 			#{serialnumber},
 			#{financialserialnumber},
-			#{comfirmid}
+			#{comfirmid},
+			#{confirmFlow},
+			#{remittanceTag}
 		)
 	</insert>
 

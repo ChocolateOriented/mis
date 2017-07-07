@@ -3,6 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import java.util.Date;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -42,6 +44,8 @@ public class TMisRemittanceConfirmLog extends DataEntity<TMisRemittanceConfirmLo
 	private Date beginupdatetime;
 	private Date endupdatetime;
 	private String comfirmid;		//汇款确认信息id
+	private ConfirmFlow confirmFlow;//确认流程
+	private RemittanceTag remittanceTag;		//入账标签
 	
 	public TMisRemittanceConfirmLog() {
 		super();
@@ -79,6 +83,8 @@ public class TMisRemittanceConfirmLog extends DataEntity<TMisRemittanceConfirmLo
 		this.beginupdatetime = tMisRemittanceConfirm.getBeginupdatetime();
 		this.endupdatetime = tMisRemittanceConfirm.getEndupdatetime();
 		this.comfirmid = tMisRemittanceConfirm.getId();
+		this.confirmFlow = tMisRemittanceConfirm.getConfirmFlow();
+		this.remittanceTag = tMisRemittanceConfirm.getRemittanceTag();
 	}
 
 	public Integer getDbid() {
@@ -305,4 +311,19 @@ public class TMisRemittanceConfirmLog extends DataEntity<TMisRemittanceConfirmLo
 		this.comfirmid = comfirmid;
 	}
 
+	public ConfirmFlow getConfirmFlow() {
+		return confirmFlow;
+	}
+
+	public void setConfirmFlow(ConfirmFlow confirmFlow) {
+		this.confirmFlow = confirmFlow;
+	}
+
+	public RemittanceTag getRemittanceTag() {
+		return remittanceTag;
+	}
+
+	public void setRemittanceTag(RemittanceTag remittanceTag) {
+		this.remittanceTag = remittanceTag;
+	}
 }

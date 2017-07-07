@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 汇款确认信息DAO接口
@@ -91,5 +92,18 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return
 	 */
 	public List<TMisRemittanceConfirm> findRelatedList(TMisRemittanceConfirm tMisRemittanceConfirm);
-	
+
+	/**
+	 * @Description 批量插入
+	 * @param confirms
+	 * @return void
+	 */
+	void batchInsert(@Param("list")List<TMisRemittanceConfirm> confirms);
+
+	/**
+	 * @Description 查账流程--入账
+	 * @param confirm
+	 * @return void
+	 */
+	void auditConfrimUpdate(TMisRemittanceConfirm confirm);
 }

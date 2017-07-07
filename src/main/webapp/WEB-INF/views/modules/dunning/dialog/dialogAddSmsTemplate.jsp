@@ -218,8 +218,8 @@
 <ul class="nav nav-tabs">
 
 	</ul>
-	<form:form id="inputForm" modelAttribute="TMisContantRecord"  class="form-horizontal">
-		<input type="hidden" name="invalid" value="t"/>
+	<form:form id="inputForm"   class="form-horizontal">
+		
 		<div class="control-group">
 			<label class="control-label">英文模板名称：</label>
 			<div class="controls">
