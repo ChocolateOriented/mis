@@ -22,12 +22,9 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,9 +151,11 @@ public class TMisRemittanceMessageService extends
 			return;
 		}
 		logger.info("开始自动匹配,汇款信息共" + remittanceMessages.size() + "条");
+
+		List<TMisRemittanceMessage> successMatch = new ArrayList<TMisRemittanceMessage>(remittanceMessages.size());
+		List<TMisRemittanceConfirm> completeAudit = new ArrayList<TMisRemittanceConfirm>(remittanceMessages.size());
+
 		//获取备注中包含手机号的汇款信息
-		HashMap<String, TMisRemittanceMessage> containMobileInRemarkMap = new HashMap<String, TMisRemittanceMessage>(
-				remittanceMessages.size());
 		for (TMisRemittanceMessage remittanceMessage : remittanceMessages) {
 			if (null == remittanceMessage) {
 				continue;
@@ -164,35 +163,34 @@ public class TMisRemittanceMessageService extends
 			//检查备注中是否包含手机号
 			String remark = remittanceMessage.getRemark();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_CONTAIN_MOBILE, remark);
-			if (StringUtils.isNoneBlank(mobile)) {//备注包含手机号
-				containMobileInRemarkMap.put(mobile, remittanceMessage);
+			//通过备注匹配
+			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage,mobile);
+			if (remittanceConfirm == null){
+				continue;
 			}
+			successMatch.add(remittanceMessage);
+			completeAudit.add(remittanceConfirm);
 		}
-		List<TMisRemittanceMessage> successMatchByRemark = this.matchOrderWithMobil(containMobileInRemarkMap);
-		logger.info("通过备注匹配成功:" + successMatchByRemark.size() + "条");
 
 		//使用作为账号的手机号匹配(备注匹配失败 + 备注中不包含手机号)
-		Collection<TMisRemittanceMessage> containMobileInRemark = containMobileInRemarkMap.values();
-		remittanceMessages.removeAll(containMobileInRemark);
-		containMobileInRemark.removeAll(successMatchByRemark);
-		List<TMisRemittanceMessage> checkRemittanceAccountList = new ArrayList<TMisRemittanceMessage>(
-				remittanceMessages.size() + containMobileInRemark.size());
-		checkRemittanceAccountList.addAll(remittanceMessages);
-		checkRemittanceAccountList.addAll(containMobileInRemark);
-
-		HashMap<String, TMisRemittanceMessage> accountIsMobileMap = new HashMap<String, TMisRemittanceMessage>(
-				remittanceMessages.size());
-		for (TMisRemittanceMessage remittanceMessage : checkRemittanceAccountList) {
+		remittanceMessages.removeAll(successMatch);
+		for (TMisRemittanceMessage remittanceMessage : remittanceMessages) {
 			//检查账号是否使手机号
 			String account = remittanceMessage.getRemittanceAccount();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_MOBILE, account);
-			if (StringUtils.isNotBlank(mobile)) {
-				accountIsMobileMap.put(mobile, remittanceMessage);
+			//通过账号匹配
+			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage,mobile);
+			if (remittanceConfirm == null){
+				continue;
 			}
+			successMatch.add(remittanceMessage);
+			completeAudit.add(remittanceConfirm);
 		}
-		List<TMisRemittanceMessage> successMatchByAccount = this
-				.matchOrderWithMobil(accountIsMobileMap);
-		logger.info("通过账号匹配成功:" + successMatchByAccount.size() + "条");
+		logger.info("匹配成功:" + successMatch.size() + "条");		//生成remittanceConfirm
+
+		User user = new User();
+		user.setName("sys");
+		remittanceConfirmService.batchInsert(completeAudit, user);
 	}
 
 	/**
@@ -200,49 +198,21 @@ public class TMisRemittanceMessageService extends
 	 * @Description 通过电话匹配订单
 	 */
 	@Transactional(readOnly = false)
-	public List<TMisRemittanceMessage> matchOrderWithMobil(
-			HashMap<String, TMisRemittanceMessage> containMobileMap) {
-		if (null == containMobileMap) {
-			return new ArrayList<TMisRemittanceMessage>();
+	private TMisRemittanceConfirm matchOrderWithMobil(TMisRemittanceMessage remittanceMessage,String mobile) {
+		if (StringUtils.isBlank(mobile)) {
+			return null;
 		}
-		Set<String> mobiles = containMobileMap.keySet();
-		if (mobiles.size() == 0) {
-			return new ArrayList<TMisRemittanceMessage>();
+		//查找订单
+		DunningOrder order = dunningOrderService.findPaymentOrderByMobile(mobile);
+		if (order == null) {
+			return null;
 		}
-		//通过手机号批量查询未还款订单的用户信息
-		List<DunningOrder> orders = dunningOrderService.findPaymentOrderByMobiles(new ArrayList<String>(mobiles));
-		if (orders == null || orders.size() == 0) {
-			return new ArrayList<TMisRemittanceMessage>();
-		}
-
-		//匹配订单
-		List<TMisRemittanceMessage> successMatchList = new ArrayList<TMisRemittanceMessage>(orders.size());
-		List<TMisRemittanceConfirm> confirms = new ArrayList<TMisRemittanceConfirm>(orders.size());
-		for (DunningOrder order : orders) {
-			if (order == null) {
-				continue;
-			}
-			String mobile = order.getMobile();
-			TMisRemittanceMessage remittanceMessage = containMobileMap.get(mobile);
-			if (remittanceMessage == null) {
-				continue;
-			}
-			logger.debug(
-					"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
-							+ "匹配成功");
-
-			TMisRemittanceConfirm remittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
-			this.autoAddTemittanceTag(remittanceMessage, order, remittanceConfirm);
-
-			successMatchList.add(remittanceMessage);
-			confirms.add(remittanceConfirm);
-		}
-
-		//生成remittanceConfirm
-		User user = new User();
-		user.setName("sys");
-		remittanceConfirmService.batchInsert(confirms, user);
-		return successMatchList;
+		logger.debug(
+				"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
+						+ "匹配成功");
+		TMisRemittanceConfirm remittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
+		this.autoAddTemittanceTag(remittanceMessage, order, remittanceConfirm);
+		return remittanceConfirm;
 	}
 
 	/**

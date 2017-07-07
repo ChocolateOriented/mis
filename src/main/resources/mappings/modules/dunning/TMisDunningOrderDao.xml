@@ -25,7 +25,7 @@
       o.dealcode = #{dealcode}
 	</select>
 
-	<select id="findPaymentOrderByMobiles" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
+	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
 		SELECT
 		o.dealcode AS "dealcode",
 		o.buyer_id AS "buyer_id",
@@ -39,10 +39,7 @@
 		o.merchant_id = 7
 		AND o.`status`= 'payment'
 		AND o.type = 'loan'
-		AND b.mobile IN
-		<foreach collection="list" item="mobile" open="(" separator="," close=")">
-			#{mobile}
-		</foreach>
+		AND b.mobile = #{mobile}
 	</select>
 
 	<select id="findPaymentOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">

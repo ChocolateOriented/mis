@@ -533,7 +533,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			tMisRemittanceConfirmService.auditConfrim(confirm);
 		} catch (Exception e) {
 			logger.warn("入账失败",e);
-			return "入账失败, 服务器网络异常";
+			return e.getMessage();
 		}
 		return "success";
 	}
