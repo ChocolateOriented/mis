@@ -161,6 +161,9 @@
 		m.financialtime AS "financialTime",
 		m.remark AS "remark",
 		m.createdate AS "createDate",
+		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
+		c.ConfirmStatus AS "accountStatus",
+		</if>
 		m.remittanceSerialNumber AS "remittanceSerialNumber"
 		from
 		t_mis_remittance_message m
@@ -286,7 +289,7 @@
                 AND m.mobile=#{mobile}
         </if>
 		 <if test=" realName!= null and  realName!= ''">
-                AND  m.RemittanceName=#{realName}
+                AND  m.name=#{realName}
         </if>
 		 <if test=" dealcode!= null and  dealcode!= ''">
                 AND m.dealcode=#{dealcode}
@@ -311,10 +314,7 @@
 	</select>
 	
 	<select id="findMessagCompletedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
-	select
-	 *
-	from
-	(
+	
 		select
 		  mix.realName AS "realName",
 		  mix.remittanceName AS "remittanceName",
@@ -379,7 +379,7 @@
 		                AND m.mobile=#{mobile}
 		        </if>
 				 <if test=" realName!= null and  realName!= ''">
-		                AND  m.RemittanceNamee=#{realName}
+		                AND  m.name=#{realName}
 		        </if>
 				 <if test=" dealcode!= null and  dealcode!= ''">
 		                AND m.dealcode=#{dealcode}
@@ -396,18 +396,11 @@
 
             )
 	        AS mix
-	        	LEFT JOIN t_mis_remittance_confirm_log AS g ON g.ComfirmId = mix.confirmId
-	        where
-	            g.ConfirmStatus="complete_audit"
-
-	          ORDER BY
-	          	g.updateDate desc
-           )
-           AS mm
-           group by
-            mm.confirmId
-           ORDER BY
-          	mm.updateDate desc
+	         LEFT JOIN t_mis_remittance_confirm_log AS g ON g.ComfirmId = mix.confirmId
+			where
+			g.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="complete_audit" GROUP BY l.ComfirmId)
+	     
+        
 	</select>
 
 	<select id="findRemittanceMessagChecked" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
