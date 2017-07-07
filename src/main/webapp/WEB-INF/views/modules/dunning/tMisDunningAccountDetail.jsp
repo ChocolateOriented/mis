@@ -120,7 +120,15 @@
 					  ${tmessage.remark }  
 				</td>
 				<td>
-					  ${tmessage.accountStatus }  
+					   <c:if test="${empty tmessage.accountStatus }">
+					  	未查账
+					  </c:if>  
+					   <c:if test="${tmessage.accountStatus eq 'complete_audit'}">
+					  	已查账
+					  </c:if>  
+					  <c:if test="${tmessage.accountStatus eq 'finish'}">
+					  	 已完成
+					  </c:if>   
 				</td>
 				<td>
 					<fmt:formatDate value="${tmessage.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/> 
