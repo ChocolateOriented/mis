@@ -76,6 +76,7 @@
                 if (msg == "success") {
                   $.jBox.close();
                   jBox.tip("入账成功");
+                  page();
                   return ;
                 }
                 $.jBox.tip(msg);
@@ -144,7 +145,7 @@
 
               $.jBox(content, {
                 title: "查账",
-                width: 500,
+                width: 550,
                 height: 350
               });
 
@@ -303,8 +304,12 @@
 				</td>
 
 				<td>
-				<input id="changeSms" onclick="recorded('${tmessage.remittanceConfirmId}')"  class="btn btn-primary" type="button" value="入账"/>
-				<input id="derate" class="btn btn-primary" onclick="collectionfunction(this)" buyerId="${tmessage.buyerId}" dunningtaskdbid="${tmessage.dunningtaskdbid}" dealcode="${tmessage.dealcode }"  type="button" value="减免" />
+					<shiro:hasPermission name="dunning:tMisRemittanceConfirm:auditConfrim">
+						<input id="changeSms" onclick="recorded('${tmessage.remittanceConfirmId}')"  class="btn btn-primary" type="button" value="入账"/>
+					</shiro:hasPermission>
+					<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+						<input id="derate" class="btn btn-primary" onclick="collectionfunction(this)" buyerId="${tmessage.buyerId}" dunningtaskdbid="${tmessage.dunningtaskdbid}" dealcode="${tmessage.dealcode }"  type="button" value="减免" />
+					</shiro:hasPermission>
 				</td>
 			</tr>
 		</c:forEach>

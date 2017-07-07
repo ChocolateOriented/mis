@@ -342,7 +342,7 @@
 		o.type = 'loan' 
     AND o.merchant_id = 7
 		AND o.`status`IN ('payoff', 'payment' )
-		AND m.ConfirmStatus="finsh"
+		AND m.ConfirmStatus="finish"
 		AND m.ConfirmFlow="AUDIT"
 		AND  m.updateDate=l.updateDate
 		AND a.RemittanceChannel=m.RemittanceChannel

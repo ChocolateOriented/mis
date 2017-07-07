@@ -491,7 +491,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 	 * @param remittanceTag 还款标签
 	 * @return java.lang.String
 	 */
-//	@RequiresPermissions("dunning:tMisRemittanceConfirm:edit")
+	@RequiresPermissions("dunning:tMisRemittanceConfirm:auditConfrim")
 	@RequestMapping(value = "auditConfrim")
 	@ResponseBody
 	public String auditConfrim(String remittanceConfirmId,String paytype,RemittanceTag remittanceTag){
@@ -501,10 +501,12 @@ public class TMisRemittanceConfirmController extends BaseController {
 		if (StringUtils.isBlank(paytype)){
 			return "还款类型不能为空";
 		}
-
 		TMisRemittanceConfirm confirm = tMisRemittanceConfirmService.get(remittanceConfirmId);
 		if (confirm == null){
 			return "未查询到汇确认信息";
+		}
+		if (!ConfirmFlow.AUDIT.equals(confirm.getConfirmFlow()) && !TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
+			return "错误，汇确认信息未完成查账";
 		}
 		DunningOrder order = tMisDunningOrderService.findOrderByDealcode(confirm.getDealcode());
 		if (order == null) {

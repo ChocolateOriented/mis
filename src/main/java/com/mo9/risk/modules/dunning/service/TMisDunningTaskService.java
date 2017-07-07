@@ -1463,7 +1463,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		String type = getDunningCycleType();
 		List<Dict> dicts = DictUtils.getDictList(type);
 		for(Dict dict : dicts){
-			System.out.println(dict.getLabel());
 			dict.getValue();
 //			if(){
 //				
@@ -2196,19 +2195,19 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
         int month = Calendar.MAY;  
         int date = 1;  
         calendar.set(year, month, date);  
-        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);  
-        System.out.println("Max Day: " + maxDay);  
-        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);  
-        System.out.println("Min Day: " + minDay);  
+        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+				logger.debug("Max Day: " + maxDay);
+        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+				logger.debug("Min Day: " + minDay);
   
         for (int i = minDay +1; i <= maxDay; i++) {  
-            calendar.set(year, month, i);  
-            System.out.println("Day: " + calendar.getTime().toLocaleString());  
+            calendar.set(year, month, i);
+						logger.debug("Day: " + calendar.getTime().toLocaleString());
 //        	int datenum = calendar.get(Calendar.DATE);
 //        	System.out.println(datenum);
             int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
 //        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-        	System.out.println(s);
+						logger.debug(s);
         }  
 //      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
 		

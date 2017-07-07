@@ -85,6 +85,7 @@
                   if ("success" == msg){
                     $.jBox.close();
                     jBox.tip("查账成功");
+                    page();
                     return ;
                   }
                   $.jBox.tip(msg);
@@ -294,8 +295,9 @@
         <li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
     </ul>
 </form:form>
-
-<div><a onclick="openHandAudit()" class="btn btn-primary btn-large">+查账申请</a></div>
+<shiro:hasPermission name="dunning:TMisRemittanceMessage:handleAudit">
+    <div><a onclick="openHandAudit()" class="btn btn-primary btn-large">+查账申请</a></div>
+</shiro:hasPermission>
 
 <br/>
 <iframe id="ifm" name="ifm" frameborder="0"

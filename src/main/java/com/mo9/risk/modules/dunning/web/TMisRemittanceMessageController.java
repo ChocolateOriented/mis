@@ -47,17 +47,10 @@ public class TMisRemittanceMessageController extends BaseController {
 	@Autowired
 	private TMisRemittanceMessageService tMisRemittanceMessageService;
 
-	@RequiresPermissions("dunning:tMisRemittanceMessage:view")
-	@RequestMapping(value = {"list", ""})
-	public String list(TMisRemittanceMessage tMisRemittanceMessage, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findPage(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage); 
-		model.addAttribute("page", page);
-		return "modules/dunning/tMisRemittanceMessageList";
-	}
-
 	/**
 	 * 跳转账目解析页面
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:analysis")
 	@RequestMapping(value = "analysis")
 	public String accountAnalysis(Model model, String message) {
 		model.addAttribute("message", message);
@@ -68,6 +61,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	 * @return java.lang.String
 	 * @Description 导入文件
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:analysis")
 	@RequestMapping(value = "fileUpload")
 	public String fileUpload(MultipartFile file, String channel, RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:analysis";
@@ -118,6 +112,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	/**
 	 * 跳转对公明细
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
 	@RequestMapping(value = "detail")
 	public String detail(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
 		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
@@ -148,6 +143,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	/**
 	 * 跳转查账入账
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "confirmList")
 	public String accountTotal(TMisRemittanceMessagChecked tMisRemittanceMessagChecked,String childPage,Model model,HttpServletRequest request, HttpServletResponse response) {
 		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,childPage);
@@ -162,6 +158,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	/**
 	 * 跳转已查账
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "checked")
 	public String accountChecked(String child,TMisRemittanceMessagChecked tMisRemittanceMessagChecked,Model model,HttpServletRequest request, HttpServletResponse response) {
 		if(StringUtils.isNotEmpty(child)){
@@ -176,6 +173,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	/**
 	 * 跳转已完成
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "completed")
 	public String accountCompleted(String child, TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -224,6 +222,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	/**
 	 * 手工查账
 	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:handleAudit")
 	@RequestMapping(value = "handleAudit")
 	@ResponseBody
 	public String handleAudit(TMisRemittanceConfirm remittanceConfirm){

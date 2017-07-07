@@ -212,7 +212,7 @@
 		UPDATE t_mis_remittance_confirm SET
 			paytype = #{paytype},
 			confirmstatus = #{confirmstatus},
-			remittanceTag = #(remittanceTag);
+			remittanceTag = #{remittanceTag},
 			updateby = #{updateBy.name},
 			updatedate = #{updateDate}
 		WHERE id = #{id}
