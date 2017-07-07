@@ -15,14 +15,12 @@ import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +75,7 @@ public class TMisRemittanceMessageController extends BaseController {
 			list = ei.getDataList(AlipayRemittanceExcel.class);
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
+			logger.info("解析式发生错误",e);
 			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误");
 			return redirectUrl;
 		}

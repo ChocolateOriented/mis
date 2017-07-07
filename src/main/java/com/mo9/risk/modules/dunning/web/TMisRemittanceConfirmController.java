@@ -505,8 +505,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 		if (confirm == null){
 			return "未查询到汇确认信息";
 		}
-		if (!ConfirmFlow.AUDIT.equals(confirm.getConfirmFlow()) && !TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
-			return "错误，汇确认信息未完成查账";
+		if (!ConfirmFlow.AUDIT.equals(confirm.getConfirmFlow()) || !TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
+			return "错误，汇款确认信息未完成查账";
 		}
 		DunningOrder order = tMisDunningOrderService.findOrderByDealcode(confirm.getDealcode());
 		if (order == null) {
