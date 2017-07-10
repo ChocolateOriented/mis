@@ -265,15 +265,15 @@
         <li><label>手机号</label>
             <form:input path="mobile" htmlEscape="false" class="input-medium"/>
         </li>
-        <li><label>对方姓名</label>
+        <li><label>借款人姓名</label>
             <form:input path="realName" htmlEscape="false" maxlength="128" class="input-medium"/>
         </li>
         <li><label>订单编号</label>
             <form:input path="dealcode" htmlEscape="false" maxlength="128" class="input-medium"/>
         </li>
-<!--         <li><label>交易流水号</label> -->
-<%--             <form:input path="remittanceSerialNumber" htmlEscape="false" class="input-medium"/> --%>
-<!--         </li> -->
+        <li><label>交易流水号</label>
+             <form:input path="remittanceSerialNumber" htmlEscape="false" class="input-medium"/>
+        </li>
 
         <li><label>订单状态</label>
             <form:select id="status" path="orderStatus" class="input-medium">
