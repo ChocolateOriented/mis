@@ -52,11 +52,11 @@
 			<li><label>交易金额</label>
 				<form:input path="remittanceAmount"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			<li><label>对方账户</label>
+			<li><label>汇款人账户</label>
 				<form:input path="remittanceAccount"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			
-			<li><label>对方姓名</label>
+			<li><label>汇款人姓名</label>
 				<form:input  path="remittanceName"  htmlEscape="false" maxlength="128" class="input-medium" />
 			</li>
 			
@@ -83,8 +83,8 @@
 				<th>交易时间</th>
 				<th>交易渠道</th>
 				<th>交易金额（元）</th>
-				<th>对方名称</th>
-				<th>对方账户</th>
+				<th>汇款人名称</th>
+				<th>汇款人账户</th>
 				<th>备注</th>
 				<th>入账状态</th>
 				<th>上传时间</th>

@@ -57,7 +57,7 @@
 		<thead>
 			<tr>
 				<th>编号</th>
-				<th>姓名</th>
+				<th>借款人姓名</th>
 				<th>手机号</th>
 				<th>订单编号</th>
 				<th>催收人</th>
