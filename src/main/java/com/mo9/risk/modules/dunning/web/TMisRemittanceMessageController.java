@@ -10,6 +10,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -84,7 +85,14 @@ public class TMisRemittanceMessageController extends BaseController {
 		List<Integer> listNum=new ArrayList<Integer>();
 		LinkedList<TMisRemittanceMessage> tMisRemittanceList = new LinkedList<TMisRemittanceMessage>();
 		String errorMsg = tMisRemittanceMessageService.getValidRemittanceMessage(list,tMisRemittanceList,listNum);
-		String sameUpdateNum = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel,listNum);
+		String sameUpdateNum="";
+		try {
+			sameUpdateNum = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel,listNum);
+		} catch (Exception e) {
+			logger.info("Excel表有相同的流水号和支付渠道",e);
+			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误.支付渠道相同情况下有相同的流水号。这不允许");
+			return redirectUrl;
+		}
 		//调用自动查账
 		tMisRemittanceMessageService.autoAuditAfterFinancialtime(DateUtils.parseDate(DateUtils.getDate()));
 
@@ -94,12 +102,13 @@ public class TMisRemittanceMessageController extends BaseController {
 		int fail=listNum.get(1);
 		int same=listNum.get(2);
 		int updateNUm=listNum.get(3);
+		int saveNum=listNum.get(4);
 		if (StringUtils.isBlank(errorMsg)){
 			message.append("上传完成");
 		}else {
 			message.append("上传失败");
 		}
-		message.append(String.format(",共导入%d/%d条数据。",total-fail-same-updateNUm,total));
+		message.append(String.format(",共导入%d/%d条数据。",saveNum,total));
 		
 		message.append(sameUpdateNum);
 		message.append(errorMsg);

@@ -13,6 +13,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.util.RegexUtil;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -30,6 +31,7 @@ import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 财务确认汇款信息Service
@@ -85,22 +87,27 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @return int
-	 * @Description 去重并保存汇款信息
+	 * 
+	 * @param tMisRemittanceList
+	 * @param channel
+	 * @param listNum
+	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public String saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel,List<Integer> listNum) {
+	public String saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel,List<Integer> listNum)throws MySQLIntegrityConstraintViolationException{
+		int saveNum=0;
+		int totals=tMisRemittanceList.size();
 		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList, channel);
 		List<TMisRemittanceMessage> updateordList = new ArrayList<TMisRemittanceMessage>();
 		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
-		if (trMList.size() > 0 && trMList != null) {
+		if (!CollectionUtils.isEmpty(trMList)) {
 			for (TMisRemittanceMessage tMisRemittanceMessage : trMList) {
 				if (StringUtils.isEmpty(tMisRemittanceMessage.getAccountStatus())) {
 					updateordList.add(tMisRemittanceMessage);
 				}
 			}
 		}
-		if (updateordList.size() > 0 && updateordList != null) {
+		if (!CollectionUtils.isEmpty(updateordList)) {
 			for (int i = 0; i < updateordList.size(); i++) {
 				for (int j = 0; j < tMisRemittanceList.size(); j++) {
 					if (updateordList.get(i).getRemittanceSerialNumber()
@@ -112,10 +119,10 @@ public class TMisRemittanceMessageService extends
 
 		}
 		tMisRemittanceList.removeAll(trMList);
-		if (tMisRemittanceList.size() > 0 && tMisRemittanceList != null) {
-			misRemittanceMessageDao.saveList(tMisRemittanceList);
+		if (!CollectionUtils.isEmpty(tMisRemittanceList)) {
+			saveNum = misRemittanceMessageDao.saveList(tMisRemittanceList);
 		}
-		if (updateNewList.size() > 0 && updateNewList != null) {
+		if (!CollectionUtils.isEmpty(updateNewList)) {
 			//更新数据相同但是状态为未查账的.
 			for (TMisRemittanceMessage tMisRemittanceMessage : updateNewList) {
 
@@ -123,10 +130,11 @@ public class TMisRemittanceMessageService extends
 			}
 		}
 		
-		int updateNum = updateordList.size();
-		int sameNum = trMList.size() - updateNum;
+		int updateNum = updateNewList.size();
+		int sameNum = totals - updateNum-saveNum;
 		listNum.add(sameNum);
 		listNum.add(updateNum);
+		listNum.add(saveNum);
 		return "重复" + sameNum + "条,更新 " + updateNum + "条。";
 	}
 
@@ -301,7 +309,7 @@ public class TMisRemittanceMessageService extends
 			TMisRemittanceMessage trMessage = new TMisRemittanceMessage();
 			trMessage.setRemittanceTime(parseTime);
 			trMessage.setRemittanceSerialNumber(trExcel.getAlipaySerialNumber());
-			trMessage.setRemittanceChannel("alipay");
+			trMessage.setRemittanceChannel("支付宝");
 			trMessage.setRemittanceAmount(trExcel.getRemittanceamount());
 			trMessage.setRemittanceName(trExcel.getRemittancename());
 			trMessage.setRemittanceAccount(trExcel.getRemittanceaccount());

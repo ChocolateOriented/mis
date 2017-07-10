@@ -79,7 +79,7 @@
 				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
 			LEFT JOIN t_mis_remittance_confirm AS c 
-				ON a.remittanceSerialNumber = c.Serialnumber 
+				ON a.remittanceSerialNumber = c.Serialnumber and a.remittancechannel =c.remittanceChannel and invalid="t"
 			where
 			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
@@ -87,6 +87,7 @@
 			</foreach>
 			and
 			a.remittancechannel = #{channel}
+			
 
 			
 	</select>
