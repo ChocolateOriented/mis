@@ -56,7 +56,7 @@ input.bor {border:1px dashed #444444;width:300px;height:160px;margin-top:10px}
 
 		<div class="control-group divp" >
 			<label class="control-label">对账渠道 	</label>
-			<input type="radio" value="支付宝" name="channel" checked="checked" />支付宝
+			<input type="radio" value="alipay" name="channel" checked="checked" />支付宝
 		</div>
 		<div class="control-group divp">
 			<label class="control-label">对账文件</label>

@@ -13,7 +13,6 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.util.RegexUtil;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -87,16 +86,17 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * 
+	 *
 	 * @param tMisRemittanceList
 	 * @param channel
 	 * @param listNum
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public String saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel,List<Integer> listNum)throws MySQLIntegrityConstraintViolationException{
-		int saveNum=0;
-		int totals=tMisRemittanceList.size();
+	public String saveUniqList(LinkedList<TMisRemittanceMessage> tMisRemittanceList, String channel, List<Integer> listNum)
+			throws Exception {
+		int saveNum = 0;
+		int totals = tMisRemittanceList.size();
 		List<TMisRemittanceMessage> trMList = misRemittanceMessageDao.findBySerialNumbers(tMisRemittanceList, channel);
 		List<TMisRemittanceMessage> updateordList = new ArrayList<TMisRemittanceMessage>();
 		List<TMisRemittanceMessage> updateNewList = new ArrayList<TMisRemittanceMessage>();
@@ -129,9 +129,9 @@ public class TMisRemittanceMessageService extends
 				misRemittanceMessageDao.updateList(tMisRemittanceMessage, channel);
 			}
 		}
-		
+
 		int updateNum = updateNewList.size();
-		int sameNum = totals - updateNum-saveNum;
+		int sameNum = totals - updateNum - saveNum;
 		listNum.add(sameNum);
 		listNum.add(updateNum);
 		listNum.add(saveNum);
@@ -172,8 +172,8 @@ public class TMisRemittanceMessageService extends
 			String remark = remittanceMessage.getRemark();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_CONTAIN_MOBILE, remark);
 			//通过备注匹配
-			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage,mobile);
-			if (remittanceConfirm == null){
+			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage, mobile);
+			if (remittanceConfirm == null) {
 				continue;
 			}
 			successMatch.add(remittanceMessage);
@@ -187,14 +187,14 @@ public class TMisRemittanceMessageService extends
 			String account = remittanceMessage.getRemittanceAccount();
 			String mobile = RegexUtil.getStringValueByRegex(RegexUtil.REGEX_MOBILE, account);
 			//通过账号匹配
-			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage,mobile);
-			if (remittanceConfirm == null){
+			TMisRemittanceConfirm remittanceConfirm = this.matchOrderWithMobil(remittanceMessage, mobile);
+			if (remittanceConfirm == null) {
 				continue;
 			}
 			successMatch.add(remittanceMessage);
 			completeAudit.add(remittanceConfirm);
 		}
-		logger.info("匹配成功:" + successMatch.size() + "条");		//生成remittanceConfirm
+		logger.info("匹配成功:" + successMatch.size() + "条");    //生成remittanceConfirm
 
 		User user = new User();
 		user.setName("sys");
@@ -206,7 +206,7 @@ public class TMisRemittanceMessageService extends
 	 * @Description 通过电话匹配订单
 	 */
 	@Transactional(readOnly = false)
-	private TMisRemittanceConfirm matchOrderWithMobil(TMisRemittanceMessage remittanceMessage,String mobile) {
+	private TMisRemittanceConfirm matchOrderWithMobil(TMisRemittanceMessage remittanceMessage, String mobile) {
 		if (StringUtils.isBlank(mobile)) {
 			return null;
 		}
@@ -278,7 +278,7 @@ public class TMisRemittanceMessageService extends
 	 * @Description 获取有效支付宝汇款信息
 	 */
 	public String getValidRemittanceMessage(List<AlipayRemittanceExcel> srcData,
-			List<TMisRemittanceMessage> validData,List<Integer> listNum) {
+			List<TMisRemittanceMessage> validData, List<Integer> listNum) {
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		//记录解析失败的条数
 		int fail = 0;
@@ -309,7 +309,7 @@ public class TMisRemittanceMessageService extends
 			TMisRemittanceMessage trMessage = new TMisRemittanceMessage();
 			trMessage.setRemittanceTime(parseTime);
 			trMessage.setRemittanceSerialNumber(trExcel.getAlipaySerialNumber());
-			trMessage.setRemittanceChannel("支付宝");
+			trMessage.setRemittanceChannel("alipay");
 			trMessage.setRemittanceAmount(trExcel.getRemittanceamount());
 			trMessage.setRemittanceName(trExcel.getRemittancename());
 			trMessage.setRemittanceAccount(trExcel.getRemittanceaccount());
@@ -319,7 +319,7 @@ public class TMisRemittanceMessageService extends
 			trMessage.preInsert();
 			validData.add(trMessage);
 		}
-		listNum.add(validData.size()+fail);
+		listNum.add(validData.size() + fail);
 		listNum.add(fail);
 		return fail > 0 ? "失败" + fail + "条,失败原因:" + errorMsg : "";
 	}
@@ -335,14 +335,13 @@ public class TMisRemittanceMessageService extends
 
 	/**
 	 * 查询已查账的huozhe yiwanchengde 所有数据
-	 * @param page
-	 * @return
 	 */
-	public Page<TMisRemittanceMessagChecked> findMessagList(Page<TMisRemittanceMessagChecked> page,TMisRemittanceMessagChecked entity,String childPage) {
+	public Page<TMisRemittanceMessagChecked> findMessagList(Page<TMisRemittanceMessagChecked> page, TMisRemittanceMessagChecked entity,
+			String childPage) {
 		entity.setPage(page);
 		if ("completed".equals(childPage)) {
 			page.setList(dao.findMessagCompletedList(entity));
-		}else{
+		} else {
 			page.setList(dao.findMessagCheckedList(entity));
 		}
 		return page;
@@ -404,13 +403,14 @@ public class TMisRemittanceMessageService extends
 		//生成TMisRemittanceConfirm
 		TMisRemittanceConfirm new_tMisRemittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
 		String id = remittanceConfirm.getId();
-		if (StringUtils.isNotBlank(id)){
+		if (StringUtils.isNotBlank(id)) {
 			new_tMisRemittanceConfirm.setId(id);
 		}
 		new_tMisRemittanceConfirm.setRemittanceTag(remittanceConfirm.getRemittanceTag());
 		remittanceConfirmService.save(new_tMisRemittanceConfirm);
 		return true;
 	}
+
 	/**
 	 * 获取汇款确认信息
 	 */
