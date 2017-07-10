@@ -79,7 +79,7 @@
 				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
 			LEFT JOIN t_mis_remittance_confirm AS c 
-				ON a.remittanceSerialNumber = c.Serialnumber and a.remittancechannel =c.remittanceChannel and invalid="t"
+				ON a.remittanceSerialNumber = c.Serialnumber and a.remittancechannel =c.remittanceChannel and c.invalid="t"
 			where
 			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
@@ -162,16 +162,13 @@
 		m.financialtime AS "financialTime",
 		m.remark AS "remark",
 		m.createdate AS "createDate",
-		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 		c.ConfirmStatus AS "accountStatus",
-		</if>
 		m.remittanceSerialNumber AS "remittanceSerialNumber"
 		from
 		t_mis_remittance_message m
-		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 		LEFT JOIN t_mis_remittance_confirm AS c 
-				ON m.remittanceSerialNumber = c.Serialnumber 
-		</if>
+				ON m.remittanceSerialNumber = c.Serialnumber and  m.RemittanceChannel=c.RemittanceChannel
+				 and c.ConfirmFlow="AUDIT" and c.invalid="t"
 		<where>
 			
 		<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
@@ -201,12 +198,10 @@
 		</if>
 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 			and c.ConfirmStatus =#{ accountStatus}
-			and c.ConfirmFlow="AUDIT"
-			and m.RemittanceChannel=c.RemittanceChannel
 		</if>
-<!-- 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'"> -->
-<!-- 			and c.id is null -->
-<!-- 		</if> -->
+		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
+			and c.id is null
+		</if>
 		
 		</where>
 		
@@ -284,6 +279,7 @@
 		AND m.ConfirmStatus="complete_audit"
 		AND l.ConfirmStatus="complete_audit"
 		AND m.ConfirmFlow="AUDIT"
+		AND m.invalid="t"
 		AND  m.updateDate=l.updateDate
 		AND a.RemittanceChannel=m.RemittanceChannel
 		 <if test=" mobile!= null and  mobile!= ''">
@@ -374,6 +370,7 @@
 				AND o.`status`IN ('payoff', 'payment' )
 				AND m.ConfirmStatus="finish"
 				AND m.ConfirmFlow="AUDIT"
+				AND m.invalid="t"
 				AND  m.updateDate=l.updateDate
 				AND a.RemittanceChannel=m.RemittanceChannel
 				 <if test=" mobile!= null and  mobile!= ''">
