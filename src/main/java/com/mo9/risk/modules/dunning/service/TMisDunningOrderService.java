@@ -4,17 +4,9 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
-import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
-import com.thinkgem.jeesite.common.persistence.BaseDao;
-import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.BaseService;
-import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.modules.sys.entity.User;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,11 +34,15 @@ public class TMisDunningOrderService extends BaseService{
 
 	/**
 	 * @Description 通过手机查询未还款订单
-	 * @param mobiles
+	 * @param mobile
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
 	 */
-	List<DunningOrder> findPaymentOrderByMobiles(List<String> mobiles){
-		return tMisDunningOrderDao.findPaymentOrderByMobiles(mobiles);
+	DunningOrder findPaymentOrderByMobile(String mobile){
+		List<DunningOrder> orders = tMisDunningOrderDao.findPaymentOrderByMobile(mobile);
+		if (null == orders || orders.size() == 0){
+			return null ;
+		}
+		return orders.get(0);
 	}
 
 	/**

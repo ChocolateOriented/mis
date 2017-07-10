@@ -17,14 +17,13 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -128,13 +127,12 @@ public class ImportExcel {
 			throws InvalidFormatException, IOException {
 		if (StringUtils.isBlank(fileName)){
 			throw new RuntimeException("导入文档为空!");
-		}else if(fileName.toLowerCase().endsWith("xls")){    
-			this.wb = new HSSFWorkbook(is);    
-        }else if(fileName.toLowerCase().endsWith("xlsx")){  
-        	this.wb = new XSSFWorkbook(is);
-        }else{  
-        	throw new RuntimeException("文档格式不正确!");
-        }  
+		}
+		try {
+			this.wb = WorkbookFactory.create(is);
+		} catch (Exception e) {
+			throw new RuntimeException("文档格式不正确!");
+		}
 		if (this.wb.getNumberOfSheets()<sheetIndex){
 			throw new RuntimeException("文档中没有工作表!");
 		}

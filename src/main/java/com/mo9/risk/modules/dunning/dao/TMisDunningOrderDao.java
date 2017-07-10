@@ -22,7 +22,7 @@ import org.apache.ibatis.annotations.Param;
 @MyBatisDao
 public interface TMisDunningOrderDao extends BaseDao {
 
-	List<DunningOrder> findPaymentOrderByMobiles(List<String> mobiles);
+	List<DunningOrder> findPaymentOrderByMobile(String mobile);
 
 	List<DunningOrder> findPaymentOrder(DunningOrder order);
 

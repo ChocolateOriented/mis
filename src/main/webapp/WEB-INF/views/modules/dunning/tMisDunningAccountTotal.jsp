@@ -169,7 +169,7 @@
           jBox.tip("请输入流水号");
           return;
         }
-        $.post("${ctx}/dunning/tMisRemittanceMessage/findRemittance",{remittanceSerialNumber:serialNumber,remittanceChannel: "aliPay"},
+        $.post("${ctx}/dunning/tMisRemittanceMessage/findRemittance",{remittanceSerialNumber:serialNumber,remittanceChannel: "alipay"},
             function (remittanceConfirm) {
               //没查到给提示
               if (remittanceConfirm == null) {
@@ -312,7 +312,7 @@ style="width:100%;height:600px;">
 <%--查账信息--%>
 <form id="auditForm">
     <input type="hidden" id="auditDealcode" name="dealcode">
-    <input type="hidden" name="remittancechannel" value="aliPay">
+    <input type="hidden" name="remittancechannel" value="alipay">
     <input type="hidden" id="auditRemittanceId" name="id">
     <input type="hidden" id="auditRemittanceSerialNumber" name="serialnumber">
     <input type="hidden" id="auditRemittanceTag" name="remittanceTag">

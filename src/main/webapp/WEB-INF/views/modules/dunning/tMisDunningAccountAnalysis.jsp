@@ -56,11 +56,11 @@ input.bor {border:1px dashed #444444;width:300px;height:160px;margin-top:10px}
 
 		<div class="control-group divp" >
 			<label class="control-label">对账渠道 	</label>
-			<input type="radio" value="aliPay" name="channel" checked="checked" />支付宝
+			<input type="radio" value="alipay" name="channel" checked="checked" />支付宝
 		</div>
 		<div class="control-group divp">
 			<label class="control-label">对账文件</label>
-            <input   id="file" type="file" name="file"  class="input-xlarge required bor divp " />
+            <input   id="file" type="file" accept=".xls,.xlsx" name="file"  class="input-xlarge required bor divp " />
             <div class=" divp" >
                <font color="red">可拖拽至虚线框上传</font>    
             </div>

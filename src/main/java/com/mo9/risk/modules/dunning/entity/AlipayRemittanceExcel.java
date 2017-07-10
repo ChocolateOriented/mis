@@ -165,7 +165,7 @@ public class AlipayRemittanceExcel extends DataEntity<AlipayRemittanceExcel> {
 	public void setServerPay(Double serverPay) {
 		this.serverPay = serverPay;
 	}
-
+	@NotEmpty(message = "支付渠道不能为空")
 	@ExcelField(title = "支付渠道", type = 0, align = 2, sort = 110)
 	public String getRemittancechannel() {
 		return remittancechannel;

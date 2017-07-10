@@ -96,7 +96,7 @@
 					  ${tmessage.amount }  
 				</td>
 				<td>
-					  ${tmessage.modifyamount} 
+					  ${tmessage.modifyamount/100} 
 				</td>
 				<td>
 					  ${tmessage.remainAmmount }
