@@ -30,8 +30,8 @@ $(document).ready(function() {
 		$("#message").val("");
 	}
 	
-	
-	
+
+
 });
 
 function submitting() {
