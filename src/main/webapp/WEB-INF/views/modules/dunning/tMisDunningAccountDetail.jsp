@@ -8,6 +8,26 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			
+		var a=/^[0-9]*(\.[0-9]{1,2})?$/;
+		$("#searchForm").validate({
+				submitHandler: function(form){
+                    if (!a.test($("#remittanceAmount").val())){
+                    	top.$.jBox.tip('金额格式不正确','warning');
+                    }else{
+                        loading('正在查询，请稍等...');
+                        form.submit();
+                    }
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
 			// 清空查询功能
 			 $("#empty").click(function(){
        		 window.location.href="${ctx}/dunning/tMisRemittanceMessage/detail";
@@ -50,7 +70,7 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			<li><label>交易金额</label>
-				<form:input path="remittanceAmount"  htmlEscape="false" maxlength="128" class="input-medium"/>
+				<form:input path="remittanceAmount"  htmlEscape="false" maxlength="128" class="input-medium "/>
 			</li>
 			<li><label>汇款人账户</label>
 				<form:input path="remittanceAccount"  htmlEscape="false" maxlength="128" class="input-medium"/>
