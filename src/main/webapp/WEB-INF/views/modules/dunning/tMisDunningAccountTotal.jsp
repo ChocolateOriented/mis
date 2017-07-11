@@ -246,14 +246,11 @@
       }
     
     </script>
-
 </head>
 <body>
 <ul class="nav nav-tabs">
     <li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/confirmList">查账入账</a></li>
-
     <span id="successRate" style="float:right;padding:8px;"></span>
-
 </ul>
 
 <sys:message content="${message}"/>
@@ -352,13 +349,13 @@ style="width:100%;height:600px;">
                 <div class="control-group">
                     <label class="control-label">借款金额</label>
                     <div class="controls">
-                        <input name="amount" style="border: none;background-color: inherit" readonly>（元）
+                        <input name="amount" style="width: 4em;border: none;background-color: inherit" readonly>（元）
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">应催金额</label>
                     <div class="controls">
-                        <input name="creditamount" style="border: none;background-color: inherit" readonly>（元）
+                        <input name="remainAmmount" style="width: 4em;border: none;background-color: inherit" readonly>（元）
                     </div>
                 </div>
                 <div class="control-group">
@@ -380,7 +377,7 @@ style="width:100%;height:600px;">
     <div id="queryRemittanceMessage">
         <h3>
             <div class="row" style="text-align: center; color: #999; margin-bottom: 20px">
-                <div class="span3"><i class="icon-ok"></i> 订单查询</div>
+                <div class="span3" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
                 <div class="span3" style="color: #2fa4e7">② 交易查询</div>
                 <div class="span2">③ 查账</div>
             </div>
@@ -409,7 +406,7 @@ style="width:100%;height:600px;">
                 <div class="control-group">
                     <label class="control-label">交易金额</label>
                     <div class="controls">
-                        <input name="remittanceamount" style="border: none;background-color: inherit" readonly>（元）
+                        <input name="remittanceamount" style="width: 4em;border: none;background-color: inherit" readonly>（元）
                     </div>
                 </div>
                 <div class="control-group">
@@ -431,8 +428,8 @@ style="width:100%;height:600px;">
     <div id="auditComfirm">
         <h3>
             <div class="row" style="text-align: center; color: #999; margin-bottom: 20px">
-                <div class="span3"><i class="icon-ok"></i> 订单查询</div>
-                <div class="span3"> <i class="icon-ok"></i>交易查询</div>
+                <div class="span3" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
+                <div class="span3" style="color: #2fa4e7"> <i class="icon-ok"></i>交易查询</div>
                 <div class="span2" style="color: #2fa4e7">③ 查账</div>
             </div>
         </h3>
@@ -470,7 +467,7 @@ style="width:100%;height:600px;">
                     <div class="row-fluid">
                         <div class="span4">应催金额</div>
                         <div class="span8" style="text-align: left">
-                            <input name="creditamount" style="border: none;background-color: inherit;width: 100px;" readonly>（元）
+                            <input name="remainAmmount" style="width: 4em;border: none;background-color: inherit;" readonly>（元）
                         </div>
                     </div>
                 </form>
@@ -503,7 +500,7 @@ style="width:100%;height:600px;">
                     <div class="row-fluid">
                         <div class="span4">交易金额</div>
                         <div class="span8" style="text-align: left">
-                            <input name="remittanceamount" style="border: none;background-color: inherit;width: 100px;" readonly>（元）
+                            <input name="remittanceamount" style="width: 4em;border: none;background-color: inherit;" readonly>（元）
                         </div>
                     </div>
                 </form>

@@ -349,7 +349,7 @@
 		<div id="recordedDetailTemplate">
 			<h3>
 				<div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
-					<div class="span6"><i class="icon-ok"></i> 还款标记</div>
+					<div class="span6" style="color: #2fa4e7"><i class="icon-ok"></i> 还款标记</div>
 					<div class="span6" style="color: #2fa4e7">② 还款明细</div>
 				</div>
 			</h3>

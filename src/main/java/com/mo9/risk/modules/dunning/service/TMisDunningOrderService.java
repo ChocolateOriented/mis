@@ -33,12 +33,12 @@ public class TMisDunningOrderService extends BaseService{
 	}
 
 	/**
-	 * @Description 通过手机查询未还款订单
-	 * @param mobile
+	 * @Description 查询未还款订单, 包含借款人信息
+	 * @param queryOrder
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
 	 */
-	DunningOrder findPaymentOrderByMobile(String mobile){
-		List<DunningOrder> orders = tMisDunningOrderDao.findPaymentOrderByMobile(mobile);
+	public DunningOrder findPaymentOrderMsg(DunningOrder queryOrder){
+		List<DunningOrder> orders = tMisDunningOrderDao.findPaymentOrderMsg(queryOrder);
 		if (null == orders || orders.size() == 0){
 			return null ;
 		}
@@ -46,11 +46,48 @@ public class TMisDunningOrderService extends BaseService{
 	}
 
 	/**
-	 * @Description 查询未还款订单
+	 * @Description 通过手机查询未还款订单, 包含借款人信息
+	 * @param mobile
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
+	 */
+	public DunningOrder findPaymentOrderMsgByMobile(String mobile){
+		DunningOrder queryOrder = new DunningOrder();
+		queryOrder.setMobile(mobile);
+		return findPaymentOrderMsg(queryOrder);
+	}
+
+	/**
+	 * @Description 通过订单号查询未还款订单, 包含借款人信息
+	 * @param dealcode
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
+	 */
+	public DunningOrder findPaymentOrderMsgByDealcode(String dealcode) {
+		DunningOrder queryOrder = new DunningOrder();
+		queryOrder.setDealcode(dealcode);
+		return findPaymentOrderMsg(queryOrder);
+	}
+
+	/**
+	 * @Description 查询未还款订单详情包含借款人, 催收任务信息
 	 * @param order
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
 	 */
-	List<DunningOrder> findPaymentOrder(DunningOrder order){
-		return tMisDunningOrderDao.findPaymentOrder(order);
+	DunningOrder findPaymentOrderDetail(DunningOrder order){
+		List<DunningOrder> dunningOrders = tMisDunningOrderDao.findPaymentOrderDetail(order);
+		if (dunningOrders != null && dunningOrders.size() > 0) {
+			return dunningOrders.get(0);
+		}
+		return null;
 	}
+
+	/**
+	 * @return com.mo9.risk.modules.dunning.entity.DunningOrder
+	 * @Description 通过电话查询未还款订单详情, 包含借款人, 催收任务信息
+	 */
+	public DunningOrder findPaymentOrderDetailByMobile(String mobile) {
+		DunningOrder order = new DunningOrder();
+		order.setMobile(mobile);
+		return findPaymentOrderDetail(order);
+	}
+
 }
