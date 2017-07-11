@@ -231,6 +231,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @param relatedId
 	 * @return java.lang.String
 	 */
+	@Transactional
 	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
