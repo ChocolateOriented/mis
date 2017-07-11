@@ -79,7 +79,9 @@
 				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
 			LEFT JOIN t_mis_remittance_confirm AS c 
-				ON a.remittanceSerialNumber = c.financialserialnumber and a.remittancechannel =c.remittanceChannel and c.invalid="t"
+				ON a.remittanceSerialNumber = c.financialserialnumber
+				<!--AND a.remittancechannel = c.remittancechannel  新老渠道不同, 为兼容若只是流水号相同就视为已查账-->
+				and c.invalid="t"
 			where
 			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
