@@ -79,7 +79,7 @@
 				c.ConfirmStatus AS "accountStatus"
 			from t_mis_remittance_message a
 			LEFT JOIN t_mis_remittance_confirm AS c 
-				ON a.remittanceSerialNumber = c.Serialnumber and a.remittancechannel =c.remittanceChannel and c.invalid="t"
+				ON a.remittanceSerialNumber = c.financialserialnumber and a.remittancechannel =c.remittanceChannel and c.invalid="t"
 			where
 			a.remittanceSerialNumber  in
 			<foreach collection="list" item="tMisRemittanceMessage"  index="index"  separator="," open="(" close=")">
@@ -134,18 +134,19 @@
 
 	<select id="findAfterFinancialTimeNotAuditList" resultType="TMisRemittanceMessage">
 		SELECT
-			<include refid="tMisRemittanceMessageColumns"/>
+		<include refid="tMisRemittanceMessageColumns"/>
 		FROM
-			t_mis_remittance_message AS a
-			LEFT JOIN  t_mis_remittance_confirm AS c
-			ON a.remittanceSerialNumber = c.serialnumber
-			AND a.remittancechannel = c.remittancechannel
+		t_mis_remittance_message AS a
+		LEFT JOIN t_mis_remittance_confirm AS c
+		ON a.remittanceSerialNumber = c.Financialserialnumber
+		<!--AND a.remittancechannel = c.remittancechannel  新老渠道不同, 为兼容若只是流水号相同就视为已查账-->
+		AND c.invalid="t"
 		WHERE
 		c.dbid IS NULL
 		<if test="date != null">
 			<![CDATA[
-      	AND a.financialtime > #{date}
-      ]]>
+    AND a.financialtime > #{date}
+  ]]>
 		</if>
 	</select>
 
@@ -167,7 +168,7 @@
 		from
 		t_mis_remittance_message m
 		LEFT JOIN t_mis_remittance_confirm AS c 
-				ON m.remittanceSerialNumber = c.Serialnumber and  m.RemittanceChannel=c.RemittanceChannel
+				ON m.remittanceSerialNumber = c.Financialserialnumber and  m.RemittanceChannel=c.RemittanceChannel
 				 and c.ConfirmFlow="AUDIT" and c.invalid="t"
 		<where>
 			
@@ -269,7 +270,7 @@
 	  t_mis_remittance_confirm m
 	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
 	  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Serialnumber 
+      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber
       LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
       LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
 	  WHERE
@@ -361,7 +362,7 @@
 			  t_mis_remittance_confirm m
 			  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
 			  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-		      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Serialnumber
+		      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber
 		      LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
 		      LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
 			  WHERE
@@ -430,9 +431,10 @@
 		a.remark AS "remark"
 
 		FROM t_mis_remittance_message a
-		LEFT JOIN  t_mis_remittance_confirm c
-		ON a.remittanceSerialNumber = c.serialnumber
+		LEFT JOIN t_mis_remittance_confirm c
+		ON a.remittanceSerialNumber = c.Financialserialnumber
 		AND a.remittancechannel = c.remittancechannel
+		AND c.invalid="t"
 		WHERE
 		(
 			c.dbid IS NULL

@@ -106,7 +106,7 @@
 			<label class="control-label">汇款渠道：</label>
 			<div class="controls">
 				<form:select id="remittancechannel" path="remittancechannel" class="input-xlarge ">
-					<form:option value="先玩后付" label="先玩后付"/>
+					<form:options items="${fns:getDictList('remittancechannel')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</div>
 		</div>

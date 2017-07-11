@@ -133,7 +133,8 @@
 			mobile,
 			updateby,
 			updatedate,
-			serialnumber
+			serialnumber,
+			financialserialnumber
 
 		) VALUES (
 			#{id},
@@ -155,7 +156,8 @@
 			#{mobile},
 			#{updateBy.name},
 			#{updateDate},
-			#{serialnumber}
+			#{serialnumber},
+			#{financialserialnumber}
 		)
 	</insert>
 
@@ -177,7 +179,8 @@
 		mobile = #{mobile},
 		updateby = #{updateBy.name},
 		updatedate = #{updateDate},
-		serialnumber = #{serialnumber}
+		serialnumber = #{serialnumber},
+		financialserialnumber = #{financialserialnumber}
 		WHERE id = #{id}
 	</update>
 	
@@ -335,7 +338,7 @@
 		mobile,
 		updateby,
 		updatedate,
-		serialnumber
+		financialserialnumber
 		)
 		values
 		<foreach collection="list" index="index" item="item" separator="," >
@@ -357,7 +360,7 @@
 			#{item.mobile},
 			#{item.updateBy.name},
 			#{item.updateDate},
-			#{item.serialnumber}
+			#{item.financialserialnumber}
 			)
 		</foreach>
 	</insert>
