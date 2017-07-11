@@ -211,7 +211,7 @@ public class TMisRemittanceMessageService extends
 			return null;
 		}
 		//查找订单
-		DunningOrder order = dunningOrderService.findPaymentOrderByMobile(mobile);
+		DunningOrder order = dunningOrderService.findPaymentOrderMsgByMobile(mobile);
 		if (order == null) {
 			return null;
 		}
@@ -348,20 +348,6 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @return com.mo9.risk.modules.dunning.entity.DunningOrder
-	 * @Description 通过电话查询未还款订单
-	 */
-	public DunningOrder findPaymentOrderByMobile(String mobile) {
-		DunningOrder order = new DunningOrder();
-		order.setMobile(mobile);
-		List<DunningOrder> dunningOrders = dunningOrderService.findPaymentOrder(order);
-		if (dunningOrders != null && dunningOrders.size() > 0) {
-			return dunningOrders.get(0);
-		}
-		return null;
-	}
-
-	/**
 	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage
 	 * @Description 查找未完成的汇款
 	 */
@@ -376,13 +362,7 @@ public class TMisRemittanceMessageService extends
 	@Transactional
 	public boolean handleAudit(TMisRemittanceConfirm remittanceConfirm) {
 		//查询订单
-		DunningOrder q_order = new DunningOrder();
-		q_order.setDealcode(remittanceConfirm.getDealcode());
-		List<DunningOrder> orders = dunningOrderService.findPaymentOrder(q_order);
-		if (orders == null || orders.size() == 0) {
-			return false;
-		}
-		DunningOrder order = orders.get(0);
+		DunningOrder order = dunningOrderService.findPaymentOrderMsgByDealcode(remittanceConfirm.getDealcode());
 		if (order == null) {
 			return false;
 		}

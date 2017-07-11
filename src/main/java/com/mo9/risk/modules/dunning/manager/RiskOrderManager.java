@@ -36,6 +36,8 @@ public class RiskOrderManager {
 		if (!StringUtils.isBlank(remark)) {
 			remark = remark.replace('\r', ' ');
 			remark = remark.replace('\n', ' ');
+		}else{
+			remark = paychannel;
 		}
 
 		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
@@ -43,7 +45,7 @@ public class RiskOrderManager {
 
 		logger.info("接口url：" + url);
 		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");
-		logger.info("接口url返回参数" + res.getBytes("UTF-8"));
+		logger.info("接口url返回参数" + res);
 
 		if (StringUtils.isNotBlank(res)) {
 			return  new JSONObject(res);

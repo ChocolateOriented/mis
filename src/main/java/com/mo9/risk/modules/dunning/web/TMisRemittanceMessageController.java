@@ -9,6 +9,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
@@ -44,6 +45,8 @@ public class TMisRemittanceMessageController extends BaseController {
 
 	@Autowired
 	private TMisRemittanceMessageService tMisRemittanceMessageService;
+	@Autowired
+	private TMisDunningOrderService tMisDunningOrderService;
 
 	/**
 	 * 跳转账目解析页面
@@ -210,7 +213,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	@RequestMapping(value = "findOrderByMobile")
 	@ResponseBody
 	public DunningOrder findOrderByMobile(String mobile){
-		return tMisRemittanceMessageService.findPaymentOrderByMobile(mobile);
+		return tMisDunningOrderService.findPaymentOrderDetailByMobile(mobile);
 	}
 
 	/**

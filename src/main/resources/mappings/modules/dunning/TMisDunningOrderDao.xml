@@ -25,7 +25,7 @@
       o.dealcode = #{dealcode}
 	</select>
 
-	<select id="findPaymentOrderByMobile" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder" parameterType="java.util.List">
+	<select id="findPaymentOrderMsg" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
 		SELECT
 		o.dealcode AS "dealcode",
 		o.buyer_id AS "buyer_id",
@@ -39,17 +39,22 @@
 		o.merchant_id = 7
 		AND o.`status`= 'payment'
 		AND o.type = 'loan'
-		AND b.mobile = #{mobile}
+		<if test="mobile!= null and mobile!= ''">
+			AND b.mobile = #{mobile}
+		</if>
+		<if test="dealcode!= null and dealcode!= ''">
+			AND o.dealcode = #{dealcode}
+		</if>
 	</select>
 
-	<select id="findPaymentOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+	<select id="findPaymentOrderDetail" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
 		SELECT
 		idc.real_name AS "realname",
 		o.dealcode AS "dealcode",
 		o.buyer_id AS "buyer_id",
 		b.mobile AS "mobile",
 		o.amount AS "amount",
-		<include refid="countRemainAmmount"/> AS creditamount,
+		<include refid="countRemainAmmount"/> AS remainAmmount,
 		DATEDIFF(CURDATE(), o.repayment_time) AS overduedays,
 		p.`nickname` AS `dunningPeople.nickname`
 		FROM
