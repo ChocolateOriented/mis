@@ -241,7 +241,7 @@ public class TMisRemittanceMessageService extends
 		remittanceConfirm.setRemittancetime(remittanceMessage.getRemittanceTime());
 		remittanceConfirm.setRemittanceamount(remittanceMessage.getRemittanceAmount());
 		remittanceConfirm.setRemittancechannel(remittanceMessage.getRemittanceChannel());
-		remittanceConfirm.setSerialnumber(remittanceMessage.getRemittanceSerialNumber());
+		remittanceConfirm.setFinancialserialnumber(remittanceMessage.getRemittanceSerialNumber());
 
 		return remittanceConfirm;
 	}
