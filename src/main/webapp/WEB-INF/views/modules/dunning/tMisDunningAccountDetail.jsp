@@ -117,7 +117,12 @@
 					 ${tmessage.remittanceAccount}
 				</td>
 				<td>
-					  ${tmessage.remark }  
+					<c:if test="${tmessage.remark eq '转账' }">
+					  
+					 </c:if>    
+					<c:if test="${tmessage.remark ne '转账' }">
+					  ${tmessage.remark } 
+					 </c:if>    
 				</td>
 				<td>
 					   <c:if test="${empty tmessage.accountStatus }">

@@ -191,10 +191,10 @@
 			and m.remittanceamount =#{ remittanceAmount}
 		</if>
 		<if test="  remittanceAccount!= null and   remittanceAccount!= ''">
-			and m.remittanceaccount =#{ remittanceAccount}
+			and m.remittanceaccount like concat(concat('%',#{ remittanceAccount}),'%')
 		</if>
 		<if test="  remittanceName!= null and   remittanceName!= ''">
-			and m.remittancename =#{ remittanceName}
+			and m.remittancename like concat(concat('%',#{ remittanceName}),'%')
 		</if>
 		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
 			and c.ConfirmStatus =#{ accountStatus}
