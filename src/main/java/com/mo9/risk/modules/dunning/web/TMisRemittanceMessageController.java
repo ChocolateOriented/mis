@@ -92,7 +92,7 @@ public class TMisRemittanceMessageController extends BaseController {
 			sameUpdateNum = tMisRemittanceMessageService.saveUniqList(tMisRemittanceList,channel,listNum);
 		} catch (Exception e) {
 			logger.info("Excel表有相同的流水号和支付渠道",e);
-			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误.支付渠道相同情况下有相同的流水号。这不允许");
+			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误。该文件存在支付渠道和流水号都相同的汇款数据。请检查好文件，重新导入。谢谢");
 			return redirectUrl;
 		}
 		//调用自动查账
