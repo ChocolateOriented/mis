@@ -131,7 +131,7 @@ public class GetRequest
         }
         conn.setDoOutput(false);
         // 到这里已经完成了，不过我们还是看看返回信息吧，他的注册返回信息也在此页面
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
         String inputLine = reader.readLine().toString();
         reader.close();
         return inputLine;

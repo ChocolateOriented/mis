@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.rmi.ServerException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -532,9 +533,11 @@ public class TMisRemittanceConfirmController extends BaseController {
 		confirm.setPaytype(paytype);
 		try {
 			tMisRemittanceConfirmService.auditConfrim(confirm);
-		} catch (Exception e) {
-			logger.warn("入账失败",e);
-			return e.getMessage();
+		} catch (ServerException e){
+			return "入账失败, "+e.getMessage();
+
+		}catch (Exception e) {
+			return "入账失败";
 		}
 		return "success";
 	}
