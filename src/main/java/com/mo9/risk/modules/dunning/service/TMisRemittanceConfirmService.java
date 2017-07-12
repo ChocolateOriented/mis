@@ -217,9 +217,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			remittanceConfirm.setCreateBy(user);
 		}
 		dao.batchInsert(confirms);
-		for (TMisRemittanceConfirm remittanceConfirm: confirms) {
-			tMisRemittanceConfirmLogService.saveLog(remittanceConfirm);
-		}
+		tMisRemittanceConfirmLogService.batchInsert(confirms,user);
 	}
 
 	/**

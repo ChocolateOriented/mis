@@ -10,6 +10,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirmLog;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,23 @@ public class TMisRemittanceConfirmLogService extends CrudService<TMisRemittanceC
 	public void saveLog(List<String> ids) {
 		for (String id : ids) {
 			saveLog(id);
+		}
+	}
+	/**
+	 * @Description 批量插入日志
+	 * @param confirms
+	 * @param user 批量更新人
+	 * @return void
+	 */
+	public void batchInsert(List<TMisRemittanceConfirm> confirms,User user) {
+		for (TMisRemittanceConfirm record: confirms) {
+			if (record == null) {
+				throw new ServiceException("record is not existed");
+			}
+			TMisRemittanceConfirmLog logData = new TMisRemittanceConfirmLog(record);
+			logData.preInsert();
+			logData.setUpdateBy(user);
+			dao.insert(logData);
 		}
 	}
 }
