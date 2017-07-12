@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.manager;
 
 import com.mo9.risk.util.GetRequest;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class RiskOrderManager {
 	 * @param delayDay 续期天数
 	 * @return org.activiti.engine.impl.util.json.JSONObject
 	 */
-	public JSONObject repay (String dealcode, String paychannel, String remark, String paytype, BigDecimal Payamount, String delayDay) throws IOException {
+	public String repay (String dealcode, String paychannel, String remark, String paytype, BigDecimal Payamount, String delayDay) throws IOException {
 		if (!StringUtils.isBlank(remark)) {
 			remark = remark.replace('\r', ' ');
 			remark = remark.replace('\n', ' ');
@@ -47,9 +48,17 @@ public class RiskOrderManager {
 		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");
 		logger.info("接口url返回参数" + res);
 
-		if (StringUtils.isNotBlank(res)) {
-			return  new JSONObject(res);
+		if (StringUtils.isBlank(res)) {
+			throw new ServiceException("订单接口回调失败");
 		}
-		return new JSONObject();
+		JSONObject repJson = new JSONObject(res);
+		String resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
+		if(StringUtils.isBlank(resultCode) || !"200".equals(resultCode)) {
+			//抛异常回滚
+			String msg =  repJson.has("resultMsg") ? String.valueOf(repJson.get("resultMsg")) : "";
+			logger.info("订单接口回调失败,失败信息: " + repJson.toString());
+			throw new ServiceException("订单接口回调失败,失败信息: "+msg);
+		}
+		return repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
 	}
 }

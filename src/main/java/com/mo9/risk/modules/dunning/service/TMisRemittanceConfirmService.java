@@ -17,6 +17,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -268,15 +269,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 
 		//回调江湖救急接口
-		JSONObject repJson = riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
-		String resultCode = repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
-		if (StringUtils.isBlank(resultCode) || !"200".equals(resultCode)) {
-			//抛异常回滚
-			throw new ServiceException("订单接口回调失败,失败信息" + repJson.toString());
-		}
-
-		String msg = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
-		return msg;
+		return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 }
 
 	/**
@@ -294,11 +287,6 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 
 		//回调江湖救急接口
 		String delayDay = "7";
-		JSONObject repJson = riskOrderManager.repay(confirm.getDealcode(),confirm.getRemittancechannel(),confirm.getRemark(),confirm.getPaytype(), new BigDecimal(confirm.getRemittanceamount()),delayDay);
-		String resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
-		if(StringUtils.isBlank(resultCode) || !"200".equals(resultCode)){
-			//抛异常回滚
-			throw new ServiceException("订单接口回调失败,失败信息"+repJson.toString());
-		}
+		riskOrderManager.repay(confirm.getDealcode(),confirm.getRemittancechannel(),confirm.getRemark(),confirm.getPaytype(), new BigDecimal(confirm.getRemittanceamount()),delayDay);
 	}
 }
