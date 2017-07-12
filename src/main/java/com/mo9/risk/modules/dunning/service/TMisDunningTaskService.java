@@ -102,6 +102,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	public static final String  AUTOQ0_ID_1 = "autoQ0_id_1";
 	public static final String  AUTOQ0_NAME_1 = "autoQ0机器人1号";
+	public static final String QUALITY_GOOD = "y";
+	public static final String QUALITY_ORDINARY = "n";
 	
 	public static final String  C0 = "Q0";      //  提醒0-0
 	public static final String  C_P1 = "Q1";	 
@@ -1650,10 +1652,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				
 				/**  * auto Q0 队列 begin */
 				String autoQ0 = DictUtils.getDictValue("autoQ0","Scheduled","false");
+				String autoQ0Tag = DictUtils.getDictValue("autoQ0Tag","Scheduled","false");
 				Map<String, String> atuoQ0DealcodeMap = new HashMap<String, String>();
 				List<TMisDunningTask> atuoDunningTasks = new ArrayList<TMisDunningTask>();
 				List<TMisDunningTaskLog> atuoQ0DunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
-				if(autoQ0.equals("true")){
+				if(autoQ0.equals("true") || autoQ0Tag.equals("true")){
 					List<String> atuoQ0Dealcodes = tMisDunningTaskDao.findAtuoQ0Dealcode(begin_Q0,"1");
 					logger.info("findAtuoQ0Dealcode-autoQ0查询历史借款逾期小于1天的用户订单" +atuoQ0Dealcodes.size()  + "条"  + new Date());
 					for(String atuoQ0Dealcode : atuoQ0Dealcodes){
@@ -1683,10 +1686,21 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					/** * auto Q0 队列 end  */
 					
-					/**
-					 * 创建任务 
-					  */
-					TMisDunningTask dunningTask = this.createNewDunningTask(dunningTaskLog,dict);
+					TMisDunningTask dunningTask = null;
+					
+					/**  * auto Q0 优质用户标记  begin  */
+					if(autoQ0Tag.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+						/**
+						 * 创建任务 (标示优质用户)
+						 */
+						dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_GOOD);
+						/**  * auto Q0 优质用户标记  end  */
+					} else {
+						/**
+						 * 创建任务  (标示普通用户)
+						 */
+						dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_ORDINARY);
+					}
 					/**
 					 * 每个周期的任务集合
 					 */
@@ -1974,7 +1988,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * @param period
 	 * @return
 	 */
-	private TMisDunningTask createNewDunningTask(TMisDunningTaskLog taskLog,Dict dict) throws Exception{
+	private TMisDunningTask createNewDunningTask(TMisDunningTaskLog taskLog,Dict dict,String quality) throws Exception{
 		Date now = new Date();
 		TMisDunningTask task = new TMisDunningTask();
 		task.setId(IdGen.uuid());
@@ -1996,6 +2010,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		task.setRepaymentTime(new java.sql.Date(taskLog.getRepaymenttime().getTime()));
 		task.setCreateBy(new User("auto_admin"));
 		task.setCreateDate(new Date());
+		task.setQuality(quality);
 //		Calendar calendar = Calendar.getInstance();
 //		calendar.setTime(toDate(order.repaymentDate));
 //		calendar.add(Calendar.DAY_OF_YEAR, period.end + 1);

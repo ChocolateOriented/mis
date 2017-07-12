@@ -73,6 +73,8 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private Date promisepaydate; 	// 到期还款时间
 	private Date nextfollowdate; 	// 下次跟进时间
 	
+	private String quality;
+	
 	public TMisDunningTask() {
 		super();
 	}
@@ -299,6 +301,14 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 
 	public void setNextfollowdate(Date nextfollowdate) {
 		this.nextfollowdate = nextfollowdate;
+	}
+	
+	public String getQuality() {
+		return quality;
+	}
+
+	public void setQuality(String quality) {
+		this.quality = quality;
 	}
 	
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
