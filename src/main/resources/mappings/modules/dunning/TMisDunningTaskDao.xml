@@ -868,7 +868,8 @@
         o.outerfiletime AS outerfiletime,
         t.dunningcycle AS dunningcycle,
         t.nextfollowdate as nextfollowdate,
-        t.promisepaydate as promisepaydate
+        t.promisepaydate as promisepaydate,
+        t.quality as quality
         FROM
         t_mis_dunning_task AS t
 		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
@@ -951,6 +952,10 @@
         <!-- 			# PTP 时间  -->
         <if test="beginpromisepaydate != null and endpromisepaydate != null and beginpromisepaydate != '' and endpromisepaydate != ''">
             AND t.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
+        </if>
+        <if test="quality != null and quality != ''">
+        <!-- 			     # 优质订单    -->
+            AND t.quality = #{quality}
         </if>
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -1542,7 +1547,8 @@
 			createdate,
 			updateby,
 			updatedate,
-			dunningcycle
+			dunningcycle,
+			quality
 		) VALUES
 		<foreach collection="list" item="item" index="index" separator=",">
 		 (
@@ -1567,7 +1573,8 @@
 			#{item.createDate},
 			#{item.updateBy.id},
 			#{item.updateDate},
-			#{item.dunningcycle}
+			#{item.dunningcycle},
+			#{item.quality}
 		)
 		</foreach>
 	</insert>

@@ -444,6 +444,13 @@
 			<li><label>订单号</label>
 				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
+			<li><label>是否优质</label>
+				<form:select  id="quality" path="quality" class="input-medium">
+					<form:option selected="selected" value="" label="全部"/>
+					<form:option value="y" label="是"/>
+					<form:option value="n" label="否"/>
+				</form:select>
+			</li>
 			<li><label>催收备注</label>
 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
@@ -594,6 +601,7 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
+				<th>是否优质</th>
 <!-- 				<th>任务状态</th> -->
 <!-- 				<th>操作</th> -->
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
@@ -659,15 +667,23 @@
 					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}"   > --%>
 					${dunningOrder.dealcode}
 				</td>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
 				<td>
 					<fmt:formatDate value="${dunningOrder.nextfollowdate}" pattern="yyyy-MM-dd"/>
 				</td>
-				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
+				<td>
+					<c:choose>  
+						<c:when test="${dunningOrder.quality  eq 'y'}">  
+							<c:out value="是" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="" />
+						</c:otherwise>  
+					</c:choose>
 				
+				</td>
 <!-- 				<td> -->
 <%-- 					${dunningOrder.dunningtaskstatusText} --%>
 <!-- 				</td> -->
