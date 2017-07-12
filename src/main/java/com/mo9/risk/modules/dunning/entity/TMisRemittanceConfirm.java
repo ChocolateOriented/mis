@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import java.util.Date;
 import javax.validation.constraints.NotNull;
@@ -106,6 +107,7 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 		this.remittancename = remittancename;
 	}
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getRemittancetime() {
 		return remittancetime;
 	}

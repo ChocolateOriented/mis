@@ -122,7 +122,7 @@
 
         $.jBox(content, {
           title: "查账",
-          width: 700,
+          width: 900,
           height: 450
         });
       }
@@ -319,10 +319,10 @@ style="width:100%;height:600px;">
     <%--订单查询模板--%>
     <div id="queryOrderTemplate">
         <h3>
-            <div class="row" style="text-align: center; color: #999; margin-bottom: 20px">
-                <div class="span3" style="color: #2fa4e7">① 订单查询</div>
-                <div class="span3">② 交易查询</div>
-                <div class="span2">③ 查账</div>
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+                <div class="span4" style="color: #2fa4e7">① 订单查询</div>
+                <div class="span4">② 交易查询</div>
+                <div class="span4">③ 查账</div>
             </div>
         </h3>
         <form class="form-horizontal" id="orderMsg">
@@ -376,10 +376,10 @@ style="width:100%;height:600px;">
     <%--交易查询模板--%>
     <div id="queryRemittanceMessage">
         <h3>
-            <div class="row" style="text-align: center; color: #999; margin-bottom: 20px">
-                <div class="span3" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
-                <div class="span3" style="color: #2fa4e7">② 交易查询</div>
-                <div class="span2">③ 查账</div>
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+                <div class="span4" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
+                <div class="span4" style="color: #2fa4e7">② 交易查询</div>
+                <div class="span4">③ 查账</div>
             </div>
         </h3>
         <form class="form-horizontal" id="remittanceMsg">
@@ -427,10 +427,10 @@ style="width:100%;height:600px;">
     <%--查账模板--%>
     <div id="auditComfirm">
         <h3>
-            <div class="row" style="text-align: center; color: #999; margin-bottom: 20px">
-                <div class="span3" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
-                <div class="span3" style="color: #2fa4e7"> <i class="icon-ok"></i>交易查询</div>
-                <div class="span2" style="color: #2fa4e7">③ 查账</div>
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+                <div class="span4" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
+                <div class="span4" style="color: #2fa4e7"> <i class="icon-ok"></i>交易查询</div>
+                <div class="span4" style="color: #2fa4e7">③ 查账</div>
             </div>
         </h3>
         <div class="row-fluid" id="btnGroup">
