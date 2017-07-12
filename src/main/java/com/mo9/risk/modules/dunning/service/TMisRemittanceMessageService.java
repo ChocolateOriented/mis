@@ -308,7 +308,7 @@ public class TMisRemittanceMessageService extends
 
 			TMisRemittanceMessage trMessage = new TMisRemittanceMessage();
 			trMessage.setRemittanceTime(parseTime);
-			trMessage.setRemittanceSerialNumber(trExcel.getAlipaySerialNumber());
+			trMessage.setRemittanceSerialNumber(trExcel.getAlipayRemittanceNumber());
 			trMessage.setRemittanceChannel("alipay");
 			trMessage.setRemittanceAmount(trExcel.getRemittanceamount());
 			trMessage.setRemittanceName(trExcel.getRemittancename());
