@@ -257,7 +257,7 @@
 	  o.amount AS "amount",
 	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
 	  <include refid="countRemainAmmount"/> AS "remainAmmount",
-	  m.Serialnumber AS "remittanceSerialNumber",
+	  m.financialserialnumber AS "remittanceSerialNumber",
 	  l.updateBy AS "checkedPeople",
 	  o.status AS "orderStatus",
 	  m.RemittanceTag AS "remittanceTag",
@@ -295,7 +295,7 @@
                 AND m.dealcode=#{dealcode}
         </if>
 		 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-                AND m.Serialnumber=#{remittanceSerialNumber}
+                AND m.financialserialnumber=#{remittanceSerialNumber}
         </if>
 		 <if test=" orderStatus!= null and  orderStatus!= ''">
                 AND o.status=#{orderStatus}
@@ -348,7 +348,7 @@
 			  o.amount AS "amount",
 			  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
 			  <include refid="countRemainAmmount"/> AS "remainAmmount",
-			  m.Serialnumber AS "remittanceSerialNumber",
+			  m.financialserialnumber AS "remittanceSerialNumber",
 			  l.updateBy AS "completePeople",
 			  o.status AS "orderStatus",
 			  m.RemittanceTag AS "remittanceTag",
@@ -386,7 +386,7 @@
 		                AND m.dealcode=#{dealcode}
 		        </if>
 				 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-		                AND m.Serialnumber=#{remittanceSerialNumber}
+		                AND m.financialserialnumber=#{remittanceSerialNumber}
 		        </if>
 				 <if test=" orderStatus!= null and  orderStatus!= ''">
 		                AND o.status=#{orderStatus}
