@@ -31,7 +31,7 @@ public class RiskOrderManager {
 	 * @param paytype 还款类型
 	 * @param Payamount 还款金额
 	 * @param delayDay 续期天数
-	 * @return org.activiti.engine.impl.util.json.JSONObject
+	 * @return java.lang.String 成功信息
 	 */
 	public String repay (String dealcode, String paychannel, String remark, String paytype, BigDecimal Payamount, String delayDay) throws IOException {
 		if (!StringUtils.isBlank(remark)) {

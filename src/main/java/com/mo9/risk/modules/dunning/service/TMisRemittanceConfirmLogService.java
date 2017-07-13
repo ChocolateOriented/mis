@@ -82,6 +82,7 @@ public class TMisRemittanceConfirmLogService extends CrudService<TMisRemittanceC
 	 * @param user 批量更新人
 	 * @return void
 	 */
+	@Transactional
 	public void batchInsert(List<TMisRemittanceConfirm> confirms,User user) {
 		for (TMisRemittanceConfirm record: confirms) {
 			if (record == null) {

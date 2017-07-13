@@ -537,6 +537,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			return "入账失败, "+e.getMessage();
 
 		}catch (Exception e) {
+			logger.info("入账失败",e);
 			return "入账失败";
 		}
 		return "success";

@@ -12,19 +12,15 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.common.service.ServiceException;
-import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,11 +237,11 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String delayDay = paid.getDelayDay();
 
 		BigDecimal remittanceamount = new BigDecimal(paidAmount);
-		if(platform.equals("app")){
-			//do nothing
-		}else{
-			remittanceamount = remittanceamount.multiply(BigDecimal.valueOf(100));
-		}
+//		if(platform.equals("app")){
+//			//do nothing
+//		}else{
+//			remittanceamount = remittanceamount.multiply(BigDecimal.valueOf(100));
+//		}
 
 		if ("1".equals(isMergeRepayment)) {
 			List<String> relatedIds = new ArrayList<String>(Arrays.asList(relatedId));
@@ -283,8 +279,22 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
+		/**
+		 * 部分还款，生成部分还款任务日志
+		 */
+		String paidType = confirm.getPaytype();
+		String dealcode = confirm.getDealcode();
+		if("partial".equals(paidType)){
+			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+			dunningTaskLog.setBehaviorstatus("partial");
+			dunningTaskLog.setCreateDate(new Date());
+			dunningTaskLog.setCreateBy(new User("auto_admin"));
+			dunningTaskLogDao.insert(dunningTaskLog);
+//						dunningTaskLog.setCreateDate(new Date());
+		}
+
 		//回调江湖救急接口
 		String delayDay = "7";
-		riskOrderManager.repay(confirm.getDealcode(),confirm.getRemittancechannel(),confirm.getRemark(),confirm.getPaytype(), new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
 	}
 }
