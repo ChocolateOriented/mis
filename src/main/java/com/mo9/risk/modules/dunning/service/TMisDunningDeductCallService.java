@@ -247,9 +247,9 @@ public class TMisDunningDeductCallService {
 		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
 		
 		BigDecimal bd = new BigDecimal(paidAmount);
-		if(!"app".equals(order.getPlatform())){
-			bd = bd.multiply(BigDecimal.valueOf(100));
-		}
+//		if(!"app".equals(order.getPlatform())){
+//			bd = bd.multiply(BigDecimal.valueOf(100));
+//		}
 		String riskUrl =  DictUtils.getDictValue("riskclone", "orderUrl", "");
 		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" + dealcode + "/" + paychannel + "/" + remark + "/" + paidType + "/" + String.valueOf(bd.doubleValue()) + "/" + delayDay;
 		logger.info("江湖救急接口url：" + url);
