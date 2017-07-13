@@ -125,7 +125,9 @@
 					 <fmt:formatDate value="${tmessage.remittanceTime }" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
-					 ${tmessage.remittanceChannel }
+					<c:if test="${tmessage.remittanceChannel eq 'alipay' }">
+					 		 支付宝
+					</c:if>   
 				</td>
 				<td>
 					 ${tmessage.remittanceAmount }
