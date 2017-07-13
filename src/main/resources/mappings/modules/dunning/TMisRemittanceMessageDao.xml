@@ -283,7 +283,7 @@
 		AND l.ConfirmStatus="complete_audit"
 		AND m.ConfirmFlow="AUDIT"
 		AND m.invalid="t"
-		AND  m.updateDate=l.updateDate
+		AND l.dbid in (SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="complete_audit" GROUP BY l.ComfirmId)
 		AND a.RemittanceChannel=m.RemittanceChannel
 		 <if test=" mobile!= null and  mobile!= ''">
                 AND m.mobile=#{mobile}
@@ -374,7 +374,7 @@
 				AND m.ConfirmStatus="finish"
 				AND m.ConfirmFlow="AUDIT"
 				AND m.invalid="t"
-				AND  m.updateDate=l.updateDate
+				AND l.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="finish" GROUP BY l.ComfirmId)
 				AND a.RemittanceChannel=m.RemittanceChannel
 				 <if test=" mobile!= null and  mobile!= ''">
 		                AND m.mobile=#{mobile}
@@ -400,7 +400,7 @@
 	         LEFT JOIN t_mis_remittance_confirm_log AS g ON g.ComfirmId = mix.confirmId
 			where
 			g.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="complete_audit" GROUP BY l.ComfirmId)
-	     
+	        ORDER BY  mix.updateDate desc
         
 	</select>
 
