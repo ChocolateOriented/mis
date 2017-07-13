@@ -374,7 +374,7 @@
 				AND m.ConfirmStatus="finish"
 				AND m.ConfirmFlow="AUDIT"
 				AND m.invalid="t"
-				AND  m.updateDate=l.updateDate
+				AND l.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="finish" GROUP BY l.ComfirmId)
 				AND a.RemittanceChannel=m.RemittanceChannel
 				 <if test=" mobile!= null and  mobile!= ''">
 		                AND m.mobile=#{mobile}
