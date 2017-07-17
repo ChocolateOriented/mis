@@ -41,9 +41,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private RiskOrderManager riskOrderManager ;
 	@Autowired
-	private TMisDunningTaskDao tMisDunningTaskDao;
-	@Autowired
-	private TMisDunningTaskLogDao dunningTaskLogDao;
+	private TMisDunningTaskService tMisDunningTaskService;
 
 	public TMisRemittanceConfirm get(String id) {
 		return super.get(id);
@@ -254,14 +252,8 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		 * 部分还款，生成部分还款任务日志
 		 */
 		if("partial".equals(paidType)){
-			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-			dunningTaskLog.setBehaviorstatus("partial");
-			dunningTaskLog.setCreateDate(new Date());
-			dunningTaskLog.setCreateBy(new User("auto_admin"));
-			dunningTaskLogDao.insert(dunningTaskLog);
-//						dunningTaskLog.setCreateDate(new Date());
+			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
-
 		//回调江湖救急接口
 		return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 }
@@ -279,20 +271,14 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
+		String paidType = confirm.getPaytype();
+		String dealcode = confirm.getDealcode();
 		/**
 		 * 部分还款，生成部分还款任务日志
 		 */
-		String paidType = confirm.getPaytype();
-		String dealcode = confirm.getDealcode();
 		if("partial".equals(paidType)){
-			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-			dunningTaskLog.setBehaviorstatus("partial");
-			dunningTaskLog.setCreateDate(new Date());
-			dunningTaskLog.setCreateBy(new User("auto_admin"));
-			dunningTaskLogDao.insert(dunningTaskLog);
-//						dunningTaskLog.setCreateDate(new Date());
+			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
-
 		//回调江湖救急接口
 		String delayDay = "7";
 		riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);

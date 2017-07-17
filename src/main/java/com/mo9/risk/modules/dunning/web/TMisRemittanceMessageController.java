@@ -11,6 +11,7 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
+import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -70,12 +71,17 @@ public class TMisRemittanceMessageController extends BaseController {
 			redirectAttributes.addAttribute("message", "参数错误");
 			return redirectUrl;
 		}
-		//解析上传Excel
+		//解析上传Excel或csv
 		List<AlipayRemittanceExcel> list ;
-		logger.info("正在接析文件:" + file.getOriginalFilename());
+		String filename = file.getOriginalFilename();
+		logger.info("正在接析文件:" +filename) ;
 		try {
-			ImportExcel ei = new ImportExcel(file, 1, 0);
-			list = ei.getDataList(AlipayRemittanceExcel.class);
+			if (StringUtils.endsWith(filename,".csv")){
+				list = CsvUtil.importCsv(file,AlipayRemittanceExcel.class,3);
+			}else {
+				ImportExcel ei = new ImportExcel(file, 1, 0);
+				list = ei.getDataList(AlipayRemittanceExcel.class);
+			}
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
 			logger.info("解析式发生错误",e);

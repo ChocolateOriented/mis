@@ -123,7 +123,7 @@
         $.jBox(content, {
           title: "查账",
           width: 900,
-          height: 450
+          height: 500
         });
       }
 
@@ -319,13 +319,13 @@ style="width:100%;height:600px;">
     <%--订单查询模板--%>
     <div id="queryOrderTemplate">
         <h3>
-            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 40px">
                 <div class="span4" style="color: #2fa4e7">① 订单查询</div>
                 <div class="span4">② 交易查询</div>
                 <div class="span4">③ 查账</div>
             </div>
         </h3>
-        <form class="form-horizontal" id="orderMsg">
+        <form class="form-horizontal" id="orderMsg" style="padding: 0px 100px 0px 100px">
             <div class="control-group">
                 <label class="control-label" for="inputMobile">手机号</label>
                 <div class="controls">
@@ -376,17 +376,17 @@ style="width:100%;height:600px;">
     <%--交易查询模板--%>
     <div id="queryRemittanceMessage">
         <h3>
-            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 40px">
                 <div class="span4" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
                 <div class="span4" style="color: #2fa4e7">② 交易查询</div>
                 <div class="span4">③ 查账</div>
             </div>
         </h3>
-        <form class="form-horizontal" id="remittanceMsg">
+        <form class="form-horizontal" id="remittanceMsg" style="padding: 0px 100px 0px 100px">
             <div class="control-group">
                 <label class="control-label" for="inputRemittanceSerialNumber">支付宝交易流水号</label>
                 <div class="controls">
-                    <input type="text" id="inputRemittanceSerialNumber"/>
+                    <input type="text" id="inputRemittanceSerialNumber" style="width: 350px"/>
                     <a class="btn btn-primary" onclick="findRemittance()">查询</a>
                 </div>
             </div>
@@ -427,7 +427,7 @@ style="width:100%;height:600px;">
     <%--查账模板--%>
     <div id="auditComfirm">
         <h3>
-            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 20px">
+            <div class="row-fluid" style="text-align: center; color: #999; margin-bottom: 40px">
                 <div class="span4" style="color: #2fa4e7"><i class="icon-ok"></i> 订单查询</div>
                 <div class="span4" style="color: #2fa4e7"> <i class="icon-ok"></i>交易查询</div>
                 <div class="span4" style="color: #2fa4e7">③ 查账</div>
@@ -435,11 +435,11 @@ style="width:100%;height:600px;">
         </h3>
         <div class="row-fluid" id="btnGroup">
             <div class="span2 offset1 text-center" style="line-height: 45px">入账标签</div>
-            <div class="span3"><a class="btn btn-large" id="REPAYMENT_SELF" onclick="addTag('REPAYMENT_SELF')">本人还款</a></div>
-            <div class="span3"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
+            <div class="span4"><a class="btn btn-large" id="REPAYMENT_SELF" onclick="addTag('REPAYMENT_SELF')">本人还款</a></div>
+            <div class="span4"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
         </div>
         <div class="row-fluid text-right" style="margin-top: 30px">
-            <div id="auditRemittanceData" class="span5 offset1" style="border: 2px solid black;padding-top: 20px">
+            <div id="auditRemittanceData" class="span5 offset1" style="border: 2px solid grey;padding-top: 20px">
                 <h4>
                     <div class="row-fluid">
                         <div class="span4" style="color: #2fa4e7">订单信息</div>
@@ -472,7 +472,7 @@ style="width:100%;height:600px;">
                     </div>
                 </form>
             </div>
-            <div id="auditOrderData" class="span5" style="border: 2px solid black;padding-top: 20px">
+            <div id="auditOrderData" class="span5" style="border: 2px solid grey;padding-top: 20px">
                 <h4>
                     <div class="row-fluid">
                         <div class="span4" style="color: #2fa4e7">交易信息</div>

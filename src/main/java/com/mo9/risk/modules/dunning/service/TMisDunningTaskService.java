@@ -2753,5 +2753,17 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public String findBuyerIdCardImg(String buyerid) {
 		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
 	}
-	
+
+	/**
+	 * @Description  保存部分还款日志
+	 * @param dealcode
+	 * @return void
+	 */
+	public void savePartialRepayLog(String dealcode) {
+		TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+		dunningTaskLog.setBehaviorstatus("partial");
+		dunningTaskLog.setCreateDate(new Date());
+		dunningTaskLog.setCreateBy(new User("auto_admin"));
+		tMisDunningTaskLogDao.insert(dunningTaskLog);
+	}
 }

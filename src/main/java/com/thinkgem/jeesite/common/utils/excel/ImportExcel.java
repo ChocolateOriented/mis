@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Date;
+import java.math.BigDecimal;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -180,22 +178,30 @@ public class ImportExcel {
 	 * @param column 获取单元格列号
 	 * @return 单元格值
 	 */
-	public Object getCellValue(Row row, int column){
-		Object val = "";
+	public String getCellValue(Row row, int column){
+		String val = "";
+		Cell cell = row.getCell(column);
+		if (cell == null) {
+			return val;
+		}
 		try{
-			Cell cell = row.getCell(column);
-			if (cell != null){
-				if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-					val = cell.getNumericCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_STRING){
+			switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_NUMERIC:
+					Double value = cell.getNumericCellValue();
+					val = new BigDecimal(value).toString();
+					break;
+				case Cell.CELL_TYPE_STRING:
 					val = cell.getStringCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+					break;
+				case Cell.CELL_TYPE_BOOLEAN:
+					val = String.valueOf(cell.getBooleanCellValue());
+					break;
+				case Cell.CELL_TYPE_ERROR:
+					val = String.valueOf(cell.getErrorCellValue());
+					break;
+				case Cell.CELL_TYPE_FORMULA:
 					val = cell.getCellFormula();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN){
-					val = cell.getBooleanCellValue();
-				}else if (cell.getCellType() == Cell.CELL_TYPE_ERROR){
-					val = cell.getErrorCellValue();
-				}
+					break;
 			}
 		}catch (Exception e) {
 			return val;
@@ -215,77 +221,22 @@ public class ImportExcel {
 		// Get excel data
 		List<E> dataList = Lists.newArrayList();
 		for (int i = this.getDataRowNum(); i < this.getLastDataRowNum(); i++) {
-			E e = (E)cls.newInstance();
+			E entity = (E)cls.newInstance();
 			int column = 0;
 			Row row = this.getRow(i);
 			StringBuilder sb = new StringBuilder();
 			for (ExcelFieldNode node : annotationList){
-				Object val = this.getCellValue(row, column++);
+				String val = this.getCellValue(row, column++);
 				if (val != null){
-					ExcelField ef = node.getExcelField();
-					Object target = node.getTarget();
-					// If is dict type, get dict value
-					if (StringUtils.isNotBlank(ef.dictType())){
-						val = DictUtils.getDictValue(val.toString(), ef.dictType(), "");
-						//log.debug("Dictionary type value: ["+i+","+colunm+"] " + val);
-					}
-					// Get param type and type cast
-					Class<?> valType = Class.class;
-					if (target instanceof Field){
-						valType = ((Field)target).getType();
-					}else if (target instanceof Method){
-						Method method = ((Method)target);
-						if ("get".equals(method.getName().substring(0, 3))){
-							valType = method.getReturnType();
-						}else if("set".equals(method.getName().substring(0, 3))){
-							valType = ((Method)target).getParameterTypes()[0];
-						}
-					}
-					//log.debug("Import value type: ["+i+","+column+"] " + valType);
 					try {
-						if (valType == String.class){
-							String s = String.valueOf(val.toString());
-							if(StringUtils.endsWith(s, ".0")){
-								val = StringUtils.substringBefore(s, ".0");
-							}else{
-								val = String.valueOf(val.toString());
-							}
-						}else if (valType == Integer.class){
-							val = Double.valueOf(val.toString()).intValue();
-						}else if (valType == Long.class){
-							val = Double.valueOf(val.toString()).longValue();
-						}else if (valType == Double.class){
-							val = Double.valueOf(val.toString());
-						}else if (valType == Float.class){
-							val = Float.valueOf(val.toString());
-						}else if (valType == Date.class){
-							val = DateUtil.getJavaDate((Double)val);
-						}else{
-							if (ef.fieldType() != Class.class){
-								val = ef.fieldType().getMethod("getValue", String.class).invoke(null, val.toString());
-							}else{
-								val = Class.forName(this.getClass().getName().replaceAll(this.getClass().getSimpleName(), 
-										"fieldtype."+valType.getSimpleName()+"Type")).getMethod("getValue", String.class).invoke(null, val.toString());
-							}
-						}
-					} catch (Exception ex) {
-						log.info("Get cell value ["+i+","+column+"] error: " + ex.toString());
-						val = null;
-					}
-					// set entity value
-					if (target instanceof Field){
-						Reflections.invokeSetter(e, ((Field)target).getName(), val);
-					}else if (target instanceof Method){
-						String mthodName = ((Method)target).getName();
-						if ("get".equals(mthodName.substring(0, 3))){
-							mthodName = "set"+StringUtils.substringAfter(mthodName, "get");
-						}
-						Reflections.invokeMethod(e, mthodName, new Class[] {valType}, new Object[] {val});
+						parser.setStringValue2Field(val,node,entity);
+					} catch (Exception e1) {
+						log.info("Set cell value ["+i+","+column+"] to item error",e1);
 					}
 				}
 				sb.append(val+", ");
 			}
-			dataList.add(e);
+			dataList.add(entity);
 			log.debug("Read success: ["+i+"] "+sb.toString());
 		}
 		return dataList;
