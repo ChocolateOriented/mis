@@ -61,5 +61,98 @@
 		</choose>
 	</select>
 	
-
+	<!--  迁徙率 begin	 -->
+	
+	<!--  # 更新已经采集的逾期订单	 -->
+	<update id="updateHaveBeenCollectDealcode">
+		<![CDATA[
+			UPDATE t_risk_order as o 
+			INNER JOIN tmp_move_rate AS r on r.dealcode = o.dealcode
+			SET r.PayoffTime = DATE(o.payoff_time),
+				r.OperatorStatus = 
+				CASE 
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) = 0 
+					THEN 'payoff'
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) > 0 
+					THEN 'delay'
+					ELSE NULL
+				END;
+		]]>
+	</update>
+	
+	<!--  # 采集今天逾期一天的数据	 -->
+	<insert id="insert">
+		<![CDATA[
+    		INSERT INTO tmp_move_rate(id, AddTime, dealcode, CorpusAmount,PayoffTime,OrderStatus,OperatorStatus,cycle)
+			SELECT
+				NULL AS id,
+				DATE(DATE_ADD(o.repayment_time, INTERVAL 1 DAY)) AS AddTime,
+				dealcode,
+				IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0) AS CorpusAmount,
+				DATE(o.payoff_time) AS PayoffTime,
+				o.`status`,
+				CASE 
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) = 0 
+					THEN 'payoff'
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) > 0 
+					THEN 'delay'
+					ELSE NULL
+				END AS OperatorStatus,
+				@cycle AS cycle
+			FROM t_risk_order AS o 
+			WHERE o.type = 'loan'
+				AND o.merchant_id = 7
+				AND o.`status` IN ('payment', 'payoff')
+				AND o.repayment_time >= @datetime_start
+				AND o.repayment_time <  @datetime_end
+				AND (DATE(o.payoff_time) > DATE(o.repayment_time)
+					OR o.payoff_time is null)
+			order by AddTime; 
+      	]]>
+	</insert>
+	
+	
+	
+	<!--  # 采集新的迁徙率的统计数据	 -->
+	<insert id="insert">
+		<![CDATA[
+    		insert into data_center.t_mis_dunning_qianxilv_new(createTime,Q1)
+			select 
+				AddTime,
+				COUNT(1) AS Q1
+			from data_center.tmp_move_rate AS r 
+			LEFT JOIN data_center.tmp_move_cycle AS c ON r.cycle  =c.cycle
+			WHERE r.AddTime >= @datetime_start
+				AND r.AddTime < @datetime_end
+			GROUP BY AddTime;
+      	]]>
+	</insert>
+	
+	
+	<!--  # 更新已经采集的逾期订单	 -->
+	<update id="updateHaveBeenCollectDealcode">
+		<![CDATA[
+			UPDATE t_risk_order as o 
+			INNER JOIN tmp_move_rate AS r on r.dealcode = o.dealcode
+			SET r.PayoffTime = DATE(o.payoff_time),
+				r.OperatorStatus = 
+				CASE 
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) = 0 
+					THEN 'payoff'
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) > 0 
+					THEN 'delay'
+					ELSE NULL
+				END;
+		]]>
+	</update>
+	
+	
+	
+	<!--  迁徙率 end	 -->
 </mapper>
