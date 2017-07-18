@@ -387,7 +387,11 @@
 
     <!--按订单号查询催收任务-->
     <select id="findDunningTaskByDealcode" resultType="TMisDunningTask" parameterType="map">
-		select * from t_mis_dunning_task where DunningTaskStatus =#{STATUS_DUNNING} and Dealcode=#{DEALCODE};
+		select * from t_mis_dunning_task
+		where Dealcode=#{DEALCODE}
+		<if test="STATUS_DUNNING != null and STATUS_DUNNING != ''">
+			and DunningTaskStatus =#{STATUS_DUNNING}
+		</if>
 	</select>
     <resultMap type="com.mo9.risk.modules.dunning.entity.DunningUserInfo" id="dunning_userinfo">
         <result property="realName" column="real_name"/>

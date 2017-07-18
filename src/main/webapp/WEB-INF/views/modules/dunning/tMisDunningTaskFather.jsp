@@ -6,6 +6,9 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			if("${ispayoff}" == "true"){
+				disableBtn();
+			}
 // 			var s = window.frames["iframe_text"].document.getElementById("aaa").innerHTML;
 // 			$("#btnOk",document.frames("ifm").document).click();
 		});
@@ -86,6 +89,7 @@
 			$("#changeIdcard").prop("disabled", true);
 			$("#changeMobile").prop("disabled", true);
 			$("#changeBankcard").prop("disabled", true);
+			$("#butnSms").prop("disabled", true);
 		}
 		
 		function getBuyerIdCardImg() {
@@ -107,7 +111,7 @@
 				<input id="btnTelTaskFather" class="btn btn-primary" type="button" value="电话" style="padding:0px 8px 0px 8px;font-size:13px;"
 					contactMobile="${personalInfo.mobile}" contactstype="SELF" onclick="collectionfunction(this, 650)" method="Tel"/>
 				
-				<input <c:if test="${'payoff' eq status }">disabled</c:if> id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"  
+				<input id="butnSms" style="padding:0px 8px 0px 8px;font-size:13px;"  
 				 name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactMobile="${personalInfo.mobile}" contactstype="self"  method="Sms" type="button" value="短信" />
 				
 				<shiro:hasPermission name="dunning:tMisDunningImage:view">

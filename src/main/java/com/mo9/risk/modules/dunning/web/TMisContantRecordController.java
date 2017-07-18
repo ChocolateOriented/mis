@@ -158,14 +158,20 @@ public class TMisContantRecordController extends BaseController {
 		
 		tMisContantRecord.setBuyerid(Integer.parseInt(buyerId));
 		Page<TMisContantRecord> page = null;
-		TMisDunningTask task = null;
+		/*TMisDunningTask task = null;
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
+		params.put("DEALCODE", dealcode);*/
+		TMisDunningOrder order = null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			page = tMisContantRecordService.findPage(new Page<TMisContantRecord>(request, response, 50), tMisContantRecord);
-			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			//task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
 		} catch (Exception e) {
 			logger.info("切换只读库查询失败：" + e.getMessage());
 			return "views/error/500";
@@ -212,9 +218,7 @@ public class TMisContantRecordController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);

@@ -917,9 +917,12 @@ public class TMisDunningTaskController extends BaseController {
 			}
 			
 			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("STATUS_DUNNING", "dunning");
 			params.put("DEALCODE", dealcode);
 			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			if (task == null) {
+				logger.warn("任务不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
 			model.addAttribute("dunningCycle", task.getDunningcycle());
 			
 			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
@@ -942,6 +945,12 @@ public class TMisDunningTaskController extends BaseController {
 			hasContact = true;
 		}
 		model.addAttribute("hasContact", hasContact);
+		
+		boolean ispayoff = false;
+		if (order != null && "payoff".equals(order.getStatus())) {
+			ispayoff = true;
+		}
+		model.addAttribute("ispayoff", ispayoff);
 		
 		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
 		
@@ -1036,14 +1045,12 @@ public class TMisDunningTaskController extends BaseController {
 				logger.warn("订单不存在，订单号：" + dealcode);
 				return null;
 			}
-			Map<String,Object> params = new HashMap<String,Object>();
+			/*Map<String,Object> params = new HashMap<String,Object>();
 			params.put("STATUS_DUNNING", "dunning");
 			params.put("DEALCODE", dealcode);
-			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
 			boolean ispayoff = false;
-			if(null != task){
-				ispayoff = task.getIspayoff();
-			}else{
+			if (order != null && "payoff".equals(order.getStatus())) {
 				ispayoff = true;
 			}
 			model.addAttribute("workInfo", workinfo);
@@ -1089,14 +1096,20 @@ public class TMisDunningTaskController extends BaseController {
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
 		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
-		TMisDunningTask task = null;
+		/*TMisDunningTask task = null;
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
+		params.put("DEALCODE", dealcode);*/
+		TMisDunningOrder order = null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
 			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
-			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			//task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		} catch (Exception e) {
 			logger.info("切换只读库查询失败：" + e.getMessage());
 			return "views/error/500";
@@ -1114,9 +1127,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("mobileSelf", mobileSelf);
 		
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
@@ -1156,14 +1167,18 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("mobileSelf", mobileSelf);
 		
-		Map<String,Object> params = new HashMap<String,Object>();
+		/*Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
+		
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
@@ -1193,14 +1208,17 @@ public class TMisDunningTaskController extends BaseController {
 //		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
 //		model.addAttribute("personalInfo", personalInfo);
 		
-		Map<String,Object> params = new HashMap<String,Object>();
+		/*Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
@@ -1236,14 +1254,17 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dealcode", dealcode);
 			model.addAttribute("mobileSelf", mobileSelf);
 			
-			Map<String,Object> params = new HashMap<String,Object>();
+			/*Map<String,Object> params = new HashMap<String,Object>();
 			params.put("STATUS_DUNNING", "dunning");
 			params.put("DEALCODE", dealcode);
-			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
+			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			if (order == null) {
+				logger.warn("订单不存在，订单号：" + dealcode);
+				return "views/error/500";
+			}
 			boolean ispayoff = false;
-			if(null != task){
-				ispayoff = task.getIspayoff();
-			}else{
+			if (order != null && "payoff".equals(order.getStatus())) {
 				ispayoff = true;
 			}
 			model.addAttribute("ispayoff", ispayoff);
