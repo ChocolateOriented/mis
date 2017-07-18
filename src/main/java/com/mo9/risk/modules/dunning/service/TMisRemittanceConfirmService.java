@@ -286,11 +286,12 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String dealcode = confirm.getDealcode();
 		if("partial".equals(paidType)){
 			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-			dunningTaskLog.setBehaviorstatus("partial");
-			dunningTaskLog.setCreateDate(new Date());
-			dunningTaskLog.setCreateBy(new User("auto_admin"));
-			dunningTaskLogDao.insert(dunningTaskLog);
-//						dunningTaskLog.setCreateDate(new Date());
+			if(null != dunningTaskLog){
+				dunningTaskLog.setBehaviorstatus("partial");
+				dunningTaskLog.setCreateDate(new Date());
+				dunningTaskLog.setCreateBy(new User("auto_admin"));
+				dunningTaskLogDao.insert(dunningTaskLog);
+			}
 		}
 
 		//回调江湖救急接口
