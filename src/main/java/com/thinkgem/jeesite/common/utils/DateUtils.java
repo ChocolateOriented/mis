@@ -290,6 +290,18 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 	}
 	
 	/**
+	 * 获取昨天的当前时间日期
+	 * @param newDate
+	 * @return
+	 */
+	public static Date getBeforeDay(){
+		
+		Date today = new Date();
+		Date yesterday = new Date(today.getTime() - 86400000L);
+		return yesterday;
+	}
+	
+	/**
 	 * @param args
 	 * @throws ParseException
 	 */
@@ -297,6 +309,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		 Calendar cal = Calendar.getInstance();
 		int year = cal.get(Calendar.YEAR);//获取年份
         int month=cal.get(Calendar.MONTH);//获取月份
+        System.out.println(getBeforeDay());
         System.out.println(year);
         System.out.println(month);
 //		System.out.println(formatDate(parseDate("2010/3/6")));

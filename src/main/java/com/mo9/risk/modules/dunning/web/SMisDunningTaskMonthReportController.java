@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
@@ -117,6 +118,25 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 		sMisDunningTaskMonthReportService.delete(sMisDunningTaskMonthReport);
 		addMessage(redirectAttributes, "删除催收月绩效成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/sMisDunningTaskMonthReport/?repage";
+	}
+	/**
+	 * 贷后报表测试用例
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "test")
+	public String testReportPage() {
+		return "modules/dunning/sMisDunningMigrationRateTest";
+		
+	}
+	/**
+	 * 关于测试迁徙率数据的获取
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "testMigration")
+	@ResponseBody
+	public void testMigration() {
+		sMisDunningTaskMonthReportService.migrationRateGetData();
 	}
 
 }

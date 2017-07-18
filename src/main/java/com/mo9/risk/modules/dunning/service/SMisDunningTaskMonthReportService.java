@@ -5,22 +5,27 @@ package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.SMisDunningTaskMonthReportDao;
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.util.CsvUtil;
 import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.util.ByteArrayDataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,7 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Lazy(false)
 @Transactional(readOnly = true)
 public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTaskMonthReportDao, SMisDunningTaskMonthReport> {
-
+	@Autowired
+	private SMisDunningTaskMonthReportDao sMisDunMRDao;
+	
 	public SMisDunningTaskMonthReport get(String id) {
 		return super.get(id);
 	}
@@ -126,20 +133,37 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	
 	/**
 	 * @return void
-	 * @Description 自动邮件
+	 * @Description 迁徙率数据的获取
 	 */
-	@Scheduled(cron = "0 0 7 * * ?")
-	public void migrationRateDB() {
+//	@Scheduled(cron = "0 0 7 * * ?")
+	@Transactional(readOnly = false)
+	public void migrationRateGetData() {
 		try {
-			
-//			mailSender.sendMail();
-			logger.debug("月报邮件发送成功");
+			//执行一系列的迁徙率数据获取
+			sMisDunMRDao.householdsUpdateHaveBeenCollectDealcode();
+			sMisDunMRDao.householdsInsertOverOneDay(40,DateUtils.getBeforeDay(),new Date());
+			sMisDunMRDao.householdsInsertStatisticalData(DateUtils.getBeforeDay(),new Date());
+			sMisDunMRDao.householdsUpdatePayoffQ1();
+			sMisDunMRDao.householdsUpdatePayoffQ2();
+			sMisDunMRDao.householdsUpdatePayoffQ3();
+			sMisDunMRDao.householdsUpdatePayoffQ4();
+			sMisDunMRDao.householdsUpdateQ2();
+			sMisDunMRDao.householdsUpdateQ3();
+			sMisDunMRDao.householdsUpdateQ4();
+			sMisDunMRDao.householdsUpdateOverOneDay();
+			sMisDunMRDao.principalInsertStatisticalData(DateUtils.getBeforeDay(),new Date());
+			sMisDunMRDao.principalUpdatePayoffQ1();
+			sMisDunMRDao.principalUpdatePayoffQ2();
+			sMisDunMRDao.principalUpdatePayoffQ3();
+			sMisDunMRDao.principalUpdatePayoffQ4();
+			sMisDunMRDao.principalUpdateQ2();
+			sMisDunMRDao.principalUpdateQ3();
+			sMisDunMRDao.principalUpdateQ4();
+			sMisDunMRDao.principalUpdateOverOneDay();
 		} catch (Exception e) {
-			logger.warn("月报表自动邮件发送失败", e);
+			throw new ServiceException(e);
 		}
 	}
 
-	
-	
 	
 }
