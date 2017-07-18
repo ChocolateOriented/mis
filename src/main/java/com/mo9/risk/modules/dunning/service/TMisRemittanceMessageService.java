@@ -356,7 +356,7 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @return boolean
+	 * @return boolean 成功true 失败false
 	 * @Description 手工查账
 	 */
 	@Transactional

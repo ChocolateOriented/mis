@@ -30,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -135,6 +136,18 @@ public class TMisRemittanceMessageController extends BaseController {
 		model.addAttribute("page",page);
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
+
+	/**
+	 * 对公明细导出
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
+	@RequestMapping(value = "detailExport", method= RequestMethod.POST)
+	public String detailExport(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
+		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
+		model.addAttribute("page",page);
+		return "modules/dunning/tMisDunningAccountDetail";
+	}
+
 	@ModelAttribute
 	public TMisRemittanceMessage get(@RequestParam(required=false) String id) {
 		TMisRemittanceMessage entity = null;

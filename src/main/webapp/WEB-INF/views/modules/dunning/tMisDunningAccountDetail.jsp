@@ -34,6 +34,19 @@
 			 }); 
 				
 		});
+
+        $(document).ready(function() {
+          $("#btnExport").click(function(){
+            top.$.jBox.confirm("确认要导出对公明细数据吗？","系统提示",function(v,h,f){
+              if(v=="ok"){
+                $("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/performanceMonthReportExport");
+                $("#searchForm").submit();
+              }
+            },{buttonsFocus:1});
+            top.$('.jbox-body .jbox-icon').css('top','55px');
+          });
+
+        });
 		
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
@@ -91,6 +104,7 @@
 			</br>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
+			<li class="btns"><input id="btnExport" class="btn btn-primary" type="button" value="导出" /></li>
 		</ul>
 	</form:form>
 	
