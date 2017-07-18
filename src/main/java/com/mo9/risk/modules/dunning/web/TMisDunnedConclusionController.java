@@ -3,7 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.service.TMisDunnedConclusionService;
 
 /**
@@ -54,14 +53,18 @@ public class TMisDunnedConclusionController extends BaseController {
 		
 		tMisDunnedConclusion.setBuyerid(Integer.parseInt(buyerId));
 		Page<TMisDunnedConclusion> page = tMisDunnedConclusionService.findPage(new Page<TMisDunnedConclusion>(request, response), tMisDunnedConclusion);
-		Map<String,Object> params = new HashMap<String,Object>();
+		/*Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
+		
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return null;
+		}
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 

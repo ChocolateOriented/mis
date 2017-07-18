@@ -27,7 +27,7 @@ import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductCallService;
 
@@ -64,14 +64,17 @@ public class TMisDunningDeductController extends BaseController {
 		}
 		
 		Page<TMisDunningDeduct> page = tMisDunningDeductService.findPage(new Page<TMisDunningDeduct>(request, response), tMisDunningDeduct);
-		Map<String,Object> params = new HashMap<String,Object>();
+		/*Map<String,Object> params = new HashMap<String,Object>();
 		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
+		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+		if (order == null) {
+			logger.warn("订单不存在，订单号：" + dealcode);
+			return "views/error/500";
+		}
 		boolean ispayoff = false;
-		if(null != task){
-			ispayoff = task.getIspayoff();
-		}else{
+		if (order != null && "payoff".equals(order.getStatus())) {
 			ispayoff = true;
 		}
 
