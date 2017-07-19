@@ -416,6 +416,13 @@
 			}
 			return nickname ;
 		}
+		
+		//批量代扣
+		function batchDeduct() {
+			$.get('${ctx}/dunning/tMisDunningTest/testFunction', {}, function(data){
+				alert(data);
+			});
+		}
 	</script>
 	
 </head>
@@ -569,6 +576,9 @@
 	</shiro:hasPermission>
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 
+	<shiro:hasPermission name="dunning:tMisDunningDeduct:batch">
+		<input id="batchDeduct" class="btn btn-primary" type="button" value="批量代扣" onclick="return confirmx('确认要批量代扣吗？', batchDeduct);"/>
+	</shiro:hasPermission>
 <%-- 		<form id="searchForm"  action="${ctx}/dunning/tMisDunningTask/exportOuterFile" method="post"> --%>
 <%-- 			<shiro:hasPermission name="dunning:tMisDunningTask:exportFile">  --%>
 <!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="委外导出" /> -->

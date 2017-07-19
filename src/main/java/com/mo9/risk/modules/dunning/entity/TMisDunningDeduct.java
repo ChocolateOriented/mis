@@ -59,6 +59,8 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	private PayStatus repaymentstatus;		//还款状态
 
 	private String repaymentdetail;		//还款状态明细
+	
+	private String operationtype;		//操作类型
     
 	public TMisDunningDeduct() {
 		super();
@@ -240,6 +242,14 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 		this.repaymentdetail = repaymentdetail;
 	}
 	
+	public String getOperationtype() {
+		return operationtype;
+	}
+
+	public void setOperationtype(String operationtype) {
+		this.operationtype = operationtype;
+	}
+
 	public String getStatusDesc() {
 		if (status == null) {
 			return "";

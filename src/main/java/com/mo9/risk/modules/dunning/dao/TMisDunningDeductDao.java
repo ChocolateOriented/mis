@@ -9,8 +9,9 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import java.util.List;
 
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 
 /**
  * 催收代扣DAO接口
@@ -69,5 +70,24 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	 */
 	public int getNoBalanceDeductNum(TMisDunningDeduct tMisDunningDeduct);
 	
-
+	/**
+	 * 根据登录账号查询催收人id
+	 * @param users
+	 * @return
+	 */
+	public List<String> getPeopleIdByUsers(List<String> users);
+	
+	/**
+	 * 根据代扣范围查询代扣订单号
+	 * @param dunningOrder
+	 * @return
+	 */
+	public List<String> getDealcodeByScope(DunningOrder dunningOrder);
+	
+	/**
+	 * 根据订单号查询用户信息
+	 * @param dealcode
+	 * @return
+	 */
+	public TRiskBuyerPersonalInfo getBuyerInfoByDealcode(String dealcode);
 }

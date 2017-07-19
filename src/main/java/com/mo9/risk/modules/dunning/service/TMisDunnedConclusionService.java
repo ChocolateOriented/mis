@@ -21,8 +21,8 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.modules.sys.dao.DictDao;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 电催结论Service
@@ -40,10 +40,7 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 	
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
-
-	@Autowired
-	private DictDao dictDao;
-
+	
 	@Override
 	public TMisDunnedConclusion get(String id) {
 		return super.get(id);
@@ -127,9 +124,7 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 	 */
 	@Transactional(readOnly = true)
 	public Map<String, String> getFollowDateConfig() {
-		Dict dict = new Dict();
-		dict.setType("dunning_result_code");
-		List<Dict> rs = dictDao.findList(dict);
+		List<Dict> rs = DictUtils.getDictList("dunning_result_code");
 		
 		Map<String, String> map = new HashMap<String, String>();
 		for (Dict nextDay : rs) {

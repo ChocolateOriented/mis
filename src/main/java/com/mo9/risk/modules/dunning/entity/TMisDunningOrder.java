@@ -9,8 +9,6 @@ import java.util.Date;
  */
 public class TMisDunningOrder {
 	
-	public static String CHANNEL_KAOLA = "kaola"; //表示放款资方为考拉
-	
 	public String platform;
 	
 	public String platformExt;

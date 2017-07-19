@@ -16,6 +16,7 @@
 		a.delaydays as "delaydays",
 		a.payamount as "payamount",
 		a.paychannel as "paychannel",
+		a.operationtype as "operationtype",
 		a.status as "status",
 		a.statusdetail as "statusdetail",
 		a.reason as "reason",
@@ -49,6 +50,7 @@
 			a.delaydays AS "delaydays",
 			a.payamount AS "payamount",
 			a.paychannel AS "paychannel",
+			a.operationtype AS "operationtype",
 			a.status AS "status",
 			a.statusdetail AS "statusdetail",
 			a.reason AS "reason",
@@ -71,9 +73,9 @@
 	</select>
 	
 	<select id="findAllList" resultType="TMisDunningDeduct">
-		SELECT 
+		SELECT
 			<include refid="TMisDunningDeductLogColumns"/>
-		FROM t_mis_dunning_deduct_log a		
+		FROM t_mis_dunning_deduct_log a
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -97,6 +99,7 @@
 			delaydays,
 			payamount,
 			paychannel,
+			operationtype,
 			status,
 			statusdetail,
 			reason,
@@ -119,6 +122,7 @@
 			#{delaydays},
 			#{payamount},
 			#{paychannel},
+			#{operationtype},
 			#{status},
 			#{statusdetail},
 			#{reason},
@@ -132,7 +136,7 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE t_mis_dunning_deduct_log SET 	
+		UPDATE t_mis_dunning_deduct_log SET
 			dealcode = #{dealcode},
 			bankname = #{bankname},
 			buyername = #{buyername},
@@ -143,6 +147,7 @@
 			delaydays = #{delaydays},
 			payamount = #{payamount},
 			paychannel = #{paychannel},
+			operationtype = #{operationtype},
 			status = #{status},
 			statusdetail = #{statusdetail},
 			reason = #{reason},

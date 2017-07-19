@@ -47,6 +47,7 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
+import com.mo9.risk.modules.dunning.entity.BankCardInfo;
 import com.mo9.risk.modules.dunning.entity.DerateReason;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -964,7 +965,10 @@ public class TMisDunningTaskController extends BaseController {
 			}
 		}
 		
+		BankCardInfo bankCardInfo = tMisChangeCardRecordService.getBankByCard(tMisChangeCardRecord.getBankcard());
+		boolean deductable = tMisDunningDeductService.preCheckChannel(bankCardInfo);
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
+		model.addAttribute("deductable", deductable);
 		
 		//根据资方和逾期天数判断是否开启代扣
 		String daikouStatus=tMisDunningTaskService.findOrderByPayCode(order);

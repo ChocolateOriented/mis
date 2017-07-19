@@ -25,11 +25,12 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.entity.BankCardInfo;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
-import com.mo9.risk.modules.dunning.service.TMisDunningDeductCallService;
 
 /**
  * 催收代扣Controller
@@ -44,7 +45,7 @@ public class TMisDunningDeductController extends BaseController {
 	private TMisDunningDeductService tMisDunningDeductService;
 	
 	@Autowired
-	private TMisDunningDeductCallService tMisDunningDeductCallService;
+	private TMisChangeCardRecordService tMisChangeCardRecordService;
 	
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
@@ -149,6 +150,7 @@ public class TMisDunningDeductController extends BaseController {
 			}
 			
 			tMisDunningDeduct.setDealcode(dealcode);
+			tMisDunningDeduct.setOperationtype("manual");
 			deductcode = tMisDunningDeductService.saveRecord(tMisDunningDeduct);
 		} catch (Exception e) {
 			logger.warn(e);
@@ -165,7 +167,7 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		result = tMisDunningDeductCallService.submitOrderInMo9(tMisDunningDeduct);
+		result = tMisDunningDeductService.submitOrder(tMisDunningDeduct);
 		result.put("deductcode", deductcode);
 		
 		return result;
@@ -208,7 +210,7 @@ public class TMisDunningDeductController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningDeduct:view")
 	@RequestMapping(value = "preCheck")
 	@ResponseBody
-	public Map<String, String> preCheck(String dealcode, String bankName, String bankCard, HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, String> preCheck(String dealcode, String bankCard, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
 		
 		if (!tMisDunningDeductService.preCheckDunningPeople()) {
@@ -217,7 +219,8 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankName);
+		BankCardInfo bankCardInfo = tMisChangeCardRecordService.getBankByCard(bankCard);
+		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankCardInfo);
 		
 		if (payChannelList == null || payChannelList.size() == 0) {
 			result.put("result", "NO");
@@ -243,7 +246,6 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		
 		if (!tMisDunningDeductService.preCheckStatus(dealcode)) {
 			result.put("result", "NO");
 			result.put("msg", "当前订单代扣处理中，请勿发起代扣");
@@ -260,6 +262,14 @@ public class TMisDunningDeductController extends BaseController {
 	@ResponseBody
 	public List<PayChannelInfo> getSuccessRateByChannel(String paychannel, HttpServletRequest request, HttpServletResponse response) {
 		return tMisDunningDeductService.getSuccessRateByChannel(paychannel);
+	}
+	
+	@RequiresPermissions("dunning:tMisDunningDeduct:batch")
+	@RequestMapping(value = "batchDeduct")
+	@ResponseBody
+	public String testFunction(HttpServletRequest request, HttpServletResponse response) {
+		tMisDunningDeductService.batchDeduct();
+		return "done";
 	}
 
 }

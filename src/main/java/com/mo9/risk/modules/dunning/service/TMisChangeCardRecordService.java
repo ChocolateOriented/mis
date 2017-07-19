@@ -63,7 +63,7 @@ public class TMisChangeCardRecordService extends CrudService<TMisChangeCardRecor
 		return tMisChangeCardRecordDao.getAllChannelBank();
 	}
 
-	public BankCardInfo getBankByCard(String bin) {
-		return tMisChangeCardRecordDao.getBankByCard(bin);
+	public BankCardInfo getBankByCard(String bankCard) {
+		return tMisChangeCardRecordDao.getBankByCard(bankCard);
 	}
 }
