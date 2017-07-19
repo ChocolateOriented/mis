@@ -74,7 +74,7 @@
 				bankName = "${personalInfo.remitBankName}";
 				bankCard = "${personalInfo.remitBankNo}";
 			}
-			$.get("${ctx}/dunning/tMisDunningDeduct/preCheck", {dealcode:"${dealcode}" ,bankName: bankName, bankCard: bankCard}, function(data) {
+			$.get("${ctx}/dunning/tMisDunningDeduct/preCheck", {dealcode:"${dealcode}", bankCard: bankCard}, function(data) {
 				if(data && data.result != "OK") {
 					$.jBox.tip(data.msg, "warning");
 					return;
@@ -173,7 +173,7 @@
 	</table>
 	
 	<shiro:hasPermission name="dunning:tMisDunningDeduct:view">
-	<h4>&nbsp;&nbsp;扣款信息</h4>
+	<h4>&nbsp;&nbsp;扣款信息&nbsp;&nbsp;<span style="color:red; font-size:15px;">${deductable ? '可' : '不可'}代扣</span></h4>
 	<table id="customerTable4" class="table table-striped table-bordered table-condensed">
 		<tbody>
 			<tr>

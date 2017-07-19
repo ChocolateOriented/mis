@@ -17,6 +17,7 @@
 		a.delaydays as "delaydays",
 		a.payamount as "payamount",
 		a.paychannel as "paychannel",
+		a.operationtype as "operationtype",
 		a.status as "status",
 		a.statusdetail as "statusdetail",
 		a.reason as "reason",
@@ -30,7 +31,7 @@
 	</sql>
     
 	<select id="get" resultType="TMisDunningDeduct">
-		SELECT 
+		SELECT
 			<include refid="TMisDunningDeductColumns"/>
 		FROM t_mis_dunning_deduct a
 		WHERE a.deductcode = #{deductcode}
@@ -103,6 +104,7 @@
 			delaydays,
 			payamount,
 			paychannel,
+			operationtype,
 			status,
 			createby,
 			createdate,
@@ -122,6 +124,7 @@
 			#{delaydays},
 			#{payamount},
 			#{paychannel},
+			#{operationtype},
 			#{status},
 			#{createBy.name},
 			#{createDate},
@@ -264,6 +267,56 @@
 		WHERE a.status = #{status}
 	</select>
 	
-
-
+	<select id="getPeopleIdByUsers" resultType="String">
+		SELECT 
+			p.id
+		FROM sys_user u,
+			t_mis_dunning_people p
+		WHERE u.del_flag = '0'
+		AND p.id = u.id
+		AND u.login_name IN
+		<foreach item="user" collection="list" open="(" close=")" separator=",">
+			#{user}
+		</foreach>
+	</select>
+	
+	<select id="getDealcodeByScope" resultType="String">
+		SELECT 
+			t.dealcode
+		FROM t_mis_dunning_task t
+		LEFT JOIN t_risk_order o ON t.dealcode = o.dealcode
+		WHERE o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o.status = 'payment'
+		<if test="overduedays != null">
+			AND DATEDIFF(CURDATE(), o.repayment_time) = #{overduedays}
+		</if>
+		<if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
+			AND t.dunningpeopleid in
+			<foreach item="item" collection="dunningPeople.queryIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="getBuyerInfoByDealcode" resultType="TRiskBuyerPersonalInfo">
+		SELECT
+			o.dealcode as "dealcode",
+			o.repayment_time as "repaymentTime",
+			o.buyer_id as "buyerId",
+			b.mobile as "mobile",
+			b.mobile_city as "mobileCity",
+			c.real_name as "realName",
+			c.idCard as "idcard",
+			c.ocr_addr as "ocrAddr",
+			c.sex As sex
+		FROM t_risk_order AS o
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+		WHERE o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o.status in ('payment', 'payoff')
+		AND o.dealcode = #{dealcode}
+		limit 1
+	</select>
 </mapper>
