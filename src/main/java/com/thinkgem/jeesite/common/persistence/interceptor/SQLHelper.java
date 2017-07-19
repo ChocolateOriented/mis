@@ -3,7 +3,10 @@
  */
 package com.thinkgem.jeesite.common.persistence.interceptor;
 
+import org.apache.ibatis.cache.Cache;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.ErrorContext;
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.ExecutorException;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.mapping.BoundSql;
@@ -14,6 +17,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
@@ -90,49 +94,73 @@ public class SQLHelper {
 
     /**
      * 查询总纪录数
-     * @param sql             SQL语句
-     * @param connection      数据库连接
+     *
+     * @param sql SQL语句
+     * @param connection 数据库连接
      * @param mappedStatement mapped
      * @param parameterObject 参数
-     * @param boundSql        boundSql
+     * @param boundSql boundSql
+     * @param executor
      * @return 总记录数
      * @throws SQLException sql查询错误
      */
     public static int getCount(final String sql, final Connection connection,
-    							final MappedStatement mappedStatement, final Object parameterObject,
-    							final BoundSql boundSql, Log log) throws SQLException {
-    	String dbName = Global.getConfig("jdbc.type");
-		final String countSql;
-		if("oracle".equals(dbName)){
-			countSql = "select count(1) from (" + sql + ") tmp_count";
-		}else{
-			countSql = "select count(1) from (" + removeOrders(sql) + ") tmp_count";
+        final MappedStatement mappedStatement, final Object parameterObject,
+        final BoundSql boundSql, Log log, Executor executor) throws SQLException {
+        String dbName = Global.getConfig("jdbc.type");
+        final String countSql;
+        if ("oracle".equals(dbName)) {
+            countSql = "select count(1) from (" + sql + ") tmp_count";
+        } else {
+            countSql = "select count(1) from (" + removeOrders(sql) + ") tmp_count";
 //	        countSql = "select count(1) " + removeSelect(removeOrders(sql));
-		}
+        }
         Connection conn = connection;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-        	if (log.isDebugEnabled()) {
-                log.debug("COUNT SQL: " + StringUtils.replaceEach(countSql, new String[]{"\n","\t"}, new String[]{" "," "}));
+            if (log.isDebugEnabled()) {
+                log.debug("COUNT SQL: " + StringUtils.replaceEach(countSql, new String[]{"\n", "\t"}, new String[]{" ", " "}));
             }
-        	if (conn == null){
-        		conn = mappedStatement.getConfiguration().getEnvironment().getDataSource().getConnection();
-            }
-        	ps = conn.prepareStatement(countSql);
             BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql,
-                    boundSql.getParameterMappings(), parameterObject);
+                boundSql.getParameterMappings(), parameterObject);
             //解决MyBatis 分页foreach 参数失效 start
-			if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
-				MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
-				Reflections.setFieldValue(countBS, "metaParameters", mo);
-			}
-			//解决MyBatis 分页foreach 参数失效 end 
+            if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
+                MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
+                Reflections.setFieldValue(countBS, "metaParameters", mo);
+            }
+
+            //优先查询缓存
+            Cache cache = null;
+            CacheKey cacheKey = null;
+            if (mappedStatement.isUseCache()) {
+                cache = mappedStatement.getCache();
+                if (cache != null) {
+                    //获取参数
+                    RowBounds rowBounds = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
+                    cacheKey = executor.createCacheKey(mappedStatement, countBS.getParameterObject(), rowBounds, countBS);
+                    Integer count = (Integer) cache.getObject(cacheKey);
+                    if (count != null) {
+                        log.debug(cache.getId() + "分页查询countSql缓存命中");
+                        return count;
+                    }
+                }
+            }
+
+            if (conn == null) {
+                conn = mappedStatement.getConfiguration().getEnvironment().getDataSource().getConnection();
+            }
+            ps = conn.prepareStatement(countSql);
+            //解决MyBatis 分页foreach 参数失效 end
             SQLHelper.setParameters(ps, mappedStatement, countBS, parameterObject);
             rs = ps.executeQuery();
             int count = 0;
             if (rs.next()) {
                 count = rs.getInt(1);
+            }
+            if (cache != null && cacheKey !=null){
+                log.debug(cache.getId()+"分页查询countSql添加缓存");
+                cache.putObject(cacheKey ,new Integer(count));
             }
             return count;
         } finally {
@@ -140,10 +168,10 @@ public class SQLHelper {
                 rs.close();
             }
             if (ps != null) {
-            	ps.close();
+                ps.close();
             }
             if (conn != null) {
-            	conn.close();
+                conn.close();
             }
         }
     }
@@ -191,5 +219,4 @@ public class SQLHelper {
         m.appendTail(sb);
         return sb.toString();  
     }
-    
 }

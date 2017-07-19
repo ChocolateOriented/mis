@@ -106,7 +106,7 @@ public class DictUtils {
 	 * 根据标签和类型获取键值
 	 * @param label
 	 * @param type
-	 * @param defaultLabel
+	 * @param defaultDict
 	 * @return
 	 */
 	public static Dict getDict(String label, String type, Dict defaultDict){

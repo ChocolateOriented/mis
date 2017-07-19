@@ -325,12 +325,19 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * 查询所有的对公明细
+	 * 分页查询对公明细
 	 */
 	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page, TMisRemittanceMessage entity) {
 		entity.setPage(page);
 		page.setList(dao.findAccountPageList(entity));
 		return page;
+	}
+
+	/**
+	 * 查询所有的对公明细
+	 */
+	public List<TMisRemittanceMessage> findAcountPageList(TMisRemittanceMessage tMisRemittanceMessage) {
+		return dao.findAccountPageList(tMisRemittanceMessage);
 	}
 
 	/**
@@ -356,7 +363,7 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * @return boolean
+	 * @return boolean 成功true 失败false
 	 * @Description 手工查账
 	 */
 	@Transactional
@@ -397,4 +404,5 @@ public class TMisRemittanceMessageService extends
 	public TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId) {
 		return dao.findRemittanceMessagChecked(remittanceConfirmId);
 	}
+
 }

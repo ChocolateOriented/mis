@@ -11,9 +11,11 @@ import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
+import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,12 +73,17 @@ public class TMisRemittanceMessageController extends BaseController {
 			redirectAttributes.addAttribute("message", "参数错误");
 			return redirectUrl;
 		}
-		//解析上传Excel
+		//解析上传Excel或csv
 		List<AlipayRemittanceExcel> list ;
-		logger.info("正在接析文件:" + file.getOriginalFilename());
+		String filename = file.getOriginalFilename();
+		logger.info("正在接析文件:" +filename) ;
 		try {
-			ImportExcel ei = new ImportExcel(file, 1, 0);
-			list = ei.getDataList(AlipayRemittanceExcel.class);
+			if (StringUtils.endsWith(filename,".csv")){
+				list = CsvUtil.importCsv(file,AlipayRemittanceExcel.class,3);
+			}else {
+				ImportExcel ei = new ImportExcel(file, 1, 0);
+				list = ei.getDataList(AlipayRemittanceExcel.class);
+			}
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
 			logger.info("解析式发生错误",e);
@@ -129,6 +137,25 @@ public class TMisRemittanceMessageController extends BaseController {
 		model.addAttribute("page",page);
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
+
+	/**
+	 * 对公明细导出
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
+	@RequestMapping(value = "detailExport", method= RequestMethod.POST)
+	public String detailExport(TMisRemittanceMessage tMisRemittanceMessage,HttpServletRequest request, HttpServletResponse response,RedirectAttributes redirectAttributes) {
+		List<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(tMisRemittanceMessage);
+		String fileName = "对公明细" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
+		try {
+			new ExportExcel("对公明细", TMisRemittanceMessage.class).setDataList(page).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			logger.info("对公明细导出失败",e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/detail?repage";
+	}
+
 	@ModelAttribute
 	public TMisRemittanceMessage get(@RequestParam(required=false) String id) {
 		TMisRemittanceMessage entity = null;
