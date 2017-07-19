@@ -2761,11 +2761,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 */
 	public void savePartialRepayLog(String dealcode) {
 		TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-		if (dunningTaskLog != null){
-			dunningTaskLog.setBehaviorstatus("partial");
-			dunningTaskLog.setCreateDate(new Date());
-			dunningTaskLog.setCreateBy(new User("auto_admin"));
-			tMisDunningTaskLogDao.insert(dunningTaskLog);
+		if (dunningTaskLog == null) {
+			return;
 		}
+		dunningTaskLog.setBehaviorstatus("partial");
+		dunningTaskLog.setCreateDate(new Date());
+		dunningTaskLog.setCreateBy(new User("auto_admin"));
+		tMisDunningTaskLogDao.insert(dunningTaskLog);
 	}
 }

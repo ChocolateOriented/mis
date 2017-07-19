@@ -93,8 +93,15 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceAmount = remittanceAmount;
 	}
 
-	@ExcelField(title="交易渠道", type=1, align=2, sort=3)
 	public String getRemittanceChannel() {
+		return remittanceChannel;
+	}
+
+	@ExcelField(title="交易渠道", type=1, align=2, sort=3)
+	public String getRemittanceChannelText() {
+		if ("alipay".equals(remittanceChannel)){
+			return "支付宝";
+		}
 		return remittanceChannel;
 	}
 
