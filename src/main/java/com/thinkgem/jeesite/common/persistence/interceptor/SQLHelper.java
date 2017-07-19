@@ -130,17 +130,20 @@ public class SQLHelper {
                 Reflections.setFieldValue(countBS, "metaParameters", mo);
             }
 
+            //优先查询缓存
             Cache cache = null;
-            CacheKey cacheKey = null ;
-            if (mappedStatement.isUseCache()){
+            CacheKey cacheKey = null;
+            if (mappedStatement.isUseCache()) {
                 cache = mappedStatement.getCache();
-                //获取参数
-                RowBounds rowBounds = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
-                cacheKey  = executor.createCacheKey(mappedStatement,countBS.getParameterObject(),rowBounds,countBS);
-                Integer count = (Integer)cache.getObject(cacheKey);
-                if (count != null){
-                    log.debug(cache.getId()+"分页查询缓存命中");
-                    return count;
+                if (cache != null) {
+                    //获取参数
+                    RowBounds rowBounds = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
+                    cacheKey = executor.createCacheKey(mappedStatement, countBS.getParameterObject(), rowBounds, countBS);
+                    Integer count = (Integer) cache.getObject(cacheKey);
+                    if (count != null) {
+                        log.debug(cache.getId() + "分页查询countSql缓存命中");
+                        return count;
+                    }
                 }
             }
 
@@ -156,7 +159,7 @@ public class SQLHelper {
                 count = rs.getInt(1);
             }
             if (cache != null && cacheKey !=null){
-                log.debug(cache.getId()+"分页查询添加缓存");
+                log.debug(cache.getId()+"分页查询countSql添加缓存");
                 cache.putObject(cacheKey ,new Integer(count));
             }
             return count;

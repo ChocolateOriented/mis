@@ -15,6 +15,7 @@ import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import java.util.ArrayList;
@@ -142,10 +143,17 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
 	@RequestMapping(value = "detailExport", method= RequestMethod.POST)
-	public String detailExport(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
-		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
-		model.addAttribute("page",page);
-		return "modules/dunning/tMisDunningAccountDetail";
+	public String detailExport(TMisRemittanceMessage tMisRemittanceMessage,HttpServletRequest request, HttpServletResponse response,RedirectAttributes redirectAttributes) {
+		List<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(tMisRemittanceMessage);
+		String fileName = "对公明细" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
+		try {
+			new ExportExcel("对公明细", TMisRemittanceMessage.class).setDataList(page).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			logger.info("对公明细导出失败",e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/detail?repage";
 	}
 
 	@ModelAttribute

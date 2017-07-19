@@ -14,7 +14,6 @@
                     if (!a.test($("#remittanceAmount").val())){
                     	top.$.jBox.tip('金额格式不正确','warning');
                     }else{
-                        loading('正在查询，请稍等...');
                         form.submit();
                     }
 				},
@@ -39,7 +38,7 @@
           $("#btnExport").click(function(){
             top.$.jBox.confirm("确认要导出对公明细数据吗？","系统提示",function(v,h,f){
               if(v=="ok"){
-                $("#searchForm").attr("action","${ctx}/dunning/tMisDunningTask/performanceMonthReportExport");
+                $("#searchForm").attr("action","${ctx}/dunning/tMisRemittanceMessage/detailExport");
                 $("#searchForm").submit();
               }
             },{buttonsFocus:1});
@@ -159,15 +158,7 @@
 					 </c:if>    
 				</td>
 				<td>
-					   <c:if test="${empty tmessage.accountStatus }">
-					  	未查账
-					  </c:if>  
-					   <c:if test="${tmessage.accountStatus eq 'complete_audit'}">
-					  	已查账
-					  </c:if>  
-					  <c:if test="${tmessage.accountStatus eq 'finish'}">
-					  	 已完成
-					  </c:if>   
+						${tmessage.accountStatusText }
 				</td>
 				<td>
 					<fmt:formatDate value="${tmessage.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/> 
