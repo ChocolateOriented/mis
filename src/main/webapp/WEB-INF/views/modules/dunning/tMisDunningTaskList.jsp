@@ -419,7 +419,7 @@
 		
 		//批量代扣
 		function batchDeduct() {
-			$.get('${ctx}/dunning/tMisDunningTest/testFunction', {}, function(data){
+			$.get('${ctx}/dunning/tMisDunningDeduct/batchDeduct', {}, function(data){
 				alert(data);
 			});
 		}

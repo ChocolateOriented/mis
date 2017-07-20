@@ -21,19 +21,19 @@
 			if($("#inputForm").valid()){
 				if ("${changeType}" == "changeBankcard") {
 					$.post("${ctx}/dunning/tMisChangeCardRecord/getBankByCard", {bankCard: bankCard}, function(data) {
-						if (data) {
-							if (data.bankname && data.bankname.indexOf(bankName) < 0 ) {
-								$.jBox.tip("换卡失败，当前卡号匹配发卡行为：" + data.bankname + "，请返回修改", "warning");
-								return;
-							}
-							if (data.cardtype && data.cardtype != "借记卡") {
-								$.jBox.tip("换卡失败，当前卡号匹配为：" + data.bankname + " " + data.cardtype + "，请返回修改", "warning");
-								return;
-							}
-							save();
-						} else {
-							confirmx("该卡无法匹配对应发卡行，是否确认保存？", save);
+						if (!data) {
+							$.jBox.tip("该卡无法匹配对应发卡行，请返回修改", "warning");
+							return;
 						}
+						if (data.bankname && data.bankname.indexOf(bankName) < 0 ) {
+							$.jBox.tip("换卡失败，当前卡号匹配发卡行为：" + data.bankname + "，请返回修改", "warning");
+							return;
+						}
+						if (data.cardtype && data.cardtype != "借记卡") {
+							$.jBox.tip("换卡失败，当前卡号匹配为：" + data.bankname + " " + data.cardtype + "，请返回修改", "warning");
+							return;
+						}
+						save();
 					});
 				} else {
 					save();
@@ -52,8 +52,11 @@
 		var card = $("#bankcard").val();
 		var numReg = /\D/g;
 		var separatorReg = /(\d{4})/g;
-		card = card.replace(numReg, '');
-		$("#bankcard").val(card);
+		//避免无非法字符时光标被定位到末尾
+		if (numReg.test(card)) {
+			card = card.replace(numReg, '');
+			$("#bankcard").val(card);
+		}
 		if (card) {
 			var displayCard = card.replace(separatorReg, '$1 ');
 			$('#displaybankcard').css('visibility', 'visible');

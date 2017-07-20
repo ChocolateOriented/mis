@@ -473,6 +473,10 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			List<String> users = Arrays.asList(scope.split(","));
 			List<String> peopleIds = tMisDunningDeductDao.getPeopleIdByUsers(users);
 			
+			if (peopleIds == null || peopleIds.size() == 0) {
+				logger.info("批量代扣结束，没有查询到当前账号");
+				return;
+			}
 			TMisDunningPeople dunningPeople = new TMisDunningPeople();
 			dunningPeople.setQueryIds(peopleIds);
 			dunningOrder.setDunningPeople(dunningPeople);
