@@ -59,6 +59,10 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	private String buyerId;
 	// dunningtaskdbid
 	private String dunningtaskdbid;
+	// 催收小组id
+	private String dunningGroupId;
+	// 催收人id
+	private String dunningPeopleId;
 
 	public String getRealName() {
 		return realName;
@@ -193,5 +197,21 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 
 	public void setRemittanceConfirmId(String remittanceConfirmId) {
 		this.remittanceConfirmId = remittanceConfirmId;
+	}
+
+	public String getDunningGroupId() {
+		return dunningGroupId;
+	}
+
+	public void setDunningGroupId(String dunningGroupId) {
+		this.dunningGroupId = dunningGroupId;
+	}
+
+	public String getDunningPeopleId() {
+		return dunningPeopleId;
+	}
+
+	public void setDunningPeopleId(String dunningPeopleId) {
+		this.dunningPeopleId = dunningPeopleId;
 	}
 }

@@ -66,6 +66,8 @@ public class DunningReportController extends BaseController {
 	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
 	@RequestMapping(value = {"productivePowerDailyReport"})
 	public String findDunningProductivePowerDailyReport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport, HttpServletRequest request, HttpServletResponse response, Model model) {
+		//添加默认查询条件
+		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
 		Page<SMisDunningProductivePowerDailyReport> page = reportService
 				.findProductivePowerDailyReport(new Page<SMisDunningProductivePowerDailyReport>(request, response), smMisDunningProductivePowerDailyReport);
 		model.addAttribute("page", page);
@@ -93,6 +95,8 @@ public class DunningReportController extends BaseController {
 	public String dunningProductivePowerDailyReportExport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport,
 			HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String fileName = "productivePowerDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+		//添加默认查询条件
+		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
 		List<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(smMisDunningProductivePowerDailyReport);
 		try {
 			new ExportExcel("催收员案件活动日报", SMisDunningProductivePowerDailyReport.class).setDataList(page).write(response, fileName).dispose();

@@ -227,17 +227,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
-
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
 		String delayDay = paid.getDelayDay();
-
 		BigDecimal remittanceamount = new BigDecimal(paidAmount);
-//		if(platform.equals("app")){
-//			//do nothing
-//		}else{
-//			remittanceamount = remittanceamount.multiply(BigDecimal.valueOf(100));
-//		}
 
 		if ("1".equals(isMergeRepayment)) {
 			List<String> relatedIds = new ArrayList<String>(Arrays.asList(relatedId));

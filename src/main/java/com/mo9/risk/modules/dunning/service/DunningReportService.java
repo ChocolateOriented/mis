@@ -3,13 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.mo9.risk.modules.dunning.dao.DunningReportDao;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.SMisDunningProductivePowerDailyReport;
@@ -18,6 +11,11 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import java.util.Date;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收员案件活动日报Service
@@ -28,27 +26,24 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 @Transactional(readOnly = true)
 public class DunningReportService extends BaseService {
 	@Autowired
-	DunningReportDao dunningReportDao ;
+	private DunningReportDao dunningReportDao ;
 	@Autowired
 	private TMisDunningGroupService groupService ;
 	
 	/**
 	 * 催收员案件活动日报
-	 * @param performanceMonthReport
+	 * @param entity
 	 * @return
 	 */
 	public List<SMisDunningProductivePowerDailyReport> findProductivePowerDailyReport(SMisDunningProductivePowerDailyReport entity){
-		this.setQueryConditions(entity);
 		return dunningReportDao.findProductivePowerDailyReport(entity) ;
 	}
 
 	/**
 	 * 催收员案件活动日报-分页
-	 * @param performanceMonthReport
 	 * @return
 	 */
 	public Page<SMisDunningProductivePowerDailyReport> findProductivePowerDailyReport(Page<SMisDunningProductivePowerDailyReport> page, SMisDunningProductivePowerDailyReport entity) {
-		this.setQueryConditions(entity);
 		entity.setPage(page);
 		page.setList(dunningReportDao.findProductivePowerDailyReport(entity));
 		return page;
@@ -59,7 +54,7 @@ public class DunningReportService extends BaseService {
 	 * @param entity
 	 * @return: void
 	 */
-	private void setQueryConditions(SMisDunningProductivePowerDailyReport entity) {
+	public void setQueryConditions(SMisDunningProductivePowerDailyReport entity) {
 		//查询条件默认当天
 		if (null == entity.getBeginCreateTime()) {
 			entity.setBeginCreateTime( DateUtils.getDateToDay(new Date()));
@@ -86,11 +81,12 @@ public class DunningReportService extends BaseService {
 	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceMonthReport){
 		return dunningReportDao.findPerformanceDayReport(performanceMonthReport);
 	}
-	
+
 	/**
-	 * 催收日报表-分页
-	 * @param performanceMonthReport
-	 * @return
+	 * @Description  催收日报表-分页
+	 * @param page
+	 * @param entity
+	 * @return com.thinkgem.jeesite.common.persistence.Page<com.mo9.risk.modules.dunning.entity.PerformanceDayReport>
 	 */
 	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport entity) {
 		entity.setPage(page);

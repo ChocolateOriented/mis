@@ -7,6 +7,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
@@ -49,6 +50,8 @@ public class TMisRemittanceMessageService extends
 	private TMisRemittanceConfirmService remittanceConfirmService;
 	@Autowired
 	private TMisDunningOrderService dunningOrderService;
+	@Autowired
+	private TMisDunningGroupService groupService ;
 	@Autowired
 	protected Validator validator;
 
@@ -341,16 +344,26 @@ public class TMisRemittanceMessageService extends
 	}
 
 	/**
-	 * 查询已查账的huozhe yiwanchengde 所有数据
+	 * @Description 查询已完成的数据
+	 * @param page
+	 * @param entity
+	 * @return com.thinkgem.jeesite.common.persistence.Page<com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked>
 	 */
-	public Page<TMisRemittanceMessagChecked> findMessagList(Page<TMisRemittanceMessagChecked> page, TMisRemittanceMessagChecked entity,
-			String childPage) {
+	public Page<TMisRemittanceMessagChecked> findMessagFinishList(Page<TMisRemittanceMessagChecked> page, TMisRemittanceMessagChecked entity) {
 		entity.setPage(page);
-		if ("completed".equals(childPage)) {
-			page.setList(dao.findMessagCompletedList(entity));
-		} else {
-			page.setList(dao.findMessagCheckedList(entity));
-		}
+		page.setList(dao.findMessagFinishList(entity));
+		return page;
+	}
+
+	/**
+	 * @Description  查询已查账的数据
+	 * @param page
+	 * @param entity
+	 * @return com.thinkgem.jeesite.common.persistence.Page<com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked>
+	 */
+	public Page<TMisRemittanceMessagChecked> findMessagCheckedList(Page<TMisRemittanceMessagChecked> page, TMisRemittanceMessagChecked entity) {
+		entity.setPage(page);
+		page.setList(dao.findMessagCheckedList(entity));
 		return page;
 	}
 
@@ -403,6 +416,26 @@ public class TMisRemittanceMessageService extends
 	 */
 	public TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId) {
 		return dao.findRemittanceMessagChecked(remittanceConfirmId);
+	}
+
+	/**
+	 * @Description 设置登录人所管理的组
+	 * @param tMisRemittanceMessagChecked
+	 * @return void
+	 */
+	public void setManageGroup(TMisRemittanceMessagChecked tMisRemittanceMessagChecked) {
+		if (null != tMisRemittanceMessagChecked.getDunningGroupId()){//空字符串为全部查询
+			return;
+		}
+		TMisDunningGroup queryGroup = new TMisDunningGroup();
+		queryGroup.setLeader(UserUtils.getUser());
+		List<TMisDunningGroup> groups = groupService.findList(queryGroup);
+		if (groups !=null && groups.size()>0 ){
+			TMisDunningGroup manageGroup = groups.get(0);
+			if (manageGroup != null){
+				tMisRemittanceMessagChecked.setDunningGroupId(manageGroup.getId());
+			}
+		}
 	}
 
 }

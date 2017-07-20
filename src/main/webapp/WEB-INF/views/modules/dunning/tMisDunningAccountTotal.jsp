@@ -6,10 +6,108 @@
     <title>查账入账父页面</title>
     <meta name="decorator" content="default"/>
     <script type="text/javascript">
-      var content = null;
-      var auditComiting = false;
       $(document).ready(function () {
+        //加载子页面
+        if (null == currentPageUrl){
+          checkedPage();
+        }
 
+    	// 清空查询功能
+		 $("#empty").click(function(){
+			var sss = window.frames["ifm"].document.getElementById("childIfam").value;
+  		 	window.location.href="${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss;
+		 });
+
+        //组与花名联动查询
+        $("#groupList").on("change", function () {
+          $("#dunningPeople").select2("val", null);
+        });
+        $("#dunningPeople").select2({//
+          ajax: {
+            url: "${ctx}/dunning/tMisDunningPeople/optionList",
+            dataType: 'json',
+            quietMillis: 250,
+            data: function (term, page) {//查询参数 ,term为输入字符
+              var groupId = $("#groupList").val();
+              return {'group.id': groupId, nickname: term};
+            },
+            results: function (data, page) {//选择要显示的数据`
+              var resultsData = [] ;
+              resultsData[0] = {id:null,nickname:"全部人员"};
+              for (var i = 0; i < data.length; i++) {
+                resultsData[i+1] = {id:data[i].id,nickname:data[i].nickname};
+              }
+              return { results: resultsData };
+            },
+            cache: true
+          },
+          initSelection: function (element, callback) {//回显
+            var id = $(element).val();
+            if (id == "") {
+              return;
+            }
+            //根据组查询选项
+            $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+              data: function () {
+                var groupId = $("#groupList").val();
+                return {groupId: groupId}
+              },
+              dataType: "json"
+            }).done(function (data) {
+              for (var item in data) {
+                //若回显ids里包含选项则选中
+                if (id == data[item].id) {
+                  callback(data[item]);
+                }
+              }
+            });
+          },
+          formatResult: formatPeopleList, //选择显示字段
+          formatSelection: formatPeopleList, //选择选中后填写字段
+          width:170
+        });
+      });
+      //格式化peopleList选项
+      function formatPeopleList(item) {
+        var nickname = item.nickname;
+        if (nickname == null || nickname == '') {
+          nickname = "空";
+        }
+        return nickname;
+      }
+
+      var currentPageUrl = null;
+      //选则已查账
+      function checkedPage(){
+        $("#checkedPageLab").addClass("active");
+        $("#completedPageLab").removeClass("active");
+
+        currentPageUrl = "${ctx}/dunning/tMisRemittanceMessage/checked?";
+        page(1);
+      }
+      //选则已完成
+      function completedPage(){
+        $("#completedPageLab").addClass("active");
+        $("#checkedPageLab").removeClass("active");
+
+        currentPageUrl = "${ctx}/dunning/tMisRemittanceMessage/completed?" ;
+        page(1);
+      }
+      function page(n, s) {
+        if (n) $("#pageNo").val(n);
+        if (s) $("#pageSize").val(s);
+        $("#ifm").attr("src", currentPageUrl + $("#searchForm").serialize());
+        return false;
+      }
+
+      /**
+       * ===================手工查账======================
+       */
+      var auditComiting = false;
+
+      //获取手工查账弹窗
+      var content = null;
+      $(document).ready(function () {
         var queryOrderTemplate = $("#queryOrderTemplate").html();
         var queryRemittanceMessage = $("#queryRemittanceMessage").html();
         var auditComfirm = $("#auditComfirm").html();
@@ -95,25 +193,8 @@
             }
           }
         };
-
-    	// 清空查询功能
-		 $("#empty").click(function(){
-			var sss = window.frames["ifm"].document.getElementById("childIfam").value;
-  		 	window.location.href="${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss;
-		 });
-
       });
-      function page(n, s) {
-        if (n) $("#pageNo").val(n);
-        if (s) $("#pageSize").val(s);
-        var sss = window.frames["ifm"].document.getElementById("childIfam").value;
-        $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss);
-        $("#searchForm").submit();
-        return false;
-      }
-      /**
-       * ===================手工查账======================
-       */
+
       function openHandAudit() {
         auditComiting = false;
         restOrder();
@@ -219,7 +300,6 @@
         $(".jbox-container").find("#btnGroup a").removeClass("btn-primary");
       }
 
-
       //将数据值与inputname对应的表单回显
       function formLoad(form,data) {
         for(var i in data){
@@ -279,33 +359,55 @@
                 <form:option value="payoff" label="已还清"/>
            	</form:select>
         </li>
+
         <li><label>入账标签</label>
             <form:select id="status" path="remittanceTag" class="input-medium">
                 <form:option selected="selected" value="" label="全部状态"/>
-                				<c:forEach items="${remittanceTagList}" var="remittanceTag">
-                				 	<form:option value="${remittanceTag}" label="${remittanceTag.desc}"/>
-                				</c:forEach>
+                <form:options items="${remittanceTagList}" itemLabel="desc" />
             </form:select>
         </li>
 
-        <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/></li>
-        <li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
+        <li><label>催收小组：</label>
+            <form:select id="groupList" path="dunningGroupId" class="input-medium">
+                <form:option value="">全部</form:option>
+                <!-- 添加组类型为optgroup -->
+                <c:forEach items="${groupTypes}" var="type">
+                    <optgroup label="${type.value}">
+                        <!-- 添加类型对应的小组 -->
+                        <c:forEach items="${groupList}" var="item">
+                            <c:if test="${item.type == type.key}">
+                                <option value="${item.id}"
+                                        <c:if test="${TMisRemittanceMessagChecked.dunningGroupId == item.id }">selected="selected"</c:if>>${item.name}</option>
+                            </c:if>
+                        </c:forEach>
+                    </optgroup>
+                </c:forEach>
+            </form:select></li>
+
+        <li><label>催收员</label>
+            <form:input id="dunningPeople" path="dunningPeopleId" type="hidden" />
+        </li>
+
+        <li class="btns">
+            <input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page(1);"/>
+            <input id="empty" class="btn btn-primary" type="button" value="清空"/>
+        </li>
+        <li class="clearfix"></li>
     </ul>
 </form:form>
+
 <shiro:hasPermission name="dunning:TMisRemittanceMessage:handleAudit">
     <div><a onclick="openHandAudit()" class="btn btn-primary btn-large">+查账申请</a></div>
 </shiro:hasPermission>
-
 <br/>
-<iframe id="ifm" name="ifm" frameborder="0"
- <c:if test="${childPage eq 'completed'}">
-  src="${ctx}/dunning/tMisRemittanceMessage/completed"
-</c:if>
- <c:if test="${childPage ne 'completed'}">
-  src="${ctx}/dunning/tMisRemittanceMessage/checked"
-</c:if>
-style="width:100%;height:600px;">
-</iframe>
+
+<ul class="nav nav-tabs">
+    <li id="checkedPageLab" class="active"><a onclick="checkedPage()">已查账</a></li>
+    <li id="completedPageLab" ><a onclick="completedPage()">已完成</a></li>
+</ul>
+
+<iframe id="ifm" name="ifm" frameborder="0" style="width:100%;height: 560px;"></iframe>
+
 <%--查账信息--%>
 <form id="auditForm">
     <input type="hidden" id="auditDealcode" name="dealcode">

@@ -39,7 +39,7 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	List<TMisRemittanceConfirm> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
 
-	public List<TMisRemittanceMessagChecked> findMessagCompletedList(TMisRemittanceMessagChecked entity);
+	public List<TMisRemittanceMessagChecked> findMessagFinishList(TMisRemittanceMessagChecked entity);
 
 	TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId);
 }
