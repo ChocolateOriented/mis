@@ -29,8 +29,6 @@ import java.util.List;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -43,7 +41,6 @@ import org.springframework.util.CollectionUtils;
  */
 @Service
 @Transactional(readOnly = true)
-@EnableAsync
 public class TMisRemittanceMessageService extends
 		CrudService<TMisRemittanceMessageDao, TMisRemittanceMessage> {
 
@@ -148,7 +145,6 @@ public class TMisRemittanceMessageService extends
 	 * @return void
 	 * @Description 财务上传时间在参数之后的汇款自动查账
 	 */
-	@Async
 	@Transactional(readOnly = false)
 	public void autoAuditAfterFinancialtime(Date date) {
 		List<TMisRemittanceMessage> list = dao.findAfterFinancialTimeNotAuditList(date);
