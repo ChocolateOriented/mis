@@ -267,7 +267,7 @@ public class TMisDunningDeductController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningDeduct:batch")
 	@RequestMapping(value = "batchDeduct")
 	@ResponseBody
-	public String testFunction(HttpServletRequest request, HttpServletResponse response) {
+	public String batchDeduct(HttpServletRequest request, HttpServletResponse response) {
 		tMisDunningDeductService.batchDeduct();
 		return "done";
 	}
