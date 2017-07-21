@@ -3,8 +3,11 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
+import com.mo9.risk.modules.dunning.entity.SMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.SMisDunningTaskMonthReportService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
@@ -137,6 +142,134 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 	@ResponseBody
 	public void testMigration() {
 		sMisDunningTaskMonthReportService.migrationRateGetData();
+	}
+	/**
+	 * 迁徙率数据的图表
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "migrationdata")
+	public String migrationData() {
+		
+		return "modules/dunning/sMisDunningMigrationRate";
+	}
+	/**
+	 * 获取迁徙率数据的图表
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "migrationGetdata")
+	@ResponseBody
+	public Map<String, Object> migrationGetData() {
+		
+		Map<String, Object> migrationData=new HashMap<String, Object>();
+		
+		List<String>  cycle=new ArrayList<String>();
+		cycle.add("一周");
+		cycle.add("二周");
+		cycle.add("三周");
+		cycle.add("四周");
+		cycle.add("五周");
+		migrationData.put("cycle", cycle);
+		
+		List<String>  mirg=new ArrayList<String>();
+		mirg.add("户数Q1");
+		mirg.add("户数Q2");
+		mirg.add("户数Q3");
+		mirg.add("户数Q4");
+		mirg.add("本金Q1");
+		mirg.add("本金Q2");
+		mirg.add("本金Q3");
+		mirg.add("本金Q4");
+		migrationData.put("mirg", mirg);
+		
+		List<SMisMigrationData>  smdList=new ArrayList<SMisMigrationData>();
+		
+		SMisMigrationData smd1=new SMisMigrationData();
+		smd1.setName("户数Q1");
+		List<Integer>  hQ1=new ArrayList<Integer>();
+		hQ1.add(15);
+		hQ1.add(40);
+		hQ1.add(30);
+		hQ1.add(40);
+		hQ1.add(50);
+		smd1.setData(hQ1);
+		smdList.add(smd1);
+		
+		
+		SMisMigrationData smd2=new SMisMigrationData();
+		smd2.setName("户数Q2");
+		List<Integer>  hQ2=new ArrayList<Integer>();
+		hQ2.add(32);
+		hQ2.add(52);
+		hQ2.add(12);
+		hQ2.add(82);
+		smd2.setData(hQ2);
+		smdList.add(smd2);
+		
+		
+		SMisMigrationData smd3=new SMisMigrationData();
+		smd3.setName("户数Q3");
+		List<Integer>  hQ3=new ArrayList<Integer>();
+		hQ3.add(43);
+		hQ3.add(73);
+		hQ3.add(93);
+		smd3.setData(hQ3);
+		smdList.add(smd3);
+		
+		
+		SMisMigrationData smd4=new SMisMigrationData();
+		smd4.setName("户数Q4");
+		List<Integer>  hQ4=new ArrayList<Integer>();
+		hQ4.add(74);
+		hQ4.add(34);
+		smd4.setData(hQ4);
+		smdList.add(smd4);
+		
+		
+		SMisMigrationData smd5=new SMisMigrationData();
+		smd5.setName("本金Q1");
+		List<Integer>  hQ5=new ArrayList<Integer>();
+		hQ5.add(25);
+		hQ5.add(55);
+		hQ5.add(15);
+		hQ5.add(85);
+		hQ5.add(95);
+		smd5.setData(hQ5);
+		smdList.add(smd5);
+		
+		
+		SMisMigrationData smd6=new SMisMigrationData();
+		smd6.setName("本金Q2");
+		List<Integer>  hQ6=new ArrayList<Integer>();
+		hQ6.add(26);
+		hQ6.add(66);
+		hQ6.add(16);
+		hQ6.add(56);
+		smd6.setData(hQ6);
+		smdList.add(smd6);
+		
+		
+		SMisMigrationData smd7=new SMisMigrationData();
+		smd7.setName("本金Q3");
+		List<Integer>  hQ7=new ArrayList<Integer>();
+		hQ7.add(70);
+		hQ7.add(20);
+		hQ7.add(90);
+		smd7.setData(hQ7);
+		smdList.add(smd7);
+		
+		
+		SMisMigrationData smd8=new SMisMigrationData();
+		smd8.setName("本金Q4");
+		List<Integer>  hQ8=new ArrayList<Integer>();
+		hQ8.add(90);
+		hQ8.add(10);
+		smd8.setData(hQ8);
+		smdList.add(smd8);
+		
+		migrationData.put("smdList", smdList);
+		
+		System.out.println(JSON.toJSONString(migrationData));
+		return migrationData;
 	}
 
 }
