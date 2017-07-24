@@ -445,7 +445,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				} else {
 					continue;
 				}
-	
+				
 				record.setStatusdetail(responseOrder.getMessage());
 				record.setReason(responseOrder.getReason());
 				record.setChargerate(responseOrder.getChargeRate());
@@ -510,12 +510,14 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		for (String dealcode : targetDealcode) {
 			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
 			if (order == null || "payoff".equals(order.getStatus())) {
+				logger.info("批量代扣跳过，订单号：" + dealcode + "，订单已还清");
 				skip++;
 				continue;
 			}
 			
 			//当前订单资方是否可发起批量代扣
 			if (!checkBatchDeductCapital(order.getPayCode(), deductableCapital)) {
+				logger.info("批量代扣跳过，订单号：" + dealcode + "，当前资方不可发起代扣");
 				skip++;
 				continue;
 			}
@@ -525,6 +527,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			
 			//已存在订单号，有效期3分钟
 			if (value != null && timestamp - value < 180 * 1000) {
+				logger.info("批量代扣跳过，订单号：" + dealcode + "，当前订单代扣处理中");
 				skip++;
 				continue;
 			}
@@ -532,12 +535,14 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			try {
 				//当前订单代扣处理中
 				if (!preCheckStatus(dealcode)) {
+					logger.info("批量代扣跳过，订单号：" + dealcode + "，当前订单代扣处理中");
 					skip++;
 					continue;
 				}
 				//获取用户信息
 				TRiskBuyerPersonalInfo peopleInfo = personalInfoService.getNewBuyerInfoByDealcode(dealcode);
 				if (peopleInfo == null) {
+					logger.info("批量代扣跳过，订单号：" + dealcode + "，用户信息不存在");
 					skip++;
 					continue;
 				}
@@ -546,6 +551,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				BankCardInfo bankCardInfo = tMisChangeCardRecordService.getBankByCard(peopleInfo.getRemitBankNo());
 				List<PayChannelInfo> supportChannel = getSupportedChannel(bankCardInfo);
 				if (supportChannel == null || supportChannel.size() == 0) {
+					logger.info("批量代扣跳过，订单号：" + dealcode + "，当前银行卡不支持代扣");
 					skip++;
 					continue;
 				}
@@ -553,13 +559,18 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				peopleInfo.setRemitBankName(bankCardInfo.getBankname());
 				TMisDunningDeduct tMisDunningDeduct = createSysDeductOrder(peopleInfo);
 				String payChannel = chooseChannel(supportChannel, channelTable, channelLevelMap);
+				if (payChannel == null) {
+					logger.info("批量代扣跳过，订单号：" + dealcode + "，当前渠道不支持批量代扣");
+					skip++;
+					continue;
+				}
 				tMisDunningDeduct.setPaychannel(payChannel);
 				
 				saveRecord(tMisDunningDeduct);
 				submitOrder(tMisDunningDeduct);
 				submit++;
 			} catch (Exception e) {
-				logger.info("系统代扣失败，订单号：" + dealcode + "，" + e.getMessage());
+				logger.info("批量代扣失败，订单号：" + dealcode + "，" + e.getMessage());
 				error++;
 			} finally {
 				dealcodeMap.remove(dealcode);
@@ -639,8 +650,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		
 		if (result != null) {
 			channelTable.get(level).put(result, ++cnt);
-		} else {
-			result = supportChannel.get(0).getChannelid();
 		}
 		return result;
 	}

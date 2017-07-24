@@ -57,7 +57,7 @@ public class RiskOrderManager {
 			//抛异常回滚
 			String msg =  repJson.has("resultMsg") ? String.valueOf(repJson.get("resultMsg")) : "";
 			logger.info("订单接口回调失败,失败信息: " + repJson.toString());
-			throw new ServiceException("订单接口回调失败,失败信息: "+msg);
+			throw new ServiceException(msg);
 		}
 		return repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
 	}
