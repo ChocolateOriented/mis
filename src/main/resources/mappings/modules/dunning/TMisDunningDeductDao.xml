@@ -309,7 +309,8 @@
 			c.real_name as "realName",
 			c.idCard as "idcard",
 			c.ocr_addr as "ocrAddr",
-			c.sex As sex
+			c.sex As sex,
+			o.platform_ext as "finProduct"
 		FROM t_risk_order AS o
 		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
