@@ -611,6 +611,22 @@
 
 		]]>
 	</update>	
+	
+	<select id="getMaxcycle" >
+		SELECT max(cycle)+1 as maxcycle FROM tmp_move_cycle 
+	</select>
+	
+	<insert id="insertTmpMoveCycle">
+		INSERT INTO tmp_move_cycle(
+			cycle,
+			datetime_start,
+			datetime_end
+		) VALUES (
+			#{cycle},
+			#{datetimestart},
+			#{datetimeend}
+		)
+	</insert>
 		
 	<!--  迁徙率 end	 -->
 </mapper>
