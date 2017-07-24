@@ -3,7 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
@@ -40,7 +39,7 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	List<TMisRemittanceConfirm> findNotFinish(@Param("remittanceChannel") String remittanceChannel,@Param("remittanceSerialNumber") String remittanceSerialNumber);
 
-	public List<TMisRemittanceMessagChecked> findMessagCompletedList(TMisRemittanceMessagChecked entity);
+	public List<TMisRemittanceMessagChecked> findMessagFinishList(TMisRemittanceMessagChecked entity);
 
 	TMisRemittanceMessagChecked findRemittanceMessagChecked(String remittanceConfirmId);
 }

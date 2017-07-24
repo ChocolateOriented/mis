@@ -1153,7 +1153,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	/**
 	 * 催收绩效月报-分页
-	 * @param performanceMonthReport
+	 * @param entity
 	 * @return
 	 */
 	public Page<PerformanceMonthReport> findPerformanceMonthReport(Page<PerformanceMonthReport> page, PerformanceMonthReport entity) {
@@ -2706,11 +2706,17 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	public String findOrderByPayCode(TMisDunningOrder order) {
 		String payCode = order.getPayCode();
-		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
 		if(StringUtils.isEmpty(payCode)){
 			return "daikoufalse";
 		}
-		if(payCode.contains("mindaipay")){
+		
+		List<Dict> captials = DictUtils.getDictList("captial_deduct");
+		if (captials == null || captials.size() == 0) {
+			return "daikoutrue";
+		}
+		
+		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
+		/*if(payCode.contains("mindaipay")){
 			if(overdayas<2){
 				return "daikoufalse";	
 			}
@@ -2721,9 +2727,18 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			if(overdayas<0){
 				return "daikoufalse";
 			}
+		}*/
+		
+		for (Dict captial : captials) {
+			String captialName = captial.getLabel();
+			int days = Integer.parseInt(captial.getValue());
+			
+			if (payCode.contains(captialName) && overdayas >= days) {
+				return "daikoutrue";
+			}
 		}
 		
-	  return "daikoutrue";
+		return "daikoufalse";
 	}
 	/**
 	 * 验证手机号码和电话号码的格式是否对.第一个参数为号码.第二个参数为类型(1表示手机号码.2表示电话号码)
@@ -2753,5 +2768,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public String findBuyerIdCardImg(String buyerid) {
 		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
 	}
-	
+
+	/**
+	 * @Description  保存部分还款日志
+	 * @param dealcode
+	 * @return void
+	 */
+	public void savePartialRepayLog(String dealcode) {
+		TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+		if (dunningTaskLog == null) {
+			return;
+		}
+		dunningTaskLog.setBehaviorstatus("partial");
+		dunningTaskLog.setCreateDate(new Date());
+		dunningTaskLog.setCreateBy(new User("auto_admin"));
+		tMisDunningTaskLogDao.insert(dunningTaskLog);
+	}
 }

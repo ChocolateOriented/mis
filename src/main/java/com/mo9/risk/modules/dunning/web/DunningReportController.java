@@ -55,71 +55,67 @@ public class DunningReportController extends BaseController {
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 	}
 	
+	/**
+	 * @Description 催收员案件活动日报
+	 * @param smMisDunningProductivePowerDailyReport
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return java.lang.String
+	 */
+	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
+	@RequestMapping(value = {"productivePowerDailyReport"})
+	public String findDunningProductivePowerDailyReport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport, HttpServletRequest request, HttpServletResponse response, Model model) {
+		//添加默认查询条件
+		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
+		Page<SMisDunningProductivePowerDailyReport> page = reportService
+				.findProductivePowerDailyReport(new Page<SMisDunningProductivePowerDailyReport>(request, response), smMisDunningProductivePowerDailyReport);
+		model.addAttribute("page", page);
+
+		//催收小组列表,若无限制则查询所有小组
+		List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups();
+		if (groups == null || groups.size() == 0) {
+			groups = groupService.findList(new TMisDunningGroup());
+		}
+		model.addAttribute("groupList", groups);
+
+		//若只管理一个小组则默认选中
+		if (groups.size() == 1) {
+			smMisDunningProductivePowerDailyReport.setGroupId(groups.get(0).getId());
+		}
+		return "modules/dunning/sMisDunningProductivePowerDailyReportList";
+	}
+
+	/**
+	 * @Description: 催收员案件活动日报导出
+	 * @return: String
+	 */
+	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
+	@RequestMapping(value = "productivePowerDailyReportExport", method = RequestMethod.POST)
+	public String dunningProductivePowerDailyReportExport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport,
+			HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		String fileName = "productivePowerDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+		//添加默认查询条件
+		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
+		List<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(smMisDunningProductivePowerDailyReport);
+		try {
+			new ExportExcel("催收员案件活动日报", SMisDunningProductivePowerDailyReport.class).setDataList(page).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			logger.info("催收员案件活动日报导出失败",e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/dunning/report/productivePowerDailyReport?repage";
+	}
 	
 	/**
-	 * @Description: 催收员案件活动日报
+	 * @Description  催收绩效日表
 	 * @param performanceDayReport
 	 * @param dunningPeople
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @return
-	 * @return: String
-	 */
-	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
-	@RequestMapping(value = {"productivePowerDailyReport"})
-	public String findDunningProductivePowerDailyReport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport, HttpServletRequest request, HttpServletResponse response, Model model) {
-		try {
-			Page<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(new Page<SMisDunningProductivePowerDailyReport>(request, response), smMisDunningProductivePowerDailyReport);
-			model.addAttribute("page", page);
-			
-			//催收小组列表,若无限制则查询所有小组
-			List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups() ;
-			if (groups == null || groups.size() == 0) {
-				groups = groupService.findList(new TMisDunningGroup()) ;
-			}
-			model.addAttribute("groupList", groups);
-			
-			//若只管理一个小组则默认选中
-			if (groups.size() == 1) {
-				smMisDunningProductivePowerDailyReport.setGroupId(groups.get(0).getId());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "modules/dunning/sMisDunningProductivePowerDailyReportList";
-	}
-	
-	/**
-	 * @Description: 催收员案件活动日报导出
-	 * @param performanceDayReport
-	 * @param request
-	 * @param response
-	 * @param redirectAttributes
-	 * @return
-	 * @return: String
-	 */
-	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
-    @RequestMapping(value = "productivePowerDailyReportExport", method=RequestMethod.POST)
-    public String dunningProductivePowerDailyReportExport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		try {
-            String fileName = "productivePowerDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
-            List<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(smMisDunningProductivePowerDailyReport);
-    		new ExportExcel("催收员案件活动日报", SMisDunningProductivePowerDailyReport.class).setDataList(page).write(response, fileName).dispose();
-    		return null;
-		} catch (Exception e) {
-			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
-		}
-		return "redirect:" + adminPath + "/dunning/report/productivePowerDailyReport?repage";
-    }
-	
-	/**
-	 * 催收绩效日表
-	 * @param performanceMonthReport
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
+	 * @return java.lang.String
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
 	@RequestMapping(value = {"findPerformanceDayReport", ""})
@@ -134,38 +130,38 @@ public class DunningReportController extends BaseController {
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("催收绩效日表打开失败",e);
 			return "error";
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "modules/dunning/performanceDayReportList";
 	}
-	
+
 	/**
-	 * 催收绩效日报导出
-	 * @param user
-	 * @param request
-	 * @param response
-	 * @param redirectAttributes
-	 * @return
+	 * @return java.lang.String
+	 * @Description 催收绩效日报导出
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:viewReport")
-    @RequestMapping(value = "performanceDayReportExport", method=RequestMethod.POST)
-    public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+	@RequestMapping(value = "performanceDayReportExport", method = RequestMethod.POST)
+	public String performanceDayReportExport(PerformanceDayReport performanceDayReport, HttpServletRequest request, HttpServletResponse response,
+			RedirectAttributes redirectAttributes) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
-			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
-			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
+			performanceDayReport.setDatetimestart(
+					null == performanceDayReport.getDatetimestart() ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
+			performanceDayReport
+					.setDatetimeend(null == performanceDayReport.getDatetimeend() ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
+			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
 			List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
 			new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
 			return null;
 		} catch (Exception e) {
-			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
+			logger.info("催收绩效日报导出失败！", e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
-    }
+	}
 }

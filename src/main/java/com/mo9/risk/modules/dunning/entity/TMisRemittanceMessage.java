@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import java.util.Date;
 
 /**
@@ -64,6 +65,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.dbid = dbid;
 	}
 
+	@ExcelField(title="汇款人名称", type=1, align=2, sort=5)
 	public String getRemittanceName() {
 		return remittanceName;
 	}
@@ -73,6 +75,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	}
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="交易时间", type=1, align=2, sort=2)
 	public Date getRemittanceTime() {
 		return remittanceTime;
 	}
@@ -81,6 +84,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceTime = remittanceTime;
 	}
 
+	@ExcelField(title="交易金额（元）", type=1, align=2, sort=4)
 	public Double getRemittanceAmount() {
 		return remittanceAmount;
 	}
@@ -93,10 +97,19 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		return remittanceChannel;
 	}
 
+	@ExcelField(title="交易渠道", type=1, align=2, sort=3)
+	public String getRemittanceChannelText() {
+		if ("alipay".equals(remittanceChannel)){
+			return "支付宝";
+		}
+		return remittanceChannel;
+	}
+
 	public void setRemittanceChannel(String remittanceChannel) {
 		this.remittanceChannel = remittanceChannel;
 	}
 
+	@ExcelField(title="汇款人账户", type=1, align=2, sort=6)
 	public String getRemittanceAccount() {
 		return remittanceAccount;
 	}
@@ -105,6 +118,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remittanceAccount = remittanceAccount;
 	}
 
+	@ExcelField(title="上传人", type=1, align=2, sort=10)
 	public String getFinancialUser() {
 		return financialUser;
 	}
@@ -121,6 +135,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.financialTime = financialTime;
 	}
 
+	@ExcelField(title="备注", type=1, align=2, sort=7)
 	public String getRemark() {
 		return remark;
 	}
@@ -129,6 +144,7 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.remark = remark;
 	}
 
+	@ExcelField(title="交易流水号", type=1, align=2, sort=1)
 	public String getRemittanceSerialNumber() {
 		return remittanceSerialNumber;
 	}
@@ -136,9 +152,20 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 	public void setRemittanceSerialNumber(String remittanceSerialNumber) {
 		this.remittanceSerialNumber = remittanceSerialNumber;
 	}
-	
-	
+
 	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	@ExcelField(title="入账状态", type=1, align=2, sort=8)
+	public String getAccountStatusText() {
+		if (TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(accountStatus)){
+			return "已查账";
+		}else if (TMisRemittanceConfirm.CONFIRMSTATUS_FINISH.equals(accountStatus)){
+			return "已完成";
+		}else if (null == accountStatus){
+			return "未查账";
+		}
 		return accountStatus;
 	}
 
@@ -146,7 +173,13 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		this.accountStatus = accountStatus;
 	}
 
-	
+	@Override
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="上传时间", type=1, align=2, sort=9)
+	public Date getCreateDate() {
+		return createDate;
+	}
+
 	@Override
 	public String toString() {
 		return "TMisRemittanceMessage [dbid=" + dbid + ", remittanceName=" + remittanceName + ", remittanceTime="

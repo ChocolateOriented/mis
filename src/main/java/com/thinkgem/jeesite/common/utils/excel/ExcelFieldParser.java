@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,27 +77,6 @@ public class ExcelFieldParser {
 		return annotationList;
 	}
 
-	private void parseExcelAnnotation(Object target, ExcelField ef) {
-		if (ef != null && (ef.type() == 0 || ef.type() == type)) {
-			if (groups != null && groups.length > 0) {
-				boolean inGroup = false;
-				for (int g : groups) {
-					if (inGroup) {
-						break;
-					}
-					for (int efg : ef.groups()) {
-						if (g == efg) {
-							inGroup = true;
-							annotationList.add(new ExcelFieldNode(target, ef));
-							break;
-						}
-					}
-				}
-			} else {
-				annotationList.add(new ExcelFieldNode(target, ef));
-			}
-		}
-	}
 
 	/**
 	 * @return java.util.List<java.lang.String>
@@ -122,12 +102,65 @@ public class ExcelFieldParser {
 		return headerList;
 	}
 
+
+	/**
+	 * @Description  尝试将字符串转换为目标字段类型并赋值
+	 * @param stringVal
+	 * @param node
+	 * @param entity
+	 * @return void
+	 */
+	public void setStringValue2Field(String stringVal, ExcelFieldNode node, Object entity) throws Exception {
+		if (StringUtils.isBlank(stringVal)){
+			return;
+		}
+
+		ExcelField ef = node.getExcelField();
+		Object target = node.getTarget();
+		// If is dict type, get dict value
+		if (StringUtils.isNotBlank(ef.dictType())) {
+			stringVal = DictUtils.getDictValue(stringVal, ef.dictType(), "");
+		}
+		// Get param type and type cast
+		Class<?> valType = Class.class;
+		if (target instanceof Field) {
+			valType = ((Field) target).getType();
+		} else if (target instanceof Method) {
+			Method method = ((Method) target);
+			if ("get".equals(method.getName().substring(0, 3))) {
+				valType = method.getReturnType();
+			} else if ("set".equals(method.getName().substring(0, 3))) {
+				valType = ((Method) target).getParameterTypes()[0];
+			}
+		}
+
+		Object val = this.string2Value(stringVal, valType, ef.fieldType());
+		// set entity value
+		if (target instanceof Field) {
+			Reflections.invokeSetter(entity, ((Field) target).getName(), val);
+		} else if (target instanceof Method) {
+			String mthodName = ((Method) target).getName();
+			if ("get".equals(mthodName.substring(0, 3))) {
+				mthodName = "set" + StringUtils.substringAfter(mthodName, "get");
+			}
+			Reflections.invokeMethod(entity, mthodName, new Class[]{valType}, new Object[]{val});
+		}
+	}
+
+	/**
+	 * @return java.lang.String
+	 * @Description 获取对应字段或getter方法字符串值
+	 */
+	public <E> String getFieldStringValue(E entity, ExcelFieldNode node) {
+		return this.value2String(this.getTargetValue(entity, node), node.getExcelField().fieldType());
+	}
+
 	/**
 	 * @return java.lang.Object
 	 * @Description 获取对应字段或getter方法值
 	 */
-	public <E> Object getTargetValue(E e, ExcelFieldNode note) {
-		if (note == null || e == null) {
+	private <E> Object getTargetValue(E entity, ExcelFieldNode note) {
+		if (note == null || entity == null) {
 			return null;
 		}
 		Object target = note.getTarget();
@@ -139,13 +172,13 @@ public class ExcelFieldParser {
 		Object val = null;
 		try {
 			if (StringUtils.isNotBlank(ef.value())) {
-				val = Reflections.invokeGetter(e, ef.value());
+				val = Reflections.invokeGetter(entity, ef.value());
 			} else {
 				if (target instanceof Field) {
-					val = Reflections.invokeGetter(e, ((Field) target).getName());
+					val = Reflections.invokeGetter(entity, ((Field) target).getName());
 				} else if (target instanceof Method) {
 					val = Reflections
-							.invokeMethod(e, ((Method) target).getName(), new Class[]{}, new Object[]{});
+							.invokeMethod(entity, ((Method) target).getName(), new Class[]{}, new Object[]{});
 				}
 			}
 			// If is dict, get dict label
@@ -158,20 +191,11 @@ public class ExcelFieldParser {
 		}
 		return val;
 	}
-
-	/**
-	 * @return java.lang.String
-	 * @Description 获取对应字段或getter方法字符串值
-	 */
-	public <E> String getStringValue(E e, ExcelFieldNode node) {
-		return this.value2String(this.getTargetValue(e, node), node.getExcelField().fieldType());
-	}
-
 	/**
 	 * @return java.lang.String
 	 * @Description 将值转为String类型
 	 */
-	public String value2String(Object val, Class fieldType) {
+	private String value2String(Object val, Class fieldType) {
 		String stringVal;
 		if (val == null) {
 			stringVal = "";
@@ -205,6 +229,70 @@ public class ExcelFieldParser {
 			}
 		}
 		return stringVal;
+	}
+
+	/**
+	 * @Description  将String转换为目标对象
+	 * @param stringVal
+	 * @param fieldType
+	 * @return java.lang.Object
+	 */
+	private Object string2Value(String stringVal,Class valType,Class fieldType)
+			throws Exception {
+		Object val;
+		if (valType == String.class) {
+			if (StringUtils.endsWith(stringVal, ".0")) {
+				val = StringUtils.substringBefore(stringVal, ".0");
+			} else {
+				val = stringVal;
+			}
+		} else if (valType == Integer.class) {
+			val = Double.valueOf(stringVal).intValue();
+		} else if (valType == Long.class) {
+			val = Double.valueOf(stringVal).longValue();
+		} else if (valType == Double.class) {
+			val = Double.valueOf(stringVal);
+		} else if (valType == Float.class) {
+			val = Float.valueOf(stringVal);
+		} else if (valType == Date.class) {
+			val = DateUtil.getJavaDate(Double.valueOf(stringVal));
+		} else {
+			if (fieldType != Class.class) {
+				val = fieldType.getMethod("getValue", String.class).invoke(null, stringVal);
+			} else {
+				val = Class.forName(this.getClass().getName().replaceAll(this.getClass().getSimpleName(),
+						"fieldtype." + valType.getSimpleName() + "Type")).getMethod("getValue", String.class).invoke(null, stringVal);
+			}
+		}
+		return val;
+	}
+
+	/**
+	 * @Description  获取注解关系列表
+	 * @param target
+	 * @param ef
+	 * @return void
+	 */
+	private void parseExcelAnnotation(Object target, ExcelField ef) {
+		if (ef != null && (ef.type() == 0 || ef.type() == type)) {
+			if (groups != null && groups.length > 0) {
+				boolean inGroup = false;
+				for (int g : groups) {
+					if (inGroup) {
+						break;
+					}
+					for (int efg : ef.groups()) {
+						if (g == efg) {
+							inGroup = true;
+							annotationList.add(new ExcelFieldNode(target, ef));
+							break;
+						}
+					}
+				}
+			} else {
+				annotationList.add(new ExcelFieldNode(target, ef));
+			}
+		}
 	}
 
 	public class ExcelFieldNode {

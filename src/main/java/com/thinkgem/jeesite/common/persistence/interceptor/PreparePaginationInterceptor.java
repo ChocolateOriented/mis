@@ -3,6 +3,7 @@
  */
 package com.thinkgem.jeesite.common.persistence.interceptor;
 
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.BaseStatementHandler;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -41,7 +42,7 @@ public class PreparePaginationInterceptor extends BaseInterceptor {
             final RoutingStatementHandler statementHandler = (RoutingStatementHandler) ivk.getTarget();
             final BaseStatementHandler delegate = (BaseStatementHandler) Reflections.getFieldValue(statementHandler, DELEGATE);
             final MappedStatement mappedStatement = (MappedStatement) Reflections.getFieldValue(delegate, MAPPED_STATEMENT);
-
+            Executor executor = (Executor) ivk.getTarget();
 //            //拦截需要分页的SQL
 ////            if (mappedStatement.getId().matches(_SQL_PATTERN)) { 
 //            if (StringUtils.indexOfIgnoreCase(mappedStatement.getId(), _SQL_PATTERN) != -1) {
@@ -55,7 +56,8 @@ public class PreparePaginationInterceptor extends BaseInterceptor {
                     final Connection connection = (Connection) ivk.getArgs()[0];
                     final String sql = boundSql.getSql();
                     //记录统计
-                    final int count = SQLHelper.getCount(sql, connection, mappedStatement, parameterObject, boundSql, log);
+                    final int count = SQLHelper.getCount(sql, connection, mappedStatement, parameterObject, boundSql, log, executor
+                    );
                     Page<Object> page = null;
                     page = convertParameter(parameterObject, page);
                     page.setCount(count);

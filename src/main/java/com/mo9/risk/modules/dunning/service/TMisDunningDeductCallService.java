@@ -190,7 +190,7 @@ public class TMisDunningDeductCallService {
 		} catch (Exception e) {
 			logger.info("江湖救急接口返回失败：" + e.getMessage());
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.failed);
-			tMisDunningDeduct.setRepaymentdetail("订单还款失败");
+			tMisDunningDeduct.setRepaymentdetail(e.getMessage());
 			update(tMisDunningDeduct);
 			saveDeductLog(tMisDunningDeduct);
 			return false;

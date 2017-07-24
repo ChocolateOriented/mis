@@ -63,4 +63,23 @@ public interface SMisDunningTaskMonthReportDao extends CrudDao<SMisDunningTaskMo
 	public void principalUpdateQ4();
 	//更新逾期1天的当天到期的订单数
 	public void principalUpdateOverOneDay();
+	
+	
+	/**
+	 * 最大週期数
+	 * @return
+	 */
+	public int getMaxcycle();
+	
+	/**
+	 * 插入TmpMoveCycle
+	 * @param cycle
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public int insertTmpMoveCycle(@Param("cycle")int cycle,@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
+	
+	
+	
 }
