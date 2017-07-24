@@ -3,8 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
@@ -41,9 +39,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private RiskOrderManager riskOrderManager ;
 	@Autowired
-	private TMisDunningTaskDao tMisDunningTaskDao;
-	@Autowired
-	private TMisDunningTaskLogDao dunningTaskLogDao;
+	private TMisDunningTaskService tMisDunningTaskService;
 
 	public TMisRemittanceConfirm get(String id) {
 		return super.get(id);
@@ -231,17 +227,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
-
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
 		String delayDay = paid.getDelayDay();
-
 		BigDecimal remittanceamount = new BigDecimal(paidAmount);
-//		if(platform.equals("app")){
-//			//do nothing
-//		}else{
-//			remittanceamount = remittanceamount.multiply(BigDecimal.valueOf(100));
-//		}
 
 		if ("1".equals(isMergeRepayment)) {
 			List<String> relatedIds = new ArrayList<String>(Arrays.asList(relatedId));
@@ -254,14 +243,8 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		 * 部分还款，生成部分还款任务日志
 		 */
 		if("partial".equals(paidType)){
-			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-			dunningTaskLog.setBehaviorstatus("partial");
-			dunningTaskLog.setCreateDate(new Date());
-			dunningTaskLog.setCreateBy(new User("auto_admin"));
-			dunningTaskLogDao.insert(dunningTaskLog);
-//						dunningTaskLog.setCreateDate(new Date());
+			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
-
 		//回调江湖救急接口
 		return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 }
@@ -279,21 +262,14 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
+		String paidType = confirm.getPaytype();
+		String dealcode = confirm.getDealcode();
 		/**
 		 * 部分还款，生成部分还款任务日志
 		 */
-		String paidType = confirm.getPaytype();
-		String dealcode = confirm.getDealcode();
 		if("partial".equals(paidType)){
-			TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
-			if(null != dunningTaskLog){
-				dunningTaskLog.setBehaviorstatus("partial");
-				dunningTaskLog.setCreateDate(new Date());
-				dunningTaskLog.setCreateBy(new User("auto_admin"));
-				dunningTaskLogDao.insert(dunningTaskLog);
-			}
+			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
-
 		//回调江湖救急接口
 		String delayDay = "7";
 		riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);

@@ -5,30 +5,33 @@ package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessage;
+import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
+import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +50,8 @@ public class TMisRemittanceMessageController extends BaseController {
 	private TMisRemittanceMessageService tMisRemittanceMessageService;
 	@Autowired
 	private TMisDunningOrderService tMisDunningOrderService;
+	@Autowired
+	private TMisDunningGroupService tMisDunningGroupService;
 
 	/**
 	 * 跳转账目解析页面
@@ -70,12 +75,17 @@ public class TMisRemittanceMessageController extends BaseController {
 			redirectAttributes.addAttribute("message", "参数错误");
 			return redirectUrl;
 		}
-		//解析上传Excel
+		//解析上传Excel或csv
 		List<AlipayRemittanceExcel> list ;
-		logger.info("正在接析文件:" + file.getOriginalFilename());
+		String filename = file.getOriginalFilename();
+		logger.info("正在接析文件:" +filename) ;
 		try {
-			ImportExcel ei = new ImportExcel(file, 1, 0);
-			list = ei.getDataList(AlipayRemittanceExcel.class);
+			if (StringUtils.endsWith(filename,".csv")){
+				list = CsvUtil.importCsv(file,AlipayRemittanceExcel.class,3);
+			}else {
+				ImportExcel ei = new ImportExcel(file, 1, 0);
+				list = ei.getDataList(AlipayRemittanceExcel.class);
+			}
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
 			logger.info("解析式发生错误",e);
@@ -129,6 +139,25 @@ public class TMisRemittanceMessageController extends BaseController {
 		model.addAttribute("page",page);
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
+
+	/**
+	 * 对公明细导出
+	 */
+	@RequiresPermissions("dunning:TMisRemittanceMessage:detail")
+	@RequestMapping(value = "detailExport", method= RequestMethod.POST)
+	public String detailExport(TMisRemittanceMessage tMisRemittanceMessage,HttpServletRequest request, HttpServletResponse response,RedirectAttributes redirectAttributes) {
+		List<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(tMisRemittanceMessage);
+		String fileName = "对公明细" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
+		try {
+			new ExportExcel("对公明细", TMisRemittanceMessage.class).setDataList(page).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			logger.info("对公明细导出失败",e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/dunning/tMisRemittanceMessage/detail?repage";
+	}
+
 	@ModelAttribute
 	public TMisRemittanceMessage get(@RequestParam(required=false) String id) {
 		TMisRemittanceMessage entity = null;
@@ -155,14 +184,13 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "confirmList")
-	public String accountTotal(TMisRemittanceMessagChecked tMisRemittanceMessagChecked,String childPage,Model model,HttpServletRequest request, HttpServletResponse response) {
-		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,childPage);
-		HttpSession session = request.getSession();
-		session.setAttribute("page", page);
-		RemittanceTag[] values = RemittanceTag.values();
-		List<RemittanceTag> remittanceTagList = Arrays.asList(values);
-		model.addAttribute("childPage",childPage);
-		model.addAttribute("remittanceTagList",remittanceTagList);
+	public String accountTotal(TMisRemittanceMessagChecked tMisRemittanceMessagChecked,Model model) {
+		//组长默认选中自己小组
+		tMisRemittanceMessageService.setManageGroup(tMisRemittanceMessagChecked);
+
+		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
+		model.addAttribute("remittanceTagList", RemittanceTag.values());
 		return "modules/dunning/tMisDunningAccountTotal";
 	}
 	/**
@@ -170,14 +198,11 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "checked")
-	public String accountChecked(String child,TMisRemittanceMessagChecked tMisRemittanceMessagChecked,Model model,HttpServletRequest request, HttpServletResponse response) {
-		if(StringUtils.isNotEmpty(child)){
-			Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,"checked");
-			model.addAttribute("pagechecked",page);
-		}else{
-		HttpSession session = request.getSession();
-		model.addAttribute("pagechecked",session.getAttribute("page"));
-		}
+	public String accountChecked(TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model, HttpServletRequest request,
+			HttpServletResponse response) {
+		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService
+				.findMessagCheckedList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked);
+		model.addAttribute("pagechecked", page);
 		return "modules/dunning/tMisDunningAccountChecked";
 	}
 	/**
@@ -185,16 +210,11 @@ public class TMisRemittanceMessageController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisRemittanceMessage:confirmList")
 	@RequestMapping(value = "completed")
-	public String accountCompleted(String child, TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model,
+	public String accountCompleted(TMisRemittanceMessagChecked tMisRemittanceMessagChecked, Model model,
 			HttpServletRequest request, HttpServletResponse response) {
-		if (StringUtils.isNotEmpty(child)) {
-			Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService.findMessagList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked,"completed");
-			model.addAttribute("pagecompleted",page);
-		} else {
-			HttpSession session = request.getSession();
-			model.addAttribute("pagecompleted", session.getAttribute("page"));
-		}
-
+		Page<TMisRemittanceMessagChecked> page = tMisRemittanceMessageService
+				.findMessagFinishList(new Page<TMisRemittanceMessagChecked>(request, response), tMisRemittanceMessagChecked);
+		model.addAttribute("pagecompleted", page);
 		return "modules/dunning/tMisDunningAccountCompleted";
 	}
 	/**

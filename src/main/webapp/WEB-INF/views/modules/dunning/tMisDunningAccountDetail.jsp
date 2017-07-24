@@ -14,7 +14,6 @@
                     if (!a.test($("#remittanceAmount").val())){
                     	top.$.jBox.tip('金额格式不正确','warning');
                     }else{
-                        loading('正在查询，请稍等...');
                         form.submit();
                     }
 				},
@@ -34,6 +33,19 @@
 			 }); 
 				
 		});
+
+        $(document).ready(function() {
+          $("#btnExport").click(function(){
+            top.$.jBox.confirm("确认要导出对公明细数据吗？","系统提示",function(v,h,f){
+              if(v=="ok"){
+                $("#searchForm").attr("action","${ctx}/dunning/tMisRemittanceMessage/detailExport");
+                $("#searchForm").submit();
+              }
+            },{buttonsFocus:1});
+            top.$('.jbox-body .jbox-icon').css('top','55px');
+          });
+
+        });
 		
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
@@ -91,6 +103,7 @@
 			</br>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
+			<li class="btns"><input id="btnExport" class="btn btn-primary" type="button" value="导出" /></li>
 		</ul>
 	</form:form>
 	
@@ -125,9 +138,7 @@
 					 <fmt:formatDate value="${tmessage.remittanceTime }" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
-					<c:if test="${tmessage.remittanceChannel eq 'alipay' }">
-					 		 支付宝
-					</c:if>   
+					${tmessage.remittanceChannelText }
 				</td>
 				<td>
 					 ${tmessage.remittanceAmount }
@@ -147,15 +158,7 @@
 					 </c:if>    
 				</td>
 				<td>
-					   <c:if test="${empty tmessage.accountStatus }">
-					  	未查账
-					  </c:if>  
-					   <c:if test="${tmessage.accountStatus eq 'complete_audit'}">
-					  	已查账
-					  </c:if>  
-					  <c:if test="${tmessage.accountStatus eq 'finish'}">
-					  	 已完成
-					  </c:if>   
+						${tmessage.accountStatusText }
 				</td>
 				<td>
 					<fmt:formatDate value="${tmessage.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/> 

@@ -235,25 +235,17 @@ public class ExportExcel {
 	}
 
 
-	public <E> Cell addCell(Row row, int column, E e, ExcelFieldNode node) {
+	public <E> Cell addCell(Row row, int column, E entity, ExcelFieldNode node) {
 		ExcelField ef = node.getExcelField();
 		int align = ef.align();
-		Class fieldType = ef.fieldType();
 
 		Cell cell = row.createCell(column);
 		CellStyle style = styles.get("data" + (align >= 1 && align <= 3 ? align : ""));
 
-		Object val = null;
+		String val = null;
 		try {
-			val = parser.getTargetValue(e, node);
-			if (val instanceof Date) {
-				DataFormat format = wb.createDataFormat();
-				style.setDataFormat(format.getFormat("yyyy-MM-dd"));
-				cell.setCellValue((Date) val);
-			} else {
-				String stringVal = parser.value2String(val, fieldType);
-				cell.setCellValue(stringVal);
-			}
+			val = parser.getFieldStringValue(entity,node);
+			cell.setCellValue(val);
 		} catch (Exception ex) {
 			log.info(
 					"Set cell value [" + row.getRowNum() + "," + column + "] Exception : " + ex.toString());
@@ -270,11 +262,11 @@ public class ExportExcel {
 	 * @return list 数据列表
 	 */
 	public <E> ExportExcel setDataList(List<E> list) {
-		for (E e : list) {
+		for (E item : list) {
 			int colunm = 0;
 			Row row = this.addRow();
 			for (ExcelFieldNode node : annotationList) {
-				this.addCell(row, colunm++, e, node);
+				this.addCell(row, colunm++, item, node);
 			}
 			log.debug("Write success: [" + row.getRowNum() + "] ");
 		}

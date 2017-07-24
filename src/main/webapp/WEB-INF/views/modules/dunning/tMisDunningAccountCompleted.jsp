@@ -47,11 +47,6 @@
 	</style>
 </head>
 <body>
-	<input type="hidden" id="childIfam" value="completed">
-	<ul class="nav nav-tabs">
-	<li ><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>
-	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/completed?child=true">已完成</a></li>
-	</ul> 
 	<sys:message content="${message}"/>
 	<table id="accountTable" class="table table-striped table-bordered table-condensed">
 		<thead>
@@ -64,6 +59,7 @@
 				<th>欠款金额</th>
 				<th>减免金额</th>
 				<th>应还金额</th>
+				<th>交易金额</th>
 				<th>交易流水号</th>
 				<th>查账人</th>
 				<th>订单状态</th>
@@ -76,36 +72,37 @@
 		<tbody>
 		<c:forEach items="${pagecompleted.list}" var="tmessage" varStatus="status">
 			<tr>
-				
+
 				<td>
-				 	${status.count}
+					${status.count}
 				</td>
 				<td>
-					 ${tmessage.realName } 
+					${tmessage.realName }
 				</td>
 				<td>
-				 	${tmessage.mobile } 
+					${tmessage.mobile }
 				</td>
 				<td>
-					 ${tmessage.dealcode } 
+					${tmessage.dealcode }
 				</td>
 				<td>
-					 ${tmessage.nickName } 
+					${tmessage.nickName }
 				</td>
 				<td>
-					  ${tmessage.amount }  
+					${tmessage.amount }
 				</td>
 				<td>
-					  ${tmessage.modifyamount/100} 
+					${tmessage.modifyamount/100}
 				</td>
 				<td>
-					  ${tmessage.remainAmmount }
+					${tmessage.remainAmmount }
+				</td>
+				<td>
+					${tmessage.remittanceamount }
 				</td>
 				<td>
 					<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
-						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
-						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
-						 </font>
+						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}******${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}</font>
 					    <div class="suspense" style="display:none; " tabindex="0">
 							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
 							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>

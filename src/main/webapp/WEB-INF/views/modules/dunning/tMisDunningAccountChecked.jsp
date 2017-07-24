@@ -5,8 +5,47 @@
 	<title id="title">已查账</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
+
+      function showDetail(obj) {
+        $(".suspense").css("display", "none");
+        $(obj).children(".suspense").css("display", "block");
+      }
+
+      function hideDetail() {
+        $(".suspense").css("display", "none");
+      }
+
+      function page(n, s) {
+        if (n) window.parent.$("#pageNo").val(n);
+        if (s) window.parent.$("#pageSize").val(s);
+        window.location = "${ctx}/dunning/tMisRemittanceMessage/checked?" + window.parent.$("#searchForm").serialize();
+        return false;
+      }
+
+      function collectionfunction(obj, width, height) {
+        var dealcode = $(obj).attr("dealcode");
+        var buyerId = $(obj).attr("buyerId");
+        var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
+        var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode=" + dealcode + "&buyerId=" + buyerId + "&dunningtaskdbid="
+            + dunningtaskdbid;
+        $.jBox.open("iframe:" + url, $(obj).attr("value"), width || 600,
+            height || 430, {
+              buttons: {},
+              submit: function (v, h, f) {
+
+              },
+              loaded: function (h) {
+                $(".jbox-content", document).css("overflow-y",
+                    "hidden");
+              }
+            });
+      }
+
+      /**
+       * ===================入账======================
+       */
       var content; //jbox内容
-      var comiting = false ;//提交中标识
+      var comiting = false;//提交中标识
 
       $(document).ready(function () {
         var recordedDetailTemplate = $("#recordedDetailTemplate").html();
@@ -62,22 +101,22 @@
                 return false;
               }
               //入账
-			  var remittanceConfirmId = $("#recordedForm").data("target").remittanceConfirmId ;
+              var remittanceConfirmId = $("#recordedForm").data("target").remittanceConfirmId;
               var paytype = $("#recordedPaytype").val();
-              var param = {paytype:paytype,remittanceConfirmId:remittanceConfirmId};
-              if (needTag){
+              var param = {paytype: paytype, remittanceConfirmId: remittanceConfirmId};
+              if (needTag) {
                 var remittanceTag = $("#recordedRemittanceTag").val();
-                param.remittanceTag = remittanceTag ;
-			  }
+                param.remittanceTag = remittanceTag;
+              }
 
-			  comiting = true;
+              comiting = true;
               $.post("${ctx}/dunning/tMisRemittanceConfirm/auditConfrim", param, function (msg) {
                 comiting = false;
                 if (msg == "success") {
                   $.jBox.close();
                   jBox.tip("入账成功");
                   page();
-                  return ;
+                  return;
                 }
                 $.jBox.tip(msg);
               })
@@ -87,45 +126,6 @@
         };
       });
 
-      function showDetail(obj) {
-        $(".suspense").css("display", "none");
-        $(obj).children(".suspense").css("display", "block");
-      }
-
-		function hideDetail() {
-			$(".suspense").css("display", "none");
-		}
-
-		function page(n, s) {
-			if (n) window.parent.$("#pageNo").val(n);
-			if (s) window.parent.$("#pageSize").val(s);
-			window.parent.$("#searchForm").attr("action","${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=checked");
-			window.parent.$("#searchForm").submit();
-			return false;
-		}
-
-      function collectionfunction(obj, width, height) {
-        var dealcode = $(obj).attr("dealcode");
-        var buyerId = $(obj).attr("buyerId");
-        var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
-        var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode=" + dealcode + "&buyerId=" + buyerId + "&dunningtaskdbid="
-            + dunningtaskdbid;
-        $.jBox.open("iframe:" + url, $(obj).attr("value"), width || 600,
-            height || 430, {
-              buttons: {},
-              submit: function (v, h, f) {
-
-              },
-              loaded: function (h) {
-                $(".jbox-content", document).css("overflow-y",
-                    "hidden");
-              }
-            });
-      }
-
-      /**
-       * ===================入账======================
-       */
       var needTag;//否需要打标签
       function recorded(remittanceConfirmId) {
         //重置表单
@@ -180,33 +180,29 @@
       }
 	</script>
 	<style type="text/css">
-				.suspense {
-				z-index:10000;
-				position:absolute;
-				top:10px;
-				left:10px;
-				height:200px;
-				width:250px;
-				background-color:white;
-				opacity:0.9;
-				border:solid red 1px;
-				border-radius:5px;
-				outline:none;
-				padding-left:20px;
-				padding-top:20px;
-				}
-				.beautif{
-				padding-bottom:10px;
-				}
+		.suspense {
+			z-index: 10000;
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			height: 200px;
+			width: 250px;
+			background-color: white;
+			opacity: 0.9;
+			border: solid red 1px;
+			border-radius: 5px;
+			outline: none;
+			padding-left: 20px;
+			padding-top: 20px;
+		}
+
+		.beautif {
+			padding-bottom: 10px;
+		}
 	</style>
 
 </head>
 <body>
-	<input type="hidden" id="childIfam" value="checked">
-	<ul class="nav nav-tabs">
-	<li class="active"><a href="${ctx}/dunning/tMisRemittanceMessage/checked?child=true">已查账</a></li>
-	<li ><a href="${ctx}/dunning/tMisRemittanceMessage/completed?child=true">已完成</a></li>
-	</ul> 
 	<sys:message content="${message}"/>
 	<table id="accountTable" class="table table-striped table-bordered table-condensed">
 		<thead>
@@ -219,6 +215,7 @@
 				<th>欠款金额</th>
 				<th>减免金额</th>
 				<th>应还金额</th>
+
 				<th>交易流水号</th>
 				<th>查账人</th>
 				<th>订单状态</th>
@@ -256,13 +253,14 @@
 					 ${tmessage.modifyamount/100} 
 				</td>
 				<td>
-					  ${tmessage.remainAmmount }
+					${tmessage.remainAmmount }
+				</td>
+				<td>
+					${tmessage.remittanceamount }
 				</td>
 				<td >
 					<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
-						 <font  color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}****** 
-						 ${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}
-						 </font>
+						<font color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}******${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}</font>
 					    <div class="suspense" style="display:none; " tabindex="0">
 							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
 							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>

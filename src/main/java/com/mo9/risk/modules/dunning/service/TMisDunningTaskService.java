@@ -1153,7 +1153,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	/**
 	 * 催收绩效月报-分页
-	 * @param performanceMonthReport
+	 * @param entity
 	 * @return
 	 */
 	public Page<PerformanceMonthReport> findPerformanceMonthReport(Page<PerformanceMonthReport> page, PerformanceMonthReport entity) {
@@ -2753,5 +2753,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public String findBuyerIdCardImg(String buyerid) {
 		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
 	}
-	
+
+	/**
+	 * @Description  保存部分还款日志
+	 * @param dealcode
+	 * @return void
+	 */
+	public void savePartialRepayLog(String dealcode) {
+		TMisDunningTaskLog dunningTaskLog = tMisDunningTaskDao.newfingTaskByDealcode(dealcode);
+		if (dunningTaskLog == null) {
+			return;
+		}
+		dunningTaskLog.setBehaviorstatus("partial");
+		dunningTaskLog.setCreateDate(new Date());
+		dunningTaskLog.setCreateBy(new User("auto_admin"));
+		tMisDunningTaskLogDao.insert(dunningTaskLog);
+	}
 }

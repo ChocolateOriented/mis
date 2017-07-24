@@ -244,164 +244,152 @@
 	</update>
 
 	<select id="findMessagCheckedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
-	
-	  select
-	  o.buyer_id AS "buyerId",
-	  t.id AS "dunningtaskdbid",
-	  m.id AS "remittanceConfirmId",
-	  m.name AS "realName",
-	  m.RemittanceName AS "RemittanceName",
-	  m.mobile AS "mobile",
-	  m.dealcode AS "dealcode",
-	  p.nickname AS "nickName",
-	  o.amount AS "amount",
-	  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-	  <include refid="countRemainAmmount"/> AS "remainAmmount",
-	  m.financialserialnumber AS "remittanceSerialNumber",
-	  l.updateBy AS "checkedPeople",
-	  o.status AS "orderStatus",
-	  m.RemittanceTag AS "remittanceTag",
-	  m.PayType AS "payType",
-	  m.RemittanceTime AS "remittancetime",
-	  m.RemittanceAmount AS "remittanceamount",
-	  a.RemittanceAccount AS "remittanceaccount",
-	  a.Remark AS "remark",
-	  a.FinancialUser AS "financialUser",
-	  m.updateDate AS "updateDate"
-	  from
-	  t_mis_remittance_confirm m
-	  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
-	  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber
-      LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
-      LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-	  WHERE
-		o.type = 'loan' 
-        AND o.merchant_id = 7
+
+		select
+		o.buyer_id AS "buyerId",
+		t.id AS "dunningtaskdbid",
+		m.id AS "remittanceConfirmId",
+		m.name AS "realName",
+		m.RemittanceName AS "RemittanceName",
+		m.mobile AS "mobile",
+		m.dealcode AS "dealcode",
+		p.nickname AS "nickName",
+		o.amount AS "amount",
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+		<include refid="countRemainAmmount"/> AS "remainAmmount",
+		m.financialserialnumber AS "remittanceSerialNumber",
+		m.updateBy AS "checkedPeople",
+		o.status AS "orderStatus",
+		m.RemittanceTag AS "remittanceTag",
+		m.PayType AS "payType",
+		m.RemittanceTime AS "remittancetime",
+		m.RemittanceAmount AS "remittanceamount",
+		a.RemittanceAccount AS "remittanceaccount",
+		a.Remark AS "remark",
+		a.FinancialUser AS "financialUser",
+		m.updateDate AS "updateDate"
+		from
+		t_mis_remittance_confirm m
+		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+		LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+		LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber AND a.RemittanceChannel= m.RemittanceChannel
+		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+		WHERE
+		o.type = 'loan'
+		AND o.merchant_id = 7
 		AND o.`status`IN ('payoff', 'payment' )
 		AND m.ConfirmStatus="complete_audit"
-		AND l.ConfirmStatus="complete_audit"
 		AND m.ConfirmFlow="AUDIT"
 		AND m.invalid="t"
-		AND l.dbid in (SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="complete_audit" GROUP BY l.ComfirmId)
-		AND a.RemittanceChannel=m.RemittanceChannel
-		 <if test=" mobile!= null and  mobile!= ''">
-                AND m.mobile=#{mobile}
-        </if>
-		 <if test=" realName!= null and  realName!= ''">
-                AND  m.name=#{realName}
-        </if>
-		 <if test=" dealcode!= null and  dealcode!= ''">
-                AND m.dealcode=#{dealcode}
-        </if>
-		 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-                AND m.financialserialnumber=#{remittanceSerialNumber}
-        </if>
-		 <if test=" orderStatus!= null and  orderStatus!= ''">
-                AND o.status=#{orderStatus}
-        </if>
-		 <if test=" remittanceTag!= null and  remittanceTag!= ''">
-                AND m.remittanceTag=#{remittanceTag}
-        </if>
-        <choose>
-            <when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
-                ORDER BY ${ page.orderBy}
-            </when>
-            <otherwise>
-              ORDER BY updateDate desc
-            </otherwise>
-        </choose>
-	</select>
-	
-	<select id="findMessagCompletedList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
-	
-		select
-		  mix.realName AS "realName",
-		  mix.remittanceName AS "remittanceName",
-		  mix.mobile AS "mobile",
-		  mix.dealcode AS "dealcode",
-		  mix.nickname AS "nickName",
-		  mix.amount AS "amount",
-		  mix.modifyamount AS "modifyamount",
-		  mix.remainAmmount AS "remainAmmount",
-		  mix.remittanceSerialNumber AS "remittanceSerialNumber",
-		  mix.completePeople AS "completePeople",
-		  mix.orderStatus AS "orderStatus",
-		  mix.remittanceTag AS "remittanceTag",
-		  mix.PayType AS "payType",
-		  mix.remittancetime AS "remittancetime",
-		  mix.remittanceamount AS "remittanceamount",
-		  mix.remittanceaccount AS "remittanceaccount",
-		  mix.remark AS "remark",
-		  mix.financialUser AS "financialUser",
-		  mix.updateDate AS "updateDate",
-		  mix.confirmId AS "confirmId",
-		  g.updateBy AS "checkedPeople"
-		  from
-          (
-			 select
-			  m.name AS "realName",
-			  m.RemittanceName AS "remittanceName",
-			  m.mobile AS "mobile",
-			  m.dealcode AS "dealcode",
-			  p.nickname AS "nickName",
-			  o.amount AS "amount",
-			  CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-			  <include refid="countRemainAmmount"/> AS "remainAmmount",
-			  m.financialserialnumber AS "remittanceSerialNumber",
-			  l.updateBy AS "completePeople",
-			  o.status AS "orderStatus",
-			  m.RemittanceTag AS "remittanceTag",
-			  m.PayType AS "payType",
-			  m.RemittanceTime AS "remittancetime",
-			  m.RemittanceAmount AS "remittanceamount",
-			  a.RemittanceAccount AS "remittanceaccount",
-			  a.Remark AS "remark",
-			  a.FinancialUser AS "financialUser",
-			  m.updateDate AS "updateDate",
-			  m.id AS "confirmId"
-			  from
-			  t_mis_remittance_confirm m
-			  LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
-			  LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
-		      LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber
-		      LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
-		      LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-			  WHERE
-				o.type = 'loan'
-		    	AND o.merchant_id = 7
-				AND o.`status`IN ('payoff', 'payment' )
-				AND m.ConfirmStatus="finish"
-				AND m.ConfirmFlow="AUDIT"
-				AND m.invalid="t"
-				AND l.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="finish" GROUP BY l.ComfirmId)
-				AND a.RemittanceChannel=m.RemittanceChannel
-				 <if test=" mobile!= null and  mobile!= ''">
-		                AND m.mobile=#{mobile}
-		        </if>
-				 <if test=" realName!= null and  realName!= ''">
-		                AND  m.name=#{realName}
-		        </if>
-				 <if test=" dealcode!= null and  dealcode!= ''">
-		                AND m.dealcode=#{dealcode}
-		        </if>
-				 <if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
-		                AND m.financialserialnumber=#{remittanceSerialNumber}
-		        </if>
-				 <if test=" orderStatus!= null and  orderStatus!= ''">
-		                AND o.status=#{orderStatus}
-		        </if>
-				 <if test=" remittanceTag!= null and  remittanceTag!= ''">
-		                AND m.remittanceTag=#{remittanceTag}
-		        </if>
 
-            )
-	        AS mix
-	         LEFT JOIN t_mis_remittance_confirm_log AS g ON g.ComfirmId = mix.confirmId
-			where
-			g.dbid in(SELECT MAX(l.dbid)  from t_mis_remittance_confirm_log l where  l.ConfirmStatus="complete_audit" GROUP BY l.ComfirmId)
-	        ORDER BY  mix.updateDate desc
-        
+		<if test=" mobile!= null and  mobile!= ''">
+			AND m.mobile=#{mobile}
+		</if>
+		<if test=" realName!= null and  realName!= ''">
+			AND m.name=#{realName}
+		</if>
+		<if test=" dealcode!= null and  dealcode!= ''">
+			AND m.dealcode=#{dealcode}
+		</if>
+		<if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
+			AND m.financialserialnumber=#{remittanceSerialNumber}
+		</if>
+		<if test=" orderStatus!= null and  orderStatus!= ''">
+			AND o.status=#{orderStatus}
+		</if>
+		<if test=" remittanceTag!= null and  remittanceTag!= ''">
+			AND m.remittanceTag=#{remittanceTag}
+		</if>
+		<if test=" dunningPeopleId != null and  dunningPeopleId!= ''">
+			AND p.Id=#{dunningPeopleId}
+		</if>
+		<if test=" dunningGroupId != null and  dunningGroupId!= ''">
+			AND p.GroupId = #{dunningGroupId}
+		</if>
+		<choose>
+			<when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
+				ORDER BY ${ page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY updateDate desc,realName
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findMessagFinishList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
+		select
+		mix.*,
+		g.updateBy AS "checkedPeople"
+		from
+		(
+		select
+		m.name AS "realName",
+		m.RemittanceName AS "remittanceName",
+		m.mobile AS "mobile",
+		m.dealcode AS "dealcode",
+		p.nickname AS "nickName",
+		o.amount AS "amount",
+		CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
+		<include refid="countRemainAmmount"/>
+		AS "remainAmmount",
+		m.financialserialnumber AS "remittanceSerialNumber",
+		m.updateBy AS "completePeople",
+		o.status AS "orderStatus",
+		m.RemittanceTag AS "remittanceTag",
+		m.PayType AS "payType",
+		m.RemittanceTime AS "remittancetime",
+		m.RemittanceAmount AS "remittanceamount",
+		a.RemittanceAccount AS "remittanceaccount",
+		a.Remark AS "remark",
+		a.FinancialUser AS "financialUser",
+		m.updateDate AS "updateDate",
+		m.id AS "confirmId",
+		MAX(l.dbid) AS cheackedLogId
+		from
+		t_mis_remittance_confirm m
+		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+		LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+		LEFT JOIN t_mis_remittance_message AS a ON a.remittanceSerialNumber = m.Financialserialnumber AND a.RemittanceChannel=m.RemittanceChannel
+		LEFT JOIN t_mis_remittance_confirm_log AS l ON l.ComfirmId = m.id
+		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+		WHERE
+		o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o.`status`IN ('payoff', 'payment' )
+		AND m.ConfirmStatus="finish"
+		AND m.ConfirmFlow="AUDIT"
+		AND m.invalid="t"
+		AND l.ConfirmStatus = "complete_audit"
+		<if test=" mobile!= null and  mobile!= ''">
+			AND m.mobile=#{mobile}
+		</if>
+		<if test=" realName!= null and  realName!= ''">
+			AND m.name=#{realName}
+		</if>
+		<if test=" dealcode!= null and  dealcode!= ''">
+			AND m.dealcode=#{dealcode}
+		</if>
+		<if test=" remittanceSerialNumber!= null and  remittanceSerialNumber!= ''">
+			AND m.financialserialnumber=#{remittanceSerialNumber}
+		</if>
+		<if test=" orderStatus!= null and  orderStatus!= ''">
+			AND o.status=#{orderStatus}
+		</if>
+		<if test=" remittanceTag!= null and  remittanceTag!= ''">
+			AND m.remittanceTag=#{remittanceTag}
+		</if>
+		<if test=" dunningPeopleId != null and  dunningPeopleId!= ''">
+			AND p.Id=#{dunningPeopleId}
+		</if>
+		<if test=" dunningGroupId != null and  dunningGroupId!= ''">
+			AND p.GroupId = #{dunningGroupId}
+		</if>
+		GROUP BY
+		l.ComfirmId
+		)
+		AS mix
+		LEFT JOIN t_mis_remittance_confirm_log AS g ON g.dbid = mix.cheackedLogId
+		ORDER BY updateDate desc,realName
 	</select>
 
 	<select id="findRemittanceMessagChecked" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
