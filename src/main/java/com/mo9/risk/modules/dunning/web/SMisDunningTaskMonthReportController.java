@@ -143,130 +143,133 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 	public void testMigration() {
 		sMisDunningTaskMonthReportService.migrationRateGetData();
 	}
+	
 	/**
-	 * 迁徙率数据的图表
+	 * 迁徙率数据的日报
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@RequestMapping(value = "migrationdata")
+	public String migrationReport() {
+		
+		return "modules/dunning/sMisDunningMigrationReport";
+	}
+	/**
+	 * 迁徙率户数的图形表
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "migrationRate")
 	public String migrationData() {
 		
 		return "modules/dunning/sMisDunningMigrationRate";
 	}
 	/**
-	 * 获取迁徙率数据的图表
+	 * 获取户数迁徙率的数据
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@RequestMapping(value = "migrationGetdata")
 	@ResponseBody
 	public Map<String, Object> migrationGetData() {
-		
+		//获取户数迁徙_c-p1
 		Map<String, Object> migrationData=new HashMap<String, Object>();
 		
-		List<String>  cycle=new ArrayList<String>();
-		cycle.add("一周");
-		cycle.add("二周");
-		cycle.add("三周");
-		cycle.add("四周");
-		cycle.add("五周");
+		//横坐标集合（1-16）
+		List<Integer>  cycle=new ArrayList<Integer>();
+		for (int i = 1; i < 17; i++) {
+			cycle.add(i);
+		}
 		migrationData.put("cycle", cycle);
 		
-		List<String>  mirg=new ArrayList<String>();
-		mirg.add("户数Q1");
-		mirg.add("户数Q2");
-		mirg.add("户数Q3");
-		mirg.add("户数Q4");
-		mirg.add("本金Q1");
-		mirg.add("本金Q2");
-		mirg.add("本金Q3");
-		mirg.add("本金Q4");
-		migrationData.put("mirg", mirg);
+		//Q1同时展示5个周期的时间
+		List<String>  qtime1=new ArrayList<String>();
+		qtime1.add("201705_16");
+		qtime1.add("201705_16+");
+		qtime1.add("201706_15");
+		qtime1.add("201706_15+");
+		qtime1.add("201707_15");
+		migrationData.put("qtime1", qtime1);
 		
-		List<SMisMigrationData>  smdList=new ArrayList<SMisMigrationData>();
+		//Q2同时展示4个周期的时间
+		List<String>  qtime2=new ArrayList<String>();
+		qtime2.add("201705_16");
+		qtime2.add("201705_16+");
+		qtime2.add("201706_15");
+		qtime2.add("201706_15+");
+		migrationData.put("qtime2", qtime2);
+		//Q3同时展示3个周期的时间
+		List<String>  qtime3=new ArrayList<String>();
+		qtime3.add("201705_16");
+		qtime3.add("201705_16+");
+		qtime3.add("201706_15");
+		migrationData.put("qtime3", qtime3);
+		//Q4同时展示4个周期的时间
+		List<String>  qtime4=new ArrayList<String>();
+		qtime4.add("201705_16");
+		qtime4.add("201705_16+");
+		migrationData.put("qtime4", qtime4);
 		
-		SMisMigrationData smd1=new SMisMigrationData();
-		smd1.setName("户数Q1");
-		List<Integer>  hQ1=new ArrayList<Integer>();
-		hQ1.add(15);
-		hQ1.add(40);
-		hQ1.add(30);
-		hQ1.add(40);
-		hQ1.add(50);
-		smd1.setData(hQ1);
-		smdList.add(smd1);
+		//获取c-p1的5个周期数据
+		List<SMisMigrationData>  smdList1=new ArrayList<SMisMigrationData>();
+		for (int i = 0; i <qtime1.size(); i++) {
+			SMisMigrationData smd1=new SMisMigrationData();
+			smd1.setName(qtime1.get(i));
+			List<Integer>  cycleTime1=new ArrayList<Integer>();
+			for (int y= 5*(i+1)+2; y< 5*(i+1)+18; y++) {
+				cycleTime1.add(y);
+			} 
+			smd1.setData(cycleTime1);
+			smdList1.add(smd1);
+			
+		}
+		
+		migrationData.put("smdList1", smdList1);
+		
+		List<SMisMigrationData>  smdList2=new ArrayList<SMisMigrationData>();
+		for (int i = 0; i <qtime2.size(); i++) {
+			SMisMigrationData smd1=new SMisMigrationData();
+			smd1.setName(qtime1.get(i));
+			List<Integer>  cycleTime1=new ArrayList<Integer>();
+			for (int y= 7*(i+1)+2; y< 7*(i+1)+18; y++) {
+				cycleTime1.add(y);
+			}
+			smd1.setData(cycleTime1);
+			smdList2.add(smd1);
+			
+		}
+		
+		migrationData.put("smdList2", smdList2);
+		
+		List<SMisMigrationData>  smdList3=new ArrayList<SMisMigrationData>();
+		for (int i = 0; i <qtime3.size(); i++) {
+			SMisMigrationData smd1=new SMisMigrationData();
+			smd1.setName(qtime1.get(i));
+			List<Integer>  cycleTime1=new ArrayList<Integer>();
+			for (int y= 9*(i+1)+2; y< 9*(i+1)+18; y++) {
+				cycleTime1.add(y);
+			}
+			smd1.setData(cycleTime1);
+			smdList3.add(smd1);
+			
+		}
+		
+		migrationData.put("smdList3", smdList3);
+		
+		List<SMisMigrationData>  smdList4=new ArrayList<SMisMigrationData>();
+		for (int i = 0; i <qtime4.size(); i++) {
+			SMisMigrationData smd1=new SMisMigrationData();
+			smd1.setName(qtime1.get(i));
+			List<Integer>  cycleTime1=new ArrayList<Integer>();
+			for (int y= 11*(i+1)+2; y< 11*(i+1)+18; y++) {
+				cycleTime1.add(y);
+			}
+			smd1.setData(cycleTime1);
+			smdList4.add(smd1);
+			
+		}
+		
+		migrationData.put("smdList4", smdList4);
 		
 		
-		SMisMigrationData smd2=new SMisMigrationData();
-		smd2.setName("户数Q2");
-		List<Integer>  hQ2=new ArrayList<Integer>();
-		hQ2.add(32);
-		hQ2.add(52);
-		hQ2.add(12);
-		hQ2.add(82);
-		smd2.setData(hQ2);
-		smdList.add(smd2);
-		
-		
-		SMisMigrationData smd3=new SMisMigrationData();
-		smd3.setName("户数Q3");
-		List<Integer>  hQ3=new ArrayList<Integer>();
-		hQ3.add(43);
-		hQ3.add(73);
-		hQ3.add(93);
-		smd3.setData(hQ3);
-		smdList.add(smd3);
-		
-		
-		SMisMigrationData smd4=new SMisMigrationData();
-		smd4.setName("户数Q4");
-		List<Integer>  hQ4=new ArrayList<Integer>();
-		hQ4.add(74);
-		hQ4.add(34);
-		smd4.setData(hQ4);
-		smdList.add(smd4);
-		
-		
-		SMisMigrationData smd5=new SMisMigrationData();
-		smd5.setName("本金Q1");
-		List<Integer>  hQ5=new ArrayList<Integer>();
-		hQ5.add(25);
-		hQ5.add(55);
-		hQ5.add(15);
-		hQ5.add(85);
-		hQ5.add(95);
-		smd5.setData(hQ5);
-		smdList.add(smd5);
-		
-		
-		SMisMigrationData smd6=new SMisMigrationData();
-		smd6.setName("本金Q2");
-		List<Integer>  hQ6=new ArrayList<Integer>();
-		hQ6.add(26);
-		hQ6.add(66);
-		hQ6.add(16);
-		hQ6.add(56);
-		smd6.setData(hQ6);
-		smdList.add(smd6);
-		
-		
-		SMisMigrationData smd7=new SMisMigrationData();
-		smd7.setName("本金Q3");
-		List<Integer>  hQ7=new ArrayList<Integer>();
-		hQ7.add(70);
-		hQ7.add(20);
-		hQ7.add(90);
-		smd7.setData(hQ7);
-		smdList.add(smd7);
-		
-		
-		SMisMigrationData smd8=new SMisMigrationData();
-		smd8.setName("本金Q4");
-		List<Integer>  hQ8=new ArrayList<Integer>();
-		hQ8.add(90);
-		hQ8.add(10);
-		smd8.setData(hQ8);
-		smdList.add(smd8);
-		
-		migrationData.put("smdList", smdList);
+
 		
 		System.out.println(JSON.toJSONString(migrationData));
 		return migrationData;
