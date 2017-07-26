@@ -212,9 +212,9 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	 * @param dealcode
 	 * @return
 	 */
-	public DunningOrder getRiskOrderByDealcodeFromRisk(String dealcode) {
-		String sql = "select dealcode as \"dealcode\", status as \"status\", CASE WHEN o.status = 'payoff' THEN 0 ELSE (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) END as \"creditamount\" "
-				+ "from t_risk_order o where o.dealcode = ? limit 1";
+	public TMisDunningOrder getRiskOrderByDealcodeFromRisk(String dealcode) {
+		String sql = "select dealcode, status, pay_code, CASE WHEN o.status = 'payoff' THEN 0 ELSE (IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END - IFNULL(o.balance, 0)) END as \"creditamount\" "
+				+ "from t_risk_order o where o.dealcode = ?";
 		
 		DbUtils dbUtils = new DbUtils();
 		dbUtils.setJndiName("java:comp/env/jdbc/jeesite2");
@@ -227,17 +227,19 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			}
 			Map<String, Object> record = result.get(0);
 			
-			DunningOrder order = new DunningOrder();
+			TMisDunningOrder order = new TMisDunningOrder();
 			String deal = (String) record.get("dealcode");
 			String status = (String) record.get("status");
 			BigDecimal creditamount = (BigDecimal) record.get("creditamount");
+			String paycode = (String) record.get("pay_code");
 			order.setDealcode(deal);
 			order.setStatus(status);
 			if (creditamount == null) {
-				order.setCreditamount(0D);
+				order.setCreditAmount(new BigDecimal("0"));
 			} else {
-				order.setCreditamount(creditamount.doubleValue());
+				order.setCreditAmount(creditamount);
 			}
+			order.setPayCode(paycode);
 			
 			return order;
 		} catch (Exception e) {
@@ -508,7 +510,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		int submit = 0;
 		
 		for (String dealcode : targetDealcode) {
-			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
+			TMisDunningOrder order = getRiskOrderByDealcodeFromRisk(dealcode);
 			if (order == null || "payoff".equals(order.getStatus())) {
 				logger.info("批量代扣跳过，订单号：" + dealcode + "，订单已还清");
 				skip++;
@@ -557,6 +559,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				}
 
 				peopleInfo.setRemitBankName(bankCardInfo.getBankname());
+				peopleInfo.setCreditAmount(order.getCreditAmount().toString());
 				TMisDunningDeduct tMisDunningDeduct = createSysDeductOrder(peopleInfo);
 				String payChannel = chooseChannel(supportChannel, channelTable, channelLevelMap);
 				if (payChannel == null) {
@@ -669,7 +672,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		deduct.setMobile(peopleInfo.getMobile());
 		deduct.setPaytype("loan");
 		BigDecimal payamount = new BigDecimal(peopleInfo.getCreditAmount());
-		payamount = payamount.divide(BigDecimal.valueOf(100));
 		deduct.setPayamount(payamount.doubleValue());
 		User user = new User();
 		user.setName("sys");

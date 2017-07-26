@@ -965,8 +965,7 @@ public class TMisDunningTaskController extends BaseController {
 			}
 		}
 		
-		BankCardInfo bankCardInfo = tMisChangeCardRecordService.getBankByCard(tMisChangeCardRecord.getBankcard());
-		boolean deductable = tMisDunningDeductService.preCheckChannel(bankCardInfo);
+		boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
 		model.addAttribute("deductable", deductable);
 		

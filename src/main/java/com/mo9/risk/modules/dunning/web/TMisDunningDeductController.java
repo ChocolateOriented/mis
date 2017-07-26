@@ -25,11 +25,9 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.entity.BankCardInfo;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 
 /**
@@ -43,9 +41,6 @@ public class TMisDunningDeductController extends BaseController {
 
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;
-	
-	@Autowired
-	private TMisChangeCardRecordService tMisChangeCardRecordService;
 	
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
@@ -105,7 +100,7 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		DunningOrder order = tMisDunningDeductService.getRiskOrderByDealcodeFromRisk(dealcode);
+		TMisDunningOrder order = tMisDunningDeductService.getRiskOrderByDealcodeFromRisk(dealcode);
 		
 		if (order == null) {
 			result.put("result", "NO");
@@ -125,7 +120,7 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		if (order.getCreditamount() == null || tMisDunningDeduct.getPayamount() > order.getCreditamount()) {
+		if (order.getCreditAmount() == null || tMisDunningDeduct.getPayamount() > order.getCreditAmount().doubleValue()) {
 			result.put("result", "NO");
 			result.put("msg", "扣款金额不应大于应催金额");
 			return result;
@@ -210,7 +205,7 @@ public class TMisDunningDeductController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningDeduct:view")
 	@RequestMapping(value = "preCheck")
 	@ResponseBody
-	public Map<String, String> preCheck(String dealcode, String bankCard, HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, String> preCheck(String dealcode, String bankCard, String bankName, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
 		
 		if (!tMisDunningDeductService.preCheckDunningPeople()) {
@@ -219,8 +214,7 @@ public class TMisDunningDeductController extends BaseController {
 			return result;
 		}
 		
-		BankCardInfo bankCardInfo = tMisChangeCardRecordService.getBankByCard(bankCard);
-		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankCardInfo);
+		List<PayChannelInfo> payChannelList = tMisDunningDeductService.getSupportedChannel(bankName);
 		
 		if (payChannelList == null || payChannelList.size() == 0) {
 			result.put("result", "NO");
