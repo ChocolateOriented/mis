@@ -289,7 +289,7 @@ public class ExportExcel {
 	public ExportExcel write(HttpServletResponse response, String fileName) throws IOException{
 		response.reset();
 		response.setCharacterEncoding("utf-8");
-		response.setHeader("Content-Disposition", "attachment; filename="+Encodes.urlEncode(fileName));
+		response.setHeader("Content-Disposition", "attachment;filename*=utf-8'zh_cn'"+Encodes.urlEncode(fileName));
 		response.setHeader("contentType", "text/html; charset=utf-8");
         response.setContentType("application/octet-stream; charset=utf-8");
 		write(response.getOutputStream());

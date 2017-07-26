@@ -303,15 +303,23 @@
 		<if test=" dunningPeopleId != null and  dunningPeopleId!= ''">
 			AND p.Id=#{dunningPeopleId}
 		</if>
-		<if test=" dunningGroupId != null and  dunningGroupId!= ''">
-			AND p.GroupId = #{dunningGroupId}
+		<if test="dunningGroupIds != null">
+			AND p.GroupId IN
+			<if test="dunningGroupIds.size == 0">
+				('')
+			</if>
+			<if test="dunningGroupIds.size > 0">
+				<foreach item="groupId" collection="dunningGroupIds" open="(" close=")" separator=",">
+					#{groupId}
+				</foreach>
+			</if>
 		</if>
 		<choose>
 			<when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
 				ORDER BY ${ page.orderBy}
 			</when>
 			<otherwise>
-				ORDER BY updateDate desc,realName
+				ORDER BY m.updateDate desc,m.name
 			</otherwise>
 		</choose>
 	</select>
@@ -381,8 +389,16 @@
 		<if test=" dunningPeopleId != null and  dunningPeopleId!= ''">
 			AND p.Id=#{dunningPeopleId}
 		</if>
-		<if test=" dunningGroupId != null and  dunningGroupId!= ''">
-			AND p.GroupId = #{dunningGroupId}
+		<if test="dunningGroupIds != null">
+			AND p.GroupId IN
+			<if test="dunningGroupIds.size == 0">
+				('')
+			</if>
+			<if test="dunningGroupIds.size > 0">
+				<foreach item="groupId" collection="dunningGroupIds" open="(" close=")" separator=",">
+					#{groupId}
+				</foreach>
+			</if>
 		</if>
 		GROUP BY
 		l.ComfirmId

@@ -141,7 +141,7 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 	@RequestMapping(value = "testMigration")
 	@ResponseBody
 	public void testMigration() {
-		sMisDunningTaskMonthReportService.migrationRateGetData();
+//		sMisDunningTaskMonthReportService.migrationRateGetData();
 	}
 	
 	/**

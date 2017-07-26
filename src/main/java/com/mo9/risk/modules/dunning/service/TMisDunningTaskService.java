@@ -2503,7 +2503,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	 * @Description: 委外任务列表
 	 * @param page
-	 * @param dunningOrder
+	 * @param entity
 	 * @return
 	 * @return: Page<DunningOrder>
 	 */
@@ -2522,7 +2522,24 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return page;
 	}
 
-	
+	/**
+	 * @Description  委外任务列表导出
+	 * @param entity
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.DunningOrder>
+	 */
+	public List<DunningOrder> findOuterOrderPageList(DunningOrder entity) {
+		if (entity == null) {
+			entity = new DunningOrder();
+		}
+
+		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
+			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
+		}else{
+			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
+		}
+		return dao.findOuterOrderPageList(entity);
+	}
+
 	@Scheduled(cron = "0 10 0 * * ?")  
 	@Transactional
 	public void autoSmsSend() {
@@ -2784,4 +2801,5 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		dunningTaskLog.setCreateBy(new User("auto_admin"));
 		tMisDunningTaskLogDao.insert(dunningTaskLog);
 	}
+
 }

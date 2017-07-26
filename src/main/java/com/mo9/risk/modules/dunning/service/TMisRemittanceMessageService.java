@@ -424,16 +424,34 @@ public class TMisRemittanceMessageService extends
 	 * @return void
 	 */
 	public void setManageGroup(TMisRemittanceMessagChecked tMisRemittanceMessagChecked) {
-		if (null != tMisRemittanceMessagChecked.getDunningGroupId()){//空字符串为全部查询
+		List<String> paramGroups = tMisRemittanceMessagChecked.getDunningGroupIds() ;
+		if (null != paramGroups){//有参数则以参数为准
 			return;
 		}
-		TMisDunningGroup queryGroup = new TMisDunningGroup();
-		queryGroup.setLeader(UserUtils.getUser());
-		List<TMisDunningGroup> groups = groupService.findList(queryGroup);
-		if (groups !=null && groups.size()>0 ){
-			TMisDunningGroup manageGroup = groups.get(0);
-			if (manageGroup != null){
-				tMisRemittanceMessagChecked.setDunningGroupId(manageGroup.getId());
+		paramGroups = new ArrayList<String>();
+		tMisRemittanceMessagChecked.setDunningGroupIds(paramGroups);
+
+		//添加组长管理的组
+		TMisDunningGroup queryLeaderGroup = new TMisDunningGroup();
+		queryLeaderGroup.setLeader(UserUtils.getUser());
+		List<TMisDunningGroup> leaderGroups = groupService.findList(queryLeaderGroup);
+		if (leaderGroups !=null && leaderGroups.size() > 0 ) {
+			for (TMisDunningGroup group: leaderGroups) {
+				if (group != null) {
+			    paramGroups.add(group.getId());
+				}
+			}
+		}
+
+		//添加监理管理的组
+		TMisDunningGroup querySupervisorGroup= new TMisDunningGroup();
+		querySupervisorGroup.setSupervisor(UserUtils.getUser());
+		List<TMisDunningGroup> supervisorGroups = groupService.findList(querySupervisorGroup);
+		if (supervisorGroups !=null && supervisorGroups.size() > 0 ) {
+			for (TMisDunningGroup group: supervisorGroups) {
+				if (group != null) {
+					paramGroups.add(group.getId());
+				}
 			}
 		}
 	}
