@@ -545,7 +545,7 @@
             <div class="span4"><a class="btn btn-large" id="REPAYMENT_THIRD" onclick="addTag('REPAYMENT_THIRD')">第三方还款</a></div>
         </div>
         <div class="row-fluid text-right" style="margin-top: 30px">
-            <div id="auditRemittanceData" class="span5 offset1" style="border: 2px solid grey;padding-top: 20px">
+            <div id="auditRemittanceData" class="span5 offset1" style="border: 1px solid grey;padding-top: 20px">
                 <h4>
                     <div class="row-fluid">
                         <div class="span4" style="color: #2fa4e7">订单信息</div>
@@ -578,7 +578,7 @@
                     </div>
                 </form>
             </div>
-            <div id="auditOrderData" class="span5" style="border: 2px solid grey;padding-top: 20px">
+            <div id="auditOrderData" class="span5" style="border: 1px solid grey;padding-top: 20px">
                 <h4>
                     <div class="row-fluid">
                         <div class="span4" style="color: #2fa4e7">交易信息</div>

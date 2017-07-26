@@ -3,6 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.util.DateUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -88,13 +91,30 @@ public class TMisDunningOuterTaskController extends BaseController {
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisDunningOuterTaskList";
 	}
-	
+
 	/**
-	 * 加载用户信息页面1
-	 * @param tMisDunningTask
-	 * @param model
-	 * @return
+	 * 导出数据
 	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "exportFile", method = RequestMethod.POST)
+	public String exportFile(DunningOrder order, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		String fileName = "OutSourcing" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+		List<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(order);
+		try {
+			new ExportExcel("贷后还款情况报表", DunningOrder.class).setDataList(page).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/dunning/tMisDunningOuterTask/findOrderPageList?repage";
+	}
+
+		/**
+		 * 加载用户信息页面1
+		 * @param tMisDunningTask
+		 * @param model
+		 * @return
+		 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "pageFather")
 	public String pageFather(String buyerId, String dealcode,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,Model model) {
