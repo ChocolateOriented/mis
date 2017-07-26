@@ -1,0 +1,811 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao">
+    
+	<sql id="tMisMigrationRateReportColumns">
+		a.id AS "dbid",
+		a.datetime AS "datetime",
+		a.cp1new AS "cp1new",
+		a.cp2new AS "cp2new",
+		a.cp3new AS "cp3new",
+		a.cp4new AS "cp4new",
+		a.cp1corpus AS "cp1corpus",
+		a.cp2corpus AS "cp2corpus",
+		a.cp3corpus AS "cp3corpus",
+		a.cp4corpus AS "cp4corpus",
+		a.cycle AS "cycle"
+	</sql>
+	
+	<sql id="tMisMigrationRateReportJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisMigrationRateReport">
+		SELECT 
+			<include refid="tMisMigrationRateReportColumns"/>
+		FROM t_mis_migration_rate_report a
+		<include refid="tMisMigrationRateReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisMigrationRateReport">
+		SELECT 
+			<include refid="tMisMigrationRateReportColumns"/>
+		FROM t_mis_migration_rate_report a
+		<include refid="tMisMigrationRateReportJoins"/>
+		<where>
+			
+			<if test="datetime != null and datetime != ''">
+				AND a.datetime = #{datetime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisMigrationRateReport">
+		SELECT 
+			<include refid="tMisMigrationRateReportColumns"/>
+		FROM t_mis_migration_rate_report a
+		<include refid="tMisMigrationRateReportJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_migration_rate_report(
+			datetime,
+			cp1new,
+			cp2new,
+			cp3new,
+			cp4new,
+			cp1corpus,
+			cp2corpus,
+			cp3corpus,
+			cp4corpus,
+			cycle,
+			CreateDate
+		) VALUES (
+			#{datetime},
+			#{cp1new},
+			#{cp2new},
+			#{cp3new},
+			#{cp4new},
+			#{cp1corpus},
+			#{cp2corpus},
+			#{cp3corpus},
+			#{cp4corpus},
+			#{cycle},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_migration_rate_report SET 	
+			datetime = #{datetime},
+			cp1new = #{cp1new},
+			cp2new = #{cp2new},
+			cp3new = #{cp3new},
+			cp4new = #{cp4new},
+			cp1corpus = #{cp1corpus},
+			cp2corpus = #{cp2corpus},
+			cp3corpus = #{cp3corpus},
+			cp4corpus = #{cp4corpus},
+			cycle = #{cycle}
+		WHERE id = #{dbid}
+	</update>
+	
+<!-- 	<update id="delete"> -->
+<!-- 		DELETE FROM t_mis_migration_rate_report -->
+<!-- 		WHERE id = #{dbid} -->
+<!-- 	</update> -->
+	
+	
+	<!--  迁徙率 begin	 -->
+	
+	<!--  # 更新已经采集的逾期订单	 -->
+	<update id="householdsUpdateHaveBeenCollectDealcode">
+		<![CDATA[
+			UPDATE t_risk_order as o 
+			INNER JOIN tmp_move_rate AS r on r.dealcode = o.dealcode
+			SET r.PayoffTime = DATE(o.payoff_time),
+				r.OperatorStatus = 
+				CASE 
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) = 0 
+					THEN 'payoff'
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) > 0 
+					THEN 'delay'
+					ELSE NULL
+				END;
+		]]>
+	</update>
+	
+	<!--  # 采集今天逾期一天的数据	 -->
+	<insert id="householdsInsertOverOneDay">
+		<![CDATA[
+    		INSERT INTO tmp_move_rate(id, AddTime, dealcode, CorpusAmount,PayoffTime,OrderStatus,OperatorStatus,cycle)
+			SELECT
+				NULL AS id,
+				DATE(DATE_ADD(o.repayment_time, INTERVAL 1 DAY)) AS AddTime,
+				dealcode,
+				IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0) AS CorpusAmount,
+				DATE(o.payoff_time) AS PayoffTime,
+				o.`status`,
+				CASE 
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) = 0 
+					THEN 'payoff'
+					WHEN o.`status` = 'payoff'
+						AND IFNULL(o.delay_days, 0) > 0 
+					THEN 'delay'
+					ELSE NULL
+				END AS OperatorStatus,
+				#{cycle} AS cycle
+			FROM t_risk_order AS o 
+			WHERE o.type = 'loan'
+				AND o.merchant_id = 7
+				AND o.`status` IN ('payment', 'payoff')
+				AND o.repayment_time >=#{datetimestart}
+				AND o.repayment_time <  #{datetimeend}
+				AND (DATE(o.payoff_time) > DATE(o.repayment_time)
+					OR o.payoff_time is null)
+			order by AddTime; 
+      	]]>
+	</insert>
+	
+	
+	
+	<!--  # 采集新的迁徙率的统计数据	 -->
+	<insert id="householdsInsertStatisticalData">
+<!-- 		<![CDATA[ -->
+<!--     		insert into t_mis_dunning_qianxilv_new(createTime,Q1) -->
+<!-- 			select  -->
+<!-- 				AddTime, -->
+<!-- 				COUNT(1) AS Q1 -->
+<!-- 			from  tmp_move_rate AS r  -->
+<!-- 			LEFT JOIN  tmp_move_cycle AS c ON r.cycle  =c.cycle -->
+<!-- 			WHERE r.AddTime >=#{datetimestart} -->
+<!-- 				AND r.AddTime <  #{datetimeend} -->
+<!-- 			GROUP BY AddTime; -->
+<!--       	]]> -->
+		INSERT INTO t_mis_dunning_qianxilv_new(CreateTime, Q1)
+		SELECT
+			t.*
+		FROM
+		(SELECT
+			DATE(DATE_ADD(o.repayment_time, INTERVAL 1 DAY)) AS CreateTime,
+			COUNT(1) AS OrderDueDate
+		FROM t_risk_order AS o 
+		WHERE o.type = 'loan'
+			AND o.merchant_id = 7
+			AND o.`status` in ('payment', 'payoff')
+		group by DATE(o.repayment_time)
+		) AS t
+		LEFT JOIN t_mis_dunning_qianxilv_new AS s 
+			ON t.CreateTime = s.CreateTime 
+		WHERE s.CreateTime IS NULL AND t.CreateTime IS NOT NULL;
+	</insert>
+	
+	
+	<!--  # 更新PayoffQ1	 -->
+	<update id="householdsUpdatePayoffQ1">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					PayoffTime,
+					count(1) AS PayoffQ1
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				WHERE
+					PayoffTime >= c.datetime_start
+				AND PayoffTime <= c.datetime_end
+				GROUP BY
+					PayoffTime
+			) AS t ON r.createTime = t.payofftime
+			SET r.PayoffQ1 = t.PayoffQ1;
+		]]>
+	</update>
+	
+	<!--  # 更新PayoffQ2	 -->
+	<update id="householdsUpdatePayoffQ2">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					count(1) AS PayoffQ2
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 1 = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ2 = t.PayoffQ2;
+		]]>
+	</update>
+	
+	<!--  # 更新PayoffQ3	 -->
+	<update id="householdsUpdatePayoffQ3">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					count(1) AS PayoffQ3
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 2 = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ3 = t.PayoffQ3;
+		]]>
+	</update>
+	
+	<!--  # 更新PayoffQ4	 -->
+	<update id="householdsUpdatePayoffQ4">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					count(1) AS PayoffQ4
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 3 = c.cycle
+				WHERE
+						r.PayoffTime >= c.datetime_start
+					AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ4 = t.PayoffQ4;
+
+		]]>
+	</update>
+	
+	<!--  # 更新Q2-->
+	<update id="householdsUpdateQ2">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							1
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							1
+						ELSE
+							0
+						END
+					) AS Q2
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 1 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q2 = t.Q2
+			WHERE
+				t.CreateTime IS NOT NULL;
+
+		]]>
+	</update>
+	
+	<!--  # 更新Q3-->
+	<update id="householdsUpdateQ3">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							1
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							1
+						ELSE
+							0
+						END
+					) AS Q3
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 2 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q3 = t.Q3
+			WHERE
+				t.CreateTime IS NOT NULL;
+
+
+		]]>
+	</update>
+	
+	<!--  # 更新Q4-->
+	<update id="householdsUpdateQ4">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							1
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							1
+						ELSE
+							0
+						END
+					) AS Q4
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 3 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q4 = t.Q4
+			WHERE
+				t.CreateTime IS NOT NULL;
+		]]>
+	</update>
+	
+	<!--  # 更新逾期1天的当天到期的订单数-->
+	<update id="householdsUpdateOverOneDay">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					DATE(
+						DATE_ADD(
+							o.repayment_time,
+							INTERVAL 1 DAY
+						)
+					) AS CreateTime,
+					COUNT(1) AS OrderDueDate
+				FROM
+					t_risk_order AS o
+				WHERE
+					o.type = 'loan'
+				AND o.merchant_id = 7
+				AND o.`status` IN ('payment', 'payoff')
+				GROUP BY
+					DATE(o.repayment_time)
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.OrderDueDate = t.OrderDueDate;
+
+		]]>
+	</update>
+	
+	<!-- 开始迁徙率关于 本金的 -->
+	
+	<!--  # 采集新的迁徙率的统计数据 -->
+	<insert id="principalInsertStatisticalData">
+<!-- 		<![CDATA[ -->
+<!--     		INSERT INTO t_mis_dunning_qianxilv_corpus (createTime, Q1) SELECT -->
+<!-- 				AddTime, -->
+<!-- 				SUM(CorpusAmount) AS Q1 -->
+<!-- 			FROM -->
+<!-- 				tmp_move_rate AS r -->
+<!-- 			LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle -->
+<!-- 			WHERE -->
+<!-- 				r.AddTime >=#{datetimestart} -->
+<!-- 			AND r.AddTime < #{datetimeend} -->
+<!-- 			GROUP BY -->
+<!-- 				AddTime; -->
+<!--       	]]> -->
+		INSERT INTO t_mis_dunning_qianxilv_corpus(CreateTime, Q1)
+		SELECT
+			t.*
+		FROM
+		(SELECT
+			DATE(DATE_ADD(o.repayment_time, INTERVAL 1 DAY)) AS CreateTime,
+			SUM(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) AS OrderDueDate
+		FROM t_risk_order AS o 
+		WHERE o.type = 'loan'
+			AND o.merchant_id = 7
+			AND o.`status` in ('payment', 'payoff')
+		group by DATE(o.repayment_time)
+		) AS t
+		LEFT JOIN t_mis_dunning_qianxilv_corpus AS s 
+			ON t.CreateTime = s.CreateTime 
+		WHERE s.CreateTime IS NULL AND t.CreateTime IS NOT NULL;
+	</insert>
+		
+	<!--  # 更新PayoffQ1	 -->
+	<update id="principalUpdatePayoffQ1">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					SUM(CorpusAmount) AS PayoffQ1
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ1 = t.PayoffQ1;
+
+		]]>
+	</update>	
+		
+	<!--  # 更新PayoffQ2	 -->
+	<update id="principalUpdatePayoffQ2">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					SUM(CorpusAmount) AS PayoffQ2
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 1 = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ2 = t.PayoffQ2;
+
+		]]>
+	</update>	
+		
+	<!--  # 更新PayoffQ3	 -->
+	<update id="principalUpdatePayoffQ3">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					sum(CorpusAmount) AS PayoffQ3
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 2 = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ3 = t.PayoffQ3;
+		]]>
+	</update>	
+		
+	<!--  # 更新PayoffQ4	 -->
+	<update id="principalUpdatePayoffQ4">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					r.PayoffTime,
+					sum(CorpusAmount) AS PayoffQ4
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle + 3 = c.cycle
+				WHERE
+					r.PayoffTime >= c.datetime_start
+				AND r.PayoffTime <= c.datetime_end
+				GROUP BY
+					r.PayoffTime
+			) AS t ON t.PayoffTime = r.CreateTime
+			SET r.PayoffQ4 = t.PayoffQ4;
+
+		]]>
+	</update>	
+		
+	<!--  # 更新Q2 -->
+	<update id="principalUpdateQ2">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							CorpusAmount
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							CorpusAmount
+						ELSE
+							0
+						END
+					) AS Q2
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 1 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q2 = t.Q2
+			WHERE
+				t.CreateTime IS NOT NULL;
+
+		]]>
+	</update>	
+		
+	<!--  # 更新Q3 -->
+	<update id="principalUpdateQ3">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							CorpusAmount
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							CorpusAmount
+						ELSE
+							0
+						END
+					) AS Q3
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 2 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q3 = t.Q3
+			WHERE
+				t.CreateTime IS NOT NULL;
+
+
+		]]>
+	</update>	
+		
+	<!--  # 更新Q4 -->
+	<update id="principalUpdateQ4">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					c1.datetime_start AS CreateTime,
+					SUM(
+						CASE
+						WHEN r.PayoffTime IS NULL THEN
+							CorpusAmount
+						WHEN r.PayoffTime >= c1.datetime_start THEN
+							CorpusAmount
+						ELSE
+							0
+						END
+					) AS Q4
+				FROM
+					tmp_move_rate AS r
+				LEFT JOIN tmp_move_cycle AS c ON r.cycle = c.cycle
+				LEFT JOIN tmp_move_cycle AS c1 ON r.cycle + 3 = c1.cycle
+				WHERE
+					r.AddTime >= c.datetime_start
+				AND r.AddTime <= c.datetime_end
+				GROUP BY
+					c1.datetime_start
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.Q4 = t.Q4
+			WHERE
+				t.CreateTime IS NOT NULL;
+
+
+		]]>
+	</update>	
+		
+	<!--  # 更新逾期1天的当天到期的订单数 -->
+	<update id="principalUpdateOverOneDay">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_corpus AS r
+			INNER JOIN (
+				SELECT
+					DATE(
+						DATE_ADD(
+							o.repayment_time,
+							INTERVAL 1 DAY
+						)
+					) AS CreateTime,
+					SUM(
+						IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)
+					) AS OrderDueDate
+				FROM
+					t_risk_order AS o
+				WHERE
+					o.type = 'loan'
+				AND o.merchant_id = 7
+				AND o.`status` IN ('payment', 'payoff')
+				GROUP BY
+					DATE(o.repayment_time)
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.OrderDueDate = t.OrderDueDate;
+			
+			SELECT
+				*
+			FROM
+				t_mis_dunning_qianxilv_corpus
+			ORDER BY
+				CreateTime DESC;
+			
+			SELECT
+				*
+			FROM
+				t_mis_dunning_qianxilv_new
+			ORDER BY
+				CreateTime DESC;
+
+
+
+		]]>
+	</update>	
+	
+	<select id="getMaxcycle" >
+		SELECT max(cycle)+1 as maxcycle FROM tmp_move_cycle 
+	</select>
+	
+	<insert id="insertTmpMoveCycle">
+		INSERT INTO tmp_move_cycle(
+			cycle,
+			datetime_start,
+			datetime_end
+		) VALUES (
+			#{cycle},
+			#{datetimestart},
+			#{datetimeend}
+		)
+	</insert>
+	
+	
+	<select id="getTmpMoveCycleByDatetime" resultType="com.mo9.risk.modules.dunning.bean.TmpMoveCycle" >
+		SELECT 
+			id AS "id",
+			cycle AS "cycle",
+			datetime_start AS "datetimestart",
+			datetime_end AS "datetimestart"
+		FROM tmp_move_cycle 
+		WHERE date(#{datetime}) BETWEEN datetime_start AND datetime_end
+	</select>
+	
+	
+	<select id="getTmpMoveCycleByCycle" resultType="com.mo9.risk.modules.dunning.bean.TmpMoveCycle" >
+		SELECT 
+			id AS "id",
+			cycle AS "cycle",
+			datetime_start AS "datetimestart",
+			datetime_end AS "datetimestart"
+		FROM tmp_move_cycle 
+		WHERE cycle = #{cycle}
+	</select>
+	
+	
+	<select id="getQianxilvNew" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT 
+			*
+		 FROM
+		t_mis_dunning_qianxilv_new
+	</select>
+	
+	<select id="getQianxilvCorpu" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT 
+			*
+		 FROM
+		t_mis_dunning_qianxilv_corpus
+	</select>
+	
+	
+	<select id="getSumQ1QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT 
+			IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ1QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT 
+			IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ2QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT 
+			IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ2QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT 
+			IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ3QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT 
+			IFNULL(sum(q3), 0) AS q3 ,IFNULL(sum(payoffq3), 0) AS payoffq3
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ3QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT 
+			IFNULL(sum(q3), 0) AS q3 ,IFNULL(sum(payoffq3), 0) AS payoffq3
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ4QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT 
+			IFNULL(sum(q4), 0) AS q4 ,IFNULL(sum(payoffq4), 0) AS payoffq4
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+	<select id="getSumQ4QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT 
+			IFNULL(sum(q4), 0) AS q4 ,IFNULL(sum(payoffq4), 0) AS payoffq4
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+	</select>
+	
+		
+	<!--  迁徙率 end	 -->
+	
+	
+</mapper>
