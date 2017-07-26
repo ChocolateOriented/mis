@@ -74,7 +74,7 @@
 				bankName = "${personalInfo.remitBankName}";
 				bankCard = "${personalInfo.remitBankNo}";
 			}
-			$.get("${ctx}/dunning/tMisDunningDeduct/preCheck", {dealcode:"${dealcode}", bankCard: bankCard}, function(data) {
+			$.get("${ctx}/dunning/tMisDunningDeduct/preCheck", {dealcode:"${dealcode}", bankCard: bankCard, bankName: bankName}, function(data) {
 				if(data && data.result != "OK") {
 					$.jBox.tip(data.msg, "warning");
 					return;
