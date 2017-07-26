@@ -134,6 +134,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setEndOutsourcingEndDate(Date endOutsourcingEndDate) {
 		this.endOutsourcingEndDate =  null != endOutsourcingEndDate ? DateUtils.endDate(endOutsourcingEndDate) : endOutsourcingEndDate;
 	}
+
+	@ExcelField(title="分按日期", type=1, align=2, sort=11)
 	public Date getOutsourcingBeginDate() {
 		return outsourcingBeginDate;
 	}
@@ -142,6 +144,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.outsourcingBeginDate = outsourcingBeginDate;
 	}
 
+	@ExcelField(title="催收截止日期", type=1, align=2, sort=12)
 	public Date getOutsourcingEndDate() {
 		return outsourcingEndDate;
 	}
@@ -219,7 +222,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setCreditamount(Double creditamount) {
 		this.creditamount = creditamount;
 	}
-	@ExcelField(title="到期还款日期", type=1, align=2, sort=6)
+	@ExcelField(title="到期还款日期", type=1, align=2, sort=7)
 	public Date getRepaymenttime() {
 		return repaymenttime;
 	}
@@ -227,7 +230,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public void setRepaymenttime(Date repaymenttime) {
 		this.repaymenttime = repaymenttime;
 	}
-	@ExcelField(title="逾期天数", type=1, align=2, sort=7)
+	@ExcelField(title="逾期天数", type=1, align=2, sort=8)
 	public Integer getOverduedays() {
 		return overduedays;
 	}
@@ -238,7 +241,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public String getStatus() {
 		return status;
 	}
-	@ExcelField(title="订单状态", type=1, align=2, sort=8)
+	@ExcelField(title="订单状态", type=1, align=2, sort=9)
 	public String getStatusText() {
 //		return null != this.monthincreased ? NumberUtil.formatTosepara(this.monthincreased) + "%" : "";
 		return STATUS_PAYOFF.equals(this.status) ?  "已还清" : 
@@ -248,7 +251,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.status = status;
 	}
 	
-	@ExcelField(title="催收人", type=1, align=2, sort=9)
+	@ExcelField(title="催收人", type=1, align=2, sort=10)
 	public String getDunningpeoplename() {
 		return dunningpeoplename;
 	}
@@ -256,7 +259,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.dunningpeoplename = dunningpeoplename;
 	}
 
-	@ExcelField(title="还清日期", type=1, align=2, sort=10)
+	@ExcelField(title="还清日期", type=1, align=2, sort=13)
 	public Date getPayofftime() {
 		return payofftime;
 	}
@@ -269,7 +272,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public String getDunningtaskstatus() {
 		return dunningtaskstatus;
 	}
-	@ExcelField(title="任务状态", type=1, align=2, sort=11)
+//	@ExcelField(title="任务状态", type=1, align=2, sort=11)
 	public String getDunningtaskstatusText() {
 		return STATUS_DUNNING.equals(this.dunningtaskstatus) ?  "正在催收" : 
 				STATUS_EXPIRED.equals(this.dunningtaskstatus) ?  "超出催收周期未催回" : 
@@ -436,6 +439,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.groupIds = groupIds;
 	}
 
+	@ExcelField(title="还款总额", type=1, align=2, sort=6)
 	public Double getBalance() {
 		return balance;
 	}

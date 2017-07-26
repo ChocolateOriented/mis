@@ -4,9 +4,9 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
-import com.thinkgem.jeesite.common.utils.DateUtils;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 财务确认汇款信息Entity
@@ -60,7 +60,7 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	// dunningtaskdbid
 	private String dunningtaskdbid;
 	// 催收小组id
-	private String dunningGroupId;
+	private List<String> dunningGroupIds;
 	// 催收人id
 	private String dunningPeopleId;
 
@@ -199,12 +199,12 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 		this.remittanceConfirmId = remittanceConfirmId;
 	}
 
-	public String getDunningGroupId() {
-		return dunningGroupId;
+	public List<String> getDunningGroupIds() {
+		return dunningGroupIds;
 	}
 
-	public void setDunningGroupId(String dunningGroupId) {
-		this.dunningGroupId = dunningGroupId;
+	public void setDunningGroupIds(List<String> dunningGroupIds) {
+		this.dunningGroupIds = dunningGroupIds;
 	}
 
 	public String getDunningPeopleId() {
