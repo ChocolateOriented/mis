@@ -14,8 +14,7 @@
 
     	// 清空查询功能
 		 $("#empty").click(function(){
-			var sss = window.frames["ifm"].document.getElementById("childIfam").value;
-  		 	window.location.href="${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage="+sss;
+           window.location.href="${ctx}/dunning/tMisRemittanceMessage/confirmList";
 		 });
 
         //组与花名联动查询
@@ -28,8 +27,13 @@
             dataType: 'json',
             quietMillis: 250,
             data: function (term, page) {//查询参数 ,term为输入字符
-              var groupId = $("#groupList").val();
-              return {'group.id': groupId, nickname: term};
+              var data ={};
+              var groupIds = $("#groupList").val();
+              for(var i=0;i< groupIds.length;i++){
+                data['group.groupIds['+i+']'] = groupIds[i];
+              }
+              data.nickname = term ;
+              return data;
             },
             results: function (data, page) {//选择要显示的数据`
               var resultsData = [] ;
@@ -368,8 +372,7 @@
         </li>
 
         <li><label>催收小组：</label>
-            <form:select id="groupList" path="dunningGroupId" class="input-medium">
-                <form:option value="">全部</form:option>
+            <form:select id="groupList" path="dunningGroupIds" class="input-medium" multiple="multiple" cssStyle="width: 300px;">
                 <!-- 添加组类型为optgroup -->
                 <c:forEach items="${groupTypes}" var="type">
                     <optgroup label="${type.value}">
@@ -377,7 +380,8 @@
                         <c:forEach items="${groupList}" var="item">
                             <c:if test="${item.type == type.key}">
                                 <option value="${item.id}"
-                                        <c:if test="${TMisRemittanceMessagChecked.dunningGroupId == item.id }">selected="selected"</c:if>>${item.name}</option>
+                                        <c:if test="${fn:contains(TMisRemittanceMessagChecked.dunningGroupIds, item.id)}">selected="selected"</c:if>
+                                        >${item.name}</option>
                             </c:if>
                         </c:forEach>
                     </optgroup>
