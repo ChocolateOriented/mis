@@ -400,6 +400,8 @@
 				</foreach>
 			</if>
 		</if>
+		GROUP BY
+		l.ComfirmId
 		)
 		AS mix
 		LEFT JOIN t_mis_remittance_confirm_log AS g ON g.dbid = mix.cheackedLogId
