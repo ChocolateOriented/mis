@@ -7,6 +7,7 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -14,7 +15,6 @@ import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
-import com.sun.tools.javac.util.List;
 
 /**
  * 迁徙率DAO接口
