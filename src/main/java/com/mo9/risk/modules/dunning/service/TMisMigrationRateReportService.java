@@ -265,6 +265,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			tMisMigrationRateReportDao.householdsInsertOverOneDay(40,Yesterday,today);
 			tMisMigrationRateReportDao.householdsInsertStatisticalData();
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
+			tMisMigrationRateReportDao.householdsUpdateQ1(Yesterday, today);
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ1();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ2();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ3();
@@ -276,6 +277,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			//迁徙率关于本金 
 			tMisMigrationRateReportDao.principalInsertStatisticalData();
 			tMisMigrationRateReportDao.principalUpdateOverOneDay();
+			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
 			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ3();

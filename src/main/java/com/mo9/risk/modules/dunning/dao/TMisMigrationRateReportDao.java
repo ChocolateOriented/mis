@@ -35,7 +35,8 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	
 	//更新逾期1天的当天到期的订单数
 	public void householdsUpdateOverOneDay();
-	
+	//更新Q1数据
+	public void householdsUpdateQ1(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	//更新PayoffQ1	
 	public void householdsUpdatePayoffQ1();
 	//更新PayoffQ2
@@ -57,6 +58,8 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	public void principalInsertStatisticalData();
 	//更新逾期1天的当天到期的订单数
 	public void principalUpdateOverOneDay();
+	//更新Q1数据
+	public void principalUpdateQ1(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	//更新PayoffQ1	
 	public void principalUpdatePayoffQ1();
 	//更新PayoffQ2
