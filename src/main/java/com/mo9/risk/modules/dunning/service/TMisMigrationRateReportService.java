@@ -190,6 +190,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			int maxcycle = tMisMigrationRateReportDao.getMaxcycle();
 			Date datetimestart = null;
 			Date datetimeend = null;
+			Date Yesterday = getDate(-1);
 			switch (getTomorrowDaysOfMonth()) {
 				case 30:
 					switch (getTomorrow()) {
@@ -198,16 +199,18 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 						datetimeend = getDate(15);
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
 						migrationRateGetData();
-						
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					case 16:
 						datetimestart = getDate(1);
 						datetimeend = getMonthLastDayDate();
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
 						migrationRateGetData();
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					default:
 						migrationRateGetData();
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					}
 					
@@ -218,15 +221,18 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 						datetimeend = getDate(16);
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
 						migrationRateGetData();
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					case 17:
 						datetimestart = getDate(1);
 						datetimeend = getMonthLastDayDate();
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
 						migrationRateGetData();
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					default:
 						migrationRateGetData();
+						insertMigrationRateReportDB(Yesterday);
 						return;
 					}
 					
@@ -257,7 +263,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			//执行一系列的迁徙率数据获取
 			tMisMigrationRateReportDao.householdsUpdateHaveBeenCollectDealcode();
 			tMisMigrationRateReportDao.householdsInsertOverOneDay(40,Yesterday,today);
-			tMisMigrationRateReportDao.householdsInsertStatisticalData(Yesterday,today);
+			tMisMigrationRateReportDao.householdsInsertStatisticalData();
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ1();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ2();
@@ -268,7 +274,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			tMisMigrationRateReportDao.householdsUpdateQ4();
 			
 			//迁徙率关于本金 
-			tMisMigrationRateReportDao.principalInsertStatisticalData(Yesterday,today);
+			tMisMigrationRateReportDao.principalInsertStatisticalData();
 			tMisMigrationRateReportDao.principalUpdateOverOneDay();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
@@ -316,11 +322,11 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
      */
 //	@Scheduled(cron = "0 0 7 * * ?")
 	@Transactional(readOnly = false)
-	public void insertMigrationRateReportDB() {
+	public void insertMigrationRateReportDB(Date Yesterday) {
 		try {
 			
 			TMisMigrationRateReport migrationRateReport = new TMisMigrationRateReport();
-			Date Yesterday = getDate(-1);
+//			Date Yesterday = getDate(-1);
 			TmpMoveCycle tmpMoveCycle = tMisMigrationRateReportDao.getTmpMoveCycleByDatetime(Yesterday);
 //			new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
 			
