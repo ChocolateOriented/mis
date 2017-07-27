@@ -17,13 +17,12 @@
 			$(".suspense").css("display", "none");
 		}
 
-		 function page(n, s) {
-		        if (n) window.parent.$("#pageNo").val(n);
-		        if (s) window.parent.$("#pageSize").val(s);
-		       window.parent. $("#searchForm").attr("action", "${ctx}/dunning/tMisRemittanceMessage/confirmList?childPage=completed");
-		       window.parent.$("#searchForm").submit();
-		        return false;
-		      }
+        function page(n, s) {
+          if (n) window.parent.$("#pageNo").val(n);
+          if (s) window.parent.$("#pageSize").val(s);
+          window.location = "${ctx}/dunning/tMisRemittanceMessage/completed?" + window.parent.$("#searchForm").serialize();
+          return false;
+        }
 	</script>
 	<style type="text/css">
 				.suspense {
