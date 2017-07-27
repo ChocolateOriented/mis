@@ -7,6 +7,7 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -14,7 +15,6 @@ import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
-import com.sun.tools.javac.util.List;
 
 /**
  * 迁徙率DAO接口
@@ -35,7 +35,8 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	
 	//更新逾期1天的当天到期的订单数
 	public void householdsUpdateOverOneDay();
-	
+	//更新Q1数据
+	public void householdsUpdateQ1(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	//更新PayoffQ1	
 	public void householdsUpdatePayoffQ1();
 	//更新PayoffQ2
@@ -57,6 +58,8 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	public void principalInsertStatisticalData();
 	//更新逾期1天的当天到期的订单数
 	public void principalUpdateOverOneDay();
+	//更新Q1数据
+	public void principalUpdateQ1(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	//更新PayoffQ1	
 	public void principalUpdatePayoffQ1();
 	//更新PayoffQ2

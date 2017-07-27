@@ -182,7 +182,8 @@
 <!-- 				AND r.AddTime <  #{datetimeend} -->
 <!-- 			GROUP BY AddTime; -->
 <!--       	]]> -->
-		INSERT INTO t_mis_dunning_qianxilv_new(CreateTime, Q1)
+	<![CDATA[
+		INSERT INTO t_mis_dunning_qianxilv_new(CreateTime, OrderDueDate)
 		SELECT
 			t.*
 		FROM
@@ -198,8 +199,25 @@
 		LEFT JOIN t_mis_dunning_qianxilv_new AS s 
 			ON t.CreateTime = s.CreateTime 
 		WHERE s.CreateTime IS NULL AND t.CreateTime IS NOT NULL;
+			]]>
 	</insert>
 	
+<!-- 	# 更新Q1数据 -->
+	<update id="householdsUpdateQ1">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r 
+			INNER JOIN (
+			select 
+				AddTime,
+				COUNT(1) AS Q1
+			from tmp_move_rate AS r 
+			LEFT JOIN tmp_move_cycle AS c ON r.cycle  =c.cycle
+			WHERE r.AddTime >= #{datetimestart} 
+				AND r.AddTime < #{datetimeend}
+			GROUP BY AddTime) AS t ON t.AddTime = r.CreateTime
+			SET r.Q1 = t.Q1;
+			]]>
+	</update>
 	
 	<!--  # 更新PayoffQ1	 -->
 	<update id="householdsUpdatePayoffQ1">
@@ -432,7 +450,8 @@
 <!-- 			GROUP BY -->
 <!-- 				AddTime; -->
 <!--       	]]> -->
-		INSERT INTO t_mis_dunning_qianxilv_corpus(CreateTime, Q1)
+	<![CDATA[ 
+		INSERT INTO t_mis_dunning_qianxilv_corpus(CreateTime, OrderDueDate)
 		SELECT
 			t.*
 		FROM
@@ -448,8 +467,27 @@
 		LEFT JOIN t_mis_dunning_qianxilv_corpus AS s 
 			ON t.CreateTime = s.CreateTime 
 		WHERE s.CreateTime IS NULL AND t.CreateTime IS NOT NULL;
+		]]>
 	</insert>
-		
+	
+	
+	<!-- 	#更新Q1数据 -->
+	<update id="principalUpdateQ1">
+		<![CDATA[ 
+			update t_mis_dunning_qianxilv_corpus As r
+			INNER JOIN ( 
+			select 
+				AddTime,
+				SUM(CorpusAmount) AS Q1
+			from tmp_move_rate AS r 
+			LEFT JOIN tmp_move_cycle AS c ON r.cycle  =c.cycle
+			WHERE r.AddTime >= #{datetimestart}
+				AND r.AddTime < #{datetimeend} 
+			GROUP BY AddTime) AS t ON t.AddTime = r.CreateTime
+			SET r.Q1 = t.Q1;
+			]]>
+	</update>	
+	
 	<!--  # 更新PayoffQ1	 -->
 	<update id="principalUpdatePayoffQ1">
 		<![CDATA[

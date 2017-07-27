@@ -265,6 +265,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			tMisMigrationRateReportDao.householdsInsertOverOneDay(40,Yesterday,today);
 			tMisMigrationRateReportDao.householdsInsertStatisticalData();
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
+			tMisMigrationRateReportDao.householdsUpdateQ1(Yesterday, today);
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ1();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ2();
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ3();
@@ -276,6 +277,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			//迁徙率关于本金 
 			tMisMigrationRateReportDao.principalInsertStatisticalData();
 			tMisMigrationRateReportDao.principalUpdateOverOneDay();
+			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
 			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
 			tMisMigrationRateReportDao.principalUpdatePayoffQ3();
@@ -335,9 +337,9 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				migrationRateReport.setCycle(String.valueOf(tmpMoveCycle.getCycle()));
 				migrationRateReport.setDatetime(Yesterday);
 				
-				TmpMoveCycle tmpMoveCycleBefore1 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 1);  // 本周期C-P1的前一个周期
-				TmpMoveCycle tmpMoveCycleBefore2 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 2);  // 本周期C-P1的前二个周期
-				TmpMoveCycle tmpMoveCycleBefore3 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 3);  // 本周期C-P1的前三个周期
+				TmpMoveCycle tmpMoveCycleBefore1 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 1);  // 前一个周期
+				TmpMoveCycle tmpMoveCycleBefore2 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 2);  // 前二个周期
+				TmpMoveCycle tmpMoveCycleBefore3 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 3);  // 前三个周期
 				
 				// C-P1  户数迁徙  C-P1（每日）= 期末余额/期初余额
 				QianxilvNew qianxilvnew1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
