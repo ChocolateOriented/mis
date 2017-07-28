@@ -3,8 +3,11 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.SMisDunningTaskMonthReportService;
@@ -119,24 +123,6 @@ public class SMisDunningTaskMonthReportController extends BaseController {
 		addMessage(redirectAttributes, "删除催收月绩效成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/sMisDunningTaskMonthReport/?repage";
 	}
-	/**
-	 * 贷后报表测试用例
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "test")
-	public String testReportPage() {
-		return "modules/dunning/sMisDunningMigrationRateTest";
-		
-	}
-	/**
-	 * 关于测试迁徙率数据的获取
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "testMigration")
-	@ResponseBody
-	public void testMigration() {
-//		sMisDunningTaskMonthReportService.migrationRateGetData();
-	}
-
+	
+	
 }

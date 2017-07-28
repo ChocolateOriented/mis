@@ -30,7 +30,25 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	private BigDecimal cp4corpus;		// cp4corpus
 	private String cycle;		// cycle
 	
+	private Date datetimeStart ;//周期对应的开始时间
+	private Date datetimeEnd ;//周期对应的结束时间
 	
+	public Date getDatetimeStart() {
+		return datetimeStart;
+	}
+
+	public void setDatetimeStart(Date datetimeStart) {
+		this.datetimeStart = datetimeStart;
+	}
+
+	public Date getDatetimeEnd() {
+		return datetimeEnd;
+	}
+
+	public void setDatetimeEnd(Date datetimeEnd) {
+		this.datetimeEnd = datetimeEnd;
+	}
+
 	public TMisMigrationRateReport() {
 		super();
 	}
