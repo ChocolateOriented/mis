@@ -14,8 +14,9 @@ $(document).ready(function() {
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/sMisDunningTaskMonthReport/migrationdata">贷后迁徙日报</a></li>
-		<li><a href="${ctx}/dunning/sMisDunningTaskMonthReport/migrationRate">贷后迁徙图表</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisMigrationRateReport/list">贷后迁徙日报</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙户数图表</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
@@ -39,28 +40,19 @@ $(document).ready(function() {
 		</thead>
 		
 		<tbody>
-			<tr>
-			  <td>20170701</td>
-			  <td>1%</td>
-			  <td>2%</td>
-			  <td>3%</td>
-			  <td>4%</td>
-			  <td>5%</td>
-			  <td>6%</td>
-			  <td>7%</td>
-			  <td>8%</td>
-			</tr>
-			<tr>
-			  <td>20170702</td>
-			  <td>11%</td>
-			  <td>22%</td>
-			  <td>33%</td>
-			  <td>44%</td>
-			  <td>55%</td>
-			  <td>66%</td>
-			  <td>77%</td>
-			  <td>88%</td>
-			</tr>
+			<c:forEach items="${page.list}" var="migrate" varStatus="vs">
+				<tr>
+				  <td><fmt:formatDate value="${migrate.datetime }" pattern="yyyy-MM-dd"/></td>
+				  <td>${migrate.cp1corpus }%</td>
+				  <td>${migrate.cp2corpus }%</td>
+				  <td>${migrate.cp3corpus }%</td>
+				  <td>${migrate.cp4corpus }%</td>
+				  <td>${migrate.cp1new }%</td>
+				  <td>${migrate.cp2new }%</td>
+				  <td>${migrate.cp3new }%</td>
+				  <td>${migrate.cp4new }%</td>
+				</tr>
+			</c:forEach>
 		</tbody>
 	</table>	
 </body>

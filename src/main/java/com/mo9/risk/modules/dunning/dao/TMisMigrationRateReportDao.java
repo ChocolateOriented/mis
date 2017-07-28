@@ -194,5 +194,12 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 */
 	public QianxilvCorpu getSumQ4QianxilvCorpuByCycleDatetime(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	
+	/**
+	 * 查询图表数据
+	 * @param tMisMigrationRateReport
+	 * @return
+	 */
+	public List<TMisMigrationRateReport> findMigrateChartList();
+	
 	
 }

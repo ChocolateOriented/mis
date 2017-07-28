@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-<title>贷后迁徙户数图表</title>
+<title>贷后迁徙本金图表</title>
 <meta name="decorator" content="default" />
 <script type="text/javascript">
 $(document).ready(function() {
@@ -11,14 +11,14 @@ $(document).ready(function() {
 });
 
 function mrgiation(){
-	$.post("${ctx}/dunning/sMisDunningTaskMonthReport/migrationGetdata", {}, function(data) {
+	$.post("${ctx}/dunning/tMisMigrationRateReport/migrationGetAmountdata", {}, function(data) {
 	 	if($.isEmptyObject(data)) return;
     	var myCharts = document.getElementsByName('main');
     	for (var i=1; i< myCharts.length+1; i++) {
     		var  myChart=echarts.init(myCharts[i-1]);
            	myChart.setOption({
         	title : {
-    	        text: '户数迁徙_c-p1',
+    	        text: '本金迁徙_c-p'+i,
         	},
     	    tooltip : {
     	        trigger: 'axis'
@@ -75,9 +75,11 @@ function mrgiation(){
 </style>
 </head>
 <body>
+		
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/dunning/sMisDunningTaskMonthReport/migrationdata">贷后迁徙日报</a></li>
-		<li class="active"><a href="${ctx}/dunning/sMisDunningTaskMonthReport/migrationRate">贷后迁徙户数图表</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/list">贷后迁徙日报</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙图表</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
 	
 		<div id="main1" name="main" class="main" ></div>	

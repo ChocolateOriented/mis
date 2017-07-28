@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
@@ -9,25 +10,32 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
  * @author jwchi
  *
  */
-public class SMisMigrationData  {
+public class TMisMigrationData  {
 
 	
 	private String name;
 	private  final String TYPE="line";
 	
-	private List<Integer> data;
+	private List<BigDecimal> data;
 	
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public List<Integer> getData() {
+	
+	public List<BigDecimal> getData() {
 		return data;
 	}
-	public void setData(List<Integer> data) {
+
+
+
+	public void setData(List<BigDecimal> data) {
 		this.data = data;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getTYPE() {
 		return TYPE;

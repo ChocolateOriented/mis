@@ -845,5 +845,30 @@
 		
 	<!--  迁徙率 end	 -->
 	
+	<!--  图表的数据	 -->
+	<select id="findMigrateChartList" resultType="TMisMigrationRateReport">
 	
+	SELECT
+	<include refid="tMisMigrationRateReportColumns"/>,
+	c.datetime_start AS "datetimeStart",
+	c.datetime_end AS "datetimeEnd"
+	
+	FROM
+		tmp_move_cycle c
+	inner JOIN `t_mis_migration_rate_report` a ON a.Cycle = c.cycle  INNER
+	join (
+	SELECT
+		cycle
+	FROM
+		`tmp_move_cycle`
+	
+	
+	ORDER BY
+		cycle DESC
+	LIMIT 5
+		) t on t.cycle = a.cycle
+	ORDER BY  a.cycle desc,a.DateTime ASC
+	
+	
+	</select>
 </mapper>
