@@ -412,8 +412,8 @@
 <br/>
 
 <ul class="nav nav-tabs">
-    <li id="checkedPageLab" class="active"><a onclick="checkedPage()">已查账</a></li>
-    <li id="completedPageLab" ><a onclick="completedPage()">已完成</a></li>
+    <li id="checkedPageLab" class="active" style="cursor: pointer;"><a onclick="checkedPage()">已查账</a></li>
+    <li id="completedPageLab" style="cursor: pointer;"><a onclick="completedPage()">已完成</a></li>
 </ul>
 
 <iframe id="ifm" name="ifm" frameborder="0" style="width:100%;height: 560px;"></iframe>
