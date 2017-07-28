@@ -285,7 +285,28 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			tMisMigrationRateReportDao.principalUpdateQ2();
 			tMisMigrationRateReportDao.principalUpdateQ3();
 			tMisMigrationRateReportDao.principalUpdateQ4();
-			
+			logger.info( new Date()+"开始迁徙数据采集:");
+			logger.info("户数：更新已经采集的逾期订单 执行完成。");
+			logger.info("户数：采集今天逾期一天的数据 执行完成。");
+			logger.info("户数：采集新的迁徙率的统计数据 执行完成。");
+			logger.info("户数：更新逾期1天的当天到期的订单数 执行完成。");
+			logger.info("户数：更新Q1数据 执行完成。");
+			logger.info("户数：更新PayoffQ1 执行完成。");
+			logger.info("户数：更新PayoffQ3 执行完成。");
+			logger.info("户数：更新PayoffQ4 执行完成。");
+			logger.info("户数：更新Q2 执行完成。");
+			logger.info("户数：更新Q3  执行完成。");
+			logger.info("户数：更新Q4  执行完成。");
+			logger.info("本金：采集新的迁徙率的统计数据   执行完成。");
+			logger.info("本金：更新逾期1天的当天到期的订单数   执行完成。");
+			logger.info("本金：更新Q1数据   执行完成。");
+			logger.info("本金：更新PayoffQ1   执行完成。");
+			logger.info("本金：更新PayoffQ2   执行完成。");
+			logger.info("本金：更新PayoffQ3   执行完成。");
+			logger.info("本金：更新PayoffQ4   执行完成。");
+			logger.info("本金：更新Q2   执行完成。");
+			logger.info("本金：更新Q3   执行完成。");
+			logger.info("本金：更新Q4   执行完成。");
 		} catch (Exception e) {
 			logger.warn("迁徙率数据表更新任务失败"+ new Date());
 			logger.error("错误信息"+e.getMessage());

@@ -100,7 +100,6 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
 	@RequestMapping(value = "migratechart")
 	public String migratechart(TMisMigrationRateReport tMisMigrationRateReport, Model model) {
-		model.addAttribute("tMisMigrationRateReport", tMisMigrationRateReport);
 		return "modules/dunning/tMisMigrationRateChart";
 	}
 
@@ -276,7 +275,6 @@ public class TMisMigrationRateReportController extends BaseController {
 //		
 //		migrationData.put("smdList2", smdList2);
 		
-		System.out.println(JSON.toJSONString(migrationData));
 		return migrationData;
 	}
 	/**
@@ -285,7 +283,6 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
 	@RequestMapping(value = "migrateAmountchart")
 	public String migrateAmountChart(TMisMigrationRateReport tMisMigrationRateReport, Model model) {
-		model.addAttribute("tMisMigrationRateReport", tMisMigrationRateReport);
 		return "modules/dunning/tMisMigrationRateAmountChart";
 	}
 	
@@ -445,23 +442,6 @@ public class TMisMigrationRateReportController extends BaseController {
 		migrationData.put("smdList3", smdList3);
 		migrationData.put("smdList4", smdList4);
 		
-		
-//		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
-//		for (int i = 0; i <qtime2.size(); i++) {
-//			TMisMigrationData smd1=new TMisMigrationData();
-//			smd1.setName(qtime1.get(i));
-//			List<Integer>  cycleTime1=new ArrayList<Integer>();
-//			for (int y= 7*(i+1)+2; y< 7*(i+1)+18; y++) {
-//				cycleTime1.add(y);
-//			}
-//			smd1.setData(cycleTime1);
-//			smdList2.add(smd1);
-//			
-//		}
-//		
-//		migrationData.put("smdList2", smdList2);
-		
-		System.out.println(JSON.toJSONString(migrationData));
 		return migrationData;
 	}
 
