@@ -41,7 +41,7 @@ $(document).ready(function() {
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙户数图表</a></li>
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
-	  <li class="btns"><input id="migrateReportExport" class="btn btn-primary" type="button" value="导出" /></li>
+<!-- 	  <li class="btns"><input id="migrateReportExport" class="btn btn-primary" type="button" value="导出" /></li> -->
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>

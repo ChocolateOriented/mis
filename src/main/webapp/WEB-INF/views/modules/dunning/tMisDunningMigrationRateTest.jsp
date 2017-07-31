@@ -27,7 +27,6 @@ $(document).ready(function() {
 	$("#caulmigration").click(function(){
 		if(!$("#margTime").val()){
 			$("#tip").html("时间不能为空");
-			alert(1);
 			return ;
 		}
 		$("#tip").html("");

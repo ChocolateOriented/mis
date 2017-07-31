@@ -746,7 +746,7 @@
 			id AS "id",
 			cycle AS "cycle",
 			datetime_start AS "datetimestart",
-			datetime_end AS "datetimestart"
+			datetime_end AS "datetimeend"
 		FROM tmp_move_cycle 
 		WHERE date(#{datetime}) BETWEEN datetime_start AND datetime_end
 	</select>
@@ -757,7 +757,7 @@
 			id AS "id",
 			cycle AS "cycle",
 			datetime_start AS "datetimestart",
-			datetime_end AS "datetimestart"
+			datetime_end AS "datetimeend"
 		FROM tmp_move_cycle 
 		WHERE cycle = #{cycle}
 	</select>
