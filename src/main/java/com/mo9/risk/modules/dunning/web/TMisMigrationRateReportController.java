@@ -463,20 +463,35 @@ public class TMisMigrationRateReportController extends BaseController {
 	 * 关于迁徙率数据的获取
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "getMigration")
+	@RequestMapping(value = "autoInsertTmpMoveCycleDB")
 	@ResponseBody
-	public void getMigration() {
-		tMisMigrationRateReportService.migrationRateGetData();
+	public void autoInsertTmpMoveCycleDB() {
+		tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
 	}
+	
+	/**
+	 * 关于迁徙率数据的获取
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "autoMigrationRateGetData")
+	@ResponseBody
+	public void autoMigrationRateGetData() {
+		tMisMigrationRateReportService.autoMigrationRateGetData();
+	}
+	
 	/**
 	 * 获取计算后的迁徙率数据
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "caulMigration")
+	@RequestMapping(value = "autoInsertMigrationRateReportDB")
 	@ResponseBody
-	public void caulMigration( Date yesterday) {
-		tMisMigrationRateReportService.insertMigrationRateReportDB(yesterday);
+	public void autoInsertMigrationRateReportDB( Date yesterday) {
+		tMisMigrationRateReportService.autoInsertMigrationRateReportDB();
 	}
+	
+//	autoInsertTmpMoveCycleDB
+//	autoMigrationRateGetData
+//	autoInsertMigrationRateReportDB
 	
 	/**
 	 * 迁徙导出日报

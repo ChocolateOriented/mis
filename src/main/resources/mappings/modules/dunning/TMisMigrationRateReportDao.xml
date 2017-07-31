@@ -724,8 +724,8 @@
 		]]>
 	</update>	
 	
-	<select id="getMaxcycle" >
-		SELECT max(cycle)+1 as maxcycle FROM tmp_move_cycle 
+	<select id="getMaxcycle" resultType="int">
+		SELECT max(cycle) as maxcycle FROM tmp_move_cycle 
 	</select>
 	
 	<insert id="insertTmpMoveCycle">

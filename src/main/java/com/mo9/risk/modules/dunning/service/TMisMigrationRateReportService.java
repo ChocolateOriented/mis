@@ -57,6 +57,29 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	}
 	
 	
+	/**
+	 * 获取昨天月份的天数
+	 * @param date
+	 * @return
+	 */
+    public static int getYesterDaysOfMonth() {  
+        Calendar calendar = Calendar.getInstance();  
+        calendar.add(Calendar.DATE,-1);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);  
+    }  
+	
+	/**
+	 * 返回昨天日期号
+	 * @param date
+	 * @return
+	 */
+    public static int getYesterday() {  
+    	Calendar c = Calendar.getInstance();
+    	c.add(Calendar.DATE,-1);
+    	int datenum = c.get(Calendar.DATE);
+		return datenum;
+    } 
+	
 	public static void main(String[] args) {
 //		Calendar cal=Calendar.getInstance();
 //		cal.add(Calendar.DATE,8);
@@ -184,13 +207,13 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
      */
 //	@Scheduled(cron = "0 0 7 * * ?")
 	@Transactional(readOnly = false)
-	public void automigrationRateGetDataDB() {
+	public void autoInsertTmpMoveCycleDB() {
 		
 		try {
-			int maxcycle = tMisMigrationRateReportDao.getMaxcycle();
+			int maxcycle = tMisMigrationRateReportDao.getMaxcycle() + 1;
 			Date datetimestart = null;
 			Date datetimeend = null;
-			Date Yesterday = getDate(-1);
+//			Date Yesterday = getDate(-1);
 			switch (getTomorrowDaysOfMonth()) {
 				case 30:
 					switch (getTomorrow()) {
@@ -198,19 +221,19 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 						datetimestart = getDate(1);
 						datetimeend = getDate(15);
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					case 16:
 						datetimestart = getDate(1);
 						datetimeend = getMonthLastDayDate();
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					default:
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					}
 					
@@ -220,19 +243,19 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 						datetimestart = getDate(1);
 						datetimeend = getDate(16);
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					case 17:
 						datetimestart = getDate(1);
 						datetimeend = getMonthLastDayDate();
 						tMisMigrationRateReportDao.insertTmpMoveCycle(maxcycle, datetimestart, datetimeend);
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					default:
-						migrationRateGetData();
-						insertMigrationRateReportDB(Yesterday);
+//						migrationRateGetData();
+//						insertMigrationRateReportDB(Yesterday);
 						return;
 					}
 					
@@ -246,7 +269,6 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			logger.error("错误信息"+e.getMessage());
 			throw new ServiceException(e);
 		}
-		
 	}
 	
 	
@@ -254,15 +276,16 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 迁徙率数据的表更新
 	 */
+//	@Scheduled(cron = "0 0 7 * * ?")
 	@Transactional(readOnly = false)
-	public void migrationRateGetData() {
+	public void autoMigrationRateGetData() {
 		try {
 			Date today = getDate(0);
 			Date Yesterday = getDate(-1);
-			
+			int maxcycle = tMisMigrationRateReportDao.getMaxcycle();
 			//执行一系列的迁徙率数据获取
 			tMisMigrationRateReportDao.householdsUpdateHaveBeenCollectDealcode();
-			tMisMigrationRateReportDao.householdsInsertOverOneDay(40,Yesterday,today);
+			tMisMigrationRateReportDao.householdsInsertOverOneDay(maxcycle,Yesterday,today);
 			tMisMigrationRateReportDao.householdsInsertStatisticalData();
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
 			tMisMigrationRateReportDao.householdsUpdateQ1(Yesterday, today);
@@ -314,42 +337,17 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 	}
 
-	
-	/**
-	 * 获取昨天月份的天数
-	 * @param date
-	 * @return
-	 */
-    public static int getYesterDaysOfMonth() {  
-        Calendar calendar = Calendar.getInstance();  
-        calendar.add(Calendar.DATE,-1);
-        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);  
-    }  
-	
-	/**
-	 * 返回昨天日期号
-	 * @param date
-	 * @return
-	 */
-    public static int getYesterday() {  
-    	Calendar c = Calendar.getInstance();
-    	c.add(Calendar.DATE,-1);
-    	int datenum = c.get(Calendar.DATE);
-		return datenum;
-    }  
-	
-    
     
 	/**
      * 迁徙率计算insertDB
      */
 //	@Scheduled(cron = "0 0 7 * * ?")
 	@Transactional(readOnly = false)
-	public void insertMigrationRateReportDB(Date Yesterday) {
+	public void autoInsertMigrationRateReportDB() {
 		try {
 			
 			TMisMigrationRateReport migrationRateReport = new TMisMigrationRateReport();
-//			Date Yesterday = getDate(-1);
+			Date Yesterday = getDate(-1);
 			TmpMoveCycle tmpMoveCycle = tMisMigrationRateReportDao.getTmpMoveCycleByDatetime(Yesterday);
 //			new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
 			
