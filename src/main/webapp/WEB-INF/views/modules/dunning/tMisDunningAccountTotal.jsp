@@ -27,12 +27,14 @@
             dataType: 'json',
             quietMillis: 250,
             data: function (term, page) {//查询参数 ,term为输入字符
-              var data ={};
+              var data = {};
               var groupIds = $("#groupList").val();
-              for(var i=0;i< groupIds.length;i++){
-                data['group.groupIds['+i+']'] = groupIds[i];
+              data.nickname = term;
+              if (groupIds != null && groupIds != "") {
+                for (var i = 0; i < groupIds.length; i++) {
+                  data['group.groupIds[' + i + ']'] = groupIds[i];
+                }
               }
-              data.nickname = term ;
               return data;
             },
             results: function (data, page) {//选择要显示的数据`
