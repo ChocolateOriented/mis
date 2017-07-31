@@ -6,7 +6,30 @@
 <meta name="decorator" content="default" />
 <script type="text/javascript">
 $(document).ready(function() {
-	
+	 $("#migrateReportExport").click(function(){
+			top.$.jBox.confirm("确认要导出迁徙数据吗？","系统提示",function(v,h,f){
+				if(v=="ok"){
+					$.ajax({
+						url:"${ctx}/dunning/tMisMigrationRateReport/migrateExport",
+						type:"GET",
+						data:{},
+						success:function(data){
+							if("OK"==data){
+								$.jBox.tip("导出成功");
+								return;
+							}else{
+								$.jBox.tip("导出失败");
+								return;
+							}
+							
+						},
+						 error : function(XMLHttpRequest, textStatus, errorThrown){
+		                     alert("删除失败:"+textStatus);
+		                  }
+				});
+			}
+		 });
+	 });
 });
 
 
@@ -18,7 +41,7 @@ $(document).ready(function() {
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙户数图表</a></li>
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
-	
+<!-- 	  <li class="btns"><input id="migrateReportExport" class="btn btn-primary" type="button" value="导出" /></li> -->
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
@@ -43,14 +66,14 @@ $(document).ready(function() {
 			<c:forEach items="${page.list}" var="migrate" varStatus="vs">
 				<tr>
 				  <td><fmt:formatDate value="${migrate.datetime }" pattern="yyyy-MM-dd"/></td>
-				  <td>${migrate.cp1corpus }%</td>
-				  <td>${migrate.cp2corpus }%</td>
-				  <td>${migrate.cp3corpus }%</td>
-				  <td>${migrate.cp4corpus }%</td>
-				  <td>${migrate.cp1new }%</td>
-				  <td>${migrate.cp2new }%</td>
-				  <td>${migrate.cp3new }%</td>
-				  <td>${migrate.cp4new }%</td>
+				  <td>${migrate.cp1corpus*100 }%</td>
+				  <td>${migrate.cp2corpus*100 }%</td>
+				  <td>${migrate.cp3corpus*100 }%</td>
+				  <td>${migrate.cp4corpus*100 }%</td>
+				  <td>${migrate.cp1new*100 }%</td>
+				  <td>${migrate.cp2new*100 }%</td>
+				  <td>${migrate.cp3new*100 }%</td>
+				  <td>${migrate.cp4new*100 }%</td>
 				</tr>
 			</c:forEach>
 		</tbody>

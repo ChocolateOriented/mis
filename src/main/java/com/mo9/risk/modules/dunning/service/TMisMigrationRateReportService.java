@@ -443,8 +443,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				BigDecimal cp4corpu = cp1corpuBefore3.multiply(p1p2corpuBefore2).multiply(p2p3corpuBefore1).multiply(p3p4corpu);
 				migrationRateReport.setCp4corpus(cp4corpu);
 				
+				tMisMigrationRateReportDao.insert(migrationRateReport);
 			}
-			
 			
 		} catch (Exception e) {
 			logger.warn("迁徙率计算insertDB失败"+ new Date());
