@@ -849,9 +849,19 @@
 	<select id="findMigrateChartList" resultType="TMisMigrationRateReport">
 	
 	SELECT
-	<include refid="tMisMigrationRateReportColumns"/>,
-	c.datetime_start AS "datetimeStart",
-	c.datetime_end AS "datetimeEnd"
+		a.id AS "dbid",
+		a.datetime AS "datetime",
+		a.cp1new*100 AS "cp1new",
+		a.cp2new*100 AS "cp2new",
+		a.cp3new*100 AS "cp3new",
+		a.cp4new*100 AS "cp4new",
+		a.cp1corpus*100 AS "cp1corpus",
+		a.cp2corpus*100 AS "cp2corpus",
+		a.cp3corpus*100 AS "cp3corpus",
+		a.cp4corpus*100 AS "cp4corpus",
+		a.cycle AS "cycle",
+		c.datetime_start AS "datetimeStart",
+		c.datetime_end AS "datetimeEnd"
 	
 	FROM
 		tmp_move_cycle c
