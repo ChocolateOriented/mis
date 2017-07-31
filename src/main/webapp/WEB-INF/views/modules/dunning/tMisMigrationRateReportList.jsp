@@ -6,7 +6,30 @@
 <meta name="decorator" content="default" />
 <script type="text/javascript">
 $(document).ready(function() {
-	
+	 $("#migrateReportExport").click(function(){
+			top.$.jBox.confirm("确认要导出迁徙数据吗？","系统提示",function(v,h,f){
+				if(v=="ok"){
+					$.ajax({
+						url:"${ctx}/dunning/tMisMigrationRateReport/migrateExport",
+						type:"GET",
+						data:{},
+						success:function(data){
+							if("OK"==data){
+								$.jBox.tip("导出成功");
+								return;
+							}else{
+								$.jBox.tip("导出失败");
+								return;
+							}
+							
+						},
+						 error : function(XMLHttpRequest, textStatus, errorThrown){
+		                     alert("删除失败:"+textStatus);
+		                  }
+				});
+			}
+		 });
+	 });
 });
 
 
@@ -18,7 +41,7 @@ $(document).ready(function() {
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙户数图表</a></li>
 		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
-	
+	  <li class="btns"><input id="migrateReportExport" class="btn btn-primary" type="button" value="导出" /></li>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>

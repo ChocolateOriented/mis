@@ -27,7 +27,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanMonthReportBean;
+import com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanWeekReportBean;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
@@ -473,5 +477,24 @@ public class TMisMigrationRateReportController extends BaseController {
 	public void caulMigration( Date yesterday) {
 		tMisMigrationRateReportService.insertMigrationRateReportDB(yesterday);
 	}
+	
+	/**
+	 * 迁徙导出日报
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "migrateExport")
+	@ResponseBody
+	public String migrateExport(TMisMigrationRateReport tMisMigrationRateReport,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		try {
+            String fileName = "migrateExportFile" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
+            List<TMisMigrationRateReport> migratelist = tMisMigrationRateReportService.findList(tMisMigrationRateReport); 
+            new ExportExcel("迁徙日报表", TMisMigrationRateReport.class).setDataList(migratelist).write(response, fileName).dispose();
+           
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
+		}
+		 return "OK";
+	}
+	
 	
 }
