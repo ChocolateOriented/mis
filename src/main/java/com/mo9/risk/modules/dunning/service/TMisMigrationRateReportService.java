@@ -280,56 +280,58 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	@Transactional(readOnly = false)
 	public void autoMigrationRateGetData() {
 		try {
+			logger.info( new Date()+"开始迁徙数据采集:");
 			Date today = getDate(0);
 			Date Yesterday = getDate(-1);
 			int maxcycle = tMisMigrationRateReportDao.getMaxcycle();
 			//执行一系列的迁徙率数据获取
 			tMisMigrationRateReportDao.householdsUpdateHaveBeenCollectDealcode();
+			logger.info("户数：更新已经采集的逾期订单 执行完成。");
 			tMisMigrationRateReportDao.householdsInsertOverOneDay(maxcycle,Yesterday,today);
+			logger.info("户数：采集今天逾期一天的数据 执行完成。");
 			tMisMigrationRateReportDao.householdsInsertStatisticalData();
+			logger.info("户数：采集新的迁徙率的统计数据 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
+			logger.info("户数：更新逾期1天的当天到期的订单数 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ1(Yesterday, today);
+			logger.info("户数：更新Q1数据 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ1();
+			logger.info("户数：更新PayoffQ1 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ2();
+			logger.info("户数：更新PayoffQ2 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ3();
+			logger.info("户数：更新PayoffQ3 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ4();
+			logger.info("户数：更新PayoffQ4 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ2();
+			logger.info("户数：更新Q2 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ3();
+			logger.info("户数：更新Q3  执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ4();
+			logger.info("户数：更新Q4  执行完成。");
 			
 			//迁徙率关于本金 
 			tMisMigrationRateReportDao.principalInsertStatisticalData();
-			tMisMigrationRateReportDao.principalUpdateOverOneDay();
-			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
-			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ3();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ4();
-			tMisMigrationRateReportDao.principalUpdateQ2();
-			tMisMigrationRateReportDao.principalUpdateQ3();
-			tMisMigrationRateReportDao.principalUpdateQ4();
-			logger.info( new Date()+"开始迁徙数据采集:");
-			logger.info("户数：更新已经采集的逾期订单 执行完成。");
-			logger.info("户数：采集今天逾期一天的数据 执行完成。");
-			logger.info("户数：采集新的迁徙率的统计数据 执行完成。");
-			logger.info("户数：更新逾期1天的当天到期的订单数 执行完成。");
-			logger.info("户数：更新Q1数据 执行完成。");
-			logger.info("户数：更新PayoffQ1 执行完成。");
-			logger.info("户数：更新PayoffQ3 执行完成。");
-			logger.info("户数：更新PayoffQ4 执行完成。");
-			logger.info("户数：更新Q2 执行完成。");
-			logger.info("户数：更新Q3  执行完成。");
-			logger.info("户数：更新Q4  执行完成。");
 			logger.info("本金：采集新的迁徙率的统计数据   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateOverOneDay();
 			logger.info("本金：更新逾期1天的当天到期的订单数   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
 			logger.info("本金：更新Q1数据   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
 			logger.info("本金：更新PayoffQ1   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
 			logger.info("本金：更新PayoffQ2   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ3();
 			logger.info("本金：更新PayoffQ3   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ4();
 			logger.info("本金：更新PayoffQ4   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ2();
 			logger.info("本金：更新Q2   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ3();
 			logger.info("本金：更新Q3   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ4();
 			logger.info("本金：更新Q4   执行完成。");
+			logger.info( new Date()+"迁徙数据采集完成。");
 		} catch (Exception e) {
 			logger.warn("迁徙率数据表更新任务失败"+ new Date());
 			logger.error("错误信息"+e.getMessage());
