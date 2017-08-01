@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.util.NumberUtil;
 
 /**
  * 迁徙率Entity
@@ -80,6 +81,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	public BigDecimal getCp1new() {
 		return cp1new;
 	}
+	public String getCp1newText() {
+		return null != this.cp1new ? NumberUtil.formatTosepara(this.cp1new.multiply(new BigDecimal(100))) + "%" : "";
+	}
 
 	public void setCp1new(BigDecimal cp1new) {
 		this.cp1new = cp1new;
@@ -88,6 +92,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	@Length(min=0, max=11, message="cp2new长度必须介于 0 和 11 之间")
 	public BigDecimal getCp2new() {
 		return cp2new;
+	}
+	public String getCp2newText() {
+		return null != this.cp2new ? NumberUtil.formatTosepara(this.cp2new.multiply(new BigDecimal(100))) + "%" : "";
 	}
 
 	public void setCp2new(BigDecimal cp2new) {
@@ -98,6 +105,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	public BigDecimal getCp3new() {
 		return cp3new;
 	}
+	public String getCp3newText() {
+		return null != this.cp3new ? NumberUtil.formatTosepara(this.cp3new.multiply(new BigDecimal(100))) + "%" : "";
+	}
 
 	public void setCp3new(BigDecimal cp3new) {
 		this.cp3new = cp3new;
@@ -107,6 +117,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	public BigDecimal getCp4new() {
 		return cp4new;
 	}
+	public String getCp4newText() {
+		return null != this.cp4new ? NumberUtil.formatTosepara(this.cp4new.multiply(new BigDecimal(100))) + "%" : "";
+	}
 
 	public void setCp4new(BigDecimal cp4new) {
 		this.cp4new = cp4new;
@@ -114,6 +127,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	
 	public BigDecimal getCp1corpus() {
 		return cp1corpus;
+	}
+	public String getCp1corpusText() {
+		return null != this.cp1corpus ? NumberUtil.formatTosepara(this.cp1corpus.multiply(new BigDecimal(100))) + "%" : "";
 	}
 
 	public void setCp1corpus(BigDecimal cp1corpus) {
@@ -123,6 +139,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	public BigDecimal getCp2corpus() {
 		return cp2corpus;
 	}
+	public String getCp2corpusText() {
+		return null != this.cp2corpus ? NumberUtil.formatTosepara(this.cp2corpus.multiply(new BigDecimal(100))) + "%" : "";
+	}
 
 	public void setCp2corpus(BigDecimal cp2corpus) {
 		this.cp2corpus = cp2corpus;
@@ -131,6 +150,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	public BigDecimal getCp3corpus() {
 		return cp3corpus;
 	}
+	public String getCp3corpusText() {
+		return null != this.cp3corpus ? NumberUtil.formatTosepara(this.cp3corpus.multiply(new BigDecimal(100))) + "%" : "";
+	}
 
 	public void setCp3corpus(BigDecimal cp3corpus) {
 		this.cp3corpus = cp3corpus;
@@ -138,6 +160,9 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	
 	public BigDecimal getCp4corpus() {
 		return cp4corpus;
+	}
+	public String getCp4corpusText() {
+		return null != this.cp4corpus ? NumberUtil.formatTosepara(this.cp4corpus.multiply(new BigDecimal(100))) + "%" : "";
 	}
 
 	public void setCp4corpus(BigDecimal cp4corpus) {

@@ -66,14 +66,14 @@ $(document).ready(function() {
 			<c:forEach items="${page.list}" var="migrate" varStatus="vs">
 				<tr>
 				  <td><fmt:formatDate value="${migrate.datetime }" pattern="yyyy-MM-dd"/></td>
-				  <td>${migrate.cp1corpus*100 }%</td>
-				  <td>${migrate.cp2corpus*100 }%</td>
-				  <td>${migrate.cp3corpus*100 }%</td>
-				  <td>${migrate.cp4corpus*100 }%</td>
-				  <td>${migrate.cp1new*100 }%</td>
-				  <td>${migrate.cp2new*100 }%</td>
-				  <td>${migrate.cp3new*100 }%</td>
-				  <td>${migrate.cp4new*100 }%</td>
+				  <td>${migrate.cp1newText}</td>
+				  <td>${migrate.cp2newText }</td>
+				  <td>${migrate.cp3newText }</td>
+				  <td>${migrate.cp4newText }</td>
+				  <td>${migrate.cp1corpusText}</td>
+				  <td>${migrate.cp2corpusText}</td>
+				  <td>${migrate.cp3corpusText }</td>
+				  <td>${migrate.cp4corpusText }</td>
 				</tr>
 			</c:forEach>
 		</tbody>

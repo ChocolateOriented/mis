@@ -62,8 +62,7 @@ function mrgiation(){
     	            show: true  
     		    },
     		    series:data['smdList'+i],
-    		    animationEasing :'BounceIn',
-    		    backgroundColor:'seashell ' 
+    		    animationEasing :'BounceIn'
     	    });
 		}
 	});	
