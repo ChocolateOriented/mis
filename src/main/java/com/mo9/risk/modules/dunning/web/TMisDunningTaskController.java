@@ -1030,7 +1030,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "customerDetails")
-	public String customerDetails(String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,String dunningCycle,String  mobileSelf,Model model) {
+	public String customerDetails(String overdueDays,String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,String dunningCycle,String  mobileSelf,Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1067,6 +1067,7 @@ public class TMisDunningTaskController extends BaseController {
 			
 			model.addAttribute("hasContact", hasContact);
 			model.addAttribute("dunningCycle", dunningCycle);
+			model.addAttribute("overdueDays", overdueDays);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "error";

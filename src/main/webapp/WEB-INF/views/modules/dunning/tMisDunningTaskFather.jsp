@@ -202,12 +202,12 @@
 	</shiro:hasPermission>
 <br/>
 <c:choose>
-	<c:when test="${dunningCycle eq 'Q0'}">
-		<iframe id="ifm" src="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}" frameborder="0"  style="width:100%;height:600px;">
+	<c:when test="${personalInfo.overdueDays <=1}">
+		<iframe id="ifm" src="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}&overdueDays=${personalInfo.overdueDays}" frameborder="0"  style="width:100%;height:600px;">
 		</iframe> 
 	</c:when>
 	<c:otherwise>
-		<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}" frameborder="0"  style="width:100%;height:600px;">
+		<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}&overdueDays=${personalInfo.overdueDays}" frameborder="0"  style="width:100%;height:600px;">
 		</iframe> 
 	</c:otherwise>
 </c:choose>
