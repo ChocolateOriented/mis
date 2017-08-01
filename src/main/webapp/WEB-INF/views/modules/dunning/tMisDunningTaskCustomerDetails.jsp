@@ -7,7 +7,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#btnPaid').attr("disabled","disabled");
-			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&mobile=" + $('#mobile', parent.document).val();
+			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}&mobile=" + $('#mobile', parent.document).val();
 			$("#applogiglog_a").attr("href",url);
 			
 			if("${ispayoff}" == "true"){
@@ -196,7 +196,7 @@
 	
 	<br/>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
-	<input id="btnSms"   name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactstype="${dunningCycle eq 'Q0' ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
+	<input id="btnSms"   name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary"  contactstype="${overdueDays<=1 ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
 	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
