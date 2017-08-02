@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ import com.thinkgem.jeesite.common.service.ServiceException;
  */
 @Service
 @Transactional(readOnly = true)
+@Lazy(false)
 public class TMisMigrationRateReportService extends CrudService<TMisMigrationRateReportDao, TMisMigrationRateReport> {
 	
 	@Autowired
@@ -205,7 +208,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
     /**
      * 每天定时更新迁徙率DB
      */
-//	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "0 15 0 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertTmpMoveCycleDB() {
 		
@@ -276,60 +279,62 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 迁徙率数据的表更新
 	 */
-//	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "0 18 0 * * ?")
 	@Transactional(readOnly = false)
 	public void autoMigrationRateGetData() {
 		try {
+			logger.info( new Date()+"开始迁徙数据采集:");
 			Date today = getDate(0);
 			Date Yesterday = getDate(-1);
 			int maxcycle = tMisMigrationRateReportDao.getMaxcycle();
 			//执行一系列的迁徙率数据获取
 			tMisMigrationRateReportDao.householdsUpdateHaveBeenCollectDealcode();
+			logger.info("户数：更新已经采集的逾期订单 执行完成。");
 			tMisMigrationRateReportDao.householdsInsertOverOneDay(maxcycle,Yesterday,today);
+			logger.info("户数：采集今天逾期一天的数据 执行完成。");
 			tMisMigrationRateReportDao.householdsInsertStatisticalData();
+			logger.info("户数：采集新的迁徙率的统计数据 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateOverOneDay();
+			logger.info("户数：更新逾期1天的当天到期的订单数 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ1(Yesterday, today);
+			logger.info("户数：更新Q1数据 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ1();
+			logger.info("户数：更新PayoffQ1 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ2();
+			logger.info("户数：更新PayoffQ2 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ3();
+			logger.info("户数：更新PayoffQ3 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdatePayoffQ4();
+			logger.info("户数：更新PayoffQ4 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ2();
+			logger.info("户数：更新Q2 执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ3();
+			logger.info("户数：更新Q3  执行完成。");
 			tMisMigrationRateReportDao.householdsUpdateQ4();
+			logger.info("户数：更新Q4  执行完成。");
 			
 			//迁徙率关于本金 
 			tMisMigrationRateReportDao.principalInsertStatisticalData();
-			tMisMigrationRateReportDao.principalUpdateOverOneDay();
-			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
-			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ3();
-			tMisMigrationRateReportDao.principalUpdatePayoffQ4();
-			tMisMigrationRateReportDao.principalUpdateQ2();
-			tMisMigrationRateReportDao.principalUpdateQ3();
-			tMisMigrationRateReportDao.principalUpdateQ4();
-			logger.info( new Date()+"开始迁徙数据采集:");
-			logger.info("户数：更新已经采集的逾期订单 执行完成。");
-			logger.info("户数：采集今天逾期一天的数据 执行完成。");
-			logger.info("户数：采集新的迁徙率的统计数据 执行完成。");
-			logger.info("户数：更新逾期1天的当天到期的订单数 执行完成。");
-			logger.info("户数：更新Q1数据 执行完成。");
-			logger.info("户数：更新PayoffQ1 执行完成。");
-			logger.info("户数：更新PayoffQ3 执行完成。");
-			logger.info("户数：更新PayoffQ4 执行完成。");
-			logger.info("户数：更新Q2 执行完成。");
-			logger.info("户数：更新Q3  执行完成。");
-			logger.info("户数：更新Q4  执行完成。");
 			logger.info("本金：采集新的迁徙率的统计数据   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateOverOneDay();
 			logger.info("本金：更新逾期1天的当天到期的订单数   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ1(Yesterday, today);
 			logger.info("本金：更新Q1数据   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ1();
 			logger.info("本金：更新PayoffQ1   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ2();
 			logger.info("本金：更新PayoffQ2   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ3();
 			logger.info("本金：更新PayoffQ3   执行完成。");
+			tMisMigrationRateReportDao.principalUpdatePayoffQ4();
 			logger.info("本金：更新PayoffQ4   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ2();
 			logger.info("本金：更新Q2   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ3();
 			logger.info("本金：更新Q3   执行完成。");
+			tMisMigrationRateReportDao.principalUpdateQ4();
 			logger.info("本金：更新Q4   执行完成。");
+			logger.info( new Date()+"迁徙数据采集完成。");
 		} catch (Exception e) {
 			logger.warn("迁徙率数据表更新任务失败"+ new Date());
 			logger.error("错误信息"+e.getMessage());
@@ -341,7 +346,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	/**
      * 迁徙率计算insertDB
      */
-//	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "0 35 0 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB() {
 		try {
@@ -361,7 +366,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				TmpMoveCycle tmpMoveCycleBefore3 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 3);  // 前三个周期
 				
 				// C-P1  户数迁徙  C-P1（每日）= 期末余额/期初余额
-				QianxilvNew qianxilvnew1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvNew qianxilvnew1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByYesterday(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend(),Yesterday);
 				BigDecimal cp1new = calculate(qianxilvnew1.getQ1(), qianxilvnew1.getPayoffq1(), qianxilvnew1.getOrderduedate(), 4);
 				
 				migrationRateReport.setCp1new(cp1new);
@@ -369,7 +374,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				// C-P2  户数迁徙   C-P2（每日）=（C-P1）*（P1-P2）
 				QianxilvNew qianxilvnew1Before1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal cp1newBefore1 = calculate(qianxilvnew1Before1.getQ1(), qianxilvnew1Before1.getPayoffq1(), qianxilvnew1Before1.getOrderduedate(), 4);
-				QianxilvNew qianxilvnew2 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvNew qianxilvnew2 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p1p2new = calculate(qianxilvnew2.getQ2(), qianxilvnew2.getPayoffq2(), qianxilvnew2.getQ2(), 4);
 				
 				BigDecimal cp2new = cp1newBefore1.multiply(p1p2new);
@@ -380,7 +385,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				BigDecimal cp1newBefore2 = calculate(qianxilvnew1Before2.getQ1(), qianxilvnew1Before2.getPayoffq1(), qianxilvnew1Before2.getOrderduedate(), 4);
 				QianxilvNew qianxilvnew2Before1 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal p1p2newBefore1 = calculate(qianxilvnew2Before1.getQ2(), qianxilvnew2Before1.getPayoffq2(), qianxilvnew2Before1.getQ2(), 4);
-				QianxilvNew qianxilvnew3 = tMisMigrationRateReportDao.getSumQ3QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvNew qianxilvnew3 = tMisMigrationRateReportDao.getSumQ3QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p2p3new = calculate(qianxilvnew3.getQ3(), qianxilvnew3.getPayoffq3(), qianxilvnew3.getQ3(), 4);
 				
 				BigDecimal cp3new = cp1newBefore2.multiply(p1p2newBefore1).multiply(p2p3new);
@@ -393,7 +398,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				BigDecimal p1p2newBefore2 = calculate(qianxilvnew2Before2.getQ2(), qianxilvnew2Before2.getPayoffq2(), qianxilvnew2Before2.getQ2(), 4);
 				QianxilvNew qianxilvnew3Before1 = tMisMigrationRateReportDao.getSumQ3QianxilvNewByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal p2p3newBefore1 = calculate(qianxilvnew3Before1.getQ3(), qianxilvnew3Before1.getPayoffq3(), qianxilvnew3Before1.getQ3(), 4);
-				QianxilvNew qianxilvnew4 = tMisMigrationRateReportDao.getSumQ4QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvNew qianxilvnew4 = tMisMigrationRateReportDao.getSumQ4QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p3p4new = calculate(qianxilvnew4.getQ4(), qianxilvnew4.getPayoffq4(), qianxilvnew4.getQ4(), 4);
 				
 				BigDecimal cp4new = cp1newBefore3.multiply(p1p2newBefore2).multiply(p2p3newBefore1).multiply(p3p4new);
@@ -401,14 +406,14 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				
 				
 				// C-P1  本金迁徙 C-P1（每日）= 期末余额/期初余额
-				QianxilvCorpu qianxilvcorpu1 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvCorpu qianxilvcorpu1 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByYesterday(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend(),Yesterday);
 				BigDecimal cp1corpu = calculate(qianxilvcorpu1.getQ1(), qianxilvcorpu1.getPayoffq1(), qianxilvcorpu1.getOrderduedate(), 4);
 				migrationRateReport.setCp1corpus(cp1corpu);
 				
 				// C-P2  本金迁徙
 				QianxilvCorpu qianxilvcorpu1Before1 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal cp1corpuBefore1 = calculate(qianxilvcorpu1Before1.getQ1(), qianxilvcorpu1Before1.getPayoffq1(), qianxilvcorpu1Before1.getOrderduedate(), 4);
-				QianxilvCorpu qianxilvcorpu2 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvCorpu qianxilvcorpu2 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p1p2corpu = calculate(qianxilvcorpu2.getQ2(), qianxilvcorpu2.getPayoffq2(), qianxilvcorpu2.getQ2(), 4);
 				
 				BigDecimal cp2corpu = cp1corpuBefore1.multiply(p1p2corpu);
@@ -419,7 +424,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				BigDecimal cp1corpuBefore2 = calculate(qianxilvcorpu1Before2.getQ1(), qianxilvcorpu1Before2.getPayoffq1(), qianxilvcorpu1Before2.getOrderduedate(), 4);
 				QianxilvCorpu qianxilvcorpu2Before1 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal p1p2corpuBefore1 = calculate(qianxilvcorpu2Before1.getQ2(), qianxilvcorpu2Before1.getPayoffq2(), qianxilvcorpu2Before1.getQ2(), 4);
-				QianxilvCorpu qianxilvcorpu3 = tMisMigrationRateReportDao.getSumQ3QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvCorpu qianxilvcorpu3 = tMisMigrationRateReportDao.getSumQ3QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p2p3corpus = calculate(qianxilvcorpu3.getQ3(), qianxilvcorpu3.getPayoffq3(), qianxilvcorpu3.getQ3(), 4);
 				
 				BigDecimal cp3corpu = cp1corpuBefore2.multiply(p1p2corpuBefore1).multiply(p2p3corpus);
@@ -435,7 +440,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				QianxilvCorpu qianxilvcorpu3Before1 = tMisMigrationRateReportDao.getSumQ3QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
 				BigDecimal p2p3corpuBefore1 = calculate(qianxilvcorpu3Before1.getQ3(), qianxilvcorpu3Before1.getPayoffq3(), qianxilvcorpu3Before1.getQ3(), 4);
 				
-				QianxilvCorpu qianxilvcorpu4 = tMisMigrationRateReportDao.getSumQ4QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend());
+				QianxilvCorpu qianxilvcorpu4 = tMisMigrationRateReportDao.getSumQ4QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
 				BigDecimal p3p4corpu = calculate(qianxilvcorpu4.getQ4(), qianxilvcorpu4.getPayoffq4(), qianxilvcorpu4.getQ4(), 4);
 				
 				BigDecimal cp4corpu = cp1corpuBefore3.multiply(p1p2corpuBefore2).multiply(p2p3corpuBefore1).multiply(p3p4corpu);

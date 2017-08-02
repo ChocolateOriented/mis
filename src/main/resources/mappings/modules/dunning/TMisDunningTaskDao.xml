@@ -876,14 +876,14 @@
         t.quality as quality
         FROM
         t_mis_dunning_task AS t
-		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+				LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+					AND o.type = 'loan'
+        	AND o.merchant_id = 7
+					AND o.`status` IN ('payoff', 'payment' )
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
         LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
         LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-        WHERE
-		o.type = 'loan' 
-        AND o.merchant_id = 7
-		AND o.`status` IN ('payoff', 'payment' )
+			<where>
         <if test="dealcode != null and dealcode != ''">
                 AND o.dealcode = #{dealcode}
         </if>
@@ -961,6 +961,7 @@
         <!-- 			     # 优质订单    -->
             AND t.quality = #{quality}
         </if>
+			</where>
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
                 <!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
@@ -1022,11 +1023,9 @@
         LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
         LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
         WHERE
-<!--         o.type IN ('loan', 'partial' ) -->
-		o.type = 'loan' 
+				o.type = 'loan'
         AND o.merchant_id = 7
-<!--         AND o.`status` IN ('payoff', 'payment', 'partial' ) -->
-		AND o.`status` IN ('payoff', 'payment' )
+				AND o.`status` IN ('payoff', 'payment' )
         AND t.dbid IS NOT NULL
         <!-- 任务状态为正在催收的  -->
         AND t.dunningtaskstatus IN ('dunning', 'finished' )

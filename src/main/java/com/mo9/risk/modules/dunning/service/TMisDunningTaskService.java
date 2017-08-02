@@ -916,7 +916,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
 		}else{
-			entity.getSqlMap().put("orderbyMap", " o.status,date_FORMAT(o.repayment_time, '%Y-%m-%d') DESC,creditamount DESC,o.dealcode DESC");
+			entity.getSqlMap().put("orderbyMap", " date_FORMAT(o.repayment_time, '%Y-%m-%d') DESC,creditamount DESC,o.dealcode DESC");
 		}
 		entity.setPage(page);
 		page.setList(dao.newfindOrderPageList(entity));
@@ -2515,7 +2515,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " payofftime DESC ");
 		}else{
-			entity.getSqlMap().put("orderbyMap", " status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
+			entity.getSqlMap().put("orderbyMap", " date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC,dealcode DESC");
 		}
 		entity.setPage(page);
 		page.setList(dao.findOuterOrderPageList(entity));

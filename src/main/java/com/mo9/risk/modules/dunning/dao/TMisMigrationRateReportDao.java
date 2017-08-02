@@ -142,6 +142,7 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	public QianxilvCorpu getSumQ1QianxilvCorpuByCycleDatetime(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 	
 	
+	
 	/**
 	 * 根据周期时间段查询Q2户数总和
 	 * @param datetimestart
@@ -193,6 +194,23 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 * @return
 	 */
 	public QianxilvCorpu getSumQ4QianxilvCorpuByCycleDatetime(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
+	
+	
+	/**
+	 * 根据周期时间段查询Q1户数总和 2
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvNew getSumQ1QianxilvNewByYesterday(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend,@Param("yesterday")Date yesterday);
+	
+	/**
+	 * 根据周期时间段查询Q1本金总和 2
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvCorpu getSumQ1QianxilvCorpuByYesterday(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend,@Param("yesterday")Date yesterday);
 	
 	/**
 	 * 查询图表数据

@@ -43,6 +43,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
+				ORDER BY  a.datetime desc
 			</otherwise>
 		</choose>
 	</select>
@@ -842,6 +843,51 @@
 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
 	</select>
 	
+	<select id="getSumQ1QianxilvNewByYesterday" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		select * from
+		(SELECT 
+					IFNULL(sum(q1), 0) AS q1 
+				FROM
+				t_mis_dunning_qianxilv_new
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t1,
+		(SELECT 
+					IFNULL(sum(payoffq1), 0) AS payoffq1
+				FROM
+				t_mis_dunning_qianxilv_new
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t2,
+		(SELECT 
+		 			IFNULL(sum(orderduedate), 0) AS orderduedate
+		 		FROM
+		 		t_mis_dunning_qianxilv_new
+		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})) t3
+	</select>
+	
+	<select id="getSumQ1QianxilvCorpuByYesterday" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		select * from
+		(SELECT 
+					IFNULL(sum(q1), 0) AS q1 
+				FROM
+				t_mis_dunning_qianxilv_corpus
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t1,
+		(SELECT 
+					IFNULL(sum(payoffq1), 0) AS payoffq1
+				FROM
+				t_mis_dunning_qianxilv_corpus
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t2,
+		(SELECT 
+		 			IFNULL(sum(orderduedate), 0) AS orderduedate
+		 		FROM
+		 		t_mis_dunning_qianxilv_corpus
+		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})) t3
+	</select>
+	
+<!-- 	<select id="getSumQ2QianxilvNewByYesterday" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" > -->
+<!-- 		SELECT  -->
+<!-- 			IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2 -->
+<!-- 		FROM -->
+<!-- 		t_mis_dunning_qianxilv_new -->
+<!-- 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday}) -->
+<!-- 	</select> -->
 		
 	<!--  迁徙率 end	 -->
 	
