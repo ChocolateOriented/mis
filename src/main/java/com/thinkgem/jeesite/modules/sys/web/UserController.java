@@ -24,6 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -49,6 +51,9 @@ public class UserController extends BaseController {
 
 	@Autowired
 	private SystemService systemService;
+	
+	@Autowired
+	private TMisDunningPeopleService tMisDunningPeopleService;
 	
 	@ModelAttribute
 	public User get(@RequestParam(required=false) String id) {
@@ -132,6 +137,14 @@ public class UserController extends BaseController {
 			UserUtils.clearCache();
 			//UserUtils.getCacheMap().clear();
 		}
+		
+		//同步修改催收人员的账号名
+		TMisDunningPeople dunningPeople = tMisDunningPeopleService.get(user.getId());
+		if (dunningPeople != null) {
+			dunningPeople.setName(user.getName());
+			tMisDunningPeopleService.updatePeopleNameById(dunningPeople);
+		}
+		
 		addMessage(redirectAttributes, "保存用户'" + user.getLoginName() + "'成功");
 		return "redirect:" + adminPath + "/sys/user/list?repage";
 	}

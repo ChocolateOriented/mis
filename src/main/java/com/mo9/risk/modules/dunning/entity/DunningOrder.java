@@ -84,6 +84,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private String quality;
 	
+	private Boolean taskOverdue;	//过期未跟案件
+	
 
 	public String getPlatformExt() {
 		return platformExt;
@@ -510,6 +512,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setQuality(String quality) {
 		this.quality = quality;
+	}
+
+	public Boolean getTaskOverdue() {
+		return taskOverdue;
+	}
+
+	public void setTaskOverdue(Boolean taskOverdue) {
+		this.taskOverdue = taskOverdue;
 	}
 
 }

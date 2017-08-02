@@ -511,6 +511,12 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			
+			<li>
+				<input type="checkbox" id="taskOverdue" name="taskOverdue" style="margin-left:30px;"
+					${dunningOrder.taskOverdue ? 'checked' : ''}/>
+				<label for="taskOverdue" style="margin:0px;">过期未跟案件</label>
+			</li>
+			
 			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 				<li>
 					<label>催收小组：</label>
@@ -594,6 +600,7 @@
 			<tr>
 				<th><input type="checkbox" id="allorder"  /></th>
 				<th>序号</th>
+				<th>提醒</th>
 				<th>姓名</th>
 				<th>手机号</th>
 				<th>欠款金额</th>
@@ -625,6 +632,11 @@
 				</td>
 				<td>
 					${ (vs.index+1) + (page.pageNo-1) * page.pageSize} 
+				</td>
+				<td>
+					<c:if test="${dunningOrder.taskOverdue}">
+						<i class="icon-flag" style="color:#c71c22;"></i>
+					</c:if>
 				</td>
 				<td>
 					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank" > --%>

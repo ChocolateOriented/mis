@@ -873,7 +873,10 @@
         t.dunningcycle AS dunningcycle,
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
-        t.quality as quality
+        t.quality as quality,
+        <![CDATA[
+        CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
+        ]]>
         FROM
         t_mis_dunning_task AS t
 				LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
@@ -958,8 +961,15 @@
             AND t.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
         </if>
         <if test="quality != null and quality != ''">
-        <!-- 			     # 优质订单    -->
+        <!--			# 优质订单    -->
             AND t.quality = #{quality}
+        </if>
+        <if test="taskOverdue != null and taskOverdue == true">
+        <!--			# 过期未跟案件    -->
+            <![CDATA[
+            	AND DATE(t.nextfollowdate) < CURDATE()
+            	AND o.status = 'payment'
+            ]]>
         </if>
 			</where>
         <choose>

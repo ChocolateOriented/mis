@@ -77,4 +77,10 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 
 	public Boolean checkNicknameUnique(TMisDunningPeople queryPeople);
 
+	/**
+	 * @Description: 根据id更新催收人员姓名
+	 * @param dunningPeople
+	 * @return
+	 */
+	public int updatePeopleNameById(TMisDunningPeople dunningPeople);
 }
