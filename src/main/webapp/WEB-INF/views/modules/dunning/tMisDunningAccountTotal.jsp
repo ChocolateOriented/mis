@@ -27,12 +27,14 @@
             dataType: 'json',
             quietMillis: 250,
             data: function (term, page) {//查询参数 ,term为输入字符
-              var data ={};
+              var data = {};
               var groupIds = $("#groupList").val();
-              for(var i=0;i< groupIds.length;i++){
-                data['group.groupIds['+i+']'] = groupIds[i];
+              data.nickname = term;
+              if (groupIds != null && groupIds != "") {
+                for (var i = 0; i < groupIds.length; i++) {
+                  data['group.groupIds[' + i + ']'] = groupIds[i];
+                }
               }
-              data.nickname = term ;
               return data;
             },
             results: function (data, page) {//选择要显示的数据`
@@ -330,6 +332,12 @@
       }
     
     </script>
+    <style>
+        .messageBox {
+            text-align: left;
+            padding-left: 1em;
+        }
+    </style>
 </head>
 <body>
 <ul class="nav nav-tabs">
@@ -406,8 +414,8 @@
 <br/>
 
 <ul class="nav nav-tabs">
-    <li id="checkedPageLab" class="active"><a onclick="checkedPage()">已查账</a></li>
-    <li id="completedPageLab" ><a onclick="completedPage()">已完成</a></li>
+    <li id="checkedPageLab" class="active" style="cursor: pointer;"><a onclick="checkedPage()">已查账</a></li>
+    <li id="completedPageLab" style="cursor: pointer;"><a onclick="completedPage()">已完成</a></li>
 </ul>
 
 <iframe id="ifm" name="ifm" frameborder="0" style="width:100%;height: 560px;"></iframe>
@@ -554,25 +562,25 @@
                 <form class="form-horizontal" id="orderMsgComfirm">
                     <div class="row-fluid">
                         <div class="span4">订单号</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="dealcode" style="border: none;background-color: inherit;" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">姓名</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="realname" style="border: none;background-color: inherit" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">手机号</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="mobile" style="border: none;background-color: inherit" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">应催金额</div>
-                        <div class="span8" style="text-align: left">
+                        <div class="span8 messageBox">
                             <input name="remainAmmount" style="width: 4em;border: none;background-color: inherit;" readonly>（元）
                         </div>
                     </div>
@@ -587,25 +595,25 @@
                 <form class="form-horizontal" id="remittanceMsgComfirm">
                     <div class="row-fluid">
                         <div class="span4">交易流水号</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="serialnumber" style="border: none;background-color: inherit" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">对方姓名</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="remittancename" style="border: none;background-color: inherit" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">对方账号</div>
-                        <div class="span8">
+                        <div class="span8 messageBox">
                             <input name="financialremittancename" style="border: none;background-color: inherit" readonly>
                         </div>
                     </div>
                     <div class="row-fluid">
                         <div class="span4">交易金额</div>
-                        <div class="span8" style="text-align: left">
+                        <div class="span8 messageBox">
                             <input name="remittanceamount" style="width: 4em;border: none;background-color: inherit;" readonly>（元）
                         </div>
                     </div>

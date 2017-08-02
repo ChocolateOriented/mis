@@ -3,13 +3,16 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.util.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -84,7 +87,12 @@ public class TMisDunningOuterTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = {"findOrderPageList", ""})
 	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
+		//默认条件查询未还清订单
+		if (dunningOrder.getStatus() == null){
+			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
+		}
+
+		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
 		//催收小组列表
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
@@ -96,17 +104,45 @@ public class TMisDunningOuterTaskController extends BaseController {
 	 * 导出数据
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
-	@RequestMapping(value = "exportFile", method = RequestMethod.POST)
-	public String exportFile(DunningOrder order, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-		String fileName = "OutSourcing" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
-		List<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(order);
+	@RequestMapping(value = "exportOuterFile", method = RequestMethod.POST)
+	public String exportOuterFile(String[] outerOrders, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningOuterTask/findOrderPageList?repage";
+		String fileName = "OutData" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
+
+		List<String> orders = new ArrayList<String>();
+		Map<String, String> map = new HashMap<String, String>();
+		if (outerOrders == null || outerOrders.length == 0){
+			addMessage(redirectAttributes, "导出数据为空");
+			return redirectUrl;
+		}
+		for (String str : Arrays.asList(outerOrders)) {
+			orders.add(str.split("=")[0]);
+			map.put(str.split("=")[0], str.split("=")[1]);
+		}
+
+		List<DunningOuterFile> dunningOuterFiles = tMisDunningTaskService.exportOuterFile(orders);
+		if (null == dunningOuterFiles || dunningOuterFiles.isEmpty()) {
+			addMessage(redirectAttributes, "未导出数据！");
+			return redirectUrl;
+		}
+		for (DunningOuterFile dunningOuterFile : dunningOuterFiles) {
+			dunningOuterFile.setName(map.get(dunningOuterFile.getDealcode()));
+		}
+
+		tMisDunningTaskService.savefileLog(new Date(), orders, dunningOuterFiles);
+		addMessage(redirectAttributes, "委外数据生成成功");
 		try {
-			new ExportExcel("贷后还款情况报表", DunningOrder.class).setDataList(page).write(response, fileName).dispose();
-			return null;
+			new ExportExcel("委外数据", DunningOuterFile.class).setDataList(dunningOuterFiles).write(response, fileName).dispose();
+			//  切换数据源更新order表
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+			tMisDunningTaskService.updateOuterfiletime(new Date(), orders);
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+			return  redirectUrl;
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
-		return "redirect:" + adminPath + "/dunning/tMisDunningOuterTask/findOrderPageList?repage";
+		return null;
 	}
 
 		/**
