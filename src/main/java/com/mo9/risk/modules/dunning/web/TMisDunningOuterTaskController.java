@@ -84,7 +84,12 @@ public class TMisDunningOuterTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = {"findOrderPageList", ""})
 	public String findOrderPageList(DunningOrder dunningOrder, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder); 
+		//默认条件查询未还清订单
+		if (dunningOrder.getStatus() == null){
+			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
+		}
+
+		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
 		//催收小组列表
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
