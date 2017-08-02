@@ -135,15 +135,26 @@ $(document).ready(function() {
 	 });
 
   // 普通导出功能
-  $("#dunningExport").click(function(){
-    top.$.jBox.confirm("确认要导出列表数据吗？","系统提示",function(v,h,f){
-          if(v=="ok"){
-            $("#searchForm").attr("action","${ctx}/dunning/tMisDunningOuterTask/exportFile");
+  $("#exportOuterFile").click(function () {
+    var outerOrders = new Array();
+    $("[name='orders']").each(function () {
+      if (this.checked) {
+        outerOrders.push($(this).attr("outerOrders"));
+      }
+    });
+    if (outerOrders.length == 0) {
+      $.jBox.tip("请勾选导出订单号", 'warning');
+      return;
+    }
+    $("#outerOrders").val(outerOrders);
+    top.$.jBox.confirm("确认要导出列表数据吗？", "系统提示", function (v, h, f) {
+          if (v == "ok") {
+            $("#searchForm").attr("action", "${ctx}/dunning/tMisDunningOuterTask/exportOuterFile");
             $("#searchForm").submit();
           }
         },
-        {buttonsFocus:1});
-    top.$('.jbox-body .jbox-icon').css('top','55px');
+        {buttonsFocus: 1});
+    top.$('.jbox-body .jbox-icon').css('top', '55px');
   });
 
 });
@@ -232,7 +243,10 @@ function formatPeopleList( item ){
 
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" /></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空" /></li>
-			<li class="btns"><input id="dunningExport" class="btn btn-primary" type="button" value="导出"/></li>
+			<li class="btns">
+				<input id="outerOrders" name="outerOrders" type="hidden" value=""/>
+				<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出"/>
+			</li>
 		</ul>
 	</form:form>
 	<input id="distribution" class="btn btn-primary" type="button" value="手动分配" />
