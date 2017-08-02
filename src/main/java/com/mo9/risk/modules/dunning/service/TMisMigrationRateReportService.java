@@ -364,17 +364,27 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 	}
 
-    
+	
 	/**
      * 迁徙率计算insertDB
      */
 	@Scheduled(cron = "0 35 0 * * ?")
 	@Transactional(readOnly = false)
+	public void autoInsertMigrationRateReportDB_job() {
+		Date Yesterday = getDate(-1);
+		autoInsertMigrationRateReportDB(Yesterday);
+	}
+	
+	
+	/**
+     * 迁徙率计算insertDB
+     */
+	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB(Date Yesterday) {
 		try {
-			if(null == Yesterday){
-				Yesterday = getDate(-1);
-			}
+//			if(null == Yesterday){
+//				Yesterday = getDate(-1);
+//			}
 			TMisMigrationRateReport migrationRateReport = new TMisMigrationRateReport();
 			TmpMoveCycle tmpMoveCycle = tMisMigrationRateReportDao.getTmpMoveCycleByDatetime(Yesterday);
 //			new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
