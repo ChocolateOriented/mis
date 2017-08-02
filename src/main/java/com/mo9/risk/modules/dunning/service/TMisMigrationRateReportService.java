@@ -4,6 +4,9 @@
 package com.mo9.risk.modules.dunning.service;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -93,8 +96,27 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 //		Date time = cal.getTime();
 //		System.out.println(new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss").format(time));
 //		System.out.println(getMonthLastDayDate());
-		BigDecimal cp1new = new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
-		System.out.println(cp1new);
+//		BigDecimal cp1new = new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
+//		System.out.println(cp1new);
+		
+		Calendar c = Calendar.getInstance();
+		DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+
+		try {
+			//开始时间必须小于结束时间
+			Date beginDate = dateFormat1.parse("2014-05-01");
+			Date endDate = dateFormat1.parse("2014-06-25");
+			Date date = beginDate;
+			while (!date.equals(endDate)) {
+			System.out.println(dateFormat1.format(date));
+			c.setTime(date);
+			c.add(Calendar.DATE, 1); // 日期加1天
+			date = c.getTime();
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -348,11 +370,12 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
      */
 	@Scheduled(cron = "0 35 0 * * ?")
 	@Transactional(readOnly = false)
-	public void autoInsertMigrationRateReportDB() {
+	public void autoInsertMigrationRateReportDB(Date Yesterday) {
 		try {
-			
+			if(null == Yesterday){
+				Yesterday = getDate(-1);
+			}
 			TMisMigrationRateReport migrationRateReport = new TMisMigrationRateReport();
-			Date Yesterday = getDate(-1);
 			TmpMoveCycle tmpMoveCycle = tMisMigrationRateReportDao.getTmpMoveCycleByDatetime(Yesterday);
 //			new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP); 
 			
@@ -360,6 +383,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				
 				migrationRateReport.setCycle(String.valueOf(tmpMoveCycle.getCycle()));
 				migrationRateReport.setDatetime(Yesterday);
+				migrationRateReport.setCreateDate(new Date());
 				
 				TmpMoveCycle tmpMoveCycleBefore1 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 1);  // 前一个周期
 				TmpMoveCycle tmpMoveCycleBefore2 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 2);  // 前二个周期

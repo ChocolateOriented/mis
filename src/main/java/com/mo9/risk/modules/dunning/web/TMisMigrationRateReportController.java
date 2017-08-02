@@ -4,8 +4,11 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -484,8 +487,34 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@RequestMapping(value = "autoInsertMigrationRateReportDB")
 	@ResponseBody
-	public void autoInsertMigrationRateReportDB( Date yesterday) {
-		tMisMigrationRateReportService.autoInsertMigrationRateReportDB();
+	public void autoInsertMigrationRateReportDB(Date yesterday) {
+		tMisMigrationRateReportService.autoInsertMigrationRateReportDB(yesterday);
+	}
+	
+	/**
+	 * 获取计算后的迁徙率数据
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "autoInsertHistoryMigrationRateReportDB")
+	@ResponseBody
+	public void autoInsertHistoryMigrationRateReportDB() {
+		Calendar c = Calendar.getInstance();
+		DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			//开始时间必须小于结束时间
+			Date beginDate = dateFormat1.parse("2017-03-01");
+			Date endDate = dateFormat1.parse("2017-08-01");
+			Date date = beginDate;
+			while (!date.equals(endDate)) {
+				System.out.println(dateFormat1.format(date));
+				tMisMigrationRateReportService.autoInsertMigrationRateReportDB(date);
+				c.setTime(date);
+				c.add(Calendar.DATE, 1); // 日期加1天
+				date = c.getTime();
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	autoInsertTmpMoveCycleDB
