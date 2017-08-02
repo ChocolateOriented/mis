@@ -31,6 +31,11 @@ $(document).ready(function() {
 		 });
 	 });
 });
+function page(n,s){
+	$("#pageNo").val(n);
+	$("#pageSize").val(s);
+location.href="${ctx}/dunning/tMisMigrationRateReport/list?pageNo="+n+"&pageSize="+s;
+}
 
 
 </script>
@@ -78,5 +83,6 @@ $(document).ready(function() {
 			</c:forEach>
 		</tbody>
 	</table>	
+	<div class="pagination">${page}</div>
 </body>
 </html>
