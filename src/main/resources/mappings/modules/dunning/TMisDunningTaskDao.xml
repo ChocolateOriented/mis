@@ -1053,7 +1053,7 @@
         
         <if test="mobile != null and mobile != ''">
                 <!-- 			     # 手机号码 -->
-                AND b.mobile LIKE concat('%',#{mobile},'%')
+                AND b.mobile LIKE concat(#{mobile},'%')
                 <!-- 				AND mobile = #{mobile} -->
         </if>
         
