@@ -1516,7 +1516,8 @@
 					dunningpeoplename = #{item.dunningpeoplename},
 					dunningperiodbegin = #{item.dunningperiodbegin},
 					dunningperiodend = #{item.dunningperiodend},
-					dunningcycle = #{item.dunningcycle}
+					dunningcycle = #{item.dunningcycle},
+					nextfollowdate = null
 				</set>
 				WHERE id = #{item.id}
 		 </foreach>
@@ -1734,7 +1735,8 @@
 				    updatedate = now(),
 				    updateby = #{item.updateBy.id},
 					dunningpeopleid = #{item.dunningpeopleid},
-					dunningpeoplename = #{item.dunningpeoplename}
+					dunningpeoplename = #{item.dunningpeoplename},
+					nextfollowdate = null
 				</set>
 				WHERE id = #{item.id}
 		 </foreach>
@@ -1749,7 +1751,8 @@
 					dunningpeopleid = #{item.dunningpeopleid},
 					dunningpeoplename = #{item.dunningpeoplename},
 					outsourcingbegindate = #{item.outsourcingbegindate},
-					outsourcingenddate = #{item.outsourcingenddate}
+					outsourcingenddate = #{item.outsourcingenddate},
+					nextfollowdate = null
 				</set>
 				WHERE id = #{item.id}
 		 </foreach>
