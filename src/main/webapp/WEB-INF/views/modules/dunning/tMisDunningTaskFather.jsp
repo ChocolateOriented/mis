@@ -202,7 +202,7 @@
 	</shiro:hasPermission>
 <br/>
 <c:choose>
-	<c:when test="${personalInfo.overdueDays <=1}">
+	<c:when test="${personalInfo.overdueDays<=1}">
 		<iframe id="ifm" src="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}&overdueDays=${personalInfo.overdueDays}" frameborder="0"  style="width:100%;height:600px;">
 		</iframe> 
 	</c:when>
