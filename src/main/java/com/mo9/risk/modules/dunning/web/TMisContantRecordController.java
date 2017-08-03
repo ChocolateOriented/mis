@@ -152,6 +152,7 @@ public class TMisContantRecordController extends BaseController {
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String hasContact = request.getParameter("hasContact");
 		String dunningCycle = request.getParameter("dunningCycle");
+		String overdueDays = request.getParameter("overdueDays");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -224,6 +225,7 @@ public class TMisContantRecordController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
+		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);
 		return "modules/dunning/tMisDunningTaskHistoryList";
 	}

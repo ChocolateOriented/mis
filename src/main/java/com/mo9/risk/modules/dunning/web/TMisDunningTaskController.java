@@ -1035,7 +1035,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "customerDetails")
-	public String customerDetails(String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,String dunningCycle,String  mobileSelf,Model model) {
+	public String customerDetails(String overdueDays,String buyerId, String dealcode,String dunningtaskdbid,boolean hasContact,String dunningCycle,String  mobileSelf,Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1072,6 +1072,7 @@ public class TMisDunningTaskController extends BaseController {
 			
 			model.addAttribute("hasContact", hasContact);
 			model.addAttribute("dunningCycle", dunningCycle);
+			model.addAttribute("overdueDays", overdueDays);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "error";
@@ -1096,6 +1097,7 @@ public class TMisDunningTaskController extends BaseController {
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String hasContact = request.getParameter("hasContact");
 		String dunningCycle = request.getParameter("dunningCycle");
+		String overdueDays = request.getParameter("overdueDays");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1141,6 +1143,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
+		model.addAttribute("overdueDays", overdueDays);
 		return "modules/dunning/tMisDunningTaskCommunication";
 	}
 	
@@ -1158,6 +1161,7 @@ public class TMisDunningTaskController extends BaseController {
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String hasContact = request.getParameter("hasContact");
 		String dunningCycle = request.getParameter("dunningCycle");
+		String overdueDays = request.getParameter("overdueDays");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1192,6 +1196,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
+		model.addAttribute("overdueDays", overdueDays);
 		return "modules/dunning/tMisDunningTaskCommunicationRecord";
 	}
 	
@@ -1203,7 +1208,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "orderHistoryList")
-	public String orderHistoryList( String buyerId,String dealcode,boolean hasContact,String dunningCycle,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
+	public String orderHistoryList( String buyerId,String dealcode,boolean hasContact,String dunningCycle,String overdueDays,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1232,6 +1237,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
+		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);
 		return "modules/dunning/tMisDunningOrderHistoryList";
 	}
@@ -1246,7 +1252,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "apploginlogList")
-	public String apploginlogList(String buyerId,String dealcode,boolean hasContact,String dunningCycle,String dunningtaskdbid,String mobile,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
+	public String apploginlogList(String buyerId,String dealcode,boolean hasContact,String dunningCycle,String overdueDays,String dunningtaskdbid,String mobile,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||mobile==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)||"".equals(mobile)){
 			return "views/error/500";
 		}
@@ -1278,6 +1284,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("ispayoff", ispayoff);
 			model.addAttribute("hasContact", hasContact);
 			model.addAttribute("dunningCycle", dunningCycle);
+			model.addAttribute("overdueDays", overdueDays);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
