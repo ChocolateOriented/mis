@@ -56,6 +56,22 @@ $(document).ready(function() {
 		});
 	});
 	
+	$("#migration4").click(function(){
+		$.ajax({
+			url:"${ctx}/dunning/tMisMigrationRateReport/autoInsertHistoryMigrationRateReportDB",
+			type:"GET",
+			data:{},
+			success:function(data){
+					top.$.jBox.tip("完成");
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown){
+                   alert("查询失败:"+textStatus);
+                }
+			
+		});
+	});
+	
+	
 });
 
 </script>
@@ -71,6 +87,9 @@ $(document).ready(function() {
 		<span ><font color="red" id="tip"></font></span>
 	</li>
 	<input id="migration3" class="btn btn-primary" type="button" value="计算并保存迁徙率报表" />
+	
+	<input id="migration4" class="btn btn-primary" type="button" value="迁徙率历史数据" />
+	
 	
 </body>
 </html>

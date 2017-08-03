@@ -205,4 +205,12 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		return dao.checkNicknameUnique(queryPeople);
 	}
 	
+	/**
+	 * @Description: 根据id更新催收人员姓名
+	 * @param dunningPeople
+	 * @return
+	 */
+	public int updatePeopleNameById(TMisDunningPeople dunningPeople) {
+		return dao.updatePeopleNameById(dunningPeople);
+	}
 }

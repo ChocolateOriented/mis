@@ -320,4 +320,11 @@
 		</if>
 	</select>
 	
+	<update id="updatePeopleNameById">
+		UPDATE t_mis_dunning_people SET
+			name = #{name},
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
 </mapper>
