@@ -5,6 +5,7 @@ package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.util.RegexUtil;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,8 +22,16 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
@@ -2801,5 +2810,107 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		dunningTaskLog.setCreateBy(new User("auto_admin"));
 		tMisDunningTaskLogDao.insert(dunningTaskLog);
 	}
-
+	
+	//号码清洗
+//	@Scheduled(cron = "0 0 8 * * * ?")  
+	@Transactional
+	public void numberCleanResult(){
+		
+			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "1");
+			int  overday;
+			try {
+				  overday=Integer.parseInt(overDayNumber);
+			} catch (Exception e) {
+				logger.warn("请检查数据字典号码清洗的配置");
+				return;
+			}
+			List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
+			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("test01"));
+		    long long1 = System.currentTimeMillis();
+		    for (DunningOrder dunningOrder : numberList) {
+		    	HttpClient httpClient = new DefaultHttpClient();
+				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=test01&password="
+						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://lusj.local.mo9.com/hahah/haha/cccc");
+				
+				List<Element> list=null;
+				List<Element> list2=null;
+				try {
+					
+					HttpResponse response = httpClient.execute(httpGet);
+					String entity = EntityUtils.toString(response.getEntity());
+					System.out.println(entity);
+					
+					Document document = DocumentHelper.parseText(entity);
+					// 1.获取文档的根节点.
+					Element root = document.getRootElement();
+					list = root.elements("error");
+					list2 = root.elements("message");
+					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"4"
+					.equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
+						logger.warn(new Date()+",号码清洗失败,失败原因:"+list2.get(0).getText());
+						return;
+					}
+					if("3".equals(list.get(0).getText())){
+						logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。手机号码格式不对");
+						continue;
+					}
+				} catch (Exception e) {
+					logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
+					continue;
+					
+				}
+			
+		    }
+		
+	
+	
+	}
+	//回调函数
+	@Transactional(readOnly = false)
+	public void numberCleanBack(String reqNo,String check_result){
+		if("00".equals(check_result)||"01".equals(check_result)||"02".equals(check_result)||"03".equals(check_result)||"12".equals(check_result)){
+			check_result="YXHM";
+		}
+		if("04".equals(check_result)){
+			check_result="BZFWQ";
+		}
+		if("05".equals(check_result)){
+			check_result="KH";
+		}
+		if("06".equals(check_result)){
+			check_result="HMCW";
+		}
+		if("10".equals(check_result)){
+			check_result="GJ";
+		}
+		if("11".equals(check_result)){
+			check_result="TJ";
+		}
+		if("07".equals(check_result)||"08".equals(check_result)||"09".equals(check_result)){
+			check_result="WZ";
+		}
+		tMisDunningTaskDao.updateNumberResult(reqNo,check_result);
+	}
+	//md5加密
+	public static String pwdMD5(String strs) {
+		
+		StringBuffer sb = new StringBuffer();
+		try {
+			MessageDigest digest = MessageDigest.getInstance("MD5");
+			byte[] bs = digest.digest(strs.getBytes());
+		
+			for (byte b : bs) {
+				int x = b & 255;
+				String s = Integer.toHexString(x);
+				if (x < 16) {
+					sb.append("0");
+				}
+				sb.append(s);
+			}
+		} catch (Exception e) {
+			logger.warn(new Date()+"号码清洗，加密失败");
+			throw new RuntimeException();
+		}
+		return sb.toString();
+	}
 }

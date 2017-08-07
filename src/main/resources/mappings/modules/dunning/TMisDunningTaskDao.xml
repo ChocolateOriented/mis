@@ -874,6 +874,7 @@
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
         t.quality as quality,
+        o.numberCleanResult as numberCleanResult,
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
         ]]>
@@ -963,6 +964,10 @@
         <if test="quality != null and quality != ''">
         <!--			# 优质订单    -->
             AND t.quality = #{quality}
+        </if>
+        <if test="numberCleanResult != null and numberCleanResult != ''">
+        <!--			# 号码清洗    -->
+            AND o.numberCleanResult = #{numberCleanResult}
         </if>
         <if test="taskOverdue != null and taskOverdue == true">
         <!--			# 过期未跟案件    -->
@@ -1847,4 +1852,23 @@
 		WHERE dealcode = #{dealcode}
 	</update>
 
+	<select id="findNumberByOverDay"   resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+        SELECT
+	       b.mobile  AS "mobile",
+	       o.dealcode AS "dealcode"
+        FROM  t_risk_order AS o 
+        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        WHERE
+			o.type = 'loan'
+	        AND o.merchant_id = 7
+			AND o.status = 'payment'
+	        AND o.buyer_id is not null
+	        AND  DATEDIFF(CURDATE(), o.repayment_time)&lt;= #{overday}
+    </select>
+	
+	<update id="updateNumberResult">
+		UPDATE t_risk_order SET 	
+			numberCleanResult = #{check_result}
+		WHERE dealcode = #{dealcode}
+	</update>
 </mapper>

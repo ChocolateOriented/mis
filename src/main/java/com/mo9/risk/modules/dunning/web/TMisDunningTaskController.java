@@ -2056,5 +2056,16 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceMonthReport?repage";
     }
-
+	/**
+	 * 号码清洗回调
+	 * @param reqNo
+	 * @param check_result
+	 * @param request
+	 */
+	@RequestMapping(value = "numberCleanBack")
+	public  void  numberCleanBack(String reqNo,String check_result,HttpServletRequest request){
+		
+		logger.info("订单号为:"+reqNo+"回调成功");
+		tMisDunningTaskService.numberCleanBack(reqNo,check_result);
+	}
 }
