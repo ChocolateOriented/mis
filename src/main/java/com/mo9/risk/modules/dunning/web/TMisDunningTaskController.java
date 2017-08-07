@@ -846,43 +846,39 @@ public class TMisDunningTaskController extends BaseController {
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:exportFile")
-    @RequestMapping(value = "exportOuterFile", method=RequestMethod.POST)
-    public String exportOuterFile(String[] outerOrders ,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-//          String[] strTemplate = ordersStr.split(",")[0].split("#");
-		try {
-			String fileName = "OutData" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
-            List<String> orders = new ArrayList<String>();
-            Map<String, String> map = new HashMap<String, String>();
-            for(String str : Arrays.asList(outerOrders)){
-            	orders.add(str.split("=")[0]);
-            	map.put(str.split("=")[0], str.split("=")[1]);
-            }
-            List<DunningOuterFile> dunningOuterFiles = tMisDunningTaskService.exportOuterFile(orders);
-            if(null != dunningOuterFiles && !dunningOuterFiles.isEmpty()){
-            	for(DunningOuterFile dunningOuterFile : dunningOuterFiles){
-            		dunningOuterFile.setName(map.get(dunningOuterFile.getDealcode()));
-            	}
-            	tMisDunningTaskService.savefileLog(new Date(),orders,dunningOuterFiles);
-            	addMessage(redirectAttributes, "委外数据生成成功");
-//            	response.sendRedirect(adminPath +"/dunning/tMisDunningTask/findOrderPageList?repage");
-            	new ExportExcel("委外数据", DunningOuterFile.class).setDataList(dunningOuterFiles).write(response, fileName).dispose();
-            	
-            	//  切换数据源更新order表
-            	DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-            	tMisDunningTaskService.updateOuterfiletime(new Date(),orders);
-            	return null;
-            	
-            }else{
-            	addMessage(redirectAttributes, "未导出数据！");
-            }
-		} catch (Exception e) {
-			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
+	@RequestMapping(value = "exportOuterFile", method = RequestMethod.POST)
+	public String exportOuterFile(@RequestParam("outerOrders") ArrayList<String> outerOrders, HttpServletResponse response,
+			RedirectAttributes redirectAttributes) {
+		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningTask/findOrderPageList?repage";
+
+		if (outerOrders == null || outerOrders.size() == 0) {
+			addMessage(redirectAttributes, "导出数据为空");
+			return redirectUrl;
 		}
-		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findOrderPageList?repage";
-    }
-	
+
+		List<DunningOuterFile> dunningOuterFiles = tMisDunningTaskService.exportOuterFile(outerOrders);
+		if (null == dunningOuterFiles || dunningOuterFiles.isEmpty()) {
+			addMessage(redirectAttributes, "未导出数据！");
+			return redirectUrl;
+		}
+
+		tMisDunningTaskService.savefileLog(new Date(), outerOrders, dunningOuterFiles);
+		addMessage(redirectAttributes, "委外数据生成成功");
+		try {
+			String fileName = "OutData" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+			new ExportExcel("委外数据", DunningOuterFile.class).setDataList(dunningOuterFiles).write(response, fileName).dispose();
+			//  切换数据源更新order表
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+			tMisDunningTaskService.updateOuterfiletime(new Date(), outerOrders);
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+			return redirectUrl;
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		return null;
+	}
+
 
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "form")
