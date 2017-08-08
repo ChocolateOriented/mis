@@ -874,7 +874,7 @@
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
         t.quality as quality,
-        o.numberCleanResult as numberCleanResult,
+        o.numberCleanResult as "numberCleanResult",
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
         ]]>
@@ -1863,7 +1863,7 @@
 	        AND o.merchant_id = 7
 			AND o.status = 'payment'
 	        AND o.buyer_id is not null
-	        AND  DATEDIFF(CURDATE(), o.repayment_time)&lt;= #{overday}
+	        AND  DATEDIFF(CURDATE(), o.repayment_time)= #{overday}
     </select>
 	
 	<update id="updateNumberResult">

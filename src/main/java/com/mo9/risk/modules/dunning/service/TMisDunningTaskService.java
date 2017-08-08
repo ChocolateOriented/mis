@@ -2812,11 +2812,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	//号码清洗
-//	@Scheduled(cron = "0 0 8 * * * ?")  
+	@Scheduled(cron = "0 0 8 * * ?")  
 	@Transactional
 	public void numberCleanResult(){
-		
-			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "1");
+//		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
+//		if("true".equals(startClean)){
+			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "-1");
 			int  overday;
 			try {
 				  overday=Integer.parseInt(overDayNumber);
@@ -2825,12 +2826,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				return;
 			}
 			List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
-			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("test01"));
+			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("123456"));
 		    long long1 = System.currentTimeMillis();
 		    for (DunningOrder dunningOrder : numberList) {
 		    	HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=test01&password="
-						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://lusj.local.mo9.com/hahah/haha/cccc");
+				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=szsh2667&password="
+						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://riskclone.mo9.com/mis/number/numberCleanBack");
 				
 				List<Element> list=null;
 				List<Element> list2=null;
@@ -2861,7 +2862,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 			
 		    }
-		
+//		}
 	
 	
 	}

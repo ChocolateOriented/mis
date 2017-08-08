@@ -462,7 +462,7 @@
 			<li><label>号码清洗</label>
 				<form:select  id="numberCleanResult" path="numberCleanResult" class="input-medium">
 					<form:option selected="selected" value="" label="全部"/>
-					<c:forEach items="${NumberList}" var="number">
+					<c:forEach items="${numberList}" var="number">
 						<form:option value="${number}" label="${number.numberResult }"/>
 					</c:forEach>
 				</form:select>

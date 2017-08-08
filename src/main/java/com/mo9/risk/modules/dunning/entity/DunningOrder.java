@@ -81,7 +81,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date nextfollowdate; 	// 下次跟进时间
 	private Date beginnextfollowdate ; //查询开始-下次跟进时间
 	private Date endnextfollowdate ; //查询结束-下次跟进时间
-	private Date numberCleanResult ; //号码清洗结果
+	private NumberCleanResult numberCleanResult ; //号码清洗结果
 	
 	private String quality;
 	
@@ -523,11 +523,11 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.taskOverdue = taskOverdue;
 	}
 
-	public Date getNumberCleanResult() {
+	public NumberCleanResult getNumberCleanResult() {
 		return numberCleanResult;
 	}
 
-	public void setNumberCleanResult(Date numberCleanResult) {
+	public void setNumberCleanResult(NumberCleanResult numberCleanResult) {
 		this.numberCleanResult = numberCleanResult;
 	}
 
