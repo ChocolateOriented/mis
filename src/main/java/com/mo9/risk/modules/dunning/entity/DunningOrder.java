@@ -87,7 +87,10 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private Boolean taskOverdue;	//过期未跟案件
 	
-
+	private Date latestlogintime;	//最近登录时间
+	private Date beginlatestlogintime;	//最近登录时间
+	private Date endlatestlogintime;	//最近登录时间
+	
 	public String getPlatformExt() {
 		return platformExt;
 	}
@@ -531,5 +534,28 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.numberCleanResult = numberCleanResult;
 	}
 
-	
+	public Date getLatestlogintime() {
+		return latestlogintime;
+	}
+
+	public void setLatestlogintime(Date latestlogintime) {
+		this.latestlogintime = latestlogintime;
+	}
+
+	public Date getBeginlatestlogintime() {
+		return beginlatestlogintime;
+	}
+
+	public void setBeginlatestlogintime(Date beginlatestlogintime) {
+		this.beginlatestlogintime = beginlatestlogintime;
+	}
+
+	public Date getEndlatestlogintime() {
+		return endlatestlogintime;
+	}
+
+	public void setEndlatestlogintime(Date endlatestlogintime) {
+		this.endlatestlogintime =  null != endlatestlogintime ? DateUtils.endDate(endlatestlogintime) : endlatestlogintime;
+	}
+
 }

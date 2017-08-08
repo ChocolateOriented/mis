@@ -552,7 +552,15 @@
 				</li>
 			</shiro:hasPermission>
 				
-						
+			<li><label>最近登录时间</label>
+				<input name="beginlatestlogintime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.beginlatestlogintime}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="endlatestlogintime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${dunningOrder.endlatestlogintime}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+					
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">  --%>
@@ -629,6 +637,7 @@
 				<th>PTP时间</th>
 				<th>是否优质</th>
 				<th>号码清洗</th>
+				<th>最近登录时间</th>
 <!-- 				<th>任务状态</th> -->
 <!-- 				<th>操作</th> -->
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
@@ -743,7 +752,9 @@
 							<c:out value="" />
 						</c:otherwise>
 					</c:choose>
-
+				<td>
+					<fmt:formatDate value="${dunningOrder.latestlogintime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
 				</td>
 <!-- 				<td> -->
 <%-- 					${dunningOrder.dunningtaskstatusText} --%>

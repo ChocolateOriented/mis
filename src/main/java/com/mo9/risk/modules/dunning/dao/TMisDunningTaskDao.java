@@ -309,4 +309,18 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 
 	public void updateNumberResult(@Param("dealcode")String dealcode,@Param("check_result") String check_result);
 	
+	/**
+	 * 查询订单用户登录信息
+	 * @param dunningOrder
+	 * @return
+	 */
+	public List<DunningOrder> findDunningOrderInfo(DunningOrder dunningOrder);
+	
+	/**
+	 * 更新最近登录时间
+	 * @param dunningOrder
+	 * @return
+	 */
+	public int updateLatestLoginTime(DunningOrder dunningOrder);
+	
 }

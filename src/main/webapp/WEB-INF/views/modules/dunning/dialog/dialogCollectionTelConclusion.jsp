@@ -122,17 +122,8 @@
 			var show = selected == "PTP" ? "inline-block" : "none";
 			$("div[name='promisepaydateGroup']").css("display", show);
 			$("#promisepaydate").val("");
-			var day = nextDate[selected] || 0;
-			var followDate = addDate(new Date(), day);
-			var month = followDate.getMonth() + 1;
-			if (month < 10) {
-				month = "0" + month.toString();
-			}
-			var date = followDate.getDate();
-			if (date < 10) {
-				date = "0" + date.toString();
-			}
-			$("#nextfollowdate").val(followDate.getFullYear() + "-" + month + "-" + date);
+			var followDate = nextDate[selected] || nextDate["OTHER"];
+			$("#nextfollowdate").val(followDate);
 		});
 		
         $.ajax({

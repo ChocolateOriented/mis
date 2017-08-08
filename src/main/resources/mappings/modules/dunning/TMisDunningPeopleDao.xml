@@ -322,9 +322,7 @@
 	
 	<update id="updatePeopleNameById">
 		UPDATE t_mis_dunning_people SET
-			name = #{name},
-			updateby = #{updateBy.id},
-			updatedate = #{updateDate}
+			name = #{name}
 		WHERE id = #{id}
 	</update>
 </mapper>

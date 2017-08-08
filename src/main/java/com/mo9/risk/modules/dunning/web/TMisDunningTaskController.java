@@ -1006,13 +1006,14 @@ public class TMisDunningTaskController extends BaseController {
 			response.setContentType("image/jpg");
 			response.setHeader("Content-disposition", "filename=img_" + fileId + ".jpg");
 			output = response.getOutputStream();
-			int buf = 0;
-			while ((buf = input.read()) != -1) {
-				output.write(buf);
+			int len = 0;
+			byte[] buf = new byte[1024];
+			while ((len = input.read(buf)) != -1) {
+				output.write(buf, 0, len);
 			}
 			output.flush();
 		} catch (IOException e) {
-			actionlog.info("读取影像资料失败:" + e.getMessage());
+			logger.info("读取影像资料失败:" + e.getMessage());
 		} finally {
 			try {
 				if (input != null) {

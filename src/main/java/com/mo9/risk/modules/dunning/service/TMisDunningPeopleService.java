@@ -210,6 +210,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 * @param dunningPeople
 	 * @return
 	 */
+	@Transactional(readOnly = false)
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople) {
 		return dao.updatePeopleNameById(dunningPeople);
 	}

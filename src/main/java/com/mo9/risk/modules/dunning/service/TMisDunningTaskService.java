@@ -29,6 +29,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
+import org.jdbc.DbUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -2809,6 +2810,87 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		dunningTaskLog.setCreateDate(new Date());
 		dunningTaskLog.setCreateBy(new User("auto_admin"));
 		tMisDunningTaskLogDao.insert(dunningTaskLog);
+	}
+	
+	/**
+	 * 定时更新用户最近登录时间
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	@Scheduled(cron = "0 0 0/2 * * ?")
+	public void queryLatestLoginTime() {
+		logger.info("定时更新最近登录时间开始");
+		DunningOrder entity = new DunningOrder();
+		entity.setStatus("payment");
+		List<DunningOrder> dunningOrders = tMisDunningTaskDao.findDunningOrderInfo(entity);
+		
+		if (dunningOrders == null || dunningOrders.size() == 0) {
+			logger.info("没有需要更新最近登录时间的任务");
+			return;
+		}
+		
+		try {
+			for (DunningOrder order : dunningOrders) {
+				String mobile = order.getMobile();
+				if (mobile == null || "".equals(mobile)) {
+					continue;
+				}
+				
+				AppLoginLog appLoginLog = getLatestAppLoginLog(mobile);
+				
+				if (appLoginLog == null) {
+					continue;
+				}
+				
+				Date loginTime = appLoginLog.getCreateTime();
+				if (loginTime != null && order.getLatestlogintime() == null ? true : loginTime.compareTo(order.getLatestlogintime()) != 0) {
+					order.setLatestlogintime(loginTime);
+					tMisDunningTaskDao.updateLatestLoginTime(order);
+				}
+			}
+		} catch (Exception e) {
+			logger.info("更新最近登录时间失败：" + e);
+		}
+		logger.info("定时更新最近登录时间结束");
+	}
+	
+	/**
+	 * 切换数据源查询最新登录记录
+	 * @param dealcode
+	 * @return
+	 */
+	public AppLoginLog getLatestAppLoginLog(String mobile) {
+		String sql = "SELECT mobile, localMobile, deviceModel, mo9ProductName, marketName, createTime FROM t_app_login_log WHERE mobile = ? ORDER BY createTime DESC LIMIT 1";
+		
+		DbUtils dbUtils = new DbUtils();
+		List<Object> paramList = new ArrayList<Object>();
+		paramList.add(mobile);
+		try {
+			List<Map<String, Object>> result = dbUtils.getQueryList(sql, paramList);
+			if (result == null || result.size() == 0) {
+				return null;
+			}
+			Map<String, Object> record = result.get(0);
+			
+			String localMobile = (String) record.get("localMobile");
+			String deviceModel = (String) record.get("deviceModel");
+			String mo9ProductName = (String) record.get("mo9ProductName");
+			String marketName = (String) record.get("marketName");
+			Date createTime = (Date) record.get("createTime");
+			
+            AppLoginLog appLoginLog = new AppLoginLog();
+            appLoginLog.setMobile(mobile);
+            appLoginLog.setLocalMobile(localMobile);
+            appLoginLog.setDeviceModel(deviceModel);
+            appLoginLog.setMo9ProductName(mo9ProductName);
+            appLoginLog.setMarketName(marketName);
+            appLoginLog.setCreateTime(createTime);
+			
+			return appLoginLog;
+		} catch (Exception e) {
+			logger.info("查询最新登录记录异常：" + e.getMessage());
+			return null;
+		}
 	}
 	
 	//号码清洗

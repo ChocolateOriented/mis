@@ -140,7 +140,7 @@ public class UserController extends BaseController {
 		
 		//同步修改催收人员的账号名
 		TMisDunningPeople dunningPeople = tMisDunningPeopleService.get(user.getId());
-		if (dunningPeople != null) {
+		if (dunningPeople != null && user.getName() != null && !user.getName().equals(dunningPeople.getName())) {
 			dunningPeople.setName(user.getName());
 			tMisDunningPeopleService.updatePeopleNameById(dunningPeople);
 		}
