@@ -52,6 +52,7 @@ import com.mo9.risk.modules.dunning.entity.DerateReason;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
@@ -207,11 +208,14 @@ public class TMisDunningTaskController extends BaseController {
 			tMisDunningGroup.setSupervisor(UserUtils.getUser());
 			supervisorLimit = true;
 		}
+		NumberCleanResult[] values = NumberCleanResult.values();
+		List<NumberCleanResult> numberList = Arrays.asList(values);
 		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
 		model.addAttribute("groupLimit", groupLimit);
 		model.addAttribute("supervisorLimit", supervisorLimit);
+		model.addAttribute("numberList", numberList);
 		return "modules/dunning/tMisDunningTaskList";
 	}
 	
@@ -2052,5 +2056,4 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceMonthReport?repage";
     }
-
 }

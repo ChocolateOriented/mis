@@ -300,5 +300,13 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public int updatePromisePayDateAndNextFollowDate(@Param("dealcode")String dealcode,@Param("promisepaydate")Date promisepaydate,@Param("nextfollowdate")Date  nextfollowdate);
+	/**
+	 *通过逾期天数查要清洗的号码
+	 * @param overday
+	 * @return
+	 */
+	public List<DunningOrder> findNumberByOverDay(int overday);
+
+	public void updateNumberResult(@Param("dealcode")String dealcode,@Param("check_result") String check_result);
 	
 }

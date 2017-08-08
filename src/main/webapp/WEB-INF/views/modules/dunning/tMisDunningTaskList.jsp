@@ -458,6 +458,15 @@
 					<form:option value="n" label="否"/>
 				</form:select>
 			</li>
+			<%---TODO 权限q0和q1 --%>
+			<li><label>号码清洗</label>
+				<form:select  id="numberCleanResult" path="numberCleanResult" class="input-medium">
+					<form:option selected="selected" value="" label="全部"/>
+					<c:forEach items="${numberList}" var="number">
+						<form:option value="${number}" label="${number.numberResult }"/>
+					</c:forEach>
+				</form:select>
+			</li>
 			<li><label>催收备注</label>
 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
@@ -619,6 +628,7 @@
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
 				<th>是否优质</th>
+				<th>号码清洗</th>
 <!-- 				<th>任务状态</th> -->
 <!-- 				<th>操作</th> -->
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
@@ -704,7 +714,36 @@
 							<c:out value="" />
 						</c:otherwise>  
 					</c:choose>
-				
+
+				</td>
+				<td>
+					<c:choose>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'YXHM'}">
+							<c:out value="有效号码" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'BZFWQ'}">
+							<c:out value="不在服务区" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'KH'}">
+							<c:out value="空号" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'HMCW'}">
+							<c:out value="号码错误" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'GJ'}">
+							<c:out value="关机" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'TJ'}">
+							<c:out value="停机" />
+						</c:when>
+						<c:when test="${dunningOrder.numberCleanResult  eq 'WZ'}">
+							<c:out value="未知" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="" />
+						</c:otherwise>
+					</c:choose>
+
 				</td>
 <!-- 				<td> -->
 <%-- 					${dunningOrder.dunningtaskstatusText} --%>
