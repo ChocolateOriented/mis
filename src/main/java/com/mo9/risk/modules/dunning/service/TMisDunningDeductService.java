@@ -26,7 +26,6 @@ import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.BankCardInfo;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
@@ -59,9 +58,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	
 	@Autowired
 	private TMisDunningDeductDao tMisDunningDeductDao;
-	
-	@Autowired
-	private TMisDunningTaskDao tMisDunningTaskDao;
 	
 	@Autowired
 	private TMisDunningDeductCallService tMisDunningDeductCallService;
@@ -191,7 +187,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	/**
 	 * 生成订单流水号
 	 * @param dealcode
-	 * @param peopleDbId
 	 * @return
 	 */
 	private String generateDeductCode(String dealcode) {
@@ -421,6 +416,9 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		}
 	}
 	
+	/**
+	 * 定时向先玩后付查询提交中订单状态
+	 */
 	@Scheduled(cron = "0 0/30 * * * ?")
 	@Transactional(readOnly = false)
 	public void querySubmittedDeductStatus() {

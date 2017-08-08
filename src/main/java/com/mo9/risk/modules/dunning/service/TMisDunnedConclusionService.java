@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.util.DateUtils;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
@@ -125,10 +127,14 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 	@Transactional(readOnly = true)
 	public Map<String, String> getFollowDateConfig() {
 		List<Dict> rs = DictUtils.getDictList("dunning_result_code");
-		
+		Calendar cal = Calendar.getInstance();
+		Date now = new Date();
 		Map<String, String> map = new HashMap<String, String>();
+		
 		for (Dict nextDay : rs) {
-			map.put(nextDay.getLabel(), nextDay.getValue());
+			cal.setTime(now);
+			cal.add(Calendar.DATE, Integer.parseInt(nextDay.getValue()));
+			map.put(nextDay.getLabel(), DateUtils.formatDate(cal.getTime()));
 		}
 		return map;
 	}
