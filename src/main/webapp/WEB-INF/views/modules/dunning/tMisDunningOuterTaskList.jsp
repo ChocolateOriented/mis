@@ -134,12 +134,12 @@ $(document).ready(function() {
 			
 	 });
 
-  // 普通导出功能
+  // 委外导出功能
   $("#exportOuterFile").click(function () {
     var outerOrders = new Array();
     $("[name='orders']").each(function () {
       if (this.checked) {
-        outerOrders.push($(this).attr("outerOrders"));
+        outerOrders.push($(this).attr("orders"));
       }
     });
     if (outerOrders.length == 0) {
@@ -277,7 +277,7 @@ function formatPeopleList( item ){
 		<tbody>
 			<c:forEach items="${page.list}" var="dunningOrder" varStatus="vs">
 				<tr>
-					<td><input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" outerOrders="${dunningOrder.dealcode}=${dunningOrder.dunningpeoplename}" deadline="${dunningOrder.deadline}"
+					<td><input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}"
 						value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}" /></td>
 					<td>${ (vs.index+1) + (page.pageNo-1) * page.pageSize}</td>
 					<td><a href="${ctx}/dunning/tMisDunningOuterTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank"> ${dunningOrder.realname} </a></td>

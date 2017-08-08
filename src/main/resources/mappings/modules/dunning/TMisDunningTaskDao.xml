@@ -473,68 +473,18 @@
         r.link_tel1 AS linktel1,
         r.link_name2 AS linkname2,
         r.link_relation2 AS linkrelation2,
-        r.link_tel2 AS linktel2
-        <!-- 				w.company_name AS companyname, -->
-        <!-- 				w.company_tel AS companytel, -->
-        <!-- 				c1.`name` AS linkname1, -->
-        <!-- 				CASE r1.family_relation -->
-        <!-- 				WHEN 'children' THEN '子女' -->
-        <!-- 				WHEN 'friend' THEN '朋友' -->
-        <!-- 				WHEN 'married' THEN '夫妻' -->
-        <!-- 				WHEN 'relatives' THEN '亲属' -->
-        <!-- 				WHEN 'workmate' THEN '同事' -->
-        <!-- 				WHEN 'parent' THEN '父母' -->
-        <!-- 				ELSE -->
-        <!-- 					NULL -->
-        <!-- 				END AS linkrelation1, -->
-        <!-- 				c1.tel AS linktel1, -->
-        <!-- 				c2.`name` AS linkname2, -->
-        <!-- 				CASE r2.family_relation -->
-        <!-- 				WHEN 'children' THEN '子女' -->
-        <!-- 				WHEN 'friend' THEN '朋友' -->
-        <!-- 				WHEN 'married' THEN '夫妻' -->
-        <!-- 				WHEN 'relatives' THEN '亲属' -->
-        <!-- 				WHEN 'workmate' THEN '同事' -->
-        <!-- 				WHEN 'parent' THEN '父母' -->
-        <!-- 				ELSE -->
-        <!-- 					NULL -->
-        <!-- 				END AS linkrelation2, -->
-        <!-- 				c2.tel AS linktel2 -->
+        r.link_tel2 AS linktel2,
+				t.DunningPeopleName AS `name`
         FROM
         t_risk_order AS o
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
         LEFT JOIN t_risk_buyer_idcard AS i ON o.buyer_id = i.buyer_id
         LEFT JOIN s_user_relationship as r ON r.buyer_id = o.buyer_id
-        <!-- 			LEFT JOIN t_risk_buyer_workinfo AS w ON o.buyer_id = w.buyer_id -->
-        <!-- 			LEFT JOIN ( -->
-        <!-- 				SELECT -->
-        <!-- 					buyer_id, -->
-        <!-- 					MIN(buyer_contact_id) AS link_id1, -->
-        <!-- 					MAX(buyer_contact_id) AS link_id2 -->
-        <!-- 				FROM -->
-        <!-- 					t_risk_buyer2contacts -->
-        <!-- 				WHERE -->
-        <!-- 					type IS NOT NULL -->
-        <!-- 				AND family_relation != 'callLog' -->
-        <!-- 				GROUP BY -->
-        <!-- 					buyer_id -->
-        <!-- 			) AS r ON r.buyer_id = o.buyer_id -->
-        <!-- 			LEFT JOIN t_risk_contact AS c1 ON r.link_id1 = c1.id -->
-        <!-- 			LEFT JOIN t_risk_contact AS c2 ON r.link_id2 = c2.id -->
-        <!-- 			LEFT JOIN t_risk_buyer2contacts AS r1 ON r1.buyer_contact_id = r.link_id1 and r1.buyer_id=r.buyer_id -->
-        <!-- 			LEFT JOIN t_risk_buyer2contacts AS r2 on r2.buyer_contact_id = r.link_id2 and r2.buyer_id=r.buyer_id -->
+				LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
         WHERE o.dealcode in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
-        <!-- 		<where> -->
-        <!-- 			<if test="orders != null and orders != ''"> -->
-        <!-- 				AND  o.dealcode in  -->
-        <!-- 				<foreach item="item" index="index" collection="orders" open="(" separator="," close=")"> -->
-        <!--                      #{item} -->
-        <!--                 </foreach> -->
-        <!-- 			</if> -->
-        <!-- 		</where>		 -->
     </select>
 
     <!-- 历史借款信息 list -->

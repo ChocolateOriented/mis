@@ -105,40 +105,32 @@ public class TMisDunningOuterTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "exportOuterFile", method = RequestMethod.POST)
-	public String exportOuterFile(String[] outerOrders, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+	public String exportOuterFile(@RequestParam("outerOrders") ArrayList<String> outerOrders, HttpServletRequest request, HttpServletResponse response,
+			RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningOuterTask/findOrderPageList?repage";
-		String fileName = "OutData" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
 
-		List<String> orders = new ArrayList<String>();
-		Map<String, String> map = new HashMap<String, String>();
-		if (outerOrders == null || outerOrders.length == 0){
+		if (outerOrders == null || outerOrders.size() == 0) {
 			addMessage(redirectAttributes, "导出数据为空");
 			return redirectUrl;
 		}
-		for (String str : Arrays.asList(outerOrders)) {
-			orders.add(str.split("=")[0]);
-			map.put(str.split("=")[0], str.split("=")[1]);
-		}
 
-		List<DunningOuterFile> dunningOuterFiles = tMisDunningTaskService.exportOuterFile(orders);
+		List<DunningOuterFile> dunningOuterFiles = tMisDunningTaskService.exportOuterFile(outerOrders);
 		if (null == dunningOuterFiles || dunningOuterFiles.isEmpty()) {
 			addMessage(redirectAttributes, "未导出数据！");
 			return redirectUrl;
 		}
-		for (DunningOuterFile dunningOuterFile : dunningOuterFiles) {
-			dunningOuterFile.setName(map.get(dunningOuterFile.getDealcode()));
-		}
 
-		tMisDunningTaskService.savefileLog(new Date(), orders, dunningOuterFiles);
+		tMisDunningTaskService.savefileLog(new Date(), outerOrders, dunningOuterFiles);
 		addMessage(redirectAttributes, "委外数据生成成功");
 		try {
+			String fileName = "OutData" + DateUtils.getDate("yyyy-MM-dd") + ".xlsx";
 			new ExportExcel("委外数据", DunningOuterFile.class).setDataList(dunningOuterFiles).write(response, fileName).dispose();
 			//  切换数据源更新order表
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
-			tMisDunningTaskService.updateOuterfiletime(new Date(), orders);
+			tMisDunningTaskService.updateOuterfiletime(new Date(), outerOrders);
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
-			return  redirectUrl;
+			return redirectUrl;
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
