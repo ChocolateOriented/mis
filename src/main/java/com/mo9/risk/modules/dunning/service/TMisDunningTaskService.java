@@ -3,41 +3,11 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.util.RegexUtil;
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
@@ -51,12 +21,10 @@ import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
 import com.mo9.risk.modules.dunning.entity.DunningPeriod;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PartialOrder;
-import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -67,7 +35,7 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.MsfClient;
-import com.sun.tools.classfile.StackMapTable_attribute.same_frame;
+import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -79,6 +47,28 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.util.ListSortUtil;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收任务Service
@@ -123,7 +113,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
 	@Autowired
-	private TMisDunningGroupDao tMisDunningGroupDao;
+	private TMisDunningGroupService tMisDunningGroupService;
 	@Autowired
 	private TMisDunnedHistoryDao tMisDunnedHistoryDao;
 	
@@ -883,17 +873,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 */
 	public Page<DunningOrder> newfindOrderPageList(Page<DunningOrder> page, DunningOrder entity) {
 		int permissions = getPermissions();
+		List<String> allowedGroupIds = new ArrayList<String>();
 		if(DUNNING_ALL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
 		}
-		if(DUNNING_INNER_PERMISSIONS == permissions){
-			TMisDunningPeople people = tMisDunningPeopleDao.get(UserUtils.getUser().getId());
+		if (DUNNING_INNER_PERMISSIONS == permissions) {
 			entity.setDunningpeopleid(null);
-			if (entity.getDunningPeople() != null) {
-				entity.getDunningPeople().setGroup(people == null ? null : people.getGroup());
-			} else {
-				entity.setDunningPeople(people);
-			}
+			allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
 		}
 		if(DUNNING_OUTER_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
@@ -907,17 +893,20 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
 		}
-		if(DUNNING_SUPERVISOR == permissions){
+		if (DUNNING_SUPERVISOR == permissions) {
 			TMisDunningGroup group = new TMisDunningGroup();
 			group.setSupervisor(UserUtils.getUser());
-			List<String> groupIds = tMisDunningGroupDao.findSupervisorGroupList(group);
-			entity.setGroupIds(groupIds);
+			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+			allowedGroupIds.addAll(groupIds);
 		}
+
+		entity.setGroupIds(allowedGroupIds);
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
 		}else{
 			entity.getSqlMap().put("orderbyMap", " t.CreateDate DESC,t.CapitalAmount DESC,t.Dealcode DESC");
 		}
+
 		entity.setPage(page);
 		page.setList(dao.newfindOrderPageList(entity));
 		return page;

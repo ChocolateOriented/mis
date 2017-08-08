@@ -902,18 +902,13 @@
             <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
-        </if>
-        <if test="groupIds != null">
-            AND p.groupId in
-			<if test="groupIds.size == 0">
-				('')
-			</if>
-			<if test="groupIds.size > 0">
-	            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
-	                #{groupId}
-	            </foreach>
-			</if>
-        </if>
+				</if>
+				<if test="groupIds != null and groupIds.size > 0">
+					AND p.groupId in
+					<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+						#{groupId}
+					</foreach>
+				</if>
         <if test="mobile != null and mobile != ''">
                 <!-- 			     # 手机号码 -->
                 AND b.mobile LIKE concat(#{mobile},'%')

@@ -58,4 +58,12 @@ public class TMisDunningGroupService extends CrudService<TMisDunningGroupDao,TMi
 		return dao.findSupervisorGroupList(tMisDunningGroup);
 	}
 
+	/**
+	 * @Description  通过组长查询组
+	 * @param leader
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningGroup>
+	 */
+	public List<String> findIdsByLeader(User leader){
+		return dao.findIdsByLeader(leader);
+	}
 }
