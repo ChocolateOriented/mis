@@ -213,11 +213,15 @@ public class TMisDunningTaskController extends BaseController {
 		List<NumberCleanResult> numberList = Arrays.asList(values);
 		User user=UserUtils.getUser();
 		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(user.getId());
-		String dunningCycle=tMisDunningPeople.getDunningcycle();
 		String tmiscycle=null;
-		if(StringUtils.isNotBlank(dunningCycle)){
-			if(dunningCycle.contains("Q0")||dunningCycle.contains("Q1")){
-				tmiscycle="numberClean";
+		if(null==tMisDunningPeople){
+			tmiscycle="numberClean";
+		}else{
+			String dunningCycle=tMisDunningPeople.getDunningcycle();
+			if(StringUtils.isNotBlank(dunningCycle)){
+				if(dunningCycle.contains("Q0")||dunningCycle.contains("Q1")){
+					tmiscycle="numberClean";
+				}
 			}
 		}
 		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
