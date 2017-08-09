@@ -824,7 +824,7 @@
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
         t.quality as quality,
-        o.numberCleanResult as "numberCleanResult",
+        t.numberCleanResult as "numberCleanResult",
         t.latestlogintime as latestlogintime,
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
@@ -1822,7 +1822,7 @@
     </select>
 
 	<update id="updateNumberResult">
-		UPDATE t_risk_order SET
+		UPDATE t_mis_dunning_task SET
 			numberCleanResult = #{check_result}
 		WHERE dealcode = #{dealcode}
 	</update>
