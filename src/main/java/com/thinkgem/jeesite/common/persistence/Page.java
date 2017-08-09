@@ -51,6 +51,8 @@ public class Page<T> implements Serializable{
 	
 	private String message = ""; // 设置提示消息，显示在“共n条”之后
 
+	private boolean usePaginationInterceptor = true; //是否使用mybatis分页插件,com.thinkgem.jeesite.common.persistence.interceptor.PaginationInterceptor
+
 	public Page() {
 		this.pageSize = -1;
 	}
@@ -409,7 +411,7 @@ public class Page<T> implements Serializable{
 			return pageNo + 1;
 		}
 	}
-	
+
 	/**
 	 * 获取本页数据对象列表
 	 * @return List<T>
@@ -426,6 +428,14 @@ public class Page<T> implements Serializable{
 		this.list = list;
 		initialize();
 		return this;
+	}
+
+	public boolean isUsePaginationInterceptor() {
+		return usePaginationInterceptor;
+	}
+
+	public void setUsePaginationInterceptor(boolean usePaginationInterceptor) {
+		this.usePaginationInterceptor = usePaginationInterceptor;
 	}
 
 	/**

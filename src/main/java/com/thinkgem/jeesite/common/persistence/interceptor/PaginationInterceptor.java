@@ -36,50 +36,48 @@ public class PaginationInterceptor extends BaseInterceptor {
     public Object intercept(Invocation invocation) throws Throwable {
 
         final MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
+        Object parameter = invocation.getArgs()[1];
+        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+        Object parameterObject = boundSql.getParameterObject();
+        Executor executor = (Executor) invocation.getTarget();
 
-//        //拦截需要分页的SQL
-////        if (mappedStatement.getId().matches(_SQL_PATTERN)) {
-//        if (StringUtils.indexOfIgnoreCase(mappedStatement.getId(), _SQL_PATTERN) != -1) {
-            Object parameter = invocation.getArgs()[1];
-            BoundSql boundSql = mappedStatement.getBoundSql(parameter);
-            Object parameterObject = boundSql.getParameterObject();
-            Executor executor = (Executor) invocation.getTarget();
+        if (StringUtils.isBlank(boundSql.getSql())) {
+            return null;
+        }
+        //获取分页参数对象
+        Page<Object> page = null;
+        if (parameterObject != null) {
+            page = convertParameter(parameterObject, page);
+        }
 
-            //获取分页参数对象
-            Page<Object> page = null;
-            if (parameterObject != null) {
-                page = convertParameter(parameterObject, page);
-            }
+        if (page == null || page.getPageSize() == -1) {
+            return invocation.proceed();
+        }
+        //判断是否使用分页插件
+        if (!page.isUsePaginationInterceptor()){
+            return invocation.proceed();
+        }
 
-            //如果设置了分页对象，则进行分页
-            if (page != null && page.getPageSize() != -1) {
+        //如果设置了分页对象，则进行分页
+        String originalSql = boundSql.getSql().trim();
 
-            	if (StringUtils.isBlank(boundSql.getSql())){
-                    return null;
-                }
-                String originalSql = boundSql.getSql().trim();
+        //得到总记录数
+        page.setCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log, executor));
+        //分页查询 本地化对象 修改数据库注意修改实现
+        String pageSql = SQLHelper.generatePageSql(originalSql, page, DIALECT);
 
-                //得到总记录数
-                page.setCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log,executor));
+        invocation.getArgs()[2] = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
+        BoundSql newBoundSql = new BoundSql(mappedStatement.getConfiguration(), pageSql, boundSql.getParameterMappings(),
+            boundSql.getParameterObject());
+        //解决MyBatis 分页foreach 参数失效 start
+        if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
+            MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
+            Reflections.setFieldValue(newBoundSql, "metaParameters", mo);
+        }
+        //解决MyBatis 分页foreach 参数失效 end
+        MappedStatement newMs = copyFromMappedStatement(mappedStatement, new BoundSqlSqlSource(newBoundSql));
 
-                //分页查询 本地化对象 修改数据库注意修改实现
-                String pageSql = SQLHelper.generatePageSql(originalSql, page, DIALECT);
-//                if (log.isDebugEnabled()) {
-//                    log.debug("PAGE SQL:" + StringUtils.replace(pageSql, "\n", ""));
-//                }
-                invocation.getArgs()[2] = new RowBounds(RowBounds.NO_ROW_OFFSET, RowBounds.NO_ROW_LIMIT);
-                BoundSql newBoundSql = new BoundSql(mappedStatement.getConfiguration(), pageSql, boundSql.getParameterMappings(), boundSql.getParameterObject());
-                //解决MyBatis 分页foreach 参数失效 start
-                if (Reflections.getFieldValue(boundSql, "metaParameters") != null) {
-                    MetaObject mo = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
-                    Reflections.setFieldValue(newBoundSql, "metaParameters", mo);
-                }
-                //解决MyBatis 分页foreach 参数失效 end
-                MappedStatement newMs = copyFromMappedStatement(mappedStatement, new BoundSqlSqlSource(newBoundSql));
-
-                invocation.getArgs()[0] = newMs;
-            }
-//        }
+        invocation.getArgs()[0] = newMs;
         return invocation.proceed();
     }
 

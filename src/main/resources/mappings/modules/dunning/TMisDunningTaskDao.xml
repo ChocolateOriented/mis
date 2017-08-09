@@ -837,147 +837,182 @@
             </otherwise>
         </choose>
     </select>
-    
-    <!-- 催收列表-优化版 list -->
-    <select id="newfindOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
-        SELECT
-        o.buyer_id AS "buyerid",
-        idc.real_name AS "realname",
-        o.dealcode AS "dealcode",
-        b.mobile AS "mobile",
-        o.amount AS "amount",
+
+	<!-- 催收列表-优化版 list -->
+	<select id="newfindOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+		o.buyer_id AS "buyerid",
+		idc.real_name AS "realname",
+		o.dealcode AS "dealcode",
+		b.mobile AS "mobile",
+		o.amount AS "amount",
 		<include refid="countRemainAmmount"/> AS creditamount,
-        o.repayment_time AS "repaymenttime",
-        CASE
-        WHEN o.`status` = 'payoff' THEN
-        DATEDIFF(
-        o.payoff_time,
-        o.repayment_time
-        )
-        WHEN o.`status` = 'payment' THEN
-        DATEDIFF(CURDATE(), o.repayment_time)
-        END AS overduedays,
-        o.`status` AS status,
-        p.`nickname` AS `dunningPeople.nickname`,
-        p.`name` AS dunningpeoplename,
-        t.dunningtime AS "dunningtime",
-        o.payoff_time AS payofftime,
-        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
-        t.Deadline as deadline,
-        <!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
-        t.dunningtaskstatus AS dunningtaskstatus,
-        t.DunningPeopleId AS dunningpeopleid,
-        t.id AS dunningtaskdbid,
-        t.telremark AS telremark,
-        o.outerfiletime AS outerfiletime,
-        t.dunningcycle AS dunningcycle,
-        t.nextfollowdate as nextfollowdate,
-        t.promisepaydate as promisepaydate,
-        t.quality as quality,
-        <![CDATA[
+		o.repayment_time AS "repaymenttime",
+		CASE
+      WHEN o.`status` = 'payoff' THEN
+      DATEDIFF(
+      o.payoff_time,
+      o.repayment_time
+      )
+      WHEN o.`status` = 'payment' THEN
+      DATEDIFF(CURDATE(), o.repayment_time)
+		END AS overduedays,
+		o.`status` AS status,
+		p.`nickname` AS `dunningPeople.nickname`,
+		p.`name` AS dunningpeoplename,
+		t.dunningtime AS "dunningtime",
+		o.payoff_time AS payofftime,
+		<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
+		t.Deadline as deadline,
+		<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 end-->
+		t.dunningtaskstatus AS dunningtaskstatus,
+		t.DunningPeopleId AS dunningpeopleid,
+		t.id AS dunningtaskdbid,
+		t.telremark AS telremark,
+		o.outerfiletime AS outerfiletime,
+		t.dunningcycle AS dunningcycle,
+		t.nextfollowdate as nextfollowdate,
+		t.promisepaydate as promisepaydate,
+		t.quality as quality,
+		<![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
         ]]>
-        FROM
-        t_mis_dunning_task AS t
-				LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
-					AND o.type = 'loan'
-        	AND o.merchant_id = 7
-					AND o.`status` IN ('payoff', 'payment' )
-        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-        LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
-        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-			<where>
-        <if test="dealcode != null and dealcode != ''">
-                AND o.dealcode = #{dealcode}
-        </if>
-        <if test="dunningpeopleid != null and dunningpeopleid != ''">
-                <!-- 			     # 催收人过滤    -->
-                AND t.DunningPeopleId = #{dunningpeopleid}
-        </if>
-        <if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
-                AND p.groupId = #{dunningPeople.group.id}
-        </if>
-        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
-            AND t.`DunningPeopleId` in
-            <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-				</if>
-				<if test="groupIds != null and groupIds.size > 0">
-					AND p.groupId in
-					<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
-						#{groupId}
-					</foreach>
-				</if>
-        <if test="mobile != null and mobile != ''">
-                <!-- 			     # 手机号码 -->
-                AND b.mobile LIKE concat(#{mobile},'%')
-                <!-- 				AND mobile = #{mobile} -->
-        </if>
-        <if test="realname != null and realname != ''">
-                <!-- 			    # 姓名 -->
-                AND idc.real_name LIKE concat('%',#{realname},'%')
-        </if>
-        <if test="telremark != null and telremark != ''">
-                <!-- 			     # 催收备注    -->
-                AND t.telremark  LIKE concat('%',#{telremark},'%') 
-        </if>
-        <if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
-            <![CDATA[
+		FROM
+		t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+      AND o.type = 'loan'
+      AND o.merchant_id = 7
+      AND o.`status` IN ('payoff', 'payment' )
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+
+		<include refid="newfindOrderPageCondition"></include>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				<!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+				ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
+			</when>
+			<otherwise>
+				<!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+				ORDER BY ${sqlMap.orderbyMap}
+			</otherwise>
+		</choose>
+
+		<if test="page!= null">
+			LIMIT ${page.firstResult},${page.pageSize}
+		</if>
+	</select>
+
+	<!--催收列表count-->
+	<select id="newfindOrderPageCount" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+		t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+      AND o.type = 'loan'
+      AND o.merchant_id = 7
+      AND o.`status` IN ('payoff', 'payment' )
+
+		<!--根据查询条件减少关联表-->
+		<if test="dunningPeople != null or groupIds != null" >
+			LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+		</if>
+		<if test="mobile != null and mobile != ''">
+			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		</if>
+		<if test="realname != null and realname != ''">
+			LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		</if>
+		<include refid="newfindOrderPageCondition"></include>
+	</select>
+
+	<!--列表查询条件-->
+	<sql id="newfindOrderPageCondition">
+		<where>
+			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
+				AND p.groupId = #{dunningPeople.group.id}
+			</if>
+			<if test="groupIds != null and groupIds.size > 0">
+				AND p.groupId in
+				<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+					#{groupId}
+				</foreach>
+			</if>
+			<if test="mobile != null and mobile != ''">
+				<!-- 			     # 手机号码 -->
+				AND b.mobile LIKE concat(#{mobile},'%')
+				<!-- 				AND mobile = #{mobile} -->
+			</if>
+			<if test="realname != null and realname != ''">
+				<!-- 			    # 姓名 -->
+				AND idc.real_name LIKE concat('%',#{realname},'%')
+			</if>
+
+			<if test="dealcode != null and dealcode != ''">
+				AND o.dealcode = #{dealcode}
+			</if>
+			<if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
+				<![CDATA[
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
 						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) >= #{beginOverduedays}
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
 						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) <= #{endOverduedays}
 			  ]]>
-        </if>
-
-        <if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
-                <!-- 			    # 到期还款日期-->
-                AND o.repayment_time BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
-        </if>
-        <if test="beginPayofftime != null and endPayofftime != null and beginPayofftime != '' and endPayofftime != ''">
-            <!-- 			    # 还清日期-->
-            AND o.payoff_time BETWEEN #{beginPayofftime} AND #{endPayofftime}
-        </if>
-        <if test="status != null and status != ''">
-            <!-- 			    # 订单状态 payoff 已还清 payment  -->
-            AND o.status = #{status}
-        </if>
-        <!-- 			# 任务状态  -->
-        <if test="dunningtaskstatus != null and dunningtaskstatus != ''">
-            AND t.dunningtaskstatus = #{dunningtaskstatus}
-        </if>
-        <!-- 			# 跟进日期  -->
-        <if test="beginnextfollowdate != null and endnextfollowdate != null and beginnextfollowdate != '' and endnextfollowdate != ''">
-            AND t.nextfollowdate BETWEEN #{beginnextfollowdate} AND #{endnextfollowdate}
-        </if>
-        <!-- 			# PTP 时间  -->
-        <if test="beginpromisepaydate != null and endpromisepaydate != null and beginpromisepaydate != '' and endpromisepaydate != ''">
-            AND t.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
-        </if>
-        <if test="quality != null and quality != ''">
-        <!--			# 优质订单    -->
-            AND t.quality = #{quality}
-        </if>
-        <if test="taskOverdue != null and taskOverdue == true">
-        <!--			# 过期未跟案件    -->
-            <![CDATA[
+			</if>
+			<if test="beginRepaymenttime != null and endRepaymenttime != null and beginRepaymenttime != '' and endRepaymenttime != ''">
+				<!-- 			    # 到期还款日期-->
+				AND o.repayment_time BETWEEN #{beginRepaymenttime} AND #{endRepaymenttime}
+			</if>
+			<if test="beginPayofftime != null and endPayofftime != null and beginPayofftime != '' and endPayofftime != ''">
+				<!-- 			    # 还清日期-->
+				AND o.payoff_time BETWEEN #{beginPayofftime} AND #{endPayofftime}
+			</if>
+			<if test="status != null and status != ''">
+				<!-- 			    # 订单状态 payoff 已还清 payment  -->
+				AND o.status = #{status}
+			</if>
+			<if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
+				AND t.`DunningPeopleId` in
+				<foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="dunningpeopleid != null and dunningpeopleid != ''">
+				<!-- 			     # 催收人过滤    -->
+				AND t.DunningPeopleId = #{dunningpeopleid}
+			</if>
+			<if test="telremark != null and telremark != ''">
+				<!-- 			     # 催收备注    -->
+				AND t.telremark LIKE concat('%',#{telremark},'%')
+			</if>
+			<!-- 			# 任务状态  -->
+			<if test="dunningtaskstatus != null and dunningtaskstatus != ''">
+				AND t.dunningtaskstatus = #{dunningtaskstatus}
+			</if>
+			<!-- 			# 跟进日期  -->
+			<if test="beginnextfollowdate != null and endnextfollowdate != null and beginnextfollowdate != '' and endnextfollowdate != ''">
+				AND t.nextfollowdate BETWEEN #{beginnextfollowdate} AND #{endnextfollowdate}
+			</if>
+			<!-- 			# PTP 时间  -->
+			<if test="beginpromisepaydate != null and endpromisepaydate != null and beginpromisepaydate != '' and endpromisepaydate != ''">
+				AND t.promisepaydate BETWEEN #{beginpromisepaydate} AND #{endpromisepaydate}
+			</if>
+			<if test="quality != null and quality != ''">
+				<!--			# 优质订单    -->
+				AND t.quality = #{quality}
+			</if>
+			<if test="taskOverdue != null and taskOverdue == true">
+				<!--			# 过期未跟案件    -->
+				<![CDATA[
             	AND DATE(t.nextfollowdate) < CURDATE()
             	AND o.status = 'payment'
             ]]>
-        </if>
-			</where>
-        <choose>
-            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
-                <!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
-                ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
-            </when>
-            <otherwise>
-                <!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
-                ORDER BY ${sqlMap.orderbyMap}
-            </otherwise>
-        </choose>
-    </select>
+			</if>
+		</where>
+	</sql>
 
     <!-- 委外催收列表 list -->
     <select id="findOuterOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">

@@ -899,8 +899,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
 			allowedGroupIds.addAll(groupIds);
 		}
+		if (allowedGroupIds.size()>0){
+			entity.setGroupIds(allowedGroupIds);
+		}
 
-		entity.setGroupIds(allowedGroupIds);
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
 		}else{
@@ -908,6 +910,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 
 		entity.setPage(page);
+
+		//不使用分页插件,使用自定义的count语句
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.newfindOrderPageCount(entity));
+
 		page.setList(dao.newfindOrderPageList(entity));
 		return page;
 	}
