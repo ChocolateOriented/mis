@@ -829,58 +829,85 @@
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
         ]]>
-        FROM
-        t_mis_dunning_task AS t
-				LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
-					AND o.type = 'loan'
-        	AND o.merchant_id = 7
-					AND o.`status` IN ('payoff', 'payment' )
-        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
-        LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
-        LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-			<where>
-        <if test="dealcode != null and dealcode != ''">
-                AND o.dealcode = #{dealcode}
-        </if>
-        <if test="dunningpeopleid != null and dunningpeopleid != ''">
-                <!-- 			     # 催收人过滤    -->
-                AND t.DunningPeopleId = #{dunningpeopleid}
-        </if>
-        <if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
-                AND p.groupId = #{dunningPeople.group.id}
-        </if>
-        <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
-            AND t.`DunningPeopleId` in
-            <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="groupIds != null">
-            AND p.groupId in
-			<if test="groupIds.size == 0">
-				('')
+		FROM
+		t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+      AND o.type = 'loan'
+      AND o.merchant_id = 7
+      AND o.`status` IN ('payoff', 'payment' )
+		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+
+		<include refid="newfindOrderPageCondition"></include>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				<!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+				ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
+			</when>
+			<otherwise>
+				<!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
+				ORDER BY ${sqlMap.orderbyMap}
+			</otherwise>
+		</choose>
+
+		<if test="page!= null">
+			LIMIT ${page.firstResult},${page.pageSize}
+		</if>
+	</select>
+
+	<!--催收列表count-->
+	<select id="newfindOrderPageCount" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+		t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+      AND o.type = 'loan'
+      AND o.merchant_id = 7
+      AND o.`status` IN ('payoff', 'payment' )
+
+		<!--根据查询条件减少关联表-->
+		<if test="dunningPeople != null or groupIds != null" >
+			LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+		</if>
+		<if test="mobile != null and mobile != ''">
+			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+		</if>
+		<if test="realname != null and realname != ''">
+			LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
+		</if>
+		<include refid="newfindOrderPageCondition"></include>
+	</select>
+
+	<!--列表查询条件-->
+	<sql id="newfindOrderPageCondition">
+		<where>
+			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
+				AND p.groupId = #{dunningPeople.group.id}
 			</if>
-			<if test="groupIds.size > 0">
-	            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
-	                #{groupId}
-	            </foreach>
+			<if test="groupIds != null and groupIds.size > 0">
+				AND p.groupId in
+				<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+					#{groupId}
+				</foreach>
 			</if>
-        </if>
-        <if test="mobile != null and mobile != ''">
-                <!-- 			     # 手机号码 -->
-                AND b.mobile LIKE concat(#{mobile},'%')
-                <!-- 				AND mobile = #{mobile} -->
-        </if>
-        <if test="realname != null and realname != ''">
-                <!-- 			    # 姓名 -->
-                AND idc.real_name LIKE concat('%',#{realname},'%')
-        </if>
-        <if test="telremark != null and telremark != ''">
-                <!-- 			     # 催收备注    -->
-                AND t.telremark  LIKE concat('%',#{telremark},'%') 
-        </if>
-        <if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
-            <![CDATA[
+			<if test="mobile != null and mobile != ''">
+				<!-- 			     # 手机号码 -->
+				AND b.mobile LIKE concat(#{mobile},'%')
+				<!-- 				AND mobile = #{mobile} -->
+			</if>
+			<if test="realname != null and realname != ''">
+				<!-- 			    # 姓名 -->
+				AND idc.real_name LIKE concat('%',#{realname},'%')
+			</if>
+
+			<if test="dealcode != null and dealcode != ''">
+				AND o.dealcode = #{dealcode}
+			</if>
+			<if test="beginOverduedays != null and endOverduedays != null and beginOverduedays != '' and endOverduedays != ''">
+				<![CDATA[
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
 						   WHEN o.`status` = 'payment' THEN DATEDIFF(CURDATE(), o.repayment_time) END) >= #{beginOverduedays}
 				AND  (CASE WHEN o.`status` = 'payoff' THEN DATEDIFF(o.payoff_time, o.repayment_time)
@@ -931,18 +958,8 @@
         <if test="beginlatestlogintime != null and endlatestlogintime != null and beginlatestlogintime != '' and endlatestlogintime != ''">
             AND t.latestlogintime BETWEEN #{beginlatestlogintime} AND #{endlatestlogintime}
         </if>
-			</where>
-        <choose>
-            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
-                <!-- 				ORDER BY ${page.orderBy} status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
-                ORDER BY ${page.orderBy} ${sqlMap.orderbyMap}
-            </when>
-            <otherwise>
-                <!-- 			    ORDER BY status,date_FORMAT(repaymenttime, '%Y-%m-%d') DESC,creditamount DESC -->
-                ORDER BY ${sqlMap.orderbyMap}
-            </otherwise>
-        </choose>
-    </select>
+    </where>
+  </sql>
 
     <!-- 委外催收列表 list -->
     <select id="findOuterOrderPageList" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
@@ -1826,7 +1843,7 @@
 			numberCleanResult = #{check_result}
 		WHERE dealcode = #{dealcode}
 	</update>
-	
+
 	<select id="findDunningOrderInfo" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
         SELECT
 	        o.dealcode,
@@ -1842,7 +1859,7 @@
         	AND status = #{status}
         </if>
     </select>
-    
+
 	<update id="updateLatestLoginTime">
 		UPDATE t_mis_dunning_task
 		SET LatestLoginTime = #{latestlogintime}

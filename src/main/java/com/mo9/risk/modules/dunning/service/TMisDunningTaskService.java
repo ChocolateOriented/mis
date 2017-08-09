@@ -47,7 +47,6 @@ import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningGroupDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
@@ -61,12 +60,10 @@ import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
 import com.mo9.risk.modules.dunning.entity.DunningPeriod;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PartialOrder;
-import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -77,7 +74,6 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.MsfClient;
-import com.sun.tools.classfile.StackMapTable_attribute.same_frame;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -89,6 +85,28 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.util.ListSortUtil;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收任务Service
@@ -133,7 +151,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
 	@Autowired
-	private TMisDunningGroupDao tMisDunningGroupDao;
+	private TMisDunningGroupService tMisDunningGroupService;
 	@Autowired
 	private TMisDunnedHistoryDao tMisDunnedHistoryDao;
 	
@@ -893,17 +911,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 */
 	public Page<DunningOrder> newfindOrderPageList(Page<DunningOrder> page, DunningOrder entity) {
 		int permissions = getPermissions();
+		List<String> allowedGroupIds = new ArrayList<String>();
 		if(DUNNING_ALL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
 		}
-		if(DUNNING_INNER_PERMISSIONS == permissions){
-			TMisDunningPeople people = tMisDunningPeopleDao.get(UserUtils.getUser().getId());
+		if (DUNNING_INNER_PERMISSIONS == permissions) {
 			entity.setDunningpeopleid(null);
-			if (entity.getDunningPeople() != null) {
-				entity.getDunningPeople().setGroup(people == null ? null : people.getGroup());
-			} else {
-				entity.setDunningPeople(people);
-			}
+			allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
 		}
 		if(DUNNING_OUTER_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
@@ -917,18 +931,28 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
 		}
-		if(DUNNING_SUPERVISOR == permissions){
+		if (DUNNING_SUPERVISOR == permissions) {
 			TMisDunningGroup group = new TMisDunningGroup();
 			group.setSupervisor(UserUtils.getUser());
-			List<String> groupIds = tMisDunningGroupDao.findSupervisorGroupList(group);
-			entity.setGroupIds(groupIds);
+			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+			allowedGroupIds.addAll(groupIds);
 		}
+		if (allowedGroupIds.size()>0){
+			entity.setGroupIds(allowedGroupIds);
+		}
+
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
 			entity.getSqlMap().put("orderbyMap", " o.payoff_time DESC ");
 		}else{
 			entity.getSqlMap().put("orderbyMap", " t.CreateDate DESC,t.CapitalAmount DESC,t.Dealcode DESC");
 		}
+
 		entity.setPage(page);
+
+		//不使用分页插件,使用自定义的count语句
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.newfindOrderPageCount(entity));
+
 		page.setList(dao.newfindOrderPageList(entity));
 		return page;
 	}
@@ -2811,7 +2835,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		dunningTaskLog.setCreateBy(new User("auto_admin"));
 		tMisDunningTaskLogDao.insert(dunningTaskLog);
 	}
-	
+
 	/**
 	 * 定时更新用户最近登录时间
 	 * @return
@@ -2823,25 +2847,25 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		DunningOrder entity = new DunningOrder();
 		entity.setStatus("payment");
 		List<DunningOrder> dunningOrders = tMisDunningTaskDao.findDunningOrderInfo(entity);
-		
+
 		if (dunningOrders == null || dunningOrders.size() == 0) {
 			logger.info("没有需要更新最近登录时间的任务");
 			return;
 		}
-		
+
 		try {
 			for (DunningOrder order : dunningOrders) {
 				String mobile = order.getMobile();
 				if (mobile == null || "".equals(mobile)) {
 					continue;
 				}
-				
+
 				AppLoginLog appLoginLog = getLatestAppLoginLog(mobile);
-				
+
 				if (appLoginLog == null) {
 					continue;
 				}
-				
+
 				Date loginTime = appLoginLog.getCreateTime();
 				if (loginTime != null && order.getLatestlogintime() == null ? true : loginTime.compareTo(order.getLatestlogintime()) != 0) {
 					order.setLatestlogintime(loginTime);
@@ -2853,7 +2877,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		logger.info("定时更新最近登录时间结束");
 	}
-	
+
 	/**
 	 * 切换数据源查询最新登录记录
 	 * @param dealcode
@@ -2861,7 +2885,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 */
 	public AppLoginLog getLatestAppLoginLog(String mobile) {
 		String sql = "SELECT mobile, localMobile, deviceModel, mo9ProductName, marketName, createTime FROM t_app_login_log WHERE mobile = ? ORDER BY createTime DESC LIMIT 1";
-		
+
 		DbUtils dbUtils = new DbUtils();
 		List<Object> paramList = new ArrayList<Object>();
 		paramList.add(mobile);
@@ -2871,13 +2895,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				return null;
 			}
 			Map<String, Object> record = result.get(0);
-			
+
 			String localMobile = (String) record.get("localMobile");
 			String deviceModel = (String) record.get("deviceModel");
 			String mo9ProductName = (String) record.get("mo9ProductName");
 			String marketName = (String) record.get("marketName");
 			Date createTime = (Date) record.get("createTime");
-			
+
             AppLoginLog appLoginLog = new AppLoginLog();
             appLoginLog.setMobile(mobile);
             appLoginLog.setLocalMobile(localMobile);
@@ -2885,16 +2909,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
             appLoginLog.setMo9ProductName(mo9ProductName);
             appLoginLog.setMarketName(marketName);
             appLoginLog.setCreateTime(createTime);
-			
+
 			return appLoginLog;
 		} catch (Exception e) {
 			logger.info("查询最新登录记录异常：" + e.getMessage());
 			return null;
 		}
 	}
-	
+
 	//号码清洗
-	@Scheduled(cron = "0 0 8 * * ?")  
+	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional
 	public void numberCleanResult(){
 //		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
@@ -2914,15 +2938,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		    	HttpClient httpClient = new DefaultHttpClient();
 				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=szsh2667&password="
 						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://riskclone.mo9.com/mis/number/numberCleanBack");
-				
+
 				List<Element> list=null;
 				List<Element> list2=null;
 				try {
-					
+
 					HttpResponse response = httpClient.execute(httpGet);
 					String entity = EntityUtils.toString(response.getEntity());
 					System.out.println(entity);
-					
+
 					Document document = DocumentHelper.parseText(entity);
 					// 1.获取文档的根节点.
 					Element root = document.getRootElement();
@@ -2940,13 +2964,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				} catch (Exception e) {
 					logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
 					continue;
-					
+
 				}
-			
+
 		    }
 //		}
-	
-	
+
+
 	}
 	//回调函数
 	@Transactional(readOnly = false)
@@ -2976,12 +3000,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	//md5加密
 	public static String pwdMD5(String strs) {
-		
+
 		StringBuffer sb = new StringBuffer();
 		try {
 			MessageDigest digest = MessageDigest.getInstance("MD5");
 			byte[] bs = digest.digest(strs.getBytes());
-		
+
 			for (byte b : bs) {
 				int x = b & 255;
 				String s = Integer.toHexString(x);
