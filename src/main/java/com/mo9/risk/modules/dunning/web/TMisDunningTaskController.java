@@ -97,6 +97,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -210,12 +211,22 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		NumberCleanResult[] values = NumberCleanResult.values();
 		List<NumberCleanResult> numberList = Arrays.asList(values);
+		User user=UserUtils.getUser();
+		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(user.getId());
+		String dunningCycle=tMisDunningPeople.getDunningcycle();
+		String tmiscycle=null;
+		if(StringUtils.isNotBlank(dunningCycle)){
+			if(dunningCycle.contains("Q0")||dunningCycle.contains("Q1")){
+				tmiscycle="numberClean";
+			}
+		}
 		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
 		model.addAttribute("groupLimit", groupLimit);
 		model.addAttribute("supervisorLimit", supervisorLimit);
 		model.addAttribute("numberList", numberList);
+		model.addAttribute("tmiscycle", tmiscycle);
 		return "modules/dunning/tMisDunningTaskList";
 	}
 	
