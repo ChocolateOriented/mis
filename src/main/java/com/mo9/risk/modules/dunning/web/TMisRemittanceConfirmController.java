@@ -19,6 +19,7 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
@@ -33,7 +34,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.rmi.ServerException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -534,7 +534,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		confirm.setPaytype(paytype);
 		try {
 			tMisRemittanceConfirmService.auditConfrim(confirm);
-		} catch (ServerException e){
+		} catch (ServiceException e){
 			return "入账失败, "+e.getMessage();
 
 		}catch (Exception e) {

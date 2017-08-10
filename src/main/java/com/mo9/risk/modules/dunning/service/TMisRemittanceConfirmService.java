@@ -4,18 +4,17 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,10 +254,12 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return void
 	 */
 	@Transactional
-	public void auditConfrim(TMisRemittanceConfirm confirm) throws IOException {
+	public void auditConfrim (TMisRemittanceConfirm confirm){
 		//更新汇款确认信息
 		confirm.preUpdate();
 		confirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_FINISH);
+		//TODO  数据库加行锁控制并发
+
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
@@ -272,6 +273,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		String delayDay = "7";
-		riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		try {
+			riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		} catch (IOException e) {
+			throw new ServiceException("订单接口回调失败, 网络异常",e);
+		}
 	}
 }
