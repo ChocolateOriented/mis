@@ -731,6 +731,7 @@
 				</td>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
+					  <c:if test="${dunningOrder.status eq 'payment'}">
 						<c:choose>
 							<c:when test="${dunningOrder.numberCleanResult  eq 'YXHM'}">
 								<c:out value="有效号码" />
@@ -757,6 +758,7 @@
 								<c:out value="" />
 							</c:otherwise>
 						</c:choose>
+					 </c:if>
 					</td>
 				</c:if>
 				<td>

@@ -945,7 +945,7 @@
         </if>
         <if test="numberCleanResult != null and numberCleanResult != ''">
         <!--			# 号码清洗    -->
-            AND o.numberCleanResult = #{numberCleanResult}
+            AND t.numberCleanResult = #{numberCleanResult}
         </if>
         <if test="taskOverdue != null and taskOverdue == true">
         <!--			# 过期未跟案件    -->

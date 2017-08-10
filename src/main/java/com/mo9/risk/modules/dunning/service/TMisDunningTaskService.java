@@ -2893,8 +2893,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional
 	public void numberCleanResult(){
-//		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
-//		if("true".equals(startClean)){
+		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
+		if("true".equals(startClean)){
 			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "-1");
 			int  overday;
 			try {
@@ -2905,11 +2905,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 			List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
 			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("123456"));
-		    long long1 = System.currentTimeMillis();
+			int i=0;
 		    for (DunningOrder dunningOrder : numberList) {
 		    	HttpClient httpClient = new DefaultHttpClient();
 				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=szsh2667&password="
-						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://riskclone.mo9.com/mis/number/numberCleanBack");
+						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://mis.mo9.com/number/numberCleanBack");
 
 				List<Element> list=null;
 				List<Element> list2=null;
@@ -2917,22 +2917,21 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 					HttpResponse response = httpClient.execute(httpGet);
 					String entity = EntityUtils.toString(response.getEntity());
-					System.out.println(entity);
 
 					Document document = DocumentHelper.parseText(entity);
 					// 1.获取文档的根节点.
 					Element root = document.getRootElement();
 					list = root.elements("error");
 					list2 = root.elements("message");
-					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"4"
-					.equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
+					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
 						logger.warn(new Date()+",号码清洗失败,失败原因:"+list2.get(0).getText());
 						return;
 					}
-					if("3".equals(list.get(0).getText())){
+					if("3".equals(list.get(0).getText())||"4".equals(list.get(0).getText())){
 						logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。手机号码格式不对");
 						continue;
 					}
+					++i;
 				} catch (Exception e) {
 					logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
 					continue;
@@ -2940,7 +2939,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 
 		    }
-//		}
+		    logger.info(new Date()+"本次号码清洗条数为："+i+",失败为"+(numberList.size()-i));
+
+		}
 
 
 	}
