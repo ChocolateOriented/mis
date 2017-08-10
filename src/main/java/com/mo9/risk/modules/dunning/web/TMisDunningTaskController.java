@@ -269,7 +269,7 @@ public class TMisDunningTaskController extends BaseController {
 		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(user.getId());
 		String tmiscycle=null;
 		if(null==tMisDunningPeople){
-			tmiscycle="numberClean";
+//			tmiscycle="numberClean";
 		}else{
 			String dunningCycle=tMisDunningPeople.getDunningcycle();
 			if(StringUtils.isNotBlank(dunningCycle)){
