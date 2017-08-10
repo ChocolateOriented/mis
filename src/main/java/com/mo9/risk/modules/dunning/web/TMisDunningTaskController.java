@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
+import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -100,6 +102,7 @@ import com.thinkgem.jeesite.modules.sys.entity.Role;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.thinkgem.jeesite.util.NumberUtil;
 
 /**
  * 催收任务Controller
@@ -159,6 +162,57 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TmisDunningSmsTemplateService tstService;
+	
+	@Autowired
+	private RiskOrderManager riskOrderManager ;
+	
+	private static final Map<Double, String> rounddownMap;  
+	static  
+    {  
+		rounddownMap = new HashMap<Double, String>();  
+		rounddownMap.put(6.5, "a1");  
+		rounddownMap.put(6.4, "a2");  
+		rounddownMap.put(6.3, "a3");  
+		rounddownMap.put(6.2, "a4");  
+		rounddownMap.put(6.1, "a5");  
+		
+		rounddownMap.put(6.0, "b1");  
+		rounddownMap.put(5.9, "b2");  
+		rounddownMap.put(5.8, "b3");  
+		rounddownMap.put(5.7, "b4");  
+		rounddownMap.put(5.6, "b5");  
+		
+		rounddownMap.put(5.5, "c1");  
+		rounddownMap.put(5.4, "c2");  
+		rounddownMap.put(5.3, "c3");  
+		rounddownMap.put(5.2, "c4");  
+		rounddownMap.put(5.1, "c5");  
+		
+		rounddownMap.put(5.0, "d1");  
+		rounddownMap.put(4.9, "d2");  
+		rounddownMap.put(4.8, "d3");  
+		rounddownMap.put(4.7, "d4");  
+		rounddownMap.put(4.6, "d5");  
+		
+		rounddownMap.put(4.5, "e1");  
+		rounddownMap.put(4.4, "e2");  
+		rounddownMap.put(4.3, "e3");  
+		rounddownMap.put(4.2, "e4");  
+		rounddownMap.put(4.1, "e5");  
+		
+		rounddownMap.put(4.0, "f1");  
+		rounddownMap.put(3.9, "f2");  
+		rounddownMap.put(3.8, "f3");  
+		rounddownMap.put(3.7, "f4");  
+		rounddownMap.put(3.6, "f5");  
+		
+		rounddownMap.put(3.5, "g1");  
+		rounddownMap.put(3.4, "g2");  
+		rounddownMap.put(3.3, "g3");  
+		rounddownMap.put(3.2, "g4");  
+		rounddownMap.put(3.1, "g5");  
+    } 
+	
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -989,11 +1043,35 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
 		model.addAttribute("deductable", deductable);
 		
+		try {
+			String score = riskOrderManager.scApplicationCol(personalInfo.getMobile(), dealcode, buyerId, String.valueOf(order.getId()));
+			if(null != score && "".equals(score)){
+				score = this.getCalculateScore(Double.parseDouble(score));
+			}
+			model.addAttribute("score", score);
+		} catch (IOException e) {
+			model.addAttribute("score", "评分显示失败");
+			e.printStackTrace();
+		}
+		
 		//根据资方和逾期天数判断是否开启代扣
 		String daikouStatus=tMisDunningTaskService.findOrderByPayCode(order);
 		model.addAttribute("daikouStatus", daikouStatus);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
+	
+	public String getCalculateScore(Double score){
+//		null != this.incomepercent ? NumberUtil.formatToseparaInteger(this.incomepercent) : "";
+		DecimalFormat df = new DecimalFormat("#,###.#");
+		if(score > 650){
+			return "a1";
+		}
+		if(score < 310){
+			return "g5";
+		}
+		return rounddownMap.get(df.format(score * 0.01));
+	}
+	
 	
 	/**
 	 * 展示用户影像资料

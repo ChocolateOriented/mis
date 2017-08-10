@@ -203,6 +203,33 @@
 			]]>
 	</insert>
 	
+	<!--  # 更新逾期1天的当天到期的订单数-->
+	<update id="householdsUpdateOverOneDay">
+		<![CDATA[
+			UPDATE t_mis_dunning_qianxilv_new AS r
+			INNER JOIN (
+				SELECT
+					DATE(
+						DATE_ADD(
+							o.repayment_time,
+							INTERVAL 1 DAY
+						)
+					) AS CreateTime,
+					COUNT(1) AS OrderDueDate
+				FROM
+					t_risk_order AS o
+				WHERE
+					o.type = 'loan'
+				AND o.merchant_id = 7
+				AND o.`status` IN ('payment', 'payoff')
+				GROUP BY
+					DATE(o.repayment_time)
+			) AS t ON t.CreateTime = r.CreateTime
+			SET r.OrderDueDate = t.OrderDueDate;
+
+		]]>
+	</update>
+	
 <!-- 	# 更新Q1数据 -->
 	<update id="householdsUpdateQ1">
 		<![CDATA[
@@ -407,32 +434,7 @@
 		]]>
 	</update>
 	
-	<!--  # 更新逾期1天的当天到期的订单数-->
-	<update id="householdsUpdateOverOneDay">
-		<![CDATA[
-			UPDATE t_mis_dunning_qianxilv_new AS r
-			INNER JOIN (
-				SELECT
-					DATE(
-						DATE_ADD(
-							o.repayment_time,
-							INTERVAL 1 DAY
-						)
-					) AS CreateTime,
-					COUNT(1) AS OrderDueDate
-				FROM
-					t_risk_order AS o
-				WHERE
-					o.type = 'loan'
-				AND o.merchant_id = 7
-				AND o.`status` IN ('payment', 'payoff')
-				GROUP BY
-					DATE(o.repayment_time)
-			) AS t ON t.CreateTime = r.CreateTime
-			SET r.OrderDueDate = t.OrderDueDate;
-
-		]]>
-	</update>
+	
 	
 	<!-- 开始迁徙率关于 本金的 -->
 	
