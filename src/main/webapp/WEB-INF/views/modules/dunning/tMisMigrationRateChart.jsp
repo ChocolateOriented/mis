@@ -18,7 +18,7 @@ function mrgiation(){
     		var  myChart=echarts.init(myCharts[i-1]);
            	myChart.setOption({
         	title : {
-    	        text: '户数迁徙_c-p'+i,
+    	        text: '户数迁徙_C-P'+i,
         	},
     	    tooltip : {
     	        trigger: 'axis'
@@ -54,11 +54,12 @@ function mrgiation(){
     		    },
     		    yAxis: {
     		    	 type : 'value',
-    		    	  axisLabel: {  
-    	                  show: true,  
-    	                  interval: 'auto',  
-    	                  formatter: '{value} %'  
-    	                },  
+    		    	 name:'单位（%）',
+    		    	 axisLabel: {  
+   	                  show: true,  
+   	                  interval: 'auto',  
+   	                  formatter: '{value}.00'  
+   	                },
     	            show: true  
     		    },
     		    series:data['smdList'+i],
@@ -70,7 +71,7 @@ function mrgiation(){
 
 </script>
 <style type="text/css">
-.main{height: 480px; border: 1px solid #fff; padding: 10px;}
+.main{height: 480px; border: 1px solid black; padding: 10px;}
 </style>
 </head>
 <body>
