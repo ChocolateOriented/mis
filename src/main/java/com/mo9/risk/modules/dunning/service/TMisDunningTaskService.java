@@ -93,7 +93,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
 	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
 	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
-	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  内部催收主管
+	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
 	public static final Integer DUNNING_COMMISSIONER_PERMISSIONS = 1;    //  催收专员
 //	public static final Integer DUNNING_SUPERVISION_MANAGER_PERMISSIONS =  100001;    //  催收监理经理
@@ -890,6 +890,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if (DUNNING_INNER_PERMISSIONS == permissions) {
 			entity.setDunningpeopleid(null);
 			allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
+			entity.setGroupIds(allowedGroupIds);
 		}
 		if(DUNNING_OUTER_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
@@ -908,8 +909,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			group.setSupervisor(UserUtils.getUser());
 			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
 			allowedGroupIds.addAll(groupIds);
-		}
-		if (allowedGroupIds.size()>0){
 			entity.setGroupIds(allowedGroupIds);
 		}
 
