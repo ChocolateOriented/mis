@@ -887,11 +887,16 @@
 			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
 				AND p.groupId = #{dunningPeople.group.id}
 			</if>
-			<if test="groupIds != null and groupIds.size > 0">
+			<if test="groupIds != null">
 				AND p.groupId in
-				<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
-					#{groupId}
-				</foreach>
+				<if test="groupIds.size == 0">
+					('')
+				</if>
+				<if test="groupIds.size > 0">
+					<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+						#{groupId}
+					</foreach>
+				</if>
 			</if>
 			<if test="mobile != null and mobile != ''">
 				<!-- 			     # 手机号码 -->
