@@ -145,6 +145,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TaskScheduler scheduler;
 	
+	@Autowired
+	private TMisDunningTaskSupportService tMisDunningTaskSupportService;
 	
 	public TMisDunningTask get(String id) {
 		return super.get(id);
@@ -2810,7 +2812,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	/**
 	 * 定时更新用户最近登录时间
-	 * @return
 	 */
 	@Transactional(readOnly = false)
 	@Scheduled(cron = "0 0 0/2 * * ?")
@@ -2841,7 +2842,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Date loginTime = appLoginLog.getCreateTime();
 				if (loginTime != null && order.getLatestlogintime() == null ? true : loginTime.compareTo(order.getLatestlogintime()) != 0) {
 					order.setLatestlogintime(loginTime);
-					tMisDunningTaskDao.updateLatestLoginTime(order);
+					tMisDunningTaskSupportService.updateLatestLoginTime(order);
 				}
 			}
 		} catch (Exception e) {
@@ -2852,7 +2853,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	/**
 	 * 切换数据源查询最新登录记录
-	 * @param dealcode
+	 * @param mobile
 	 * @return
 	 */
 	public AppLoginLog getLatestAppLoginLog(String mobile) {

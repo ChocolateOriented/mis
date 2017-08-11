@@ -140,6 +140,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	/**
 	 * 获取扣款渠道列表
 	 * @param bankname
+	 * @param bankCard
 	 * @return
 	 */
 	@Transactional(readOnly = true)
