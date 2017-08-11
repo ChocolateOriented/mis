@@ -202,10 +202,10 @@ public class TMisDunningDeductCallService {
 	 * @param tMisDunningDeduct
 	 * @return
 	 */
-	public Mo9ResponseData queryOrderStatusInMo9(TMisDunningDeduct deduct) {
+	public Mo9ResponseData queryOrderStatusInMo9(TMisDunningDeduct tMisDunningDeduct) {
 		Mo9DeductOrder queryOrder = new Mo9DeductOrder();
 		queryOrder.setBizSys("mis.deduct");
-		queryOrder.setInvoice(deduct.getDeductcode());
+		queryOrder.setInvoice(tMisDunningDeduct.getDeductcode());
 		String privateKey = tMisDunningConfigureDao.get("deduct.privateKey");
 		String sign = RequestParamSign.generateParamSign(queryOrder.toMap(), privateKey);
 		queryOrder.setSign(sign);
@@ -285,7 +285,7 @@ public class TMisDunningDeductCallService {
 	/**
 	 * 代扣失败发送提醒短信
 	 * @param buyerInfo
-	 * @param templateName
+	 * @param tMisDunningDeduct
 	 * @return
 	 */
 	public void sendFailRemindSMS(TRiskBuyerPersonalInfo buyerInfo, TMisDunningDeduct tMisDunningDeduct) {
