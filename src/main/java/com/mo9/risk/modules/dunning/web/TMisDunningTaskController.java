@@ -253,11 +253,9 @@ public class TMisDunningTaskController extends BaseController {
 		//催收小组列表
 		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 		int permissions = TMisDunningTaskService.getPermissions();
-		boolean groupLimit = false;
 		boolean supervisorLimit = false;
 		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
 			tMisDunningGroup.setLeader(UserUtils.getUser());
-			groupLimit = true;
 		}
 		if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
 			tMisDunningGroup.setSupervisor(UserUtils.getUser());
@@ -281,7 +279,6 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
-		model.addAttribute("groupLimit", groupLimit);
 		model.addAttribute("supervisorLimit", supervisorLimit);
 		model.addAttribute("numberList", numberList);
 		model.addAttribute("tmiscycle", tmiscycle);
