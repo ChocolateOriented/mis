@@ -74,10 +74,13 @@ public class DunningReportController extends BaseController {
 
 		//催收小组列表,若无限制则查询所有小组
 		List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups();
-		if (groups == null || groups.size() == 0) {
+		boolean groupLimit = true;
+		if (groups == null) {
 			groups = groupService.findList(new TMisDunningGroup());
+			groupLimit = false;
 		}
 		model.addAttribute("groupList", groups);
+		model.addAttribute("groupLimit", groupLimit);
 
 		//若只管理一个小组则默认选中
 		if (groups.size() == 1) {
