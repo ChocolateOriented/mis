@@ -480,7 +480,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		String msg ;
 		try {
 			msg = tMisRemittanceConfirmService.checkConfirm(paid,isMergeRepayment,confirmid,platform,relatedId);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.warn("还款错误",e);
 			return "error";
 		}
@@ -535,6 +535,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 		try {
 			tMisRemittanceConfirmService.auditConfrim(confirm);
 		} catch (ServiceException e){
+			logger.info(order.getDealcode()+"入账失败",e);
 			return "入账失败, "+e.getMessage();
 
 		}catch (Exception e) {
