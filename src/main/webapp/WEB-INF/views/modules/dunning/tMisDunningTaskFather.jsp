@@ -124,7 +124,7 @@
 		<tr>
 			<td>证件地址：${not empty personalInfo.ocrAddr ? personalInfo.ocrAddr : "未获取"}</td>
 			<td>常住地址：${not empty personalInfo.livingAddr ? personalInfo.livingAddr : "未获取"}</td>
-			<td></td>
+			<td>C卡分数：${score}</td>
 		</tr>
 		</tbody>
 	</table>

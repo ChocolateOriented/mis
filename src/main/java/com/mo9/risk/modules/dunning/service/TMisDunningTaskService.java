@@ -93,7 +93,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
 	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
 	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
-	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  内部催收主管
+	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
 	public static final Integer DUNNING_COMMISSIONER_PERMISSIONS = 1;    //  催收专员
 //	public static final Integer DUNNING_SUPERVISION_MANAGER_PERMISSIONS =  100001;    //  催收监理经理
@@ -145,6 +145,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TaskScheduler scheduler;
 	
+	@Autowired
+	private TMisDunningTaskSupportService tMisDunningTaskSupportService;
 	
 	public TMisDunningTask get(String id) {
 		return super.get(id);
@@ -890,6 +892,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		if (DUNNING_INNER_PERMISSIONS == permissions) {
 			entity.setDunningpeopleid(null);
 			allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
+			entity.setGroupIds(allowedGroupIds);
 		}
 		if(DUNNING_OUTER_PERMISSIONS == permissions){
 			entity.setDunningpeopleid(null);
@@ -908,8 +911,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			group.setSupervisor(UserUtils.getUser());
 			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
 			allowedGroupIds.addAll(groupIds);
-		}
-		if (allowedGroupIds.size()>0){
 			entity.setGroupIds(allowedGroupIds);
 		}
 
@@ -2810,7 +2811,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	/**
 	 * 定时更新用户最近登录时间
-	 * @return
 	 */
 	@Transactional(readOnly = false)
 	@Scheduled(cron = "0 0 0/2 * * ?")
@@ -2841,7 +2841,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				Date loginTime = appLoginLog.getCreateTime();
 				if (loginTime != null && order.getLatestlogintime() == null ? true : loginTime.compareTo(order.getLatestlogintime()) != 0) {
 					order.setLatestlogintime(loginTime);
-					tMisDunningTaskDao.updateLatestLoginTime(order);
+					tMisDunningTaskSupportService.updateLatestLoginTime(order);
 				}
 			}
 		} catch (Exception e) {
@@ -2852,7 +2852,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	/**
 	 * 切换数据源查询最新登录记录
-	 * @param dealcode
+	 * @param mobile
 	 * @return
 	 */
 	public AppLoginLog getLatestAppLoginLog(String mobile) {
@@ -2893,8 +2893,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional
 	public void numberCleanResult(){
-//		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
-//		if("true".equals(startClean)){
+		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
+		if("true".equals(startClean)){
 			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "-1");
 			int  overday;
 			try {
@@ -2905,11 +2905,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 			List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
 			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("123456"));
-		    long long1 = System.currentTimeMillis();
+			int i=0;
 		    for (DunningOrder dunningOrder : numberList) {
 		    	HttpClient httpClient = new DefaultHttpClient();
 				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=szsh2667&password="
-						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://riskclone.mo9.com/mis/number/numberCleanBack");
+						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://mis.mo9.com/number/numberCleanBack");
 
 				List<Element> list=null;
 				List<Element> list2=null;
@@ -2917,22 +2917,21 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 					HttpResponse response = httpClient.execute(httpGet);
 					String entity = EntityUtils.toString(response.getEntity());
-					System.out.println(entity);
 
 					Document document = DocumentHelper.parseText(entity);
 					// 1.获取文档的根节点.
 					Element root = document.getRootElement();
 					list = root.elements("error");
 					list2 = root.elements("message");
-					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"4"
-					.equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
+					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
 						logger.warn(new Date()+",号码清洗失败,失败原因:"+list2.get(0).getText());
 						return;
 					}
-					if("3".equals(list.get(0).getText())){
+					if("3".equals(list.get(0).getText())||"4".equals(list.get(0).getText())){
 						logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。手机号码格式不对");
 						continue;
 					}
+					++i;
 				} catch (Exception e) {
 					logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
 					continue;
@@ -2940,7 +2939,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 
 		    }
-//		}
+		    logger.info(new Date()+"本次号码清洗条数为："+i+",失败为"+(numberList.size()-i));
+
+		}
 
 
 	}

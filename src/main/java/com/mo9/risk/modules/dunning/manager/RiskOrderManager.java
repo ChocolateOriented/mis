@@ -61,4 +61,35 @@ public class RiskOrderManager {
 		}
 		return repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
 	}
+	
+//	https://riskclone.mo9.com/scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile={{mobile}}&dealcode={{dealcode}}&buyerId={{buyerId}}&orderId={{orderId}}&old=true
+	/**
+	 * @Description 江湖救急订单还款接口
+	 * @param dealcode 订单号
+	 * @return java.lang.String 成功信息
+	 */
+	public String scApplicationCol(String mobile, String dealcode, String buyerId, String orderId) throws IOException {
+
+		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+		String url = riskUrl + "scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile=" +mobile+ "&dealcode=" +dealcode+ "&buyerId=" +buyerId+ "&orderId=" +orderId+ "&old=true";
+
+		logger.info("接口url：" + url);
+		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");
+		logger.info("接口url返回参数" + res);
+
+		if (StringUtils.isBlank(res)) {
+			throw new ServiceException("订单接口回调失败");
+		}
+		JSONObject repJson = new JSONObject(res);
+		String resultCode =  repJson.has("code") ? String.valueOf(repJson.get("code")) : "";
+		if(StringUtils.isBlank(resultCode) || !"200".equals(resultCode)) {
+			//抛异常回滚
+			String msg =  repJson.has("message") ? String.valueOf(repJson.get("message")) : "";
+			logger.info("订单接口回调失败,失败信息: " + repJson.toString());
+			throw new ServiceException(msg);
+		}
+		return repJson.has("data") ? String.valueOf(repJson.get("data")) : "";
+	}
+	
+	
 }
