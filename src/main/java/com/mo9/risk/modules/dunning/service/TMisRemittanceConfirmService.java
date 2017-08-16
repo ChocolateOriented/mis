@@ -258,7 +258,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @param confirm
 	 * @return void
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void auditConfrim (TMisRemittanceConfirm confirm){
 		//数据库加行锁控制并发
 		logger.debug("正在获取锁TMisRemittanceConfirm:"+confirm.getId());
