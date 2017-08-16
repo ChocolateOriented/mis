@@ -46,6 +46,15 @@
 		<include refid="tMisRemittanceConfirmJoins"/>
 		WHERE a.id = #{id}
 	</select>
+
+	<select id="selectByIdForUpdate" resultType="TMisRemittanceConfirm">
+		SELECT
+		<include refid="tMisRemittanceConfirmColumns"/>
+		FROM t_mis_remittance_confirm a
+		<include refid="tMisRemittanceConfirmJoins"/>
+		WHERE a.id = #{id}
+		FOR UPDATE
+	</select>
 	
 	<select id="findList" resultType="TMisRemittanceConfirm">
 		SELECT 
