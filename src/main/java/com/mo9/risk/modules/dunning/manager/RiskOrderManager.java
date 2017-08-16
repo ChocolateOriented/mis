@@ -6,6 +6,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
@@ -40,9 +41,9 @@ public class RiskOrderManager {
 		}else{
 			remark = paychannel;
 		}
-
+		DecimalFormat df1 = new DecimalFormat("0.00");
 		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paytype+ "/" +Payamount.toString()+ "/" +delayDay;
+		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paytype+ "/" +df1.format(Payamount)+ "/" +delayDay;
 
 		logger.info("接口url：" + url);
 		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");

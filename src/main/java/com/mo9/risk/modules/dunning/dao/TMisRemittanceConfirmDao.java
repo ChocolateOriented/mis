@@ -106,4 +106,11 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return void
 	 */
 	void auditConfrimUpdate(TMisRemittanceConfirm confirm);
+
+	/**
+	 * @Description 获取被锁的汇款确认信息
+	 * @param id
+	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm
+	 */
+	TMisRemittanceConfirm selectByIdForUpdate(String id);
 }

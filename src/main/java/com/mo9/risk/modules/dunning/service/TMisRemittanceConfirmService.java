@@ -4,23 +4,23 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -223,7 +223,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return java.lang.String
 	 */
 	@Transactional
-	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
+	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
@@ -246,19 +246,32 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
-}
+		try {
+			return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
+		} catch (IOException e) {
+			throw new ServiceException("订单接口回调失败, 网络异常",e);
+		}
+	}
 
 	/**
 	 * @Description 提交查账流程--入账
 	 * @param confirm
 	 * @return void
 	 */
-	@Transactional
-	public void auditConfrim(TMisRemittanceConfirm confirm) throws IOException {
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void auditConfrim (TMisRemittanceConfirm confirm){
+		//数据库加行锁控制并发
+		logger.debug("正在获取锁TMisRemittanceConfirm:"+confirm.getId());
+		TMisRemittanceConfirm lockedConfirm = this.getLockedRemittanceConfirm(confirm.getId());
+		logger.debug("成功获取锁TMisRemittanceConfirm:"+confirm.getId());
+		if (!TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(lockedConfirm.getConfirmstatus())){
+			throw new ServiceException("汇款确认信息状态不为'已查账'");
+		}
+
 		//更新汇款确认信息
 		confirm.preUpdate();
 		confirm.setConfirmstatus(TMisRemittanceConfirm.CONFIRMSTATUS_FINISH);
+
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
@@ -272,6 +285,21 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		String delayDay = "7";
-		riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		try {
+			riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+		} catch (IOException e) {
+			throw new ServiceException("订单接口回调失败, 网络异常",e);
+		}
 	}
+
+	/**
+	 * @Description 获取被锁的汇款确认信息
+	 * @param id
+	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm
+	 */
+	@Transactional(propagation = Propagation.MANDATORY)
+	private TMisRemittanceConfirm getLockedRemittanceConfirm(String id) {
+		return dao.selectByIdForUpdate(id);
+	}
+
 }

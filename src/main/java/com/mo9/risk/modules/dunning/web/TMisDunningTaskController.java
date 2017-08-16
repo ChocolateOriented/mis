@@ -256,6 +256,7 @@ public class TMisDunningTaskController extends BaseController {
 		boolean supervisorLimit = false;
 		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
 			tMisDunningGroup.setLeader(UserUtils.getUser());
+			supervisorLimit = true;
 		}
 		if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
 			tMisDunningGroup.setSupervisor(UserUtils.getUser());
