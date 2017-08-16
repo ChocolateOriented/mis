@@ -6,7 +6,17 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-		
+
+          var groups = [];
+          if ("${groupLimit}" == "true") {
+            var groupOptions = $("#groupList")[0].options;
+            for (var i = 0; i < groupOptions.length; i++) {
+              if (groupOptions[i].value) {
+                groups.push(groupOptions[i].value);
+              }
+            }
+          }
+
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出催收员案件活动日报数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
@@ -27,8 +37,17 @@
 			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
-			        	var groupId=$("#groupList").val(); 
-		            	return {'group.id': groupId , name:term};
+					  var groupId=$("#groupList").val();
+					  var param = {};
+                      if ("${groupLimit}" == "true") {
+                        param = {'group.id': groupId,
+                          'group.groupIds': groups.toString(),
+                          name:term};
+                      } else {
+                        param = {'group.id': groupId,
+                          name:term};
+                      }
+					  return param;
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	var resultsData = [] ;
