@@ -18,7 +18,7 @@ function mrgiation(){
     		var  myChart=echarts.init(myCharts[i-1]);
            	myChart.setOption({
         	title : {
-    	        text: '本金迁徙_c-p'+i,
+    	        text: '本金迁徙_C-P'+i,
         	},
     	    tooltip : {
     	        trigger: 'axis'
@@ -54,10 +54,11 @@ function mrgiation(){
     		    },
     		    yAxis: {
     		    	 type : 'value',
+    		    	 name:'单位（%）',
     		    	  axisLabel: {  
     	                  show: true,  
     	                  interval: 'auto',  
-    	                  formatter: '{value} %'  
+    	                  formatter: '{value}.00'  
     	                },  
     	            show: true  
     		    },
@@ -70,7 +71,7 @@ function mrgiation(){
 
 </script>
 <style type="text/css">
-.main{height: 480px; border: 1px solid #fff; padding: 10px;}
+.main{height: 480px; border: 1px solid gray; padding: 10px;}
 </style>
 </head>
 <body>
@@ -81,7 +82,7 @@ function mrgiation(){
 		<li class="active"><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
 	</ul>
 	
-		<div id="main1" name="main" class="main" ></div>	
+		<div id="main1" name="main" class="main" ></div>   
 		<div id="main2" name="main" class="main" ></div>	
 		<div id="main3" name="main" class="main" ></div>	
 		<div id="main4" name="main" class="main" ></div>	

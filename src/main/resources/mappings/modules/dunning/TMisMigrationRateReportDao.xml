@@ -22,6 +22,7 @@
 	<select id="get" resultType="TMisMigrationRateReport">
 		SELECT 
 			<include refid="tMisMigrationRateReportColumns"/>
+		
 		FROM t_mis_migration_rate_report a
 		<include refid="tMisMigrationRateReportJoins"/>
 		WHERE a.id = #{id}
@@ -29,13 +30,20 @@
 	
 	<select id="findList" resultType="TMisMigrationRateReport">
 		SELECT 
-			<include refid="tMisMigrationRateReportColumns"/>
+			<include refid="tMisMigrationRateReportColumns"/>,
+			c.datetime_start AS "datetimeStart",
+			c.datetime_end AS "datetimeEnd"
 		FROM t_mis_migration_rate_report a
+		left join tmp_move_cycle c on a.cycle=c.cycle 
 		<include refid="tMisMigrationRateReportJoins"/>
 		<where>
 			
 			<if test="datetime != null and datetime != ''">
-				AND a.datetime = #{datetime}
+				AND DATE_FORMAT(a.datetime,'%Y-%m-%d') =DATE_FORMAT(#{datetime},'%Y-%m-%d')
+			</if>
+			<if test="datetimeEnd != null and datetimeEnd != ''">
+				AND c.datetime_start&lt;#{datetimeEnd}
+				AND c.datetime_end&gt;#{datetimeEnd}
 			</if>
 		</where>
 		<choose>

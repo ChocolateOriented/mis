@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -70,6 +71,28 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TMisMigrationRateReport tMisMigrationRateReport, HttpServletRequest request, HttpServletResponse response, Model model) {
+		
+		Date datetimeEnd = tMisMigrationRateReport.getDatetimeEnd();
+		Date dateChoice=null;
+		if(null!=datetimeEnd){
+			SimpleDateFormat sd=new SimpleDateFormat("yyyy-MM");
+			SimpleDateFormat sd2=new SimpleDateFormat("yyyy-MM-dd");
+			String monthUpDown = tMisMigrationRateReport.getMonthUpDown();
+			String date="";
+			if("up".equals(monthUpDown)){
+				 date=sd.format(datetimeEnd)+"-10";
+			}
+			if("down".equals(monthUpDown)){
+				 date=sd.format(datetimeEnd)+"-20";
+			}
+			try {
+				dateChoice=sd2.parse(date);
+			} catch (ParseException e) {
+				logger.warn("时间转换失败");
+				return null;
+			}
+		}
+		tMisMigrationRateReport.setDatetimeEnd(dateChoice);
 		Page<TMisMigrationRateReport> page = tMisMigrationRateReportService.findPage(new Page<TMisMigrationRateReport>(request, response), tMisMigrationRateReport); 
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisMigrationRateReportList";
@@ -526,18 +549,39 @@ public class TMisMigrationRateReportController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@RequestMapping(value = "migrateExport")
-	@ResponseBody
 	public String migrateExport(TMisMigrationRateReport tMisMigrationRateReport,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		Date datetimeEnd = tMisMigrationRateReport.getDatetimeEnd();
+		Date dateChoice=null;
+		if(null!=datetimeEnd){
+			SimpleDateFormat sd=new SimpleDateFormat("yyyy-MM");
+			SimpleDateFormat sd2=new SimpleDateFormat("yyyy-MM-dd");
+			String monthUpDown = tMisMigrationRateReport.getMonthUpDown();
+			String date="";
+			if("up".equals(monthUpDown)){
+				 date=sd.format(datetimeEnd)+"-10";
+			}
+			if("down".equals(monthUpDown)){
+				 date=sd.format(datetimeEnd)+"-20";
+			}
+			try {
+				dateChoice=sd2.parse(date);
+			} catch (ParseException e) {
+				logger.warn("时间转换失败");
+				return null;
+			}
+		}
+		tMisMigrationRateReport.setDatetimeEnd(dateChoice);
 		try {
-            String fileName = "migrateExportFile" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
+            String fileName = "迁徙率日报表" + DateUtils.getDate("yyyy/MM/dd")+".xlsx";
             List<TMisMigrationRateReport> migratelist = tMisMigrationRateReportService.findList(tMisMigrationRateReport); 
             new ExportExcel("迁徙日报表", TMisMigrationRateReport.class).setDataList(migratelist).write(response, fileName).dispose();
-           
+            return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
 		}
-		 return "OK";
-	}
+		return "redirect:" + adminPath + "/dunning/tMisMigrationRateReport/list";
+    }
+	
 	
 	
 }

@@ -76,6 +76,10 @@ public class NumberUtil {
 		DecimalFormat df = new DecimalFormat("#,###.00");
 		return Double.parseDouble(df.format(data));
 	}
+	public static String formatToseparaString(BigDecimal data) {
+		DecimalFormat df = new DecimalFormat("#,##0.00");
+		return  df.format(data);
+	}
 	
 	/**
 	 * 百分比转换
