@@ -166,51 +166,51 @@ public class TMisDunningTaskController extends BaseController {
 	@Autowired
 	private RiskOrderManager riskOrderManager ;
 	
-	private static final Map<Double, String> rounddownMap;  
+	private static final Map<String, String> rounddownMap;  
 	static  
     {  
-		rounddownMap = new HashMap<Double, String>();  
-		rounddownMap.put(6.5, "a1");  
-		rounddownMap.put(6.4, "a2");  
-		rounddownMap.put(6.3, "a3");  
-		rounddownMap.put(6.2, "a4");  
-		rounddownMap.put(6.1, "a5");  
+		rounddownMap = new HashMap<String, String>();  
+		rounddownMap.put("6.5", "a1");  
+		rounddownMap.put("6.4", "a2");  
+		rounddownMap.put("6.3", "a3");  
+		rounddownMap.put("6.2", "a4");  
+		rounddownMap.put("6.1", "a5");  
 		
-		rounddownMap.put(6.0, "b1");  
-		rounddownMap.put(5.9, "b2");  
-		rounddownMap.put(5.8, "b3");  
-		rounddownMap.put(5.7, "b4");  
-		rounddownMap.put(5.6, "b5");  
+		rounddownMap.put("6.0", "b1");  
+		rounddownMap.put("5.9", "b2");  
+		rounddownMap.put("5.8", "b3");  
+		rounddownMap.put("5.7", "b4");  
+		rounddownMap.put("5.6", "b5");  
 		
-		rounddownMap.put(5.5, "c1");  
-		rounddownMap.put(5.4, "c2");  
-		rounddownMap.put(5.3, "c3");  
-		rounddownMap.put(5.2, "c4");  
-		rounddownMap.put(5.1, "c5");  
+		rounddownMap.put("5.5", "c1");  
+		rounddownMap.put("5.4", "c2");  
+		rounddownMap.put("5.3", "c3");  
+		rounddownMap.put("5.2", "c4");  
+		rounddownMap.put("5.1", "c5");  
 		
-		rounddownMap.put(5.0, "d1");  
-		rounddownMap.put(4.9, "d2");  
-		rounddownMap.put(4.8, "d3");  
-		rounddownMap.put(4.7, "d4");  
-		rounddownMap.put(4.6, "d5");  
+		rounddownMap.put("5.0", "d1");  
+		rounddownMap.put("4.9", "d2");  
+		rounddownMap.put("4.8", "d3");  
+		rounddownMap.put("4.7", "d4");  
+		rounddownMap.put("4.6", "d5");  
 		
-		rounddownMap.put(4.5, "e1");  
-		rounddownMap.put(4.4, "e2");  
-		rounddownMap.put(4.3, "e3");  
-		rounddownMap.put(4.2, "e4");  
-		rounddownMap.put(4.1, "e5");  
+		rounddownMap.put("4.5", "e1");  
+		rounddownMap.put("4.4", "e2");  
+		rounddownMap.put("4.3", "e3");  
+		rounddownMap.put("4.2", "e4");  
+		rounddownMap.put("4.1", "e5");  
 		
-		rounddownMap.put(4.0, "f1");  
-		rounddownMap.put(3.9, "f2");  
-		rounddownMap.put(3.8, "f3");  
-		rounddownMap.put(3.7, "f4");  
-		rounddownMap.put(3.6, "f5");  
+		rounddownMap.put("4.0", "f1");  
+		rounddownMap.put("3.9", "f2");  
+		rounddownMap.put("3.8", "f3");  
+		rounddownMap.put("3.7", "f4");  
+		rounddownMap.put("3.6", "f5");  
 		
-		rounddownMap.put(3.5, "g1");  
-		rounddownMap.put(3.4, "g2");  
-		rounddownMap.put(3.3, "g3");  
-		rounddownMap.put(3.2, "g4");  
-		rounddownMap.put(3.1, "g5");  
+		rounddownMap.put("3.5", "g1");  
+		rounddownMap.put("3.4", "g2");  
+		rounddownMap.put("3.3", "g3");  
+		rounddownMap.put("3.2", "g4");  
+		rounddownMap.put("3.1", "g5");  
     } 
 	
 	
