@@ -164,6 +164,12 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					throw new RuntimeException();
 				}
 				
+				TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
+				if (tdsTmplate == null) {
+					throw new RuntimeException("短信模板不存在");
+				}
+				tMisContantRecord.setSmsType(tdsTmplate.getSmsType());
+				
 				if ("wordText".equals(tMisContantRecord.getSmsType())) {
 					Map<String, String> params = new HashMap<String, String>();
 					// 发送手机号
@@ -175,7 +181,6 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					// 发送类型 例："1","2","3","4"; 对应说明:验证码，营销，催收,系统
 					params.put("biz_type", "dunning");
 					// 客户端产品名称 例："mo9wallet","feishudai","feishudaiPro"
-					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
 					if (tdsTmplate.getSmsCotent().contains("${platform}")) {
 						if (null != order.getPlatformExt() && !"".equals(order.getPlatformExt())) {
 							if (order.getPlatformExt().contains("feishudai")) {
@@ -210,7 +215,6 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					vparams.put("mobile", tMisContantRecord.getContanttarget());// 发送手机号
 					vparams.put("style", "voiceContent");// 固定值
 					// 模板填充的map
-					TmisDunningSmsTemplate tdsTmplate = tdstDao.getByName(templateName);
 					TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
 					TRiskBuyerPersonalInfo buyerInfeo = tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
