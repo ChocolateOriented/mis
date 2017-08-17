@@ -2890,7 +2890,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 
 	//号码清洗
-	@Scheduled(cron = "0 0 8 * * ?")
+//	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional
 	public void numberCleanResult(){
 		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");

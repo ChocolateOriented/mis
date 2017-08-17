@@ -29,6 +29,6 @@ public class TMisDunningNumberCleanCallbackController extends BaseController {
 			logger.warn(new Date()+"订单号为:"+reqNo+"回调失败");
 			return;
 		}
-		tMisDunningTaskService.numberCleanBack(reqNo,checkResult);
+//		tMisDunningTaskService.numberCleanBack(reqNo,checkResult);
 	}
 }

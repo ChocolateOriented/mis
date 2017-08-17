@@ -824,7 +824,7 @@
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
         t.quality as quality,
-        t.numberCleanResult as "numberCleanResult",
+<!--         t.numberCleanResult as "numberCleanResult", -->
         t.latestlogintime as latestlogintime,
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
@@ -962,10 +962,10 @@
         <!--			# 优质订单    -->
             AND t.quality = #{quality}
         </if>
-        <if test="numberCleanResult != null and numberCleanResult != ''">
+<!--         <if test="numberCleanResult != null and numberCleanResult != ''"> -->
         <!--			# 号码清洗    -->
-            AND t.numberCleanResult = #{numberCleanResult}
-        </if>
+<!--             AND t.numberCleanResult = #{numberCleanResult} -->
+<!--         </if> -->
         <if test="taskOverdue != null and taskOverdue == true">
         <!--			# 过期未跟案件    -->
             <![CDATA[
