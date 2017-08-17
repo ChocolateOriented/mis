@@ -1043,7 +1043,7 @@ public class TMisDunningTaskController extends BaseController {
 		
 		try {
 			String score = riskOrderManager.scApplicationCol(personalInfo.getMobile(), dealcode, buyerId, String.valueOf(order.getId()));
-			if(null != score && "".equals(score)){
+			if(null != score && !"".equals(score)){
 				score = this.getCalculateScore(Double.parseDouble(score));
 			}
 			model.addAttribute("score", score);
