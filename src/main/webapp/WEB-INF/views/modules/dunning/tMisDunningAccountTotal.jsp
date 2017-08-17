@@ -381,15 +381,18 @@
 
         <li><label>催收小组：</label>
             <form:select id="groupList" path="dunningGroupIds" class="input-medium" multiple="multiple" cssStyle="width: 300px;">
-                <!-- 添加组类型为optgroup -->
+                <%-- 添加组类型为optgroup --%>
                 <c:forEach items="${groupTypes}" var="type">
                     <optgroup label="${type.value}">
-                        <!-- 添加类型对应的小组 -->
+                        <%-- 添加类型对应的小组 --%>
                         <c:forEach items="${groupList}" var="item">
                             <c:if test="${item.type == type.key}">
                                 <option value="${item.id}"
-                                        <c:if test="${fn:contains(TMisRemittanceMessagChecked.dunningGroupIds, item.id)}">selected="selected"</c:if>
-                                        >${item.name}</option>
+                                    <%--选中回显的组--%>
+                                    <c:forEach items="${TMisRemittanceMessagChecked.dunningGroupIds}" var="selectedGroup">
+                                        <c:if test="${selectedGroup == item.id}">selected="selected"</c:if>
+                                    </c:forEach>
+                                >${item.name}</option>
                             </c:if>
                         </c:forEach>
                     </optgroup>
