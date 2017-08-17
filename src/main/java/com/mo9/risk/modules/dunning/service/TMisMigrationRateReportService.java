@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
@@ -33,7 +33,6 @@ import com.thinkgem.jeesite.common.service.ServiceException;
  */
 @Service
 @Transactional(readOnly = true)
-@Lazy(false)
 public class TMisMigrationRateReportService extends CrudService<TMisMigrationRateReportDao, TMisMigrationRateReport> {
 	
 	@Autowired
@@ -230,8 +229,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
     /**
      * 每天定时更新迁徙率DB
      */
-	@Scheduled(cron = "0 15 0 * * ?")
-	@Transactional(readOnly = false)
+//	@Scheduled(cron = "0 15 0 * * ?")
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void autoInsertTmpMoveCycleDB() {
 		
 		try {
@@ -301,8 +300,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 迁徙率数据的表更新
 	 */
-	@Scheduled(cron = "0 18 0 * * ?")
-	@Transactional(readOnly = false)
+//	@Scheduled(cron = "0 18 0 * * ?")
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void autoMigrationRateGetData() {
 		try {
 			logger.info( new Date()+"开始迁徙数据采集:");
@@ -365,21 +364,21 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	}
 
 	
-	/**
-     * 迁徙率计算insertDB
-     */
-	@Scheduled(cron = "0 35 0 * * ?")
-	@Transactional(readOnly = false)
-	public void autoInsertMigrationRateReportDB_job() {
-		Date Yesterday = getDate(-1);
-		autoInsertMigrationRateReportDB(Yesterday);
-	}
+//	/**
+//     * 迁徙率计算insertDB
+//     */
+//	@Scheduled(cron = "0 35 0 * * ?")
+//	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+//	public void autoInsertMigrationRateReportDB_job() {
+//		Date Yesterday = getDate(-1);
+//		autoInsertMigrationRateReportDB(Yesterday);
+//	}
 	
 	
 	/**
      * 迁徙率计算insertDB
      */
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void autoInsertMigrationRateReportDB(Date Yesterday) {
 		try {
 //			if(null == Yesterday){

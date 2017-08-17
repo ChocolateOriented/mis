@@ -715,22 +715,6 @@
 					DATE(o.repayment_time)
 			) AS t ON t.CreateTime = r.CreateTime
 			SET r.OrderDueDate = t.OrderDueDate;
-			
-			SELECT
-				*
-			FROM
-				t_mis_dunning_qianxilv_corpus
-			ORDER BY
-				CreateTime DESC;
-			
-			SELECT
-				*
-			FROM
-				t_mis_dunning_qianxilv_new
-			ORDER BY
-				CreateTime DESC;
-
-
 
 		]]>
 	</update>	

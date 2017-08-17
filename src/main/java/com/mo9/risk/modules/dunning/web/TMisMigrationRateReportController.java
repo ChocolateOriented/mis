@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanMonthReportBean;
@@ -491,8 +492,16 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequestMapping(value = "autoInsertTmpMoveCycleDB")
 	@ResponseBody
 	public void autoInsertTmpMoveCycleDB() {
-		tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
 	}
+	
 	
 	/**
 	 * 关于迁徙率数据的获取
@@ -501,7 +510,14 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequestMapping(value = "autoMigrationRateGetData")
 	@ResponseBody
 	public void autoMigrationRateGetData() {
-		tMisMigrationRateReportService.autoMigrationRateGetData();
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.autoMigrationRateGetData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
 	}
 	
 	/**
@@ -511,7 +527,14 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequestMapping(value = "autoInsertMigrationRateReportDB")
 	@ResponseBody
 	public void autoInsertMigrationRateReportDB(Date yesterday) {
-		tMisMigrationRateReportService.autoInsertMigrationRateReportDB(yesterday);
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(yesterday);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
 	}
 	
 	/**
@@ -524,9 +547,10 @@ public class TMisMigrationRateReportController extends BaseController {
 		Calendar c = Calendar.getInstance();
 		DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			//开始时间必须小于结束时间
 			Date beginDate = dateFormat1.parse("2017-03-01");
-			Date endDate = dateFormat1.parse("2017-08-01");
+			Date endDate = dateFormat1.parse("2017-08-18");
 			Date date = beginDate;
 			while (!date.equals(endDate)) {
 				System.out.println(dateFormat1.format(date));
@@ -537,6 +561,8 @@ public class TMisMigrationRateReportController extends BaseController {
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 	}
 	

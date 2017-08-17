@@ -36,6 +36,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -2993,4 +2994,59 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		return sb.toString();
 	}
+	
+	@Autowired
+	private TMisMigrationRateReportService tMisMigrationRateReportService;
+	
+    /**
+     * 每天定时更新迁徙率DB
+     */
+	@Scheduled(cron = "0 16 0 * * ?")
+	@Transactional(readOnly = false)
+	public void autoInsertTmpMoveCycleDB() {
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
+	}
+	
+	/**
+	 * @return void
+	 * @Description 迁徙率数据的表更新
+	 */
+	@Scheduled(cron = "0 18 0 * * ?")
+	@Transactional(readOnly = false)
+	public void autoMigrationRateGetData() {
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.autoMigrationRateGetData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
+	}
+	
+	/**
+	  * 迁徙率计算insertDB
+	  */
+	@Scheduled(cron = "0 35 0 * * ?")
+	@Transactional(readOnly = false)
+	public void autoInsertMigrationRateReportDB_job() {
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			Date Yesterday = TMisMigrationRateReportService.getDate(-1);
+			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(Yesterday);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
+	}
+	
+	
 }
