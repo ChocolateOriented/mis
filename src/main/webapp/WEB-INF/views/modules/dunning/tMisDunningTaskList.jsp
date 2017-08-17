@@ -57,7 +57,7 @@
 			    },
 		        multiple: true,
 		        initSelection: function(element, callback) {//回显
-		        	var ids=$(element).val();
+		        	var ids=$(element).val().split(",");
 		            if (ids=="") {
 		            	return;
 		            }
