@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.manager;
 
 import com.mo9.risk.util.GetRequest;
+import com.mo9.risk.util.PostRequest;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
@@ -75,7 +76,7 @@ public class RiskOrderManager {
 		String url = riskUrl + "scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile=" +mobile+ "&dealcode=" +dealcode+ "&buyerId=" +buyerId+ "&orderId=" +orderId+ "&old=true";
 
 		logger.info("接口url：" + url);
-		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");
+		String res = java.net.URLDecoder.decode(PostRequest.postRequest(url, new HashMap<String, String>()), "utf-8");
 		logger.info("接口url返回参数" + res);
 
 		if (StringUtils.isBlank(res)) {
