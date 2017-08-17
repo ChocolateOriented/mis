@@ -94,7 +94,14 @@ public class TMisMigrationRateReportController extends BaseController {
 			}
 		}
 		tMisMigrationRateReport.setDatetimeEnd(dateChoice);
-		Page<TMisMigrationRateReport> page = tMisMigrationRateReportService.findPage(new Page<TMisMigrationRateReport>(request, response), tMisMigrationRateReport); 
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		Page<TMisMigrationRateReport> page ;
+		try{
+			
+			 page = tMisMigrationRateReportService.findPage(new Page<TMisMigrationRateReport>(request, response), tMisMigrationRateReport); 
+		}finally{
+		DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("page", page);
 		return "modules/dunning/tMisMigrationRateReportList";
 	}
@@ -153,7 +160,14 @@ public class TMisMigrationRateReportController extends BaseController {
 		migrationData.put("cycle", cycle);
 		
 		//获取4个队列数据数据
-		List<TMisMigrationRateReport> findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		List<TMisMigrationRateReport> findMigrateChartList;
+		try{
+			
+			 findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+		}finally{
+		DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		List<TMisMigrationData>  smdList1=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList3=new ArrayList<TMisMigrationData>();
@@ -319,7 +333,14 @@ public class TMisMigrationRateReportController extends BaseController {
 		migrationData.put("cycle", cycle);
 		
 		//获取4个队列数据数据
-		List<TMisMigrationRateReport> findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		List<TMisMigrationRateReport> findMigrateChartList;
+		try{
+			
+			 findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+		}finally{
+		DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		List<TMisMigrationData>  smdList1=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList3=new ArrayList<TMisMigrationData>();
