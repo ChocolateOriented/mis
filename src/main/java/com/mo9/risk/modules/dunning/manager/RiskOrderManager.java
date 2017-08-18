@@ -90,6 +90,7 @@ public class RiskOrderManager {
 			logger.info("订单接口回调失败,失败信息: " + repJson.toString());
 			throw new ServiceException(msg);
 		}
+		logger.info(dealcode + "&" + mobile +"返回分数信息:" + repJson.get("data"));
 		return repJson.has("data") ? String.valueOf(repJson.get("data")) : "";
 	}
 	
