@@ -37,6 +37,52 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	private Date datetimeStart ;//周期对应的开始时间
 	private Date datetimeEnd ;//周期对应的结束时间
 	
+	private BigDecimal cp1;//图表查询字段
+	private BigDecimal cp2;//图表查询字段
+	private BigDecimal cp3;//图表查询字段
+	private BigDecimal cp4;//图表查询字段
+	private String migrate;//图表查询字段
+	
+	public String getMigrate() {
+		return migrate;
+	}
+
+	public void setMigrate(String migrate) {
+		this.migrate = migrate;
+	}
+
+	public BigDecimal getCp1() {
+		return cp1;
+	}
+
+	public void setCp1(BigDecimal cp1) {
+		this.cp1 = cp1;
+	}
+
+	public BigDecimal getCp2() {
+		return cp2;
+	}
+
+	public void setCp2(BigDecimal cp2) {
+		this.cp2 = cp2;
+	}
+
+	public BigDecimal getCp3() {
+		return cp3;
+	}
+
+	public void setCp3(BigDecimal cp3) {
+		this.cp3 = cp3;
+	}
+
+	public BigDecimal getCp4() {
+		return cp4;
+	}
+
+	public void setCp4(BigDecimal cp4) {
+		this.cp4 = cp4;
+	}
+
 	public Date getDatetimeStart() {
 		return datetimeStart;
 	}

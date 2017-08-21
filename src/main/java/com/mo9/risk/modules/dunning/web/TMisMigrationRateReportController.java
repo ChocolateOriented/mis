@@ -133,25 +133,23 @@ public class TMisMigrationRateReportController extends BaseController {
 //	}
 	
 	/**
-	 * 跳转迁徙率数据户数图表页面
+	 * 跳转迁徙率数据图表页面
 	 */
 	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
 	@RequestMapping(value = "migratechart")
 	public String migratechart(TMisMigrationRateReport tMisMigrationRateReport, Model model) {
+		model.addAttribute("migrate", tMisMigrationRateReport.getMigrate());
 		return "modules/dunning/tMisMigrationRateChart";
 	}
-
 	/**
-	 * 获取户数迁徙率户数的数据
+	 * 获取迁徙率的数据
 	 */
 	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
 	@RequestMapping(value = "migrationGetdata")
 	@ResponseBody
 	public Map<String, Object> migrationGetData(TMisMigrationRateReport tMisMigrationRateReport) {
-
-		//获取户数迁徙
-		Map<String, Object> migrationData=new HashMap<String, Object>();
 		
+		Map<String, Object> migrationData=new HashMap<String, Object>();
 		//横坐标集合（1-16）
 		List<Integer>  cycle=new ArrayList<Integer>();
 		for (int i = 1; i < 17; i++) {
@@ -166,7 +164,7 @@ public class TMisMigrationRateReportController extends BaseController {
 			
 			 findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
 		}finally{
-		DynamicDataSource.setCurrentLookupKey("dataSource");
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		List<TMisMigrationData>  smdList1=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
@@ -176,6 +174,7 @@ public class TMisMigrationRateReportController extends BaseController {
 		List<String>  qtime2=new ArrayList<String>();
 		List<String>  qtime3=new ArrayList<String>();
 		List<String>  qtime4=new ArrayList<String>();
+		int min1=0,max1=0,min2=0,max2=0,min3=0,max3=0,min4=0,max4=0,split1=0,split2=0,split3=0,split4=0;
 		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
 		int i=0;
 		mrfor:for (int j = 0; j < 5; j++) {
@@ -206,28 +205,107 @@ public class TMisMigrationRateReportController extends BaseController {
 			}
 			
 			
+			if( i==0){
+				min1=findMigrateChartList.get(0).getCp1().intValue();
+				max1=findMigrateChartList.get(0).getCp1().intValue();
+				min2=findMigrateChartList.get(0).getCp2().intValue();
+				max2=findMigrateChartList.get(0).getCp2().intValue();
+				min3=findMigrateChartList.get(0).getCp3().intValue();
+				max3=findMigrateChartList.get(0).getCp3().intValue();
+				min4=findMigrateChartList.get(0).getCp4().intValue();
+				max4=findMigrateChartList.get(0).getCp4().intValue();
+			}
 			int y=0;
 			while( findMigrateChartList.size()>i){
 				if(y==0){
-					cycleTime1.add(findMigrateChartList.get(i).getCp1new());
-					if(null!=cycleTime2)
-						cycleTime2.add(findMigrateChartList.get(i).getCp2new());
-					if(null!=cycleTime3)
-						cycleTime3.add(findMigrateChartList.get(i).getCp3new());
-					if(null!=cycleTime4)
-						cycleTime4.add(findMigrateChartList.get(i).getCp4new());
+					cycleTime1.add(findMigrateChartList.get(i).getCp1());
+					if(i!=0){
+						if(findMigrateChartList.get(i).getCp1().intValue()<min1){
+							min1=findMigrateChartList.get(i).getCp1().intValue();
+						}
+						if(findMigrateChartList.get(i).getCp1().intValue()>max1){
+							max1=findMigrateChartList.get(i).getCp1().intValue();
+						}
+					}
+					if(null!=cycleTime2){
+						cycleTime2.add(findMigrateChartList.get(i).getCp2());
+						if(i!=0){
+							if(findMigrateChartList.get(i).getCp2().intValue()<min2){
+								min2=findMigrateChartList.get(i).getCp2().intValue();
+							}
+							if(findMigrateChartList.get(i).getCp2().intValue()>max2){
+								max2=findMigrateChartList.get(i).getCp2().intValue();
+							}
+						}
+					}
+					if(null!=cycleTime3){
+						cycleTime3.add(findMigrateChartList.get(i).getCp3());
+						if(i!=0){
+							if(findMigrateChartList.get(i).getCp3().intValue()<min3){
+								min3=findMigrateChartList.get(i).getCp3().intValue();
+							}
+							if(findMigrateChartList.get(i).getCp3().intValue()>max3){
+								max3=findMigrateChartList.get(i).getCp3().intValue();
+							}
+						}
+					}
+					if(null!=cycleTime4){
+						cycleTime4.add(findMigrateChartList.get(i).getCp4());
+						if(i!=0){
+							if(findMigrateChartList.get(i).getCp4().intValue()<min4){
+								min4=findMigrateChartList.get(i).getCp4().intValue();
+							}
+							if(findMigrateChartList.get(i).getCp4().intValue()>max4){
+								max4=findMigrateChartList.get(i).getCp4().intValue();
+							}
+						}
+					}
 				}
 				if(y>=1){
 					if(findMigrateChartList.get(i).getCycle().equals(findMigrateChartList.get(i-1).getCycle())){
 						
-						cycleTime1.add(findMigrateChartList.get(i).getCp1new());
-						if(null!=cycleTime2)
-							cycleTime2.add(findMigrateChartList.get(i).getCp2new());
-						if(null!=cycleTime3)
-							cycleTime3.add(findMigrateChartList.get(i).getCp3new());
-						if(null!=cycleTime4)
-							cycleTime4.add(findMigrateChartList.get(i).getCp4new());
-						
+						cycleTime1.add(findMigrateChartList.get(i).getCp1());
+						if(i!=0){
+							if(findMigrateChartList.get(i).getCp1().intValue()<min1){
+								min1=findMigrateChartList.get(i).getCp1().intValue();
+							}
+							if(findMigrateChartList.get(i).getCp1().intValue()>max1){
+								max1=findMigrateChartList.get(i).getCp1().intValue();
+							}
+						}
+						if(null!=cycleTime2){
+							cycleTime2.add(findMigrateChartList.get(i).getCp2());
+							if(i!=0){
+								if(findMigrateChartList.get(i).getCp2().intValue()<min2){
+									min2=findMigrateChartList.get(i).getCp2().intValue();
+								}
+								if(findMigrateChartList.get(i).getCp2().intValue()>max2){
+									max2=findMigrateChartList.get(i).getCp2().intValue();
+								}
+							}
+						}
+						if(null!=cycleTime3){
+							cycleTime3.add(findMigrateChartList.get(i).getCp3());
+							if(i!=0){
+								if(findMigrateChartList.get(i).getCp3().intValue()<min3){
+									min3=findMigrateChartList.get(i).getCp3().intValue();
+								}
+								if(findMigrateChartList.get(i).getCp3().intValue()>max3){
+									max3=findMigrateChartList.get(i).getCp3().intValue();
+								}
+							}
+						}
+						if(null!=cycleTime4){
+							cycleTime4.add(findMigrateChartList.get(i).getCp4());
+							if(i!=0){
+								if(findMigrateChartList.get(i).getCp4().intValue()<min4){
+									min4=findMigrateChartList.get(i).getCp4().intValue();
+								}
+								if(findMigrateChartList.get(i).getCp4().intValue()>max4){
+									max4=findMigrateChartList.get(i).getCp4().intValue();
+								}
+							}
+						}
 					}else{
 						String start = sd.format(findMigrateChartList.get(i-1).getDatetimeStart());
 						String end = sd.format(findMigrateChartList.get(i-1).getDatetimeEnd());
@@ -294,6 +372,38 @@ public class TMisMigrationRateReportController extends BaseController {
 				y++;
 			}
 		}
+		split1=(max1+1-min1)/1;
+		if(split1>20){
+			split1=20;
+			max1=split1*1+min1-1;
+		}
+		split2=(max2+1-min2)*10/5;
+		if(split2>20){
+			split2=20;
+			max2=split2*5/10+min2-1;
+		}
+		split3=(max3+1-min3)*10/2;
+		if(split3>20){
+			split3=20;
+			max3=split3*2/10+min3-1;
+		}
+		split4=(max4+1-min4)*10/1;
+		if(split4>20){
+			split4=20;
+			max4=split4/10+min4-1;
+		}
+		migrationData.put("min1", min1);
+		migrationData.put("max1", max1+1);
+		migrationData.put("min2", min2);
+		migrationData.put("max2", max2+1);
+		migrationData.put("min3", min3);
+		migrationData.put("max3", max3+1);
+		migrationData.put("min4", min4);
+		migrationData.put("max4", max4+1);
+		migrationData.put("split1", split1);
+		migrationData.put("split2", split2);
+		migrationData.put("split3", split3);
+		migrationData.put("split4", split4);
 		migrationData.put("qtime1", qtime1);
 		migrationData.put("qtime2", qtime2);
 		migrationData.put("qtime3", qtime3);
@@ -305,197 +415,7 @@ public class TMisMigrationRateReportController extends BaseController {
 		
 		return migrationData;
 	}
-	/**
-	 * 跳转迁徙率数据本金图表页面
-	 */
-	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
-	@RequestMapping(value = "migrateAmountchart")
-	public String migrateAmountChart(TMisMigrationRateReport tMisMigrationRateReport, Model model) {
-		return "modules/dunning/tMisMigrationRateAmountChart";
-	}
 	
-	/**
-	 * 获取户数迁徙率户数的数据
-	 */
-	@RequiresPermissions("dunning:tMisMigrationRateReport:view")
-	@RequestMapping(value = "migrationGetAmountdata")
-	@ResponseBody
-	public Map<String, Object> migrationGetAmountdata(TMisMigrationRateReport tMisMigrationRateReport) {
-		
-		//获取户数迁徙
-		Map<String, Object> migrationData=new HashMap<String, Object>();
-		
-		//横坐标集合（1-16）
-		List<Integer>  cycle=new ArrayList<Integer>();
-		for (int i = 1; i < 17; i++) {
-			cycle.add(i);
-		}
-		migrationData.put("cycle", cycle);
-		
-		//获取4个队列数据数据
-		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
-		List<TMisMigrationRateReport> findMigrateChartList;
-		try{
-			
-			 findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
-		}finally{
-		DynamicDataSource.setCurrentLookupKey("dataSource");
-		}
-		List<TMisMigrationData>  smdList1=new ArrayList<TMisMigrationData>();
-		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
-		List<TMisMigrationData>  smdList3=new ArrayList<TMisMigrationData>();
-		List<TMisMigrationData>  smdList4=new ArrayList<TMisMigrationData>();
-		List<String>  qtime1=new ArrayList<String>();
-		List<String>  qtime2=new ArrayList<String>();
-		List<String>  qtime3=new ArrayList<String>();
-		List<String>  qtime4=new ArrayList<String>();
-		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
-		int i=0;
-   mrfor:for (int j = 0; j < 5; j++) {
-			
-			
-				TMisMigrationData smd1=new TMisMigrationData();
-				List<BigDecimal>  cycleTime1=new ArrayList<BigDecimal>();
-				
-				TMisMigrationData smd2=null;
-				List<BigDecimal>  cycleTime2=null;
-				if(j<4){
-					smd2=new TMisMigrationData();
-					cycleTime2=new ArrayList<BigDecimal>();
-				}
-				
-				TMisMigrationData smd3=null;
-				List<BigDecimal>  cycleTime3=null;
-				if(j<3){
-					smd3=new TMisMigrationData();
-					cycleTime3=new ArrayList<BigDecimal>();
-				}
-				
-				TMisMigrationData smd4=null;
-				List<BigDecimal>  cycleTime4=null;
-				if(j<2){
-					smd4=new TMisMigrationData();
-					cycleTime4=new ArrayList<BigDecimal>();
-				}
-				
-				
-				int y=0;
-			while( findMigrateChartList.size()>i){
-				if(y==0){
-					cycleTime1.add(findMigrateChartList.get(i).getCp1corpus());
-					if(null!=cycleTime2)
-					cycleTime2.add(findMigrateChartList.get(i).getCp2corpus());
-					if(null!=cycleTime3)
-					cycleTime3.add(findMigrateChartList.get(i).getCp3corpus());
-					if(null!=cycleTime4)
-					cycleTime4.add(findMigrateChartList.get(i).getCp4corpus());
-				}
-				if(y>=1){
-					if(findMigrateChartList.get(i).getCycle().equals(findMigrateChartList.get(i-1).getCycle())){
-						
-						cycleTime1.add(findMigrateChartList.get(i).getCp1corpus());
-						if(null!=cycleTime2)
-						cycleTime2.add(findMigrateChartList.get(i).getCp2corpus());
-						if(null!=cycleTime3)
-						cycleTime3.add(findMigrateChartList.get(i).getCp3corpus());
-						if(null!=cycleTime4)
-						cycleTime4.add(findMigrateChartList.get(i).getCp4corpus());
-						
-					}else{
-						String start = sd.format(findMigrateChartList.get(i-1).getDatetimeStart());
-						String end = sd.format(findMigrateChartList.get(i-1).getDatetimeEnd());
-						
-						smd1.setData(cycleTime1);
-						smd1.setName(start+"-"+end);
-						smdList1.add(smd1);
-						qtime1.add(start+"-"+end);
-						
-						if(null!=smd2){
-							smd2.setData(cycleTime2);
-							smd2.setName(start+"-"+end);
-							smdList2.add(smd2);
-							qtime2.add(start+"-"+end);
-						}
-						if(null!=cycleTime3){
-							smd3.setData(cycleTime3);
-							smd3.setName(start+"-"+end);
-							smdList3.add(smd3);
-							qtime3.add(start+"-"+end);
-						}
-						if(null!=smd4){
-							smd4.setData(cycleTime4);
-							smd4.setName(start+"-"+end);
-							smdList4.add(smd4);
-							qtime4.add(start+"-"+end);
-						}
-						if(findMigrateChartList.size()==(i+1))
-						break mrfor;
-						
-						break;
-					}
-					
-				}
-				if(findMigrateChartList.size()==(i+1)){
-					String start = sd.format(findMigrateChartList.get(i).getDatetimeStart());
-					String end = sd.format(findMigrateChartList.get(i).getDatetimeEnd());
-					
-					smd1.setData(cycleTime1);
-					smd1.setName(start+"-"+end);
-					smdList1.add(smd1);
-					qtime1.add(start+"-"+end);
-					if(null!=smd2){
-						smd2.setData(cycleTime2);
-						smd2.setName(start+"-"+end);
-						smdList2.add(smd2);
-						qtime2.add(start+"-"+end);
-					}
-					if(null!=cycleTime3){
-						smd3.setData(cycleTime3);
-						smd3.setName(start+"-"+end);
-						smdList3.add(smd3);
-						qtime3.add(start+"-"+end);
-					}
-					if(null!=smd4){
-						smd4.setData(cycleTime4);
-						smd4.setName(start+"-"+end);
-						smdList4.add(smd4);
-						qtime4.add(start+"-"+end);
-					}
-					break mrfor;
-				}
-				i++;
-				y++;
-			}
-	}
-		migrationData.put("qtime1", qtime1);
-		migrationData.put("qtime2", qtime2);
-		migrationData.put("qtime3", qtime3);
-		migrationData.put("qtime4", qtime4);
-		migrationData.put("smdList1", smdList1);
-		migrationData.put("smdList2", smdList2);
-		migrationData.put("smdList3", smdList3);
-		migrationData.put("smdList4", smdList4);
-		
-		
-//		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
-//		for (int i = 0; i <qtime2.size(); i++) {
-//			TMisMigrationData smd1=new TMisMigrationData();
-//			smd1.setName(qtime1.get(i));
-//			List<Integer>  cycleTime1=new ArrayList<Integer>();
-//			for (int y= 7*(i+1)+2; y< 7*(i+1)+18; y++) {
-//				cycleTime1.add(y);
-//			}
-//			smd1.setData(cycleTime1);
-//			smdList2.add(smd1);
-//			
-//		}
-//		
-//		migrationData.put("smdList2", smdList2);
-		
-		return migrationData;
-	
-	}
-
 	/**
 	 * 贷后报表测试用例
 	 * @return

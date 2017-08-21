@@ -891,14 +891,18 @@
 	SELECT
 		a.id AS "dbid",
 		a.datetime AS "datetime",
-		a.cp1new*100 AS "cp1new",
-		a.cp2new*100 AS "cp2new",
-		a.cp3new*100 AS "cp3new",
-		a.cp4new*100 AS "cp4new",
-		a.cp1corpus*100 AS "cp1corpus",
-		a.cp2corpus*100 AS "cp2corpus",
-		a.cp3corpus*100 AS "cp3corpus",
-		a.cp4corpus*100 AS "cp4corpus",
+		<if test="migrate=='new'">
+		a.cp1new*100 AS "cp1",
+		a.cp2new*100 AS "cp2",
+		a.cp3new*100 AS "cp3",
+		a.cp4new*100 AS "cp4",
+		</if>
+		<if test="migrate=='corpus'">
+		a.cp1corpus*100 AS "cp1",
+		a.cp2corpus*100 AS "cp2",
+		a.cp3corpus*100 AS "cp3",
+		a.cp4corpus*100 AS "cp4",
+		</if>
 		a.cycle AS "cycle",
 		c.datetime_start AS "datetimeStart",
 		c.datetime_end AS "datetimeEnd"
