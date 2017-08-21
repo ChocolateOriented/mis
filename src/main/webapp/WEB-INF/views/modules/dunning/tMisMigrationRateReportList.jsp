@@ -30,8 +30,8 @@ function page(n,s){
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisMigrationRateReport/list">贷后迁徙日报</a></li>
-		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart">贷后迁徙户数图表</a></li>
-		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migrateAmountchart">贷后迁徙本金图表</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart?migrate=new">贷后迁徙户数图表</a></li>
+		<li><a href="${ctx}/dunning/tMisMigrationRateReport/migratechart?migrate=corpus">贷后迁徙本金图表</a></li>
 	</ul>
 	<form:form id="searchForm" modelAttribute="TMisMigrationRateReport" action="${ctx}/dunning/tMisMigrationRateReport/list" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>

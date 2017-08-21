@@ -217,7 +217,7 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 * @param tMisMigrationRateReport
 	 * @return
 	 */
-	public List<TMisMigrationRateReport> findMigrateChartList();
+	public List<TMisMigrationRateReport> findMigrateChartList(TMisMigrationRateReport tMisMigrationRateReport);
 	
 	
 }

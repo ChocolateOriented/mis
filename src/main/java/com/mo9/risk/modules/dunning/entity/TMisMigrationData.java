@@ -6,7 +6,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 
 /**
- * 短信模板entity
+ * 迁徙图表实体类
  * @author jwchi
  *
  */
