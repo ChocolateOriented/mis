@@ -2998,43 +2998,43 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TMisMigrationRateReportService tMisMigrationRateReportService;
 	
-    /**
-     * 每天定时更新迁徙率DB
-     */
-	@Scheduled(cron = "0 16 0 * * ?")
-	@Transactional(readOnly = false)
-	public void autoInsertTmpMoveCycleDB() {
-		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-			tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-	}
-	
-	/**
-	 * @return void
-	 * @Description 迁徙率数据的表更新
-	 */
-	@Scheduled(cron = "0 18 0 * * ?")
-	@Transactional(readOnly = false)
-	public void autoMigrationRateGetData() {
-		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-			tMisMigrationRateReportService.autoMigrationRateGetData();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-	}
+//    /**
+//     * 每天定时更新迁徙率DB
+//     */
+//	@Scheduled(cron = "0 16 0 * * ?")
+//	@Transactional(readOnly = false)
+//	public void autoInsertTmpMoveCycleDB() {
+//		try {
+//			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+//			tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			DynamicDataSource.setCurrentLookupKey("dataSource");  
+//		}
+//	}
+//	
+//	/**
+//	 * @return void
+//	 * @Description 迁徙率数据的表更新
+//	 */
+//	@Scheduled(cron = "0 18 0 * * ?")
+//	@Transactional(readOnly = false)
+//	public void autoMigrationRateGetData() {
+//		try {
+//			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+//			tMisMigrationRateReportService.autoMigrationRateGetData();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			DynamicDataSource.setCurrentLookupKey("dataSource");  
+//		}
+//	}
 	
 	/**
 	  * 迁徙率计算insertDB
 	  */
-	@Scheduled(cron = "0 35 0 * * ?")
+	@Scheduled(cron = "6 16 0 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB_job() {
 		try {

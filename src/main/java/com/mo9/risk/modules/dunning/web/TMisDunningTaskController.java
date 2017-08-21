@@ -1047,7 +1047,7 @@ public class TMisDunningTaskController extends BaseController {
 				score = this.getCalculateScore(Double.parseDouble(score));
 			}
 			model.addAttribute("score", score);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			model.addAttribute("score", "评分显示失败");
 			e.printStackTrace();
 		}
@@ -1060,7 +1060,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	public String getCalculateScore(Double score){
 //		null != this.incomepercent ? NumberUtil.formatToseparaInteger(this.incomepercent) : "";
-		DecimalFormat df = new DecimalFormat("#,###.#");
+		DecimalFormat df = new DecimalFormat("#,###.0");
 		if(score > 650){
 			return "a1";
 		}
