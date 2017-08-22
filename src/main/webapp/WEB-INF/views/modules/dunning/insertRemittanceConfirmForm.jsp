@@ -84,6 +84,8 @@
 		<input type="hidden" name="formurl" value="insertRemittanceConfirmForm" />
 		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
 		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
+		<input id = "dunningCycle" name="dunningCycle" type="hidden" value="${dunningCycle}"/>
+ 		<input id = "overdueDays" name="overdueDays" type="hidden" value="${overdueDays}"/>
 		<div class="control-group">
 			<label class="control-label">汇款人：</label>
 			<div class="controls">

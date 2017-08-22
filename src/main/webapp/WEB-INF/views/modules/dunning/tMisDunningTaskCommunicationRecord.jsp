@@ -110,6 +110,8 @@
 		<input id = "dunningtaskdbid" name="dunningtaskdbid" type="hidden" value="${dunningtaskdbid}"/>
 		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
 		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
+		<input id = "dunningCycle" name="dunningCycle" type="hidden" value="${dunningCycle}"/>
+ 		<input id = "overdueDays" name="overdueDays" type="hidden" value="${overdueDays}"/>
 	</form:form> 
 	<table id="unitTable" class="table table-striped table-bordered table-condensed">
 		<thead>

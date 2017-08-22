@@ -280,6 +280,14 @@ public class TMisDunningOuterTaskController extends BaseController {
 		tMisDunningTaskService.numberCleanResult();
 	}
 	
-	
+	/**
+	 * 测试号码清洗回调
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "numberCleanBackTest")
+	public void numberCleanBackTest() {
+		tMisDunningTaskService.callBackTest();
+	}
+
 	
 }

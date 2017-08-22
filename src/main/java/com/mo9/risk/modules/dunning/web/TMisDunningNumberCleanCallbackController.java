@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.web.BaseController;
 
@@ -23,12 +24,21 @@ public class TMisDunningNumberCleanCallbackController extends BaseController {
 	 * @param check_result
 	 * @param request
 	 */
-	@RequestMapping(value = "numberCleanBack")
-	public  void  numberCleanBack(String reqNo,String checkResult,HttpServletRequest request){
-		if(StringUtils.isEmpty(reqNo)||StringUtils.isEmpty(checkResult)){
-			logger.warn(new Date()+"订单号为:"+reqNo+"回调失败");
+	@RequestMapping(value = "numberBack")
+	public  void  numberCleanBack(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		if(StringUtils.isEmpty(tmisDunningNumberClean.getReqNo())||StringUtils.isEmpty(tmisDunningNumberClean.getTaskId())||
+				StringUtils.isEmpty(tmisDunningNumberClean.getPhone())||StringUtils.isEmpty(tmisDunningNumberClean.getCheckResult())){
+			logger.warn(new Date()+"必要参数 为空，该订单号码未清洗");
 			return;
 		}
-//		tMisDunningTaskService.numberCleanBack(reqNo,checkResult);
+		String checkResult=tmisDunningNumberClean.getCheckResult();
+		checkResult= checkResult.substring(0, 1);
+		if("0".equals(checkResult)||"1".equals(checkResult)){
+			logger.warn(new Date()+"流水号为："+tmisDunningNumberClean.getReqNo()+"，回调成功");
+			tMisDunningTaskService.numberCleanBack(tmisDunningNumberClean);
+		}else{
+			logger.warn(new Date()+"必要参数有误，该订单号码未清洗");
+			return;
+		}
 	}
 }
