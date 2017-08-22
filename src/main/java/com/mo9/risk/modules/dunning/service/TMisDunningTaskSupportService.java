@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 
 /**
  * 催收任务辅助Service
@@ -31,6 +32,15 @@ public class TMisDunningTaskSupportService {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public int updateLatestLoginTime(DunningOrder order) {
 		return tMisDunningTaskDao.updateLatestLoginTime(order);
+	}
+	/**
+	 * 号码清洗
+	 * @param tmisDunningNumberClean
+	 */
+	@Transactional(readOnly = false,propagation=Propagation.REQUIRES_NEW)
+	public void saveNumberList(TmisDunningNumberClean tmisDunningNumberClean){
+		tMisDunningTaskDao.saveNumberClean(tmisDunningNumberClean);
+		tMisDunningTaskDao.saveNumberCleanLog(tmisDunningNumberClean);
 	}
 
 }

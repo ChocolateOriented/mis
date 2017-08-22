@@ -25,6 +25,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
@@ -312,7 +313,34 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public List<DunningOrder> findNumberByOverDay(int overday);
 
-	public void updateNumberResult(@Param("dealcode")String dealcode,@Param("check_result") String check_result);
+	/**
+	 * 保存号码清洗前
+	 * @param list
+	 * @return
+	 */
+	public int saveNumberClean(TmisDunningNumberClean tmisDunningNumberClean);
+	/**
+	 * 更新号码清洗
+	 * @param dealcode
+	 * @param check_result
+	 */
+	public void updateNumberResult(TmisDunningNumberClean tmisDunningNumberClean);
+	/**
+	 * 回调测试数据
+	 * @return
+	 */
+	public List<TmisDunningNumberClean> findBackTest();
+	/**
+	 * 根据流水号和任务id来查询
+	 * @param tmisDunningNumberClean
+	 */
+	public TmisDunningNumberClean findNumberClean(TmisDunningNumberClean tmisDunningNumberClean);
+	/**
+	 * 号码清洗回调保存日志
+	 * @param tmisDunningNumberClean
+	 */
+	public void saveNumberCleanLog(TmisDunningNumberClean tmisDunningNumberClean);
+
 	
 	/**
 	 * 查询订单用户登录信息

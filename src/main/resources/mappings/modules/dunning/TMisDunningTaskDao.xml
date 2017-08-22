@@ -824,7 +824,7 @@
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
         t.quality as quality,
-<!--         t.numberCleanResult as "numberCleanResult", -->
+        n.checkresult as "numberCleanResult",
         t.latestlogintime as latestlogintime,
         <![CDATA[
         CASE WHEN CURDATE() > DATE(t.nextfollowdate) AND o.status = 'payment' THEN 1 ELSE 0 END as "taskOverdue"
@@ -838,7 +838,11 @@
 		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
 		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-
+		LEFT JOIN t_mis_dunning_numberclean AS n ON o.dealcode = n.dealcode
+ 		AND n.error='0'
+ 		AND n.state='true'
+ 
+		
 		<include refid="newfindOrderPageCondition"></include>
 
 		<choose>
@@ -878,6 +882,12 @@
 		<if test="realname != null and realname != ''">
 			LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
 		</if>
+		<if test="numberCleanResult != null and numberCleanResult != ''">
+ 
+ 			LEFT JOIN t_mis_dunning_numberclean AS n ON o.dealcode = n.dealcode
+			 AND n.error='0'
+			 AND n.state='true'
+ 		</if>
 		<include refid="newfindOrderPageCondition"></include>
 	</select>
 
@@ -962,10 +972,10 @@
         <!--			# 优质订单    -->
             AND t.quality = #{quality}
         </if>
-<!--         <if test="numberCleanResult != null and numberCleanResult != ''"> -->
+        <if test="numberCleanResult != null and numberCleanResult != ''">
         <!--			# 号码清洗    -->
-<!--             AND t.numberCleanResult = #{numberCleanResult} -->
-<!--         </if> -->
+            AND n.checkresult = #{numberCleanResult}
+        </if>
         <if test="taskOverdue != null and taskOverdue == true">
         <!--			# 过期未跟案件    -->
             <![CDATA[
@@ -1843,11 +1853,13 @@
 		WHERE dealcode = #{dealcode}
 	</update>
 
+<!--关于号码清洗开始-->
 	<select id="findNumberByOverDay"   resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
         SELECT
 	       b.mobile  AS "mobile",
 	       o.dealcode AS "dealcode"
-        FROM  t_risk_order AS o
+        FROM  t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
         WHERE
 			o.type = 'loan'
@@ -1856,12 +1868,167 @@
 	        AND o.buyer_id is not null
 	        AND  DATEDIFF(CURDATE(), o.repayment_time)= #{overday}
     </select>
-
+	<select id="findNumberClean"  resultType="com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean">
+		select
+		  Id AS "id",
+		 Dealcode AS "dealcode",
+		 NumCleanCode AS "numCleanCode",
+		 StartTime AS "startTime",
+		 EndTime AS "endTime",
+		 state AS "state",
+		 account AS "account",
+		 password AS "password",
+		 phone AS "phone",
+		 reqNo AS "reqNo",
+		 replyUrl AS "replyUrl",
+		 taskId AS "taskId",
+		 error AS "error",
+		 areaName AS "areaName",
+		 areaCode AS "areaCode",
+		 postCode AS "postCode",
+		 checkresult AS "checkResult",
+		 message AS "message",
+		 CreateDate AS "createDate",
+		 CreateBy AS "createByName",
+		 UpdateDate AS "updateDate",
+		 UpdateBy AS "updateByName"
+		from
+		t_mis_dunning_numberclean 
+		where
+		reqNo=#{reqNo}
+<!-- 		and taskId=#{taskId} -->
+	</select>
 	<update id="updateNumberResult">
-		UPDATE t_mis_dunning_task SET
-			numberCleanResult = #{check_result}
-		WHERE dealcode = #{dealcode}
+		update 
+		t_mis_dunning_numberclean
+		set
+		 Dealcode=#{dealcode},
+		 NumCleanCode=#{numCleanCode},
+		 StartTime=#{startTime},
+		 EndTime=#{endTime},
+		 state=#{state},
+		 account=#{account},
+		 password=#{password},
+		 phone=#{phone},
+		 reqNo=#{reqNo},
+		 replyUrl=#{replyUrl},
+		 taskId=#{taskId},
+		 error=#{error},
+		 areaName=#{areaName},
+		 areaCode=#{areaCode},
+		 postCode=#{postCode},
+		 checkresult=#{checkResult},
+		 message=#{message},
+		 UpdateDate=#{updateDate},
+		 UpdateBy =#{updateByName}
+		where 
+		reqNo=#{reqNo}
 	</update>
+	
+	<insert id="saveNumberCleanLog">
+		insert into
+		t_mis_dunning_numberclean_log(
+		 Id,
+		 Dealcode,
+		 NumCleanCode,
+		 StartTime,
+		 EndTime,
+		 state,
+		 account,
+		 password,
+		 phone,
+		 reqNo,
+		 replyUrl,
+		 taskId,
+		 error,
+		 areaName,
+		 areaCode,
+		 postCode,
+		 checkresult,
+		 message,
+		 CallingPeriod,
+		 CreateDate,
+		 CreateBy
+		)values(
+		 #{id},
+		 #{dealcode},
+		 #{numCleanCode},
+		 #{startTime},
+		 #{endTime},
+		 #{state},
+		 #{account},
+		 #{password},
+		 #{phone},
+		 #{reqNo},
+		 #{replyUrl},
+		 #{taskId},
+		 #{error},
+		 #{areaName},
+		 #{areaCode},
+		 #{postCode},
+		 #{checkResult},
+		 #{message},
+		 #{callingPeriod},
+		 #{createDate},
+		 #{createByName}
+		)
+		
+	</insert>
+	<insert id="saveNumberClean" >
+	insert into
+		t_mis_dunning_numberclean(
+		 Id,
+		 Dealcode,
+		 NumCleanCode,
+		 StartTime,
+		 EndTime,
+		 state,
+		 account,
+		 password,
+		 phone,
+		 reqNo,
+		 replyUrl,
+		 taskId,
+		 error,
+		 areaName,
+		 areaCode,
+		 postCode,
+		 checkresult,
+		 message,
+		 CreateDate,
+		 CreateBy
+		)values(
+         #{id},
+		 #{dealcode},
+		 #{numCleanCode},
+		 #{startTime},
+		 #{endTime},
+		 #{state},
+		 #{account},
+		 #{password},
+		 #{phone},
+		 #{reqNo},
+		 #{replyUrl},
+		 #{taskId},
+		 #{error},
+		 #{areaName},
+		 #{areaCode},
+		 #{postCode},
+		 #{checkResult},
+		 #{message},
+		 #{createDate},
+		 #{createByName}
+		)
+	</insert>
+	<select id="findBackTest" resultType="com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean">
+		select
+		*
+		from
+		t_mis_dunning_numberclean
+		where
+		endtime is null
+	</select>
+	<!--关于号码清洗结束-->
 
 	<select id="findDunningOrderInfo" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
         SELECT

@@ -33,6 +33,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
@@ -2891,109 +2892,190 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 
 	//号码清洗
-//	@Scheduled(cron = "0 0 8 * * ?")
-	@Transactional
-	public void numberCleanResult(){
-		String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "false");
-		if("true".equals(startClean)){
-			String overDayNumber=DictUtils.getDictValue("numberclean", "overDayNumber", "-1");
-			int  overday;
-			try {
-				  overday=Integer.parseInt(overDayNumber);
-			} catch (Exception e) {
-				logger.warn("请检查数据字典号码清洗的配置");
+		@Scheduled(cron = "0 0 8 * * ?")
+		@Transactional(readOnly = false)
+		public void numberCleanResult(){
+			//是否开启清洗
+			String startClean=DictUtils.getDictValue("startCleanNumber", "cleanNumber", "true");
+			if("true".equals(startClean)){
+				String overDayNumber=DictUtils.getDictValue("cleanDay", "cleanNumber", "-1");
+				int  overday;
+				try {
+					  overday=Integer.parseInt(overDayNumber);
+				} catch (Exception e) {
+					logger.warn("请检查数据字典号码清洗的配置");
+					return;
+				}
+				//清洗账号
+				String account=DictUtils.getDictValue("account", "cleanNumber", "szsh2667");
+				//清洗密码
+				String password=DictUtils.getDictValue("password", "cleanNumber", "123456");
+				//两次md5加密
+				password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5(password));
+				//调用地址
+				String callUrl=DictUtils.getDictValue("callUrl", "cleanNumber", "http://tele-spider.cloud.zg4007.com/asynCheckTel");
+				//回调地址
+				String replyUrl=DictUtils.getDictValue("replyUrl", "cleanNumber", "http://mis.mo9.com/number/numberBack");
+				//需要清洗的号码
+				List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
+				int fail=0;
+				logger.info(new Date()+"开始号码清洗");
+			    for (DunningOrder dunningOrder : numberList) {
+			    	TmisDunningNumberClean tmisDunningNumberClean=new TmisDunningNumberClean();
+			    	tmisDunningNumberClean.setAccount(account);
+			    	tmisDunningNumberClean.setPassword(password);
+			    	tmisDunningNumberClean.setReplyUrl(replyUrl);
+			    	tmisDunningNumberClean.setDealcode(dunningOrder.getDealcode());
+			    	tmisDunningNumberClean.setPhone(dunningOrder.getMobile());
+			    	String  reqNo=TMisDunningTaskService.pwdMD5(dunningOrder.getDealcode()+System.currentTimeMillis());
+			    	tmisDunningNumberClean.setReqNo(reqNo);
+			    	tmisDunningNumberClean.setCreateByName("sys");
+			    	tmisDunningNumberClean.setCallingPeriod("calling");
+			    	tmisDunningNumberClean.preInsert();
+			    	HttpClient httpClient = new DefaultHttpClient();
+					HttpGet httpGet = new HttpGet(callUrl+"?account="+account+ "&password="+password+"&phone="+dunningOrder.getMobile()+"&reqNo="+reqNo+"&replyUrl="+replyUrl);
+					Document document=null;
+					tmisDunningNumberClean.setStartTime(new Date());
+					tMisDunningTaskSupportService.saveNumberList(tmisDunningNumberClean);
+					try {
+						HttpResponse response = httpClient.execute(httpGet);
+						String entity = EntityUtils.toString(response.getEntity());
+						document = DocumentHelper.parseText(entity);
+					} catch (Exception e) {
+						++fail;
+						tmisDunningNumberClean.setState("false");
+						tmisDunningNumberClean.setUpdateDate(new Date());
+						tmisDunningNumberClean.setEndTime(new Date());
+						tmisDunningNumberClean.setUpdateByName(tmisDunningNumberClean.getCreateByName());
+						tMisDunningTaskDao.updateNumberResult(tmisDunningNumberClean);
+						tmisDunningNumberClean.preInsert();
+						tMisDunningTaskDao.saveNumberCleanLog(tmisDunningNumberClean);
+						logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
+						continue;
+
+					}
+						// 1.获取文档的根节点.
+						if(null==document){
+							logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
+							continue;
+						}
+						Element root = document.getRootElement();
+						List<Element> listError = root.elements("error");
+						//如果失败的不会回调，要进行更新保存
+						if(!"0".equals(listError.get(0).getText())){
+							List<Element> listTaskId = root.elements("task_id");
+							List<Element> listMessage = root.elements("message");
+							tmisDunningNumberClean.setTaskId(listTaskId.get(0).getText());
+							tmisDunningNumberClean.setError(listError.get(0).getText());
+							tmisDunningNumberClean.setMessage(listMessage.get(0).getText());
+							tmisDunningNumberClean.setEndTime(new Date());
+							tmisDunningNumberClean.setUpdateDate(new Date());
+							tmisDunningNumberClean.setUpdateByName(tmisDunningNumberClean.getCreateByName());
+							tmisDunningNumberClean.setState("false");
+							if("1".equals(listError.get(0).getText())||"2".equals(listError.get(0).getText())||"5".equals(listError.get(0).getText())){
+								tMisDunningTaskDao.updateNumberResult(tmisDunningNumberClean);
+								tmisDunningNumberClean.preInsert();
+								tMisDunningTaskDao.saveNumberCleanLog(tmisDunningNumberClean);
+								logger.warn(new Date()+",这次号码清洗失败,失败原因:"+listError.get(0).getText());
+								return;
+							}
+							if("3".equals(listError.get(0).getText())||"4".equals(listError.get(0).getText())){
+								++fail;
+								tMisDunningTaskDao.updateNumberResult(tmisDunningNumberClean);
+								tmisDunningNumberClean.preInsert();
+								tMisDunningTaskDao.saveNumberCleanLog(tmisDunningNumberClean);
+								logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。手机号码格式不对");
+							}
+						}
+			    }
+			    logger.info(new Date()+"本次号码清洗条数为："+numberList.size()+"条,失败为"+fail+"条");
+			}
+
+
+		}
+		//回调函数
+		@Transactional(readOnly = false)
+		public void numberCleanBack(TmisDunningNumberClean tmisDunningNumberClean){
+			TmisDunningNumberClean number=tMisDunningTaskDao.findNumberClean(tmisDunningNumberClean);
+			if(null==number){
+				logger.warn(new Date()+",流水号不存在，该订单号码未清洗过。");
 				return;
 			}
-			List<DunningOrder> numberList=tMisDunningTaskDao.findNumberByOverDay(overday);
-			String password = TMisDunningTaskService.pwdMD5(TMisDunningTaskService.pwdMD5("123456"));
-			int i=0;
-		    for (DunningOrder dunningOrder : numberList) {
-		    	HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet("http://tele-spider.cloud.zg4007.com/asynCheckTel?account=szsh2667&password="
-						+ password + "&phone="+dunningOrder.getMobile()+"&reqNo="+dunningOrder.getDealcode()+"&replyUrl=http://mis.mo9.com/number/numberCleanBack");
-
-				List<Element> list=null;
-				List<Element> list2=null;
-				try {
-
-					HttpResponse response = httpClient.execute(httpGet);
-					String entity = EntityUtils.toString(response.getEntity());
-
-					Document document = DocumentHelper.parseText(entity);
-					// 1.获取文档的根节点.
-					Element root = document.getRootElement();
-					list = root.elements("error");
-					list2 = root.elements("message");
-					if("1".equals(list.get(0).getText())||"2".equals(list.get(0).getText())||"5".equals(list.get(0).getText())){
-						logger.warn(new Date()+",号码清洗失败,失败原因:"+list2.get(0).getText());
-						return;
-					}
-					if("3".equals(list.get(0).getText())||"4".equals(list.get(0).getText())){
-						logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。手机号码格式不对");
-						continue;
-					}
-					++i;
-				} catch (Exception e) {
-					logger.warn(new Date()+"订单号为："+dunningOrder.getDealcode()+"号码清洗失败。");
-					continue;
-
-				}
-
-		    }
-		    logger.info(new Date()+"本次号码清洗条数为："+i+",失败为"+(numberList.size()-i));
-
-		}
-
-
-	}
-	//回调函数
-	@Transactional(readOnly = false)
-	public void numberCleanBack(String reqNo,String check_result){
-		if("00".equals(check_result)||"01".equals(check_result)||"02".equals(check_result)||"03".equals(check_result)||"12".equals(check_result)){
-			check_result="YXHM";
-		}
-		if("04".equals(check_result)){
-			check_result="BZFWQ";
-		}
-		if("05".equals(check_result)){
-			check_result="KH";
-		}
-		if("06".equals(check_result)){
-			check_result="HMCW";
-		}
-		if("10".equals(check_result)){
-			check_result="GJ";
-		}
-		if("11".equals(check_result)){
-			check_result="TJ";
-		}
-		if("07".equals(check_result)||"08".equals(check_result)||"09".equals(check_result)){
-			check_result="WZ";
-		}
-		tMisDunningTaskDao.updateNumberResult(reqNo,check_result);
-	}
-	//md5加密
-	public static String pwdMD5(String strs) {
-
-		StringBuffer sb = new StringBuffer();
-		try {
-			MessageDigest digest = MessageDigest.getInstance("MD5");
-			byte[] bs = digest.digest(strs.getBytes());
-
-			for (byte b : bs) {
-				int x = b & 255;
-				String s = Integer.toHexString(x);
-				if (x < 16) {
-					sb.append("0");
-				}
-				sb.append(s);
+			if("00".equals(tmisDunningNumberClean.getCheckResult())||"01".equals(tmisDunningNumberClean.getCheckResult())||"02".equals(tmisDunningNumberClean.getCheckResult())||
+					"03".equals(tmisDunningNumberClean.getCheckResult())||"12".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("YXHM");
 			}
-		} catch (Exception e) {
-			logger.warn(new Date()+"号码清洗，加密失败");
-			throw new RuntimeException();
+			if("04".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("BZFWQ");
+			}
+			if("05".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("KH");
+			}
+			if("06".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("HMCW");
+			}
+			if("10".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("GJ");
+			}
+			if("11".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("TJ");
+			}
+			if("07".equals(tmisDunningNumberClean.getCheckResult())||"08".equals(tmisDunningNumberClean.getCheckResult())||"09".equals(tmisDunningNumberClean.getCheckResult())){
+				number.setCheckResult("WZ");
+			}
+			Date date=new Date();
+			number.setEndTime(date);
+			number.setAreaName(tmisDunningNumberClean.getAreaName());
+			number.setAreaCode(tmisDunningNumberClean.getAreaCode());
+			number.setPostCode(tmisDunningNumberClean.getPostCode());
+			number.setMessage(tmisDunningNumberClean.getMessage());
+			number.setTaskId(tmisDunningNumberClean.getTaskId());
+			number.setCallingPeriod("callback");
+			number.setState("true");
+			number.setError("0");
+			number.setUpdateByName(number.getCreateByName());
+			number.setUpdateDate(date);
+			tMisDunningTaskDao.updateNumberResult(number);
+			number.preInsert();
+			tMisDunningTaskDao.saveNumberCleanLog(number);
 		}
-		return sb.toString();
-	}
+		//模拟回调测试
+		@Transactional(readOnly = false)
+		public void callBackTest(){
+			List<TmisDunningNumberClean> findBackTest = tMisDunningTaskDao.findBackTest();
+			for (TmisDunningNumberClean clean : findBackTest) {
+				clean.setAreaName("上海");
+				clean.setAreaCode("人广");
+				clean.setPostCode("123456");
+				clean.setTaskId(TMisDunningTaskService.pwdMD5(clean.getDealcode()+System.currentTimeMillis()));
+				clean.setMessage("回调清洗成功");
+				clean.setCheckResult("01");
+				this.numberCleanBack(clean);
+			}
+		}
+		//md5加密
+		public static String pwdMD5(String strs) {
+
+			StringBuffer sb = new StringBuffer();
+			try {
+				MessageDigest digest = MessageDigest.getInstance("MD5");
+				byte[] bs = digest.digest(strs.getBytes());
+
+				for (byte b : bs) {
+					int x = b & 255;
+					String s = Integer.toHexString(x);
+					if (x < 16) {
+						sb.append("0");
+					}
+					sb.append(s);
+				}
+			} catch (Exception e) {
+				logger.warn(new Date()+"号码清洗，加密失败");
+				throw new RuntimeException();
+			}
+			return sb.toString();
+		}
+
 	
 	@Autowired
 	private TMisMigrationRateReportService tMisMigrationRateReportService;
