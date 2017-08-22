@@ -973,8 +973,15 @@
             AND t.quality = #{quality}
         </if>
         <if test="numberCleanResult != null and numberCleanResult != ''">
-        <!--			# 号码清洗    -->
-            AND n.checkresult = #{numberCleanResult}
+        <!--			# 号码清洗状态只对应未还清    -->
+        	<if test="status !='payoff'">
+	            AND n.checkresult = #{numberCleanResult}
+	            AND o.status = 'payment'
+        	</if>
+        	<if test="status =='payoff'">
+	            AND n.checkresult ='fail'
+        	</if>
+        	
         </if>
         <if test="taskOverdue != null and taskOverdue == true">
         <!--			# 过期未跟案件    -->
