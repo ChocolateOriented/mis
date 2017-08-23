@@ -302,4 +302,12 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.selectByIdForUpdate(id);
 	}
 
+	/**
+	 * @Description 查询对公入账异常订单, 还款类型为还清, 汇款确认状态为finish, 但订单状态为未还清
+	 * @param
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm>
+	 */
+	public List<TMisRemittanceConfirm> findAbnormalRemittanceConfirm() {
+		return dao.findAbnormalRemittanceConfirm();
+	}
 }

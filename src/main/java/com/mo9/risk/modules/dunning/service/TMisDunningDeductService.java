@@ -702,4 +702,13 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		}
 		return false;
 	}
+
+	/**
+	 * @Description 查询代扣异常订单, 扣款类型为全款, 扣款状态为成功, 但是订单状态为未还清
+	 * @param
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningDeduct>
+	 */
+	public List<TMisDunningDeduct> findAbnormalDeduct() {
+		return dao.findAbnormalDeduct();
+	}
 }

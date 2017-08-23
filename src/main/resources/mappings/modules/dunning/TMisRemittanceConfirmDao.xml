@@ -373,4 +373,26 @@
 			)
 		</foreach>
 	</insert>
+
+	<select id="findAbnormalRemittanceConfirm" resultType="TMisRemittanceConfirm">
+		SELECT
+		m.Id AS "id",
+		m.RemittanceChannel AS "remittancechannel",
+		m.Remark AS "remark",
+		m.PayType AS "paytype",
+		m.RemittanceAmount AS "remittanceamount",
+		m.dealcode AS "dealcode",
+		m.mobile AS "mobile"
+		FROM
+		t_mis_remittance_confirm m
+		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+		WHERE
+		o.merchant_id = 7
+		AND o.`status`= 'payment'
+		AND o.type = 'loan'
+		AND m.ConfirmFlow="AUDIT"
+		AND m.ConfirmStatus = "finish"
+		AND m.PayType = "loan"
+		AND m.invalid="t"
+	</select>
 </mapper>

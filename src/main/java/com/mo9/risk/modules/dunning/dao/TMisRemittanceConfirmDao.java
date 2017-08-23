@@ -113,4 +113,6 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm
 	 */
 	TMisRemittanceConfirm selectByIdForUpdate(String id);
+
+	List<TMisRemittanceConfirm> findAbnormalRemittanceConfirm();
 }
