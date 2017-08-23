@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningTagDao">
+    
+	<sql id="TMisDunningTagColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.dealcode as "dealcode",
+		a.buyerid as "buyerid",
+		a.tagtype as "tagtype",
+		a.occupation as "occupation",
+		a.remark as "remark",
+		a.peopleid as "peopleid",
+		a.peoplename as "peoplename",
+		a.delflag as "delflag",
+		a.createby as "createBy.name",
+		a.createdate as "createdate",
+		a.updateby as "updateBy.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisDunningTag">
+		SELECT
+			<include refid="TMisDunningTagColumns"/>
+		FROM t_mis_dunning_tag a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningTag">
+		SELECT 
+			a.dbid as "dbid",
+			a.id as "id",
+			a.dealcode as "dealcode",
+			a.buyerid as "buyerid",
+			a.tagtype as "tagtype",
+			a.occupation as "occupation",
+			a.remark as "remark",
+			a.peopleid as "peopleid",
+			a.peoplename as "peoplename",
+			a.delflag as "delflag",
+			a.createby as "createby",
+			a.createdate as "createdate",
+			a.updateby as "updateby",
+			a.updatedate as "updatedate"
+		FROM t_mis_dunning_tag a
+		WHERE a.dealcode = #{dealcode}
+		AND delflag = '0'
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningTag">
+		SELECT 
+			<include refid="TMisDunningTagColumns"/>
+		FROM t_mis_dunning_tag a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_tag(
+			id,
+			dealcode,
+			buyerid,
+			tagtype,
+			occupation,
+			remark,
+			peopleid,
+			peoplename,
+			delflag,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{buyerid},
+			#{tagtype},
+			#{occupation},
+			#{remark},
+			#{peopleid},
+			#{peoplename},
+			#{delFlag},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_tag SET
+			<if test="tagtype != null">
+				tagtype = #{tagtype},
+			</if>
+			<if test="occupation != null">
+				occupation = #{occupation},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="peopleid != null">
+				peopleid = #{peopleid},
+			</if>
+			<if test="peoplename != null">
+				peoplename = #{peoplename},
+			</if>
+			<if test="delFlag != null">
+				delflag = #{delFlag},
+			</if>
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+		AND delflag = '0'
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_dunning_tag
+		WHERE id = #{id}
+	</update>
+	
+	<insert id="saveTagHistory">
+		INSERT INTO t_mis_dunning_tag_history(
+			id,
+			dealcode,
+			buyerid,
+			tagtype,
+			occupation,
+			remark,
+			peopleid,
+			peoplename,
+			delflag,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{buyerid},
+			#{tagtype},
+			#{occupation},
+			#{remark},
+			#{peopleid},
+			#{peoplename},
+			#{delFlag},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<select id="getExistTagByDealcode" resultType="String">
+		SELECT
+			DISTINCT a.tagtype
+		FROM t_mis_dunning_tag a
+		WHERE a.dealcode = #{dealcode}
+		AND delflag = '0'
+	</select>
+
+</mapper>

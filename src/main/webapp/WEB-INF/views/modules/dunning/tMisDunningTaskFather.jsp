@@ -4,6 +4,42 @@
 <head>
 	<title>催收任务管理父页面</title>
 	<meta name="decorator" content="default"/>
+	<style type="text/css">
+		.tag {
+			color: #ffffff;
+			border: solid 1px #fac450;
+			border-radius: 3px;
+			display: inline-block;
+			font-size: 15px;
+			font-weight: normal;
+			padding: 1px;
+			margin-right: 2px;
+			position: relative;
+		}
+		
+		#SensitiveOcp {
+			background-color: #fac450;
+		}
+		
+		#Complaint {
+			background-color: #ff6600;
+		}
+		
+		.suspense {
+			z-index: 10000;
+			position: absolute;
+			top: 22px;
+			left: -1px;
+			background-color: #f0f8fd;
+			opacity: 0.9;
+			border: solid #3daae9 1px;
+			border-radius: 5px;
+			outline: none;
+			color: #555;
+			font-size: 13px;
+			padding: 10px;
+		}
+	</style>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			if("${ispayoff}" == "true"){
@@ -13,12 +49,20 @@
 // 			$("#btnOk",document.frames("ifm").document).click();
 		});
 
-		function collectionfunction(obj, width, height){
+		function collectionfunction(obj, width, height, param){
 			var method = $(obj).attr("method");
 			var contactMobile = $(obj).attr("contactMobile");
 			var contactstype = $(obj).attr("contactstype");
 			var contactsname = "${personalInfo.realName}";
 			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype+"&mobileSelf="+contactMobile;
+			if (param) {
+				for (var name in param) {
+					if (typeof param[name] != "function") {
+						url = url + "&" + name + "=" + param[name] || "";
+					}
+				}
+			}
+			
 			$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
 				buttons: {//"确定": "ok", "取消": true
             	},
@@ -97,11 +141,119 @@
 				buttons: {}
 			});
 		}
+		
+		function tagPopup(obj) {
+			$.get("${ctx}/dunning/tMisDunningTag/preCheck", {dealcode:"${dealcode}"}, function(data) {
+				if(data == "OK") {
+					collectionfunction(obj, 540, 340);
+				} else {
+					$.jBox.tip("无法添加更多标签", "warning");
+				}
+			});
+		}
+		
+		function showTagDetail(obj) {
+			$(".suspense").css("display", "none");
+			$(obj).children(".suspense").css("display", "block");
+		}
+		
+		function hideTagDetail() {
+			$(".suspense").css("display", "none");
+		}
+		
+		function editTag(obj) {
+			var tagId = $(obj).parent().attr("tagId");
+			collectionfunction($(obj).parent(), 540, 340, {tagId : tagId});
+		}
+		
+		function closeTag(obj) {
+			var tagId = $(obj).parent().attr("tagId");
+			confirmx('确认要删除该单表吗？', function() {
+				$.post("${ctx}/dunning/tMisDunningTag/closeTag", {id : tagId}, function(data) {
+					if (data == "OK") {
+						$(obj).parent().fadeOut(300);
+						setTimeout(function() {
+							$(obj).parent().remove();
+						}, 300);
+					}
+				});
+			});
+		}
+		
+		function addTag(tagId) {
+			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
+				var templ = $("#tagTemplate");
+				var elem = templ.clone(true);
+				elem.children("#title").text(data.tagtypeDesc);
+				elem.prop("id", data.tagtype);
+				elem.attr("tagId", tagId);
+				elem.find("#tagtype span").text(data.tagtypeDesc);
+				if (!data.occupation) {
+					elem.find("#occupation").remove();
+				} else {
+					elem.find("#occupation span").text(data.occupationDesc);
+				}
+				elem.find("#remark span").text(data.remark);
+				elem.find("#peoplename span").text(data.peoplename);
+				elem.find("#updateDate span").text(data.updateDate);
+				$("#tags").append(elem);
+				$("#" + data.tagtype).fadeIn();
+			});
+		}
+		
+		function refreshTag(tagId) {
+			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
+				var elem = $(".tag[tagId='" + tagId + "']");
+				elem.find("#tagtype span").text(data.tagtypeDesc);
+				if (data.occupation) {
+					elem.find("#occupation span").text(data.occupationDesc);
+				}
+				elem.find("#remark span").text(data.remark);
+				elem.find("#peoplename span").text(data.peoplename);
+				elem.find("#updateDate span").text(data.updateDate);
+				$.jBox.tip("修改成功", "info");
+			});
+		}
+
 	</script>
 </head>
 <body>
 	<h4>&nbsp;&nbsp; </h4>
-	<h4>&nbsp;&nbsp;个人信息 </h4>
+	<h4 style="display:inline-block;margin-bottom:3.5px;">&nbsp;&nbsp;个人信息&nbsp;&nbsp;</h4>
+	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;position:relative;top:-4px;">
+		<c:forEach items="${tags}" var="tag">
+			<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
+				<span id="title">${tag.tagtype.desc}</span>
+				<shiro:hasPermission name="dunning:tMisDunningTag:edit">
+					<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+					<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
+				</shiro:hasPermission>
+				<div class="suspense" style="display:none;" tabindex="0">
+					<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>
+					<c:if test="${not empty tag.occupation.desc}">
+						<div id="occupation" style="white-space:nowrap;">职业类型: <span>${tag.occupation.desc}</span></div>
+					</c:if>
+					<div id="remark" style="white-space:nowrap;">备注: <span>${tag.remark}</span></div>
+					<div id="peoplename" style="white-space:nowrap;">标记人: <span>${tag.peoplename}</span></div>
+					<div id="updateDate" style="white-space:nowrap;">标记时间: <span><fmt:formatDate value="${tag.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/></span></div>
+				</div>
+			</div>
+		</c:forEach>
+		<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">
+			<span id="title"></span>
+			<shiro:hasPermission name="dunning:tMisDunningTag:edit">
+				<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+				<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
+			</shiro:hasPermission>
+			<div class="suspense" style="display:none;" tabindex="0">
+				<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>
+				<div id="occupation" style="white-space:nowrap;">职业类型: <span></span></div>
+				<div id="remark" style="white-space:nowrap;">备注: <span></span></div>
+				<div id="peoplename" style="white-space:nowrap;">标记人: <span></span></div>
+				<div id="updateDate" style="white-space:nowrap;">标记时间: <span></span></div>
+			</div>
+		</div>
+	</div>
 	<input id="daikouStatus" name="daikouStatus" type="hidden" value="${daikouStatus}" />
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">
 		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />

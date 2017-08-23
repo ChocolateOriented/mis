@@ -66,6 +66,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
@@ -82,6 +83,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceConfirmService;
@@ -165,6 +167,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private RiskOrderManager riskOrderManager ;
+	
+	@Autowired
+	private TMisDunningTagService tMisDunningTagService ;
 	
 	private static final Map<String, String> rounddownMap;  
 	static  
@@ -1052,6 +1057,11 @@ public class TMisDunningTaskController extends BaseController {
 			e.printStackTrace();
 		}
 		
+		TMisDunningTag tMisDunningTag = new TMisDunningTag();
+		tMisDunningTag.setDealcode(dealcode);
+		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
+		model.addAttribute("tags", tags);
+		
 		//根据资方和逾期天数判断是否开启代扣
 		String daikouStatus=tMisDunningTaskService.findOrderByPayCode(order);
 		model.addAttribute("daikouStatus", daikouStatus);
@@ -1539,16 +1549,53 @@ public class TMisDunningTaskController extends BaseController {
 		tMisDunnedConclusion.setActions(Arrays.asList(actionsArr));
 		tMisDunnedConclusion.setBuyerid(Integer.valueOf(buyerId));
 		
-		//String remark = tMisDunnedConclusionService.getDefalutRemark(tMisDunnedConclusion);
-		//Map<String, String> next = tMisDunnedConclusionService.getFollowDateConfig();
-		
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		//model.addAttribute("remark", remark);
 		model.addAttribute("actions", actionsArr);
-		//model.addAttribute("nextdate", JSON.toJSONString(next));
 		return "modules/dunning/dialog/dialogCollectionTelConclusion";
+	}
+	
+	/**
+	 * 加载敏感标签页面
+	 * @param tMisDunningConclusion
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionTag")
+	public String collectionTag(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		String tagId = request.getParameter("tagId");
+		String tagOpr = "save";
+		if (StringUtils.isNotBlank(tagId)) {
+			tagOpr = "edit";
+			TMisDunningTag tMisDunningTag = tMisDunningTagService.get(tagId);
+			model.addAttribute("tagId", tagId);
+			model.addAttribute("tMisDunningTag", tMisDunningTag);
+		} else {
+			TMisDunningTag tMisDunningTag = new TMisDunningTag();
+			tMisDunningTag.setDealcode(dealcode);
+			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
+			
+			if(tags != null && tags.size() > 0) {
+				Map<String, String> exist = new HashMap<String, String>();
+				for (TMisDunningTag tag : tags) {
+					exist.put(tag.getTagtype().name(), tag.getTagtype().getDesc());
+				}
+				model.addAttribute("exist", exist);
+			}
+		}
+		
+		if(buyerId == null || dealcode == null || "".equals(buyerId) || "".equals(dealcode)){
+			return "views/error/500";
+		}
+		
+		model.addAttribute("buyerId", buyerId);
+		model.addAttribute("dealcode", dealcode);
+		model.addAttribute("tagOpr", tagOpr);
+		return "modules/dunning/dialog/dialogCollectionTag";
 	}
 	
 	/**
