@@ -36,6 +36,7 @@ import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.PostRequest;
 import com.mo9.risk.util.RequestParamSign;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
@@ -187,12 +188,15 @@ public class TMisDunningDeductCallService {
 			}
 			
 			return true;
-		} catch (Exception e) {
+		} catch (ServiceException e) {
 			logger.info("江湖救急接口返回失败：" + e.getMessage());
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.failed);
 			tMisDunningDeduct.setRepaymentdetail(e.getMessage());
 			update(tMisDunningDeduct);
 			saveDeductLog(tMisDunningDeduct);
+			return false;
+		} catch (Exception e) {
+			logger.info("江湖救急接口返回失败：" + e.getMessage());
 			return false;
 		}
 	}

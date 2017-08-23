@@ -30,6 +30,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private String mobile;// # 手机号码
 	private Double amount;// # 欠款金额
 	private Double balance;// # 还款金额
+	private Double corpusamount;// # 本金
 	@Deprecated
 	private Double creditamount;// # 应催金额 改用字段remainAmmount
 	private Double remainAmmount;//剩余待还金额,应催金额
@@ -218,6 +219,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.amount = amount;
 	}
 	
+	public Double getCorpusamount() {
+		return corpusamount;
+	}
+
+	public void setCorpusamount(Double corpusamount) {
+		this.corpusamount = corpusamount;
+	}
+
 	public Double getCreditamount() {
 		return creditamount;
 	}

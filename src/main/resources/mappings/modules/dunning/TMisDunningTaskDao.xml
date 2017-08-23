@@ -796,6 +796,7 @@
         o.dealcode AS "dealcode",
         b.mobile AS "mobile",
         o.amount AS "amount",
+		IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0) AS corpusamount,
 		<include refid="countRemainAmmount"/> AS creditamount,
         o.repayment_time AS "repaymenttime",
         CASE

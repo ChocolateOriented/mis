@@ -49,6 +49,8 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.util.ListSortUtil;
+import com.thinkgem.jeesite.util.NumberUtil;
+
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
@@ -928,7 +930,21 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		page.setUsePaginationInterceptor(false);
 		page.setCount(dao.newfindOrderPageCount(entity));
 
-		page.setList(dao.newfindOrderPageList(entity));
+		List<DunningOrder> orders = dao.newfindOrderPageList(entity);
+		page.setList(orders);
+		
+		//分页金额统计
+		double creditamount = 0;
+		double corpusamount = 0;
+		if (orders != null && orders.size() != 0) {
+			for (DunningOrder order : orders) {
+				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
+				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
+			}
+		}
+		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
+		page.setMessage(message);
+		
 		return page;
 	}
 	
