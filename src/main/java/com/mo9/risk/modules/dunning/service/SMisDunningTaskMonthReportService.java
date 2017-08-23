@@ -68,7 +68,7 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	 */
 	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
-		String receiver = DictUtils.getDictValue("e_mail", "month_report_receiver", "");
+		String receiver = DictUtils.getDictValue("month_report_receiver", "sys_email", "");
 		if (StringUtils.isBlank(receiver)){
 			logger.warn("自动发送月报失败, 未配置收件人邮箱");
 			return;

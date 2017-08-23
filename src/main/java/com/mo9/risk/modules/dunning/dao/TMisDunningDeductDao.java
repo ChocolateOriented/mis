@@ -90,4 +90,11 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	 * @return
 	 */
 	public TRiskBuyerPersonalInfo getBuyerInfoByDealcode(String dealcode);
+
+	/**
+	 * @Description 查询订单状态异常的代扣信息
+	 * @param
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningDeduct>
+	 */
+	List<TMisDunningDeduct> findAbnormalDeduct();
 }
