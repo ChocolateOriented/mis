@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -167,6 +168,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private RiskOrderManager riskOrderManager ;
+
+	@Autowired
+	private TMisDunningOrderService orderService;
 	
 	@Autowired
 	private TMisDunningTagService tMisDunningTagService ;
@@ -889,7 +893,20 @@ public class TMisDunningTaskController extends BaseController {
 		addMessage(redirectAttributes, "自动扫描还款");
 		return "OK";
 	}
-	
+
+	/**
+	 * @Description 异常订单同步
+	 * @param redirectAttributes
+	 * @return java.lang.String
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "orderSync")
+	@ResponseBody
+	public String orderSync( RedirectAttributes redirectAttributes) {
+		orderService.checkAbnormalOrder();
+		addMessage(redirectAttributes, "异常订单同步");
+		return "OK";
+	}
 	
 	/**
 	 * 导出催收任务数据
