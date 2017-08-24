@@ -2612,7 +2612,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 							TRiskBuyerPersonalInfo buyerInfeo = tpersonalInfoDao
 									.getbuyerIfo(dunningOrder.getDealcode());
-
+							if(null==buyerInfeo){
+								throw new RuntimeException("发送短信失败");
+							}
 							smsCotent = tdstService.cousmscotent(smsTemplate.getSmsCotent(), buyerInfeo,
 									dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),
 									dunningOrder.getExtensionNumber());
@@ -2700,7 +2702,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 											+ ",发送短信成功.模板名为:" + smsTemplate.getTemplateName() + ",该模板发送的第" + i + "条");
 						} catch (Exception e) {
 
-							logger.warn("发送短信失败:" + e);
+							logger.warn("发送短信失败:" , e);
 							logger.warn("系统发送,给订单号为:" + dunningOrder.getDealcode() + ",用户电话为:"
 									+ dunningOrder.getMobile() + ",发送短信失败.用户信息不全,模板名为:" + smsTemplate.getTemplateName()
 									+ ",该模板发送的第" + i + "条");
@@ -2733,7 +2735,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						trList.add(dunning);
 					}
 					// 批量保存
-					if (trList.size() > 0) {
+					if (null!=trList&&trList.size() > 0) {
 						tMisContantRecordService.saveList(trList);
 
 					}

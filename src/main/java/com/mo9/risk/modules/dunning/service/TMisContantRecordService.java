@@ -198,6 +198,9 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 
 					TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
 					TRiskBuyerPersonalInfo buyerInfeo = tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+					if(null==buyerInfeo){
+						throw new RuntimeException("发送短信失败");
+					}
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
 							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
 					// 模板对应参数
@@ -217,6 +220,9 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					// 模板填充的map
 					TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
 					TRiskBuyerPersonalInfo buyerInfeo = tRiskBuyerPersonalInfoDao.getbuyerIfo(order.getDealcode());
+					if(null==buyerInfeo){
+						throw new RuntimeException("发送短信失败");
+					}
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
 							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
 					vparams.put("template_data", new JacksonConvertor().serialize(map));
