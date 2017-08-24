@@ -313,8 +313,24 @@
 	              });
 				
 			 });
-			 
-			
+
+		  //还清异常订单同步
+          $("#orderSync").click(function(){
+            $.ajax({
+              type: 'POST',
+              url : "${ctx}/dunning/tMisDunningTask/orderSync",
+              success : function(data) {
+                if (data == "OK") {
+                  alert("异常订单同步成功");
+                } else {
+                  alert("异常订单同步失败:"+data.message);
+                }
+              },
+              error : function(XMLHttpRequest, textStatus, errorThrown){
+                alert("保存失败:"+textStatus);
+              }
+            });
+          });
 			
 			
 			// 催收留案功能-留案自检 Patch 0001 by GQWU at 2016-11-9 start-->
@@ -596,6 +612,7 @@
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
 		<input id="autoAssignNewOrder"  class="btn btn-primary" type="button" value="新订单任务"/>
 		<input id="autoRepayment"  class="btn btn-primary" type="button" value="扫描还款"/>
+		<input id="orderSync"  class="btn btn-primary" type="button" value="订单同步"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 
