@@ -48,7 +48,26 @@ public class TMisDunningTagController extends BaseController {
 	@ResponseBody
 	public Map<String, String> saveTag(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
-		boolean addable = tMisDunningTagService.preCheckExist(tMisDunningTag.getDealcode());
+		String dealcode = tMisDunningTag.getDealcode();
+		if (dealcode == null || "".equals(dealcode) || tMisDunningTag.getTagtype() == null) {
+			result.put("status", "NO");
+			result.put("msg", "添加标签失败");
+			return result;
+		}
+		String lockStr = dealcode + "." + tMisDunningTag.getTagtype().toString();
+		
+		boolean addable = false;
+		try {
+			//自旋等待5秒
+			long timestamp = System.currentTimeMillis();
+			Long value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
+			while (value != null && timestamp - value < 5000) {
+				value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
+			}
+			addable = tMisDunningTagService.preCheckExist(tMisDunningTag.getDealcode());
+		} catch (Exception e) {
+			TMisDunningTagService.dealcodeTagType.remove(lockStr);
+		}
 		
 		if (!addable) {
 			result.put("status", "NO");
