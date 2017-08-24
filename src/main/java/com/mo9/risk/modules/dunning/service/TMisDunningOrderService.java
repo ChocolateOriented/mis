@@ -180,7 +180,7 @@ public class TMisDunningOrderService extends BaseService{
 		logger.info("代扣状态异常订单成功修复:" + successCount + "条");
 		DynamicDataSource.setCurrentLookupKey("dataSource");
 
-		this.sendAbnormalOrderEmail("代扣入账失败-订单号",failRepairMsg);
+		this.sendAbnormalOrderEmail("代扣入账失败",failRepairMsg);
 	}
 
 	/**
@@ -233,7 +233,7 @@ public class TMisDunningOrderService extends BaseService{
 		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
 		DynamicDataSource.setCurrentLookupKey("dataSource");
 
-		this.sendAbnormalOrderEmail("对公交易入账失败-订单号",failRepairMsg);
+		this.sendAbnormalOrderEmail("对公交易入账失败",failRepairMsg);
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class TMisDunningOrderService extends BaseService{
 	private boolean tryRepairAbnormalOrder(String dealcode, String remittancechannel, String remark, BigDecimal remittanceamount) {
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
-				orderManager.repay(dealcode, remittancechannel, remark, DunningOrder.STATUS_PAYOFF, remittanceamount, "7");
+				orderManager.repay(dealcode, remittancechannel, remark, "loan", remittanceamount, "7");
 			} catch (Exception e) {
 				continue;
 			}
