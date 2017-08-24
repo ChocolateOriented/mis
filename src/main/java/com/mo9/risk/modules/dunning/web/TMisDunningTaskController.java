@@ -1497,7 +1497,7 @@ public class TMisDunningTaskController extends BaseController {
 		//获取相对应的 短信模板
 		List<TmisDunningSmsTemplate> smsTemplateList = tstService.findSmsTemplate(contactstype,order.getRepaymentDate(),order,task);
 		model.addAttribute("smsTeplateList", smsTemplateList);
-		if(smsTemplateList.size()!=0)
+		if(null!=smsTemplateList&&smsTemplateList.size()!=0)
 		model.addAttribute("tSTemplate", smsTemplateList.get(0));
 //		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() : chooseSelf ? "SELF" : "" );
 		model.addAttribute("contactstype", contactstype);
