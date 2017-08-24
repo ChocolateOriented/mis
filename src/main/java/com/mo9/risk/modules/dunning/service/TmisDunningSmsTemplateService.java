@@ -95,7 +95,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 			  }
 			  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType);
 			  
-			 if(findList.size()!=0){
+			 if(null!=findList&&findList.size()!=0){
 			  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
 			  
 			  String smsCotent = tSmsTemplate.getSmsCotent();
