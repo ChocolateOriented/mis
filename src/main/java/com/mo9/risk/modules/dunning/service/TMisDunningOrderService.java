@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -152,7 +151,8 @@ public class TMisDunningOrderService extends BaseService{
 		DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
 		int successCount = 0;
 		StringBuilder failRepairMsg = new StringBuilder();
-		List<String> abnormalOrders = this.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		List<String> abnormalOrders = confirmService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		DynamicDataSource.setCurrentLookupKey("dataSource");
 		if (abnormalOrders == null || abnormalOrders.size() == 0) {
 			return ;
 		}
@@ -167,30 +167,16 @@ public class TMisDunningOrderService extends BaseService{
 			if (success) {
 				successCount++;
 				//更新代扣
-				DynamicDataSource.setCurrentLookupKey("dataSource");
 				deduct.setRepaymentstatus(PayStatus.succeeded);
-				this.updateDeduct(deduct);
-				DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
-
+				deductService.updateWithNewTransactional(deduct);
 				logger.debug("代扣信息:" + deduct.getId() + "订单" + deduct.getDealcode() + "修复成功");
 				continue;
 			}
 			failRepairMsg.append("<p>订单号: "+deduct.getDealcode()+", 手机号: "+deduct.getMobile()+", 交易金额: "+deduct.getPayamount()+"</p>");
 		}
 		logger.info("代扣状态异常订单成功修复:" + successCount + "条");
-		DynamicDataSource.setCurrentLookupKey("dataSource");
 
 		this.sendAbnormalOrderEmail("代扣入账失败",failRepairMsg);
-	}
-
-	/**
-	 * @Description 开启新的事务, 更新贷后库
-	 * @param deduct
-	 * @return void
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	private void updateDeduct(TMisDunningDeduct deduct) {
-		deductService.update(deduct);
 	}
 
 	/**
@@ -211,7 +197,8 @@ public class TMisDunningOrderService extends BaseService{
 		DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
 		int successCount = 0;
 		StringBuilder failRepairMsg = new StringBuilder();
-		List<String> abnormalOrders = this.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		List<String> abnormalOrders = confirmService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		DynamicDataSource.setCurrentLookupKey("dataSource");
 		if (abnormalOrders == null || abnormalOrders.size() == 0) {
 			return ;
 		}
@@ -231,7 +218,6 @@ public class TMisDunningOrderService extends BaseService{
 			failRepairMsg.append("<p>订单号: "+remittanceConfirm.getDealcode()+", 手机号: "+remittanceConfirm.getMobile()+", 交易金额: "+remittanceConfirm.getRemittanceamount()+"</p>");
 		}
 		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
-		DynamicDataSource.setCurrentLookupKey("dataSource");
 
 		this.sendAbnormalOrderEmail("对公交易入账失败",failRepairMsg);
 	}
@@ -271,7 +257,6 @@ public class TMisDunningOrderService extends BaseService{
 	 * @param remittanceamount
 	 * @return boolean 是否成功
 	 */
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	private boolean tryRepairAbnormalOrder(String dealcode, String remittancechannel, String remark, BigDecimal remittanceamount) {
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
@@ -282,21 +267,14 @@ public class TMisDunningOrderService extends BaseService{
 			//调用成功查看订单状态是否改变
 			List<String> shouldPayoffOrderDelcodes = new ArrayList<String>();
 			shouldPayoffOrderDelcodes.add(dealcode);
-			List<String> abnormalOrders = this.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+			List<String> abnormalOrders = confirmService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 			if (abnormalOrders.size() == 0){
 				return true;
 			}
 		}
 		return false;
 	}
-
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-	private List<String> findAbnormalOrderFromRisk(List<String> shouldPayoffOrderDelcodes) {
-		if (shouldPayoffOrderDelcodes == null || shouldPayoffOrderDelcodes.size() == 0){
-			return new ArrayList<String>();
-		}
-		return tMisDunningOrderDao.findPaymentOreder(shouldPayoffOrderDelcodes);
-	}
-
 
 }

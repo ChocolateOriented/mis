@@ -310,4 +310,17 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	public List<TMisRemittanceConfirm> findAbnormalRemittanceConfirm() {
 		return dao.findAbnormalRemittanceConfirm();
 	}
+
+	/**
+	 * @Description  查询江湖救急库异常订单
+	 * @param shouldPayoffOrderDelcodes
+	 * @return java.util.List<java.lang.String>
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public List<String> findAbnormalOrderFromRisk(List<String> shouldPayoffOrderDelcodes) {
+		if (shouldPayoffOrderDelcodes == null || shouldPayoffOrderDelcodes.size() == 0){
+			return new ArrayList<String>();
+		}
+		return dao.findPaymentOreder(shouldPayoffOrderDelcodes);
+	}
 }
