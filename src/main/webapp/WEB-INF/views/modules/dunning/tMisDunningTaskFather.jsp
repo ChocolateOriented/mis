@@ -172,7 +172,6 @@
 				$.post("${ctx}/dunning/tMisDunningTag/closeTag", {id : tagId}, function(data) {
 					if (data == "OK") {
 						$(obj).parent().fadeOut(300);
-						console.log($(obj).parent());
 						setTimeout(function() {
 							$(obj).parent().remove();
 						}, 300);
@@ -185,7 +184,7 @@
 			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
 				var templ = $("#tagTemplate");
 				var elem = templ.clone(true);
-				elem.children("#title").text(data.tagtypeDesc);
+				elem.children("#title").append(data.tagtypeDesc);
 				elem.prop("id", data.tagtype);
 				elem.attr("tagId", tagId);
 				elem.find("#tagtype span").text(data.tagtypeDesc);
@@ -224,7 +223,7 @@
 	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;position:relative;top:-4px;font-size:0px;">
 		<c:forEach items="${tags}" var="tag">
 			<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
-				<span id="title">${tag.tagtype.desc}</span>
+				<span id="title">&nbsp;${tag.tagtype.desc}</span>
 				<shiro:hasPermission name="dunning:tMisDunningTag:edit">
 					<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
 					<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
@@ -241,7 +240,7 @@
 			</div>
 		</c:forEach>
 		<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">
-			<span id="title"></span>
+			<span id="title">&nbsp;</span>
 			<shiro:hasPermission name="dunning:tMisDunningTag:edit">
 				<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
 				<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
