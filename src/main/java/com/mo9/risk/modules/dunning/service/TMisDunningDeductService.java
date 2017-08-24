@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
@@ -136,7 +137,16 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		tMisDunningDeduct.preUpdate();
 		tMisDunningDeductDao.update(tMisDunningDeduct);
 	}
-	
+
+	/**
+	 * @Description 开启新的事务, 更新贷后库
+	 * @param deduct
+	 * @return void
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateWithNewTransactional(TMisDunningDeduct deduct) {
+		this.update(deduct);
+	}
 	/**
 	 * 获取扣款渠道列表
 	 * @param bankname

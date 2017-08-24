@@ -115,4 +115,6 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	TMisRemittanceConfirm selectByIdForUpdate(String id);
 
 	List<TMisRemittanceConfirm> findAbnormalRemittanceConfirm();
+
+	List<String> findPaymentOreder(List<String> shouldPayoffOrderDelcodes);
 }

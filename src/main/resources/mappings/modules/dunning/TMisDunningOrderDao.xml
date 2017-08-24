@@ -75,21 +75,4 @@
 		</if>
 	</select>
 
-
-
-	<select id="findPaymentOreder" resultType="String">
-		SELECT
-		o.dealcode AS "dealcode"
-		FROM
-		t_risk_order AS o
-		WHERE
-		o.merchant_id = 7
-		AND o.`status`= 'payment'
-		AND o.type = 'loan'
-		AND o.dealcode IN
-		<foreach item="delcode" collection="list" open="(" close=")" separator=",">
-			#{delcode}
-		</foreach>
-	</select>
-
 </mapper>

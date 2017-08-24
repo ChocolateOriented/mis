@@ -22,5 +22,4 @@ public interface TMisDunningOrderDao extends BaseDao {
 
 	List<DunningOrder> findPaymentOrderMsg(DunningOrder queryOrder);
 
-	List<String> findPaymentOreder(List<String> shouldPayoffOrderDelcodes);
 }
