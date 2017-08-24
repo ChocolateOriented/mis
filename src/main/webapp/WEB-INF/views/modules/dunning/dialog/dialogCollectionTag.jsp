@@ -104,7 +104,7 @@
 		<div class="control-group">
 			<label class="control-label">备注：</label>
 			<div class="controls">
-				<textarea style="input-large" path="" id="remark" name="remark" maxlength="200">${tMisDunningTag.remark}</textarea>
+				<textarea class="large required" path="" id="remark" name="remark" maxlength="200">${tMisDunningTag.remark}</textarea>
 				<span class="help-inline"><font color="red">*</font></span>
  			</div>
 		</div>

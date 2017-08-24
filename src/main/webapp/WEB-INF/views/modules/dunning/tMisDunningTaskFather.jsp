@@ -13,7 +13,7 @@
 			font-size: 15px;
 			font-weight: normal;
 			padding: 1px;
-			margin-right: 2px;
+			margin-right: 5px;
 			position: relative;
 		}
 		
@@ -168,10 +168,11 @@
 		
 		function closeTag(obj) {
 			var tagId = $(obj).parent().attr("tagId");
-			confirmx('确认要删除该单表吗？', function() {
+			confirmx('确认要删除该标签吗？', function() {
 				$.post("${ctx}/dunning/tMisDunningTag/closeTag", {id : tagId}, function(data) {
 					if (data == "OK") {
 						$(obj).parent().fadeOut(300);
+						console.log($(obj).parent());
 						setTimeout(function() {
 							$(obj).parent().remove();
 						}, 300);
@@ -220,7 +221,7 @@
 <body>
 	<h4>&nbsp;&nbsp; </h4>
 	<h4 style="display:inline-block;margin-bottom:3.5px;">&nbsp;&nbsp;个人信息&nbsp;&nbsp;</h4>
-	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;position:relative;top:-4px;">
+	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;position:relative;top:-4px;font-size:0px;">
 		<c:forEach items="${tags}" var="tag">
 			<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
 				<span id="title">${tag.tagtype.desc}</span>

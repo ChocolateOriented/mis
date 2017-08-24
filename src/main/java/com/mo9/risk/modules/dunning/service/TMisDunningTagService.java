@@ -26,9 +26,16 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 @Transactional(readOnly = true)
 public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDunningTag> {
 	
+	public static ConcurrentHashMap<String, Long> dealcodeTagType = new ConcurrentHashMap<String, Long>();
+	
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 	
+	/**
+	 * 保存标签
+	 * @param tMisDunningTag
+	 * @return
+	 */
 	@Transactional(readOnly = false)
 	public String saveTag(TMisDunningTag tMisDunningTag) {
 		String peopleId = UserUtils.getUser().getId();
@@ -41,6 +48,11 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 		return tMisDunningTag.getId();
 	}
 	
+	/**
+	 * 编辑标签
+	 * @param tMisDunningTag
+	 * @return
+	 */
 	@Transactional(readOnly = false)
 	public int editTag(TMisDunningTag tMisDunningTag) {
 		String peopleId = UserUtils.getUser().getId();
@@ -50,6 +62,11 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 		return updateTag(tMisDunningTag);
 	}
 	
+	/**
+	 * 删除标签
+	 * @param id
+	 * @return
+	 */
 	@Transactional(readOnly = false)
 	public void closeTag(String id) {
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
@@ -58,6 +75,11 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 		updateTag(tMisDunningTag);
 	}
 	
+	/**
+	 * 更新标签
+	 * @param tMisDunningTag
+	 * @return
+	 */
 	@Transactional(readOnly = false)
 	public int updateTag(TMisDunningTag tMisDunningTag) {
 		tMisDunningTag.preUpdate();
@@ -70,6 +92,11 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 		return num;
 	}
 	
+	/**
+	 * 校验是否所有标签类型已添加
+	 * @param tMisDunningTag
+	 * @return
+	 */
 	@Transactional
 	public boolean preCheckExist(String dealcode) {
 		List<String> existTags = dao.getExistTagByDealcode(dealcode);
