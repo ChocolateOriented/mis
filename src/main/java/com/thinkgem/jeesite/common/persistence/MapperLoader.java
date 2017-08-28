@@ -14,6 +14,8 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -40,6 +42,7 @@ public class MapperLoader implements DisposableBean, InitializingBean, Applicati
 	private HashMap<String, String> fileMapping = new HashMap<String, String>();
 	private Scanner scanner = null;
 	private ScheduledExecutorService service = null;
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -65,7 +68,7 @@ public class MapperLoader implements DisposableBean, InitializingBean, Applicati
 			service.scheduleAtFixedRate(new Task(), 5, 5, TimeUnit.SECONDS);
 
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			logger.info("",e1);
 		}
 
 	}
@@ -80,7 +83,7 @@ public class MapperLoader implements DisposableBean, InitializingBean, Applicati
 					System.out.println("加载完毕.");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.info("",e);
 			}
 		}
 

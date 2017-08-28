@@ -282,7 +282,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				// 逾期天数
 				dunning.setOverduedays(daysBetween(repaymentTime, nowDate));
 			} catch (ParseException e) {
-				e.printStackTrace();
+				logger.info("解析时间发生异常",e);
 			}
 			dunning.setDunningtime(new Date());
 			// 联系对象

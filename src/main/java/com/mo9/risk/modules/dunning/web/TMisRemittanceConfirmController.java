@@ -579,27 +579,6 @@ public class TMisRemittanceConfirmController extends BaseController {
 			return result.toString();
 	}
 
-
-   	public static String convertStreamToString(InputStream is) {
-           BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-           StringBuilder sb = new StringBuilder();
-           String line = null;
-           try {
-               while ((line = reader.readLine()) != null) {
-                   sb.append(line + "\n");
-               }
-           } catch (IOException e) {
-               e.printStackTrace();
-           } finally {
-               try {
-                   is.close();
-               } catch (IOException e) {
-                  e.printStackTrace();
-               }
-           }
-           return sb.toString();
-       }
-
    	@RequiresPermissions("dunning:tMisRemittanceConfirm:view")
 	@RequestMapping(value = "/uploadImage")
     public String uploadImage(String formurl,String filenum,Model model,TMisRemittanceConfirm tMisRemittanceConfirm, String buyerId,String dealcode,String dunningtaskdbid,

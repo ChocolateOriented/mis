@@ -77,8 +77,7 @@ public class TRiskBuyerContactRecordsService {
 				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
 				logger.info("通话记录条数："+contactRecordsList.size());
 			} catch (Exception e) {
-				logger.info("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId());
-				e.printStackTrace();
+				logger.info("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId(),e);
 			}
 			if(!contactRecordsList.isEmpty()){
 				for(TRiskBuyerContactRecords records : contactRecordsList){

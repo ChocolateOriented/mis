@@ -3,18 +3,18 @@
  */
 package com.thinkgem.jeesite.modules.sys.security;
 
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.thinkgem.jeesite.common.utils.StringUtils;
 
 /**
  * 表单验证（包含验证码）过滤类
@@ -23,7 +23,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
  */
 @Service
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
-
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	public static final String DEFAULT_CAPTCHA_PARAM = "validateCode";
 	public static final String DEFAULT_MOBILE_PARAM = "mobileLogin";
 	public static final String DEFAULT_MESSAGE_PARAM = "message";
@@ -99,7 +99,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
 		}
 		else{
 			message = "系统出现点问题，请稍后再试！";
-			e.printStackTrace(); // 输出到控制台
+			logger.info("登录异常",e);
 		}
         request.setAttribute(getFailureKeyAttribute(), className);
         request.setAttribute(getMessageParam(), message);
