@@ -225,7 +225,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return java.lang.String
 	 */
 	@Transactional
-	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) {
+	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
@@ -248,11 +248,11 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		try {
+//		try {
 			return orderService.repayWithCheack(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
-		} catch (IOException e) {
-			throw new ServiceException("订单接口回调失败, 网络异常",e);
-		}
+//		} catch (IOException e) {
+//			throw new ServiceException("订单接口回调失败, 网络异常",e);
+//		}
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return void
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void auditConfrim (TMisRemittanceConfirm confirm){
+	public void auditConfrim (TMisRemittanceConfirm confirm) throws IOException {
 		//数据库加行锁控制并发
 		logger.debug("正在获取锁TMisRemittanceConfirm:"+confirm.getId());
 		TMisRemittanceConfirm lockedConfirm = this.getLockedRemittanceConfirm(confirm.getId());
@@ -287,11 +287,11 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		String delayDay = "7";
-		try {
+//		try {
 			orderService.repayWithCheack(dealcode,confirm.getRemittancechannel(),"对公转账",paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
-		} catch (IOException e) {
-			throw new ServiceException("订单接口回调失败, 网络异常",e);
-		}
+//		} catch (IOException e) {
+//			throw new ServiceException("订单接口回调失败, 网络异常",e);
+//		}
 	}
 
 	/**
