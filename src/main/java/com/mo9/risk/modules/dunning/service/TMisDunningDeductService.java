@@ -3,26 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.jdbc.DbUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
@@ -41,6 +21,23 @@ import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import org.jdbc.DbUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收代扣Service
@@ -68,6 +65,9 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	
 	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoService;
+
+	@Autowired
+	private TMisDunningOrderService orderService;
 	
 	@Override
 	public TMisDunningDeduct get(String deductcode) {
@@ -138,15 +138,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		tMisDunningDeductDao.update(tMisDunningDeduct);
 	}
 
-	/**
-	 * @Description 开启新的事务, 更新贷后库
-	 * @param deduct
-	 * @return void
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void updateWithNewTransactional(TMisDunningDeduct deduct) {
-		this.update(deduct);
-	}
 	/**
 	 * 获取扣款渠道列表
 	 * @param bankname
@@ -713,6 +704,50 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		return false;
 	}
 
+	/**
+	 * @Description 尝试修复代扣异常订单
+	 * @param
+	 * @return java.util.List<java.lang.String>
+	 */
+	@Scheduled(cron = "0 0 */6 * * ?")
+	@Transactional
+	public void tryRepairAbnormalDeduct() {
+		//查询代扣异常订单
+		List<TMisDunningDeduct> abnormalDeducts = this.findAbnormalDeduct();
+		logger.info("代扣状态异常订单:" + abnormalDeducts.size() + "条");
+
+		//切换江湖救急库, 查询订单状态也为未还清的订单, 过滤未同步订单
+		List<String> shouldPayoffOrderDelcodes = new ArrayList<String>();
+		for (TMisDunningDeduct deduct: abnormalDeducts) {
+			shouldPayoffOrderDelcodes.add(deduct.getDealcode());
+		}
+		int successCount = 0;
+		StringBuilder failRepairMsg = new StringBuilder();
+		List<String> abnormalOrders = orderService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		logger.info("江湖救急代扣状态异常订单:" + abnormalOrders.size() + "条",abnormalOrders);
+		if (abnormalOrders == null || abnormalOrders.size() == 0) {
+			return ;
+		}
+
+		//调用接口
+		for (TMisDunningDeduct deduct : abnormalDeducts) {
+			if (!abnormalOrders.contains(deduct.getDealcode())) {
+				continue;
+			}
+			boolean success = orderService.tryRepairAbnormalOrder(deduct.getDealcode(), "bank", "代扣", new BigDecimal(deduct.getPayamount()));
+			if (success) {
+				successCount++;
+				//更新代扣
+				deduct.setRepaymentstatus(PayStatus.succeeded);
+				this.update(deduct);
+				logger.debug("代扣信息:" + deduct.getId() + "订单" + deduct.getDealcode() + "修复成功");
+				continue;
+			}
+			failRepairMsg.append("<p>订单号: "+deduct.getDealcode()+", 手机号: "+deduct.getMobile()+", 交易金额: "+deduct.getPayamount()+"</p>");
+		}
+		logger.info("代扣状态异常订单成功修复:" + successCount + "条");
+		orderService.sendAbnormalOrderEmail("代扣入账失败",failRepairMsg.toString());
+	}
 	/**
 	 * @Description 查询代扣异常订单, 扣款类型为全款, 扣款状态为成功, 但是订单状态为未还清
 	 * @param

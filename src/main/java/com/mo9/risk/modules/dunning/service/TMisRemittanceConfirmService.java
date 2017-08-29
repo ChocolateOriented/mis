@@ -6,7 +6,6 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 2016-09-12
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConfirmDao, TMisRemittanceConfirm> {
 
@@ -37,7 +39,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private TMisRemittanceConfirmLogService tMisRemittanceConfirmLogService;
 	@Autowired
-	private RiskOrderManager riskOrderManager ;
+	private TMisDunningOrderService orderService ;
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 
@@ -247,7 +249,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		try {
-			return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
+			return orderService.repayWithCheack(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 		} catch (IOException e) {
 			throw new ServiceException("订单接口回调失败, 网络异常",e);
 		}
@@ -286,7 +288,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		//回调江湖救急接口
 		String delayDay = "7";
 		try {
-			riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+			orderService.repayWithCheack(dealcode,confirm.getRemittancechannel(),"对公转账",paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
 		} catch (IOException e) {
 			throw new ServiceException("订单接口回调失败, 网络异常",e);
 		}
@@ -302,6 +304,49 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.selectByIdForUpdate(id);
 	}
 
+
+	/**
+	 * 定时检查催收已确认还清, 但是江湖救急处理异常的订单, 尝试重新调用3次还清接口, 若还是不行发送邮件
+	 * 每6小时触发一次, 临时解决方案
+	 */
+	@Scheduled(cron = "0 0 */6 * * ?")
+	public void tryRepairAbnormalRemittanceConfirm() {
+		//查询对公入账异常订单
+		List<TMisRemittanceConfirm> abnormalRemittanceConfirm = this.findAbnormalRemittanceConfirm();
+		logger.info("对公交易状态异常订单:" + abnormalRemittanceConfirm.size() + "条");
+
+		//切换江湖救急库, 查询订单状态也为未还清的订单, 过滤未同步订单
+		List<String> shouldPayoffOrderDelcodes = new ArrayList<String>();
+		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
+			shouldPayoffOrderDelcodes.add(remittanceConfirm.getDealcode());
+		}
+
+		int successCount = 0;
+		StringBuilder failRepairMsg = new StringBuilder();
+		List<String> abnormalOrders = orderService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		logger.info("江湖救急对公交易状态异常订单:" + abnormalOrders.size() + "条,"+abnormalOrders);
+		if (abnormalOrders == null || abnormalOrders.size() == 0) {
+			return ;
+		}
+
+		//调用接口
+		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
+			if (!abnormalOrders.contains(remittanceConfirm.getDealcode())) {
+				continue;
+			}
+			boolean success = orderService.tryRepairAbnormalOrder(remittanceConfirm.getDealcode(), remittanceConfirm.getRemittancechannel(), remittanceConfirm.getRemark(), new BigDecimal(remittanceConfirm.getRemittanceamount()));
+			if (success) {
+				successCount++;
+				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
+				continue;
+			}
+			failRepairMsg.append("<p>订单号: "+remittanceConfirm.getDealcode()+", 手机号: "+remittanceConfirm.getMobile()+", 交易金额: "+remittanceConfirm.getRemittanceamount()+"</p>");
+		}
+		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
+
+		orderService.sendAbnormalOrderEmail("对公交易入账失败",failRepairMsg.toString());
+	}
+
 	/**
 	 * @Description 查询对公入账异常订单, 还款类型为还清, 汇款确认状态为finish, 但订单状态为未还清
 	 * @param
@@ -311,16 +356,4 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.findAbnormalRemittanceConfirm();
 	}
 
-	/**
-	 * @Description  查询江湖救急库异常订单
-	 * @param shouldPayoffOrderDelcodes
-	 * @return java.util.List<java.lang.String>
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<String> findAbnormalOrderFromRisk(List<String> shouldPayoffOrderDelcodes) {
-		if (shouldPayoffOrderDelcodes == null || shouldPayoffOrderDelcodes.size() == 0){
-			return new ArrayList<String>();
-		}
-		return dao.findPaymentOreder(shouldPayoffOrderDelcodes);
-	}
 }

@@ -526,7 +526,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			confirm.setRemittanceTag(remittanceTag);
 		}
 		//若还款类型为还清则判断  还款金额<应催金额
-		if (TMisRemittanceConfirm.PAYTYPE_LOAN.equals(paytype)){
+		if (DunningOrder.PAYTYPE_LOAN.equals(paytype)){
 			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
 				return "金额不匹配，入账失败";
 			}

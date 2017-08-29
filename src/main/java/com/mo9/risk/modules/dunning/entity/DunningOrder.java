@@ -24,6 +24,12 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public static final String STATUS_PAYOFF = "payoff"; //已还清
 	public static final String STATUS_PAYMENT = "payment";  //未还清
 
+	/**
+	 * 还款类型
+	 */
+	public static final String PAYTYPE_LOAN = "loan"; //还清
+	public static final String PAYTYPE_PARTIAL = "partial"; //部分还款
+
 	private Integer buyerid;
 	private String realname;// # 姓名
 	private String dealcode;// # 订单编号
