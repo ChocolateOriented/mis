@@ -43,7 +43,7 @@
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
-	<form id="listForm" method="post" action="${ctx}/dunning/demotable/demo" class="breadcrumb form-search">
+	-------------------------------------------------------------------------------------------
 		<ul class="ul-form">
 			<li><label>day：</label>
 				<input name="day" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
@@ -64,7 +64,12 @@
 			<li><label>cycyle：</label>
 				<select name="cycyle">
 					<option value =""></option>
-					<option value =""></option>
+					<option value ="Q0">Q0</option>
+					<option value ="Q1">Q1</option>
+					<option value ="Q2">Q2</option>
+					<option value ="Q3">Q3</option>
+					<option value ="Q4">Q4</option>
+					<option value ="Q5">Q5</option>
 				
 				</select>
 			</li>
@@ -74,11 +79,8 @@
   					<option value ="dealcodeamount">本金</option>
 				</select>
 			</li>
-			
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
-			<li class="clearfix"></li>
 		</ul>
-	</form>
+	
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
