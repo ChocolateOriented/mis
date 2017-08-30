@@ -43,6 +43,42 @@
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
+	<form id="listForm" method="post" action="${ctx}/dunning/demotable/demo" class="breadcrumb form-search">
+		<ul class="ul-form">
+			<li><label>day：</label>
+				<input name="day" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			</li>
+			<li><label>dealcodenum500：</label>
+				<input  type="text" name="dealcodenum500" value="" />
+			</li>
+			<li><label>dealcodenum1000：</label>
+				<input  type="text" name="dealcodenum1000" value="" />
+			</li>
+			<li><label>dealcodenum1500：</label>
+				<input  type="text" name="dealcodenum1500" value="" />
+			</li>
+			<li><label>dealcodenum2000：</label>
+				<input  type="text" name="dealcodenum2000" value="" />
+			</li>
+			<li><label>cycyle：</label>
+				<select name="cycyle">
+					<option value =""></option>
+					<option value =""></option>
+				
+				</select>
+			</li>
+			<li><label>dealcodetype：</label>
+				<select name="dealcodetype">
+					<option value ="dealcodenum">户数</option>
+  					<option value ="dealcodeamount">本金</option>
+				</select>
+			</li>
+			
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form>
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
