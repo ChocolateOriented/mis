@@ -722,7 +722,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			shouldPayoffOrderDelcodes.add(deduct.getDealcode());
 		}
 		int successCount = 0;
-		StringBuilder failRepairMsg = new StringBuilder();
 		List<String> abnormalOrders = orderService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
 		logger.info("江湖救急代扣状态异常订单:" + abnormalOrders.size() + "条",abnormalOrders);
 		if (abnormalOrders == null || abnormalOrders.size() == 0) {
@@ -730,11 +729,17 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		}
 
 		//调用接口
+		String remark = "代扣";
+		String paychannel = "bank";
+
 		for (TMisDunningDeduct deduct : abnormalDeducts) {
 			if (!abnormalOrders.contains(deduct.getDealcode())) {
 				continue;
 			}
-			boolean success = orderService.tryRepairAbnormalOrder(deduct.getDealcode(), "bank", "代扣", new BigDecimal(deduct.getPayamount()));
+			String dealcode = deduct.getDealcode();
+			BigDecimal payamount = new BigDecimal(deduct.getPayamount());
+
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel ,remark ,payamount );
 			if (success) {
 				successCount++;
 				//更新代扣
@@ -743,10 +748,9 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				logger.debug("代扣信息:" + deduct.getId() + "订单" + deduct.getDealcode() + "修复成功");
 				continue;
 			}
-			failRepairMsg.append("<p>订单号: "+deduct.getDealcode()+", 手机号: "+deduct.getMobile()+", 交易金额: "+deduct.getPayamount()+"</p>");
+			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
 		}
 		logger.info("代扣状态异常订单成功修复:" + successCount + "条");
-		orderService.sendAbnormalOrderEmail("代扣入账失败",failRepairMsg.toString());
 	}
 	/**
 	 * @Description 查询代扣异常订单, 扣款类型为全款, 扣款状态为成功, 但是订单状态为未还清

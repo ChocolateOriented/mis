@@ -248,11 +248,12 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-//		try {
+		try {
 			return orderService.repayWithCheack(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
-//		} catch (IOException e) {
-//			throw new ServiceException("订单接口回调失败, 网络异常",e);
-//		}
+		} catch (IOException e) {
+			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,remittanceamount,"网络异常:"+e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -287,11 +288,15 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		String delayDay = "7";
-//		try {
-			orderService.repayWithCheack(dealcode,confirm.getRemittancechannel(),"对公转账",paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
-//		} catch (IOException e) {
-//			throw new ServiceException("订单接口回调失败, 网络异常",e);
-//		}
+		String remark = "对公转账";
+		String paychannel = confirm.getRemittancechannel();
+		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
+		try {
+			orderService.repayWithCheack(dealcode,paychannel,remark,paidType,payamount,delayDay);
+		} catch (IOException e) {
+			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,payamount,"网络异常:"+e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -322,7 +327,6 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 
 		int successCount = 0;
-		StringBuilder failRepairMsg = new StringBuilder();
 		List<String> abnormalOrders = orderService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
 		logger.info("江湖救急对公交易状态异常订单:" + abnormalOrders.size() + "条,"+abnormalOrders);
 		if (abnormalOrders == null || abnormalOrders.size() == 0) {
@@ -330,21 +334,27 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 
 		//调用接口
+		String remark = "对公转账";
+
 		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
 			if (!abnormalOrders.contains(remittanceConfirm.getDealcode())) {
 				continue;
 			}
-			boolean success = orderService.tryRepairAbnormalOrder(remittanceConfirm.getDealcode(), remittanceConfirm.getRemittancechannel(), remittanceConfirm.getRemark(), new BigDecimal(remittanceConfirm.getRemittanceamount()));
+			String dealcode = remittanceConfirm.getDealcode();
+			String paychannel = remittanceConfirm.getRemittancechannel();
+			BigDecimal payamount = new BigDecimal(remittanceConfirm.getRemittanceamount());
+
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,remark ,payamount);
 			if (success) {
 				successCount++;
 				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
 				continue;
 			}
-			failRepairMsg.append("<p>订单号: "+remittanceConfirm.getDealcode()+", 手机号: "+remittanceConfirm.getMobile()+", 交易金额: "+remittanceConfirm.getRemittanceamount()+"</p>");
+
+			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
 		}
 		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
 
-		orderService.sendAbnormalOrderEmail("对公交易入账失败",failRepairMsg.toString());
 	}
 
 	/**

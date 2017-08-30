@@ -107,23 +107,23 @@ public class TMisDunningOrderService extends BaseService{
 
 	/**
 	 * @Description 发送订单异常邮件
-	 * @param subject
-	 * @param failRepairMsg
 	 * @return void
 	 */
-	public void sendAbnormalOrderEmail(String subject, String failRepairMsg) {
-		//若有未修复异常订单则发送邮件
-		if (failRepairMsg.length() == 0){
-			return;
-		}
+	public void sendAbnormalOrderEmail(String remark,String paychannel, String dealcode,BigDecimal payamount ,String reason) {
+		String subject = paychannel+ remark + "入账失败-"+dealcode ;
+		StringBuilder failRepairMsg = new StringBuilder();
+		failRepairMsg.append("<p>订单号: "+dealcode+", 交易金额: "+payamount.toString()+"</p>");
+		failRepairMsg.append("<p>原因</p>");
+		failRepairMsg.append("<p>"+reason+"</p>");
+
 		String receiver = DictUtils.getDictValue("abnormal_orders_receiver", "sys_email", "");
 		if (StringUtils.isBlank(receiver)){
-			logger.warn(subject+"发送失败, 未配置收件人邮箱");
+			logger.info(subject+"邮件发送失败, 未配置收件人邮箱");
 			return;
 		}
 		MailSender mailSender = new MailSender(receiver);
 		mailSender.setSubject(subject + DateUtils.getDate());
-		mailSender.setContent(failRepairMsg);
+		mailSender.setContent(failRepairMsg.toString());
 		//发送
 		try {
 			mailSender.sendMail();
@@ -133,7 +133,7 @@ public class TMisDunningOrderService extends BaseService{
 	}
 
 	/**
-	 * @Description 尝试通过回调接口修复异常订单
+	 * @Description 尝试通过回调接口修复应还清的异常订单
 	 * @param dealcode
 	 * @param remittancechannel
 	 * @param remark
@@ -144,7 +144,7 @@ public class TMisDunningOrderService extends BaseService{
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
 				orderManager.repay(dealcode, remittancechannel, remark, DunningOrder.PAYTYPE_LOAN, remittanceamount, "7");
-			} catch (Exception e) {
+			}catch (Exception e) {
 				continue;
 			}
 			//调用成功查看订单状态是否改变
@@ -219,14 +219,14 @@ public class TMisDunningOrderService extends BaseService{
 		if (after == null){
 			return result;
 		}
-		String subject = remark + paychannel + "入账失败-"+dealcode;
-		//还清订单检查新单状态
+		//还清订单检查状态
+		String reason = "调用江湖救急接口后, 订单未发生变化";
 		if (DunningOrder.PAYTYPE_LOAN.equals(paytype) && !DunningOrder.STATUS_PAYOFF.equals(after.getStatus())){
-			this.sendAbnormalOrderEmail(subject, "订单号: "+dealcode+", 交易金额: "+payamount.toString());
+			this.sendAbnormalOrderEmail(remark, paychannel,dealcode,payamount ,reason);
 		}
 		//部分还款检查应还金额
 		if (DunningOrder.PAYTYPE_PARTIAL.equals(paytype) && before!=null && before.getRemainAmmount()!=null && before.getRemainAmmount().equals(after.getRemainAmmount())){
-			this.sendAbnormalOrderEmail(subject,"订单号: "+dealcode+", 交易金额: "+payamount.toString());
+			this.sendAbnormalOrderEmail(remark, paychannel,dealcode,payamount ,reason);
 		}
 		return result;
 	}
