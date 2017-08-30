@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.DemotableDao">
+    
+	<sql id="demotableColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.dealcodenum AS "dealcodenum",
+		a.dealcodeamount AS "dealcodeamount",
+		a.datetime AS "datetime"
+	</sql>
+	
+	<sql id="demotableJoins">
+	</sql>
+    
+	<select id="get" resultType="Demotable">
+		SELECT 
+			<include refid="demotableColumns"/>
+		FROM demotable a
+		<include refid="demotableJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Demotable">
+		SELECT 
+			<include refid="demotableColumns"/>
+		FROM demotable a
+		<include refid="demotableJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="dealcodenum != null and dealcodenum != ''">
+				AND a.dealcodenum = #{dealcodenum}
+			</if>
+			<if test="dealcodeamount != null and dealcodeamount != ''">
+				AND a.dealcodeamount = #{dealcodeamount}
+			</if>
+			<if test="datetime != null and datetime != ''">
+				AND a.datetime = #{datetime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Demotable">
+		SELECT 
+			<include refid="demotableColumns"/>
+		FROM demotable a
+		<include refid="demotableJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO demotable(
+			name,
+			dealcodenum,
+			dealcodeamount,
+			datetime
+		) VALUES (
+			#{name},
+			#{dealcodenum},
+			#{dealcodeamount},
+			#{datetime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE demotable SET 	
+			name = #{name},
+			dealcodenum = #{dealcodenum},
+			dealcodeamount = #{dealcodeamount},
+			datetime = #{datetime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM demotable
+		WHERE id = #{id}
+	</update>
+	
+	<insert id="batchinsertDemotable">
+		INSERT INTO demotable(
+			name,
+			dealcodenum,
+			dealcodeamount,
+			datetime,
+			peopleId
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+		 (
+			#{item.name},
+			#{item.dealcodenum},
+			#{item.dealcodeamount},
+			#{item.datetime},
+			#{item.peopleId}
+		)
+		</foreach>
+	</insert>
+	
+	<select id="findPeopleByDemo" resultType="Demotable" >
+		SELECT 
+			a.Id as id,
+			a.name as name,
+			SUM(IFNULL(d.dealcodeNum,0)) as dealcodenum,
+			SUM(IFNULL(d.dealcodeAmount,0)) as dealcodeamount,
+			d.datetime as datetime
+		FROM t_mis_dunning_people a
+		LEFT JOIN demotable d on d.peopleId = a.Id 
+		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
+		and a.Invalid = 't' 
+		and a.auto = 't'
+		GROUP BY a.Id
+		ORDER BY #{dealcodetype},a.Id 
+	</select>
+	
+</mapper>
