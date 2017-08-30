@@ -43,6 +43,44 @@
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
+	-------------------------------------------------------------------------------------------
+		<ul class="ul-form">
+			<li><label>day：</label>
+				<input name="day" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			</li>
+			<li><label>dealcodenum500：</label>
+				<input  type="text" name="dealcodenum500" value="" />
+			</li>
+			<li><label>dealcodenum1000：</label>
+				<input  type="text" name="dealcodenum1000" value="" />
+			</li>
+			<li><label>dealcodenum1500：</label>
+				<input  type="text" name="dealcodenum1500" value="" />
+			</li>
+			<li><label>dealcodenum2000：</label>
+				<input  type="text" name="dealcodenum2000" value="" />
+			</li>
+			<li><label>cycyle：</label>
+				<select name="cycyle">
+					<option value =""></option>
+					<option value ="Q0">Q0</option>
+					<option value ="Q1">Q1</option>
+					<option value ="Q2">Q2</option>
+					<option value ="Q3">Q3</option>
+					<option value ="Q4">Q4</option>
+					<option value ="Q5">Q5</option>
+				
+				</select>
+			</li>
+			<li><label>dealcodetype：</label>
+				<select name="dealcodetype">
+					<option value ="dealcodenum">户数</option>
+  					<option value ="dealcodeamount">本金</option>
+				</select>
+			</li>
+		</ul>
+	
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
