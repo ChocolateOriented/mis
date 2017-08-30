@@ -219,13 +219,15 @@ public class TMisDunningOrderService extends BaseService{
 		if (after == null){
 			return result;
 		}
-		//还清订单检查状态
 		String reason = "调用江湖救急接口后, 订单未发生变化";
-		if (DunningOrder.PAYTYPE_LOAN.equals(paytype) && !DunningOrder.STATUS_PAYOFF.equals(after.getStatus())){
-			this.sendAbnormalOrderEmail(remark, paychannel,dealcode,payamount ,reason);
-		}
+		//还清订单检查状态
+		boolean loanOrderChanged = DunningOrder.PAYTYPE_LOAN.equals(paytype) && DunningOrder.STATUS_PAYOFF.equals(after.getStatus());
 		//部分还款检查应还金额
-		if (DunningOrder.PAYTYPE_PARTIAL.equals(paytype) && before!=null && before.getRemainAmmount()!=null && before.getRemainAmmount().equals(after.getRemainAmmount())){
+		boolean partialOrderChanged = DunningOrder.PAYTYPE_PARTIAL.equals(paytype) && before!=null && before.getRemainAmmount()!=null && !before.getRemainAmmount().equals(after.getRemainAmmount());
+		boolean orderChanged = loanOrderChanged || partialOrderChanged;
+
+		//订单没有改变则发送邮件
+		if (!orderChanged){
 			this.sendAbnormalOrderEmail(remark, paychannel,dealcode,payamount ,reason);
 		}
 		return result;

@@ -350,11 +350,9 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
 				continue;
 			}
-
 			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
 		}
 		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
-
 	}
 
 	/**
