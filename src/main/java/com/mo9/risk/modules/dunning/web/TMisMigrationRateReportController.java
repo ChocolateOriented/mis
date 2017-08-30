@@ -140,6 +140,21 @@ public class TMisMigrationRateReportController extends BaseController {
 //		addMessage(redirectAttributes, "删除迁徙率成功");
 //		return "redirect:"+Global.getAdminPath()+"/dunning/tMisMigrationRateReport/?repage";
 //	}
+	 public DefaultCategoryDataset createDataset2() {
+	        // 标注类别
+	        String[] categories = { "哈哈", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	        List<TMisMigrationRateMail> series = new ArrayList<TMisMigrationRateMail>();
+	        List<BigDecimal> list=new ArrayList<BigDecimal>();
+	        list.add(new BigDecimal(20.75));
+	        list.add(new BigDecimal(20.25));
+	        list.add(new BigDecimal(20.15));
+	        list.add(new BigDecimal(20.54));
+	        // 柱子名称：柱子所有的值集合
+	        series.add(new TMisMigrationRateMail("Tokyo", list));
+	        // 1：创建数据集合
+	        DefaultCategoryDataset dataset = TMisMigrationRateReportController.createDefaultCategoryDataset(series, categories);
+	        return dataset;
+	    }
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -160,7 +175,7 @@ public class TMisMigrationRateReportController extends BaseController {
 	public ChartPanel createChart() {
         // 2：创建Chart[创建不同图形]
         JFreeChart chart =  ChartFactory.createLineChart("", "X轴", "Y轴",  
-        		createDataset(), PlotOrientation.VERTICAL, true, true, false); 
+        		createDataset2(), PlotOrientation.VERTICAL, true, true, false); 
         return null;
     }
 	public DefaultCategoryDataset createDataset() {

@@ -35,6 +35,17 @@ public class TMisMigrationRateMail  {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public TMisMigrationRateMail() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public TMisMigrationRateMail(String name, List<BigDecimal> data) {
+		super();
+		this.name = name;
+		this.data = data;
+	}
 	
 	
 	
