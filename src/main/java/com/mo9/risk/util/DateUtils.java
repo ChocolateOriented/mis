@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 日期工具类, 继承org.apache.commons.lang.time.DateUtils类
@@ -17,6 +19,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
  * @version 2014-4-15
  */
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+	protected static Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
 	private static String[] parsePatterns = { "yyyy-MM-dd",
 			"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM", "yyyy/MM/dd",
@@ -194,7 +197,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 			date = df.parse(df.format(new Date(date.getTime() + 24 * 60 * 59
 					* 1000)));
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.info("解析时间发生错误",e);
 		}
 		return date;
 	}

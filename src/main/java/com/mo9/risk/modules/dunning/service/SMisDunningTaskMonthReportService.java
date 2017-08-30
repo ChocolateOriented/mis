@@ -123,7 +123,7 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 		try {
 			mailSender.sendMail();
 			logger.debug("月报邮件发送成功");
-		} catch (MessagingException e) {
+		} catch (Exception e) {
 			logger.warn("月报表自动邮件发送失败", e);
 		}
 	}

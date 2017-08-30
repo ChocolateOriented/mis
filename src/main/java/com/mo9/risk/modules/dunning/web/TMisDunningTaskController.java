@@ -335,7 +335,7 @@ public class TMisDunningTaskController extends BaseController {
 			String message =  tMisContantRecordService.getDunningSmsTemplate("【XXX】" ,new DunningOrder("xxx", 0D, 0), DunningSmsTemplate.valueOf(smsTemplate));
 			return message;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		}
 		return null;
 	}
@@ -612,7 +612,7 @@ public class TMisDunningTaskController extends BaseController {
                     bool = true;
                 } catch (Exception e) {
                     // TODO: handle exception
-                    e.printStackTrace();
+									logger.info("",e);
                 }finally {
                     //不要忘记关闭
                     if (pw != null) {
@@ -633,7 +633,7 @@ public class TMisDunningTaskController extends BaseController {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+					logger.info("",e);
         }
 		return bool;
 	};
@@ -730,7 +730,7 @@ public class TMisDunningTaskController extends BaseController {
 //			model.addAttribute("orders", orders);
 			model.addAttribute("dunningcycle", dunningcycle);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogDistribution";
@@ -845,7 +845,7 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			tMisDunningTaskService.autoAssign();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return e.getMessage().toString();
 		}
 		addMessage(redirectAttributes, "自动分配成功");
@@ -866,7 +866,7 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			tMisDunningTaskService.autoAssignNewOrder();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return e.getMessage().toString();
 		}
 		addMessage(redirectAttributes, "新订单任务");
@@ -887,7 +887,7 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			tMisDunningTaskService.autoRepayment();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return e.getMessage().toString();
 		}
 		addMessage(redirectAttributes, "自动扫描还款");
@@ -1071,7 +1071,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("score", score);
 		} catch (Exception e) {
 			model.addAttribute("score", "评分显示失败");
-			e.printStackTrace();
+			logger.info("评分显示失败",e);
 		}
 		
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
@@ -1193,7 +1193,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dunningCycle", dunningCycle);
 			model.addAttribute("overdueDays", overdueDays);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return "error";
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
@@ -1405,7 +1405,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dunningCycle", dunningCycle);
 			model.addAttribute("overdueDays", overdueDays);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		}
 		return "modules/dunning/tAppLoginLogList";
 	}
@@ -1674,7 +1674,7 @@ public class TMisDunningTaskController extends BaseController {
 //			System.out.println(appLoginLogs.size());
 			tMisDunningTaskService.updateOrderModifyAmount(dealcode, amount);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 			return "error";
 			
 		} finally {
@@ -2026,7 +2026,7 @@ public class TMisDunningTaskController extends BaseController {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.info("",e);
 		}
 		
 		if(StringUtils.isNotBlank(payUrl)){
@@ -2103,7 +2103,7 @@ public class TMisDunningTaskController extends BaseController {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.info("",e);
 		}
 		
 		if(StringUtils.isNotBlank(datas)){
@@ -2179,7 +2179,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		}
 		return "modules/dunning/performanceMonthReportList";
 	}

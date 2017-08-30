@@ -1107,7 +1107,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						//逾期天数
 						overDueDays = daysBetween(repaymentTime, nowDate);
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.info(e);
 					}
 				}else{
 					logger.info("错误，催收任务为null");
@@ -1256,7 +1256,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 				logger.info("redis清理已还清通话记录完成:" + new Date());
 			} catch (Exception e) {
-				e.printStackTrace();
 				logger.warn("redis清理已还清通话记录异常", e);
 			}
 		}
@@ -3142,7 +3141,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			Date Yesterday = TMisMigrationRateReportService.getDate(-1);
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(Yesterday);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info(e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}

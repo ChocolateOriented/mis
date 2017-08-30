@@ -437,7 +437,7 @@ public class TMisMigrationRateReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			tMisMigrationRateReportService.autoInsertTmpMoveCycleDB();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
@@ -455,7 +455,7 @@ public class TMisMigrationRateReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			tMisMigrationRateReportService.autoMigrationRateGetData();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
@@ -472,7 +472,7 @@ public class TMisMigrationRateReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(yesterday);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("",e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
@@ -501,7 +501,7 @@ public class TMisMigrationRateReportController extends BaseController {
 				date = c.getTime();
 			}
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.info("",e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}

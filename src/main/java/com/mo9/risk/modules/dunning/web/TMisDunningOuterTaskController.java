@@ -202,7 +202,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("加载委外手动分配页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOutDistribution";

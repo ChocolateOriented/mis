@@ -86,7 +86,7 @@ public class TMisContantRecordController extends BaseController {
 			List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,type.toLowerCase());
 			return list;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info(e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}

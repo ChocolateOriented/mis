@@ -180,7 +180,7 @@ public class TMisDunningPeopleController extends BaseController {
 		try {
 			model.addAttribute("peopleids", peopleids);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("加载手动分配页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogDunningcycle";
@@ -207,7 +207,7 @@ public class TMisDunningPeopleController extends BaseController {
 			}
 			tMisDunningPeopleService.batchUpdateDunningcycle(ids, UserUtils.getUser().getId(), dunningcycle);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("手动分配发生错误",e);
 		}
 		return "OK";
 	}
