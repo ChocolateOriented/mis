@@ -135,6 +135,10 @@
 			$("#changeBankcard").prop("disabled", true);
 			$("#butnSms").prop("disabled", true);
 			$("#butnIdCardImg").prop("disabled", true);
+			
+			var tags = $("#tags").children("div");
+			tags.children("#editTag").remove();
+			tags.children("#closeTag").remove();
 		}
 		
 		function getBuyerIdCardImg() {
@@ -229,8 +233,8 @@
 			<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
 				<span id="title" style="margin:0px 3px 0px 3px;">${tag.tagtype.desc}</span>
 				<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-					<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
-					<span onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
+					<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+					<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 				</shiro:hasPermission>
 				<div class="suspense" style="display:none;" tabindex="0">
 					<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>
@@ -246,8 +250,8 @@
 		<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">
 			<span id="title" style="margin:0px 3px 0px 3px;"></span>
 			<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-				<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
-				<span onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
+				<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+				<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 			</shiro:hasPermission>
 			<div class="suspense" style="display:none;" tabindex="0">
 				<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>
