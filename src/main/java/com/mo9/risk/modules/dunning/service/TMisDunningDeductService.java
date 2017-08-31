@@ -709,7 +709,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	 * @param
 	 * @return java.util.List<java.lang.String>
 	 */
-	@Scheduled(cron = "0 0 */6 * * ?")
+	@Scheduled(cron = "0 0 5,11,17,23 * * ?")
 	@Transactional
 	public void tryRepairAbnormalDeduct() {
 		//查询代扣异常订单
