@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.test;
+package com.mo9.risk.util;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -46,6 +46,8 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
+
+import com.mo9.risk.modules.dunning.entity.TMisMigrateMail;
 
 /**
  * Jfreechart工具类
@@ -142,10 +144,10 @@ public class ChartUtils {
     /**
      * 创建类别数据集合
      */
-    public static DefaultCategoryDataset createDefaultCategoryDataset(List<Serie> series, String[] categories) {
+    public static DefaultCategoryDataset createDefaultCategoryDataset(List<TMisMigrateMail> series, String[] categories) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        for (Serie serie : series) {
+        for (TMisMigrateMail serie : series) {
             String name = serie.getName();
             List<Object> data = serie.getData();
             if (data != null && categories != null && data.size() == categories.length) {

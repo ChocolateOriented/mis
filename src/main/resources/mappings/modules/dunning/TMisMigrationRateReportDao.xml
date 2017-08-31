@@ -925,4 +925,52 @@
 	
 	
 	</select>
+	<!-- 新图表的数据查询	 -->
+	<select id="newfindMigrateChartList" resultType="TMisMigrationRateReport">
+	
+	SELECT
+		 
+		a.datetime AS "datetime",
+		<if test="migrate=='cp1new'">
+		a.cp1new*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp2new'">
+		a.cp2new*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp3new'">
+		a.cp3new*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp4new'">
+		a.cp4new*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp1corpus'">
+		a.cp1corpus*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp2corpus'">
+		a.cp2corpus*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp3corpus'">
+		a.cp3corpus*100 AS "cpvalue",
+		</if>
+		<if test="migrate=='cp4corpus'">
+		a.cp4corpus*100 AS "cpvalue",
+		</if>
+		c.datetime_start AS "datetimeStart",
+		c.datetime_end AS "datetimeEnd"
+	FROM
+		tmp_move_cycle c
+	inner JOIN `t_mis_migration_rate_report` a ON a.Cycle = c.cycle  INNER
+	join (
+	SELECT
+		cycle
+	FROM
+		`tmp_move_cycle`
+	ORDER BY
+		cycle DESC
+	LIMIT #{cycleNum}
+		) t on t.cycle = a.cycle
+	ORDER BY  a.cycle desc,a.DateTime ASC
+	
+	
+	</select>
 </mapper>

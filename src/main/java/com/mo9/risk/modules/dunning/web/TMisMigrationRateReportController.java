@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,10 +39,13 @@ import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.alibaba.fastjson.JSON;
+import com.mo9.risk.modules.dunning.entity.TMisMigrateMail;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
 import com.mo9.risk.modules.dunning.service.TMisMigrationRateReportService;
+import com.mo9.risk.util.ChartUtils;
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.Static;
 
 /**
  * 迁徙率Controller
@@ -414,6 +418,66 @@ public class TMisMigrationRateReportController extends BaseController {
 		migrationData.put("smdList4", smdList4);
 		
 		return migrationData;
+	}
+	/**
+	 * 
+	 * @param tmMigrationRateReport 必须合理指定该对象的cyclenum 长度和migrate的值
+	 * @return 
+	 */
+	public   List<TMisMigrateMail>  getCycleData(TMisMigrationRateReport tmMigrationRateReport){
+        
+		if(tmMigrationRateReport.getCycleNum()>5||tmMigrationRateReport.getCycleNum()<2){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		List<TMisMigrationRateReport> migrateList;
+		try{
+			
+			migrateList = tMisMigrationRateReportService.findMigrateChartList(tmMigrationRateReport);
+		}finally{
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		if(null==migrateList){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+        List<TMisMigrateMail> series = new ArrayList<TMisMigrateMail>();
+        // 柱子名称：柱子所有的值集合
+        int z=0;
+        SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+        for (int i = 0; i < tmMigrationRateReport.getCycleNum(); i++) {
+			
+        	List<Object> data= new ArrayList<Object>(16);
+        	int y=0;
+	        while( true) {
+	        	//每个周期的第一个数据肯定保存起来
+				if(y==0){
+					BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
+					data.add(bigDecimal.doubleValue());
+				}
+				//关于第二个数据就要判断是否是和之前一个是同一个周期.不是跳出内循环.
+				if(y>0){
+					if(migrateList.get(z).getCycle().equals(migrateList.get(z-1).getCycle())){
+						//周期相同是同一个周期
+						BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
+						data.add(bigDecimal.doubleValue());
+					}else{
+						//不是同一个周期,封装对象,添加到集合
+						TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
+						tMisMigrateMail.setData(data);
+						String start = sd.format(migrateList.get(z-1).getDatetimeStart());
+						String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
+						tMisMigrateMail.setName(start+"-"+end);
+						series.add(tMisMigrateMail);
+						break;
+					}
+				}
+				y++;
+				z++;
+			}
+        }
+        return series;
 	}
 	
 	/**

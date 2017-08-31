@@ -495,4 +495,9 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		return tMisMigrationRateReportDao.findMigrateChartList(tMisMigrationRateReport);
 	}
 	
+	public List<TMisMigrationRateReport> newfindMigrateChartList(TMisMigrationRateReport tMisMigrationRateReport){
+		
+		return tMisMigrationRateReportDao.newfindMigrateChartList(tMisMigrationRateReport);
+	}
+	
 }

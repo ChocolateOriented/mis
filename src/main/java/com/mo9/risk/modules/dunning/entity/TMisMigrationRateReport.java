@@ -42,7 +42,27 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 	private BigDecimal cp3;//图表查询字段
 	private BigDecimal cp4;//图表查询字段
 	private String migrate;//图表查询字段
+	private  Integer cycleNum;//查询的周期数
 	
+	private BigDecimal cpvalue; //新图表查询字段 
+	
+	
+	public BigDecimal getCpvalue() {
+		return cpvalue;
+	}
+
+	public void setCpvalue(BigDecimal cpvalue) {
+		this.cpvalue = cpvalue;
+	}
+
+	public Integer getCycleNum() {
+		return cycleNum;
+	}
+
+	public void setCycleNum(Integer cycleNum) {
+		this.cycleNum = cycleNum;
+	}
+
 	public String getMigrate() {
 		return migrate;
 	}
