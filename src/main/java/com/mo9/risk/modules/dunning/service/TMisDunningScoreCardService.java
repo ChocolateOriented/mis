@@ -113,9 +113,10 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 			String dealcode = order.getDealcode();
 			String buyerId = String.valueOf(order.getBuyerid());
 			String orderId = order.getId();
+			boolean oldOrder = order.getFirstOrder() == null ? false : !order.getFirstOrder();
 			
 			try {
-				String result = riskOrderManager.scApplicationCol(mobile, dealcode, buyerId, orderId);
+				String result = riskOrderManager.scApplicationCol(mobile, dealcode, buyerId, orderId, oldOrder);
 				if (null == result || "".equals(result)) {
 					logger.info("获取评分数据无效，订单号" + dealcode);
 					continue;

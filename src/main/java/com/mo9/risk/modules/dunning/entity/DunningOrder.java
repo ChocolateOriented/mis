@@ -98,6 +98,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date beginlatestlogintime;	//最近登录时间
 	private Date endlatestlogintime;	//最近登录时间
 	
+	private Boolean firstOrder;		//初次订单
+	
 	public String getPlatformExt() {
 		return platformExt;
 	}
@@ -571,6 +573,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setEndlatestlogintime(Date endlatestlogintime) {
 		this.endlatestlogintime =  null != endlatestlogintime ? DateUtils.endDate(endlatestlogintime) : endlatestlogintime;
+	}
+
+	public Boolean getFirstOrder() {
+		return firstOrder;
+	}
+
+	public void setFirstOrder(Boolean firstOrder) {
+		this.firstOrder = firstOrder;
 	}
 
 }
