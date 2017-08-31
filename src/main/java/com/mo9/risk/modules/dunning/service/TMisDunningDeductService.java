@@ -433,7 +433,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	@Scheduled(cron = "0 0/30 * * * ?")
 	@Transactional(readOnly = false)
 	public void querySubmittedDeductStatus() {
-		List<TMisDunningDeduct> deductRecords = tMisDunningDeductDao.getDeductListByStatus("submitted");
+		List<TMisDunningDeduct> deductRecords = tMisDunningDeductDao.getSubmittedDeductList();
 		
 		if (deductRecords == null || deductRecords.size() == 0) {
 			return;

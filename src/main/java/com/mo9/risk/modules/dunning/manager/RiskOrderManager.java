@@ -67,8 +67,11 @@ public class RiskOrderManager {
 //	https://riskclone.mo9.com/scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile={{mobile}}&dealcode={{dealcode}}&buyerId={{buyerId}}&orderId={{orderId}}&old=true
 	/**
 	 * @Description 江湖救急评分卡接口
+	 * @param mobile 手机号
 	 * @param dealcode 订单号
-	 * @return java.lang.String 成功信息
+	 * @param buyerId 用户id
+	 * @param orderId 订单id
+	 * @return java.lang.String 评分
 	 */
 	public String scApplicationCol(String mobile, String dealcode, String buyerId, String orderId) throws IOException {
 
