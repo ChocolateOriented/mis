@@ -8,10 +8,18 @@
 		$(document).ready(function() {
 			
 			$("#demoBut").click(function(){
+		 	var	day=$("#day").val();
+		 	var	dealcodenum500=$("#dealcodenum500").val();
+		 	var	dealcodenum1000=$("#dealcodenum1000").val();
+		 	var	dealcodenum1500=$("#dealcodenum1500").val();
+		 	var	dealcodenum2000=$("#dealcodenum2000").val();
+		 	var	cycle=$("#cycle").val();
+		 	var	dealcodetype=$("#dealcodetype").val();
 				$.ajax({
 					url:"${ctx}/dunning/demotable/demo",
 					type:"POST",
-					data:{val1:"1",val2:"2"},
+					data:{day:day,dealcodenum500:dealcodenum500,dealcodenum1000:dealcodenum1000,dealcodenum1500:dealcodenum1500,
+						dealcodenum2000:dealcodenum2000,cycle:cycle,dealcodetype:dealcodetype},
 					success:function(data){
 						top.$.jBox.tip("分案完成");
 					},
@@ -44,7 +52,11 @@
 				
 // 			 });
 			
+		 $("#empty").click(function(){
+    		 window.location.href="${ctx}/dunning/demotable/delete";
+		 }); 
 		});
+			
 		function page(n,s){
 			$("#pageNo").val(n);
 			$("#pageSize").val(s);
@@ -77,28 +89,29 @@
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+				<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
 	<ul class="ul-form">
 		<li><label>分案日期：</label>
-			<input name="day" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+			<input id="day" name="day" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 		</li>
 		<li><label>500户数：</label>
-			<input  type="text" name="dealcodenum500" value="" />
+			<input  id="dealcodenum500" type="text" name="dealcodenum500" value="" />
 		</li>
 		<li><label>1000户数：</label>
-			<input  type="text" name="dealcodenum1000" value="" />
+			<input  id="dealcodenum1000" type="text" name="dealcodenum1000" value="" />
 		</li>
 		<li><label>1500户数：</label>
-			<input  type="text" name="dealcodenum1500" value="" />
+			<input  id="dealcodenum1500" type="text" name="dealcodenum1500" value="" />
 		</li>
 		<li><label>2000户数：</label>
-			<input  type="text" name="dealcodenum2000" value="" />
+			<input  id="dealcodenum2000" type="text" name="dealcodenum2000" value="" />
 		</li>
 		<li><label>周期：</label>
-			<select name="cycyle">
+			<select id="cycle" name="cycyle">
 				<option value ="Q0">Q0</option>
 				<option value ="Q1">Q1</option>
 				<option value ="Q2">Q2</option>
@@ -108,7 +121,7 @@
 			</select>
 		</li>
 		<li><label>周期平均形式：</label>
-			<select name="dealcodetype">
+			<select id="dealcodetype" name="dealcodetype">
 				<option value ="dealcodenum">户数</option>
  					<option value ="dealcodeamount">本金</option>
 			</select>
