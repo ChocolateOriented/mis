@@ -50,6 +50,8 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	private String finProduct;//借款的金融产品
 	private Integer rpayStatus;//还款日期；1表示还款前一天，0表示还款当天。
 	
+	private String imgFiled3;//影像资料3
+	private String imgFiled4;//影像资料4
 	
 	public String getFinProduct() {
 		return finProduct;
@@ -318,7 +320,21 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	public void setRepaymentAmount(String repaymentAmount) {
 		this.repaymentAmount = repaymentAmount;
 	}
-	
-	
+
+	public String getImgFiled3() {
+		return imgFiled3;
+	}
+
+	public void setImgFiled3(String imgFiled3) {
+		this.imgFiled3 = imgFiled3;
+	}
+
+	public String getImgFiled4() {
+		return imgFiled4;
+	}
+
+	public void setImgFiled4(String imgFiled4) {
+		this.imgFiled4 = imgFiled4;
+	}
 
 }

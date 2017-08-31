@@ -50,11 +50,11 @@ public interface TMisDunningDeductDao extends CrudDao<TMisDunningDeduct> {
 	public List<PayChannelInfo> getSuccessRateByChannel(String paychannel);
 	
 	/**
-	 * 根据状态获取扣款记录
+	 * 获取已提交的扣款记录
 	 * @param status
 	 * @return
 	 */
-	public List<TMisDunningDeduct> getDeductListByStatus(String status);
+	public List<TMisDunningDeduct> getSubmittedDeductList();
 	
 	/**
 	 * 根据订单号查询最新的扣款记录
