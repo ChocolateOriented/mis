@@ -857,7 +857,16 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = "orderSync")
 	@ResponseBody
 	public String orderSync( RedirectAttributes redirectAttributes) {
-		orderService.checkAbnormalOrder();
+		try {
+			tMisDunningDeductService.tryRepairAbnormalDeduct();
+		}catch (Exception e){
+			logger.info("代扣异常订单修复发生错误",e);
+		}
+		try {
+			tMisRemittanceConfirmService.tryRepairAbnormalRemittanceConfirm();
+		}catch (Exception e){
+			logger.info("对公还款异常订单修复发生错误",e);
+		}
 		addMessage(redirectAttributes, "异常订单同步");
 		return "OK";
 	}

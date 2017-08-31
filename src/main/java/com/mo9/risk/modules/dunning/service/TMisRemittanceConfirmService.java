@@ -6,7 +6,6 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 2016-09-12
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConfirmDao, TMisRemittanceConfirm> {
 
@@ -37,7 +39,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private TMisRemittanceConfirmLogService tMisRemittanceConfirmLogService;
 	@Autowired
-	private RiskOrderManager riskOrderManager ;
+	private TMisDunningOrderService orderService ;
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 
@@ -223,7 +225,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return java.lang.String
 	 */
 	@Transactional
-	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) {
+	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
 		String remark = paid.getRemark();
@@ -247,9 +249,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		try {
-			return riskOrderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
+			return orderService.repayWithCheack(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 		} catch (IOException e) {
-			throw new ServiceException("订单接口回调失败, 网络异常",e);
+			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,remittanceamount,"网络异常:"+e.getMessage());
+			throw e;
 		}
 	}
 
@@ -259,7 +262,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * @return void
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void auditConfrim (TMisRemittanceConfirm confirm){
+	public void auditConfrim (TMisRemittanceConfirm confirm) throws IOException {
 		//数据库加行锁控制并发
 		logger.debug("正在获取锁TMisRemittanceConfirm:"+confirm.getId());
 		TMisRemittanceConfirm lockedConfirm = this.getLockedRemittanceConfirm(confirm.getId());
@@ -285,10 +288,14 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		String delayDay = "7";
+		String remark = "对公转账";
+		String paychannel = confirm.getRemittancechannel();
+		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
 		try {
-			riskOrderManager.repay(dealcode,confirm.getRemittancechannel(),confirm.getRemark(),paidType, new BigDecimal(confirm.getRemittanceamount()),delayDay);
+			orderService.repayWithCheack(dealcode,paychannel,remark,paidType,payamount,delayDay);
 		} catch (IOException e) {
-			throw new ServiceException("订单接口回调失败, 网络异常",e);
+			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,payamount,"网络异常:"+e.getMessage());
+			throw e;
 		}
 	}
 
@@ -302,6 +309,52 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.selectByIdForUpdate(id);
 	}
 
+
+	/**
+	 * 定时检查催收已确认还清, 但是江湖救急处理异常的订单, 尝试重新调用3次还清接口, 若还是不行发送邮件
+	 * 每6小时触发一次, 临时解决方案
+	 */
+	@Scheduled(cron = "0 0 */6 * * ?")
+	public void tryRepairAbnormalRemittanceConfirm() {
+		//查询对公入账异常订单
+		List<TMisRemittanceConfirm> abnormalRemittanceConfirm = this.findAbnormalRemittanceConfirm();
+		logger.info("对公交易状态异常订单:" + abnormalRemittanceConfirm.size() + "条");
+
+		//切换江湖救急库, 查询订单状态也为未还清的订单, 过滤未同步订单
+		List<String> shouldPayoffOrderDelcodes = new ArrayList<String>();
+		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
+			shouldPayoffOrderDelcodes.add(remittanceConfirm.getDealcode());
+		}
+
+		int successCount = 0;
+		List<String> abnormalOrders = orderService.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
+		logger.info("江湖救急对公交易状态异常订单:" + abnormalOrders.size() + "条,"+abnormalOrders);
+		if (abnormalOrders == null || abnormalOrders.size() == 0) {
+			return ;
+		}
+
+		//调用接口
+		String remark = "对公转账";
+
+		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
+			if (!abnormalOrders.contains(remittanceConfirm.getDealcode())) {
+				continue;
+			}
+			String dealcode = remittanceConfirm.getDealcode();
+			String paychannel = remittanceConfirm.getRemittancechannel();
+			BigDecimal payamount = new BigDecimal(remittanceConfirm.getRemittanceamount());
+
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,remark ,payamount);
+			if (success) {
+				successCount++;
+				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
+				continue;
+			}
+			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
+		}
+		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
+	}
+
 	/**
 	 * @Description 查询对公入账异常订单, 还款类型为还清, 汇款确认状态为finish, 但订单状态为未还清
 	 * @param
@@ -311,16 +364,4 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.findAbnormalRemittanceConfirm();
 	}
 
-	/**
-	 * @Description  查询江湖救急库异常订单
-	 * @param shouldPayoffOrderDelcodes
-	 * @return java.util.List<java.lang.String>
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<String> findAbnormalOrderFromRisk(List<String> shouldPayoffOrderDelcodes) {
-		if (shouldPayoffOrderDelcodes == null || shouldPayoffOrderDelcodes.size() == 0){
-			return new ArrayList<String>();
-		}
-		return dao.findPaymentOreder(shouldPayoffOrderDelcodes);
-	}
 }
