@@ -25,7 +25,13 @@
 	
 	<select id="findList" resultType="Demotable">
 		SELECT 
-			<include refid="demotableColumns"/>
+		a.id AS "id",
+		a.name AS "name",
+		sum(a.dealcodenum) AS "dealcodenum",
+		sum(a.dealcodeamount) AS "dealcodeamount",
+		a.datetime AS "datetime",
+		a.cycle AS "cycle",
+		a.peopleId AS "peopleId"
 		FROM demotable a
 		<include refid="demotableJoins"/>
 		<where>
@@ -42,6 +48,7 @@
 				AND a.datetime = #{datetime}
 			</if>
 		</where>
+		group by a.cycle , a.name
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}

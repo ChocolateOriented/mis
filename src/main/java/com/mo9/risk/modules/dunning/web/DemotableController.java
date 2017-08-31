@@ -78,13 +78,13 @@ public class DemotableController extends BaseController {
 	@ResponseBody
 	public void demo(Date day, String dealcodenum500, String dealcodenum1000,
 			String dealcodenum1500, String dealcodenum2000,String cycle,String dealcodetype) {
-		day = new Date();
-		dealcodenum500 = "10";
-		dealcodenum1000 = "10";
-		dealcodenum1500 = "10";
-		dealcodenum2000 = "10";
-		cycle = "Q0";
-		dealcodetype = "dealcodenum";
+//		day = new Date();
+//		dealcodenum500 = "10";
+//		dealcodenum1000 = "10";
+//		dealcodenum1500 = "10";
+//		dealcodenum2000 = "10";
+//		cycle = "Q0";
+//		dealcodetype = "dealcodenum";
 		try {
 			List<Demotable> demotables = new ArrayList<Demotable>();
 			
