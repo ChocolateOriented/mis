@@ -32,11 +32,11 @@ public class RiskOrderManager {
 	 * @param paychannel 还款渠道
 	 * @param remark 备注
 	 * @param paytype 还款类型
-	 * @param Payamount 还款金额
+	 * @param payamount 还款金额
 	 * @param delayDay 续期天数
 	 * @return java.lang.String 成功信息
 	 */
-	public String repay (String dealcode, String paychannel, String remark, String paytype, BigDecimal Payamount, String delayDay) throws IOException {
+	public String repay (String dealcode, String paychannel, String remark, String paytype, BigDecimal payamount, String delayDay) throws IOException {
 		if (!StringUtils.isBlank(remark)) {
 			remark = remark.replace('\r', ' ');
 			remark = remark.replace('\n', ' ');
@@ -44,11 +44,11 @@ public class RiskOrderManager {
 			remark = paychannel;
 		}
 		DecimalFormat df1 = new DecimalFormat("0.00");
-		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paytype+ "/" +df1.format(Payamount)+ "/" +delayDay;
+		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paytype+ "/" +df1.format(payamount)+ "/" +delayDay;
 
 		logger.info("接口url：" + url);
 		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>()), "utf-8");
-		logger.info("接口url返回参数" + res);
+		logger.info(dealcode+"还款接口返回参数" + res);
 
 		if (StringUtils.isBlank(res)) {
 			throw new ServiceException("订单接口回调失败");
@@ -58,7 +58,7 @@ public class RiskOrderManager {
 		if(StringUtils.isBlank(resultCode) || !"200".equals(resultCode)) {
 			//抛异常回滚
 			String msg =  repJson.has("resultMsg") ? String.valueOf(repJson.get("resultMsg")) : "";
-			logger.info("订单接口回调失败,失败信息: " + repJson.toString());
+			logger.info(dealcode+"订单接口回调失败,失败信息: " + repJson.toString());
 			throw new ServiceException(msg);
 		}
 		return repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
@@ -95,6 +95,5 @@ public class RiskOrderManager {
 		logger.debug(dealcode + "&" + mobile +"返回分数信息:" + repJson.get("data"));
 		return repJson.has("data") ? String.valueOf(repJson.get("data")) : "";
 	}
-	
-	
+
 }
