@@ -139,7 +139,7 @@
 		and a.Invalid = 't' 
 		and a.auto = 't'
 		GROUP BY a.Id
-		ORDER BY #{dealcodetype} 
+		ORDER BY ${dealcodetype} 
 		]]>
 	</select>
 	
