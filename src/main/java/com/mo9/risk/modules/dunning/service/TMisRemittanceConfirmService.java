@@ -314,7 +314,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 * 定时检查催收已确认还清, 但是江湖救急处理异常的订单, 尝试重新调用3次还清接口, 若还是不行发送邮件
 	 * 每6小时触发一次, 临时解决方案
 	 */
-	@Scheduled(cron = "0 0 */6 * * ?")
+	@Scheduled(cron = "0 0 5,11,17,23 * * ?")
 	public void tryRepairAbnormalRemittanceConfirm() {
 		//查询对公入账异常订单
 		List<TMisRemittanceConfirm> abnormalRemittanceConfirm = this.findAbnormalRemittanceConfirm();
