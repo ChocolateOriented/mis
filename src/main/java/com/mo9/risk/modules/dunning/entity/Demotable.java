@@ -23,7 +23,7 @@ public class Demotable extends DataEntity<Demotable> {
 	private Integer dealcodenum;		// dealcodenum
 	private BigDecimal dealcodeamount;		// dealcodeamount
 	private Date datetime;		// datetime
-	private Integer peopleId;
+	private String peopleId;
 	private String cycle;
 	
 	public Demotable() {
@@ -68,11 +68,11 @@ public class Demotable extends DataEntity<Demotable> {
 		this.datetime = datetime;
 	}
 
-	public Integer getPeopleId() {
+	public String getPeopleId() {
 		return peopleId;
 	}
 
-	public void setPeopleId(Integer peopleId) {
+	public void setPeopleId(String peopleId) {
 		this.peopleId = peopleId;
 	}
 
