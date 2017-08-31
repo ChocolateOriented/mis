@@ -33,7 +33,7 @@ import com.mo9.risk.modules.dunning.service.DemotableService;
 
 /**
  * 分案demoController
- * @author 徐盛
+ * @author 
  * @version 2017-08-28
  */
 @Controller
@@ -68,6 +68,8 @@ public class DemotableController extends BaseController {
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
 	
 	
+	
+	
 	/**
 	 * 获取计算后的迁徙率数据
 	 */
@@ -76,7 +78,13 @@ public class DemotableController extends BaseController {
 	@ResponseBody
 	public void demo(Date day, String dealcodenum500, String dealcodenum1000,
 			String dealcodenum1500, String dealcodenum2000,String cycle,String dealcodetype) {
-		
+		day = new Date();
+		dealcodenum500 = "10";
+		dealcodenum1000 = "10";
+		dealcodenum1500 = "10";
+		dealcodenum2000 = "10";
+		cycle = "Q0";
+		dealcodetype = "dealcodenum";
 		try {
 			List<Demotable> demotables = new ArrayList<Demotable>();
 			
@@ -116,9 +124,11 @@ public class DemotableController extends BaseController {
 				System.out.println(j);
 				Integer dealcodeamount = tasks.get(i);
 				Demotable demotable = new Demotable();
+				demotable.setId(dunningPeoples.get(j).getId());
 				demotable.setName(dunningPeoples.get(j).getName());
 				demotable.setDealcodenum(1);
 				demotable.setDealcodeamount(BigDecimal.valueOf(dealcodeamount));
+				demotable.setDatetime(day);
 				demotables.add(demotable);
 //				dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
 			}
@@ -145,7 +155,7 @@ public class DemotableController extends BaseController {
 			return form(demotable, model);
 		}
 		demotableService.save(demotable);
-		addMessage(redirectAttributes, "保存徐盛成功");
+		addMessage(redirectAttributes, "保存成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/demotable/?repage";
 	}
 	
@@ -153,7 +163,7 @@ public class DemotableController extends BaseController {
 	@RequestMapping(value = "delete")
 	public String delete(Demotable demotable, RedirectAttributes redirectAttributes) {
 		demotableService.delete(demotable);
-		addMessage(redirectAttributes, "删除徐盛成功");
+		addMessage(redirectAttributes, "删除成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/demotable/?repage";
 	}
 	

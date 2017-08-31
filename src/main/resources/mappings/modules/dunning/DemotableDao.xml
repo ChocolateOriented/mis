@@ -7,7 +7,9 @@
 		a.name AS "name",
 		a.dealcodenum AS "dealcodenum",
 		a.dealcodeamount AS "dealcodeamount",
-		a.datetime AS "datetime"
+		a.datetime AS "datetime",
+		a.cycle AS "cycle",
+		a.peopleId AS "peopleId"
 	</sql>
 	
 	<sql id="demotableJoins">
@@ -29,11 +31,7 @@
 		<where>
 			
 			<if test="name != null and name != ''">
-				AND a.name LIKE 
-					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
-			</if>
+				AND a.name LIKE  concat('%',#{name},'%')</if>
 			<if test="dealcodenum != null and dealcodenum != ''">
 				AND a.dealcodenum = #{dealcodenum}
 			</if>
@@ -95,7 +93,7 @@
 	
 	<update id="delete">
 		DELETE FROM demotable
-		WHERE id = #{id}
+<!-- 		WHERE id = #{id} -->
 	</update>
 	
 	<insert id="batchinsertDemotable">
@@ -119,18 +117,19 @@
 	
 	<select id="findPeopleByDemo" resultType="Demotable" >
 		SELECT 
-			a.Id as id,
+			a.Id as peopleId,
 			a.name as name,
 			SUM(IFNULL(d.dealcodeNum,0)) as dealcodenum,
 			SUM(IFNULL(d.dealcodeAmount,0)) as dealcodeamount,
-			d.datetime as datetime
+			d.datetime as datetime,
+			'Q0' as cycle,
 		FROM t_mis_dunning_people a
 		LEFT JOIN demotable d on d.peopleId = a.Id 
-		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
+		WHERE a.DunningCycle LIKE concat('%','Q0','%')  
 		and a.Invalid = 't' 
 		and a.auto = 't'
 		GROUP BY a.Id
-		ORDER BY #{dealcodetype},a.Id 
+		ORDER BY dealcodeAmount,a.Id 
 	</select>
 	
 </mapper>
