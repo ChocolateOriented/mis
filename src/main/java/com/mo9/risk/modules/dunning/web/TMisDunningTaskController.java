@@ -67,6 +67,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
@@ -84,6 +85,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
@@ -165,9 +167,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TmisDunningSmsTemplateService tstService;
-	
-	@Autowired
-	private RiskOrderManager riskOrderManager ;
 
 	@Autowired
 	private TMisDunningOrderService orderService;
@@ -175,53 +174,8 @@ public class TMisDunningTaskController extends BaseController {
 	@Autowired
 	private TMisDunningTagService tMisDunningTagService ;
 	
-	private static final Map<String, String> rounddownMap;  
-	static  
-    {  
-		rounddownMap = new HashMap<String, String>();  
-		rounddownMap.put("6.5", "a1");  
-		rounddownMap.put("6.4", "a2");  
-		rounddownMap.put("6.3", "a3");  
-		rounddownMap.put("6.2", "a4");  
-		rounddownMap.put("6.1", "a5");  
-		
-		rounddownMap.put("6.0", "b1");  
-		rounddownMap.put("5.9", "b2");  
-		rounddownMap.put("5.8", "b3");  
-		rounddownMap.put("5.7", "b4");  
-		rounddownMap.put("5.6", "b5");  
-		
-		rounddownMap.put("5.5", "c1");  
-		rounddownMap.put("5.4", "c2");  
-		rounddownMap.put("5.3", "c3");  
-		rounddownMap.put("5.2", "c4");  
-		rounddownMap.put("5.1", "c5");  
-		
-		rounddownMap.put("5.0", "d1");  
-		rounddownMap.put("4.9", "d2");  
-		rounddownMap.put("4.8", "d3");  
-		rounddownMap.put("4.7", "d4");  
-		rounddownMap.put("4.6", "d5");  
-		
-		rounddownMap.put("4.5", "e1");  
-		rounddownMap.put("4.4", "e2");  
-		rounddownMap.put("4.3", "e3");  
-		rounddownMap.put("4.2", "e4");  
-		rounddownMap.put("4.1", "e5");  
-		
-		rounddownMap.put("4.0", "f1");  
-		rounddownMap.put("3.9", "f2");  
-		rounddownMap.put("3.8", "f3");  
-		rounddownMap.put("3.7", "f4");  
-		rounddownMap.put("3.6", "f5");  
-		
-		rounddownMap.put("3.5", "g1");  
-		rounddownMap.put("3.4", "g2");  
-		rounddownMap.put("3.3", "g3");  
-		rounddownMap.put("3.2", "g4");  
-		rounddownMap.put("3.1", "g5");  
-    } 
-	
+	@Autowired
+	private TMisDunningScoreCardService tMisDunningScoreCardService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -1060,43 +1014,23 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		
 		boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
-		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
-		model.addAttribute("deductable", deductable);
+		//根据资方和逾期天数判断是否开启代扣
+		boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
 		
-		try {
-			String score = riskOrderManager.scApplicationCol(personalInfo.getMobile(), dealcode, buyerId, String.valueOf(order.getId()));
-			if(null != score && !"".equals(score)){
-				score = this.getCalculateScore(Double.parseDouble(score));
-			}
-			model.addAttribute("score", score);
-		} catch (Exception e) {
-			model.addAttribute("score", "评分显示失败");
-			logger.info("评分显示失败",e);
-		}
+		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
+		model.addAttribute("deductable", deductable && daikouStatus);
+		model.addAttribute("daikouStatus", daikouStatus);
 		
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
 		tMisDunningTag.setDealcode(dealcode);
 		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 		model.addAttribute("tags", tags);
 		
-		//根据资方和逾期天数判断是否开启代扣
-		String daikouStatus=tMisDunningTaskService.findOrderByPayCode(order);
-		model.addAttribute("daikouStatus", daikouStatus);
+		TMisDunningScoreCard tMisDunningScoreCard = tMisDunningScoreCardService.getScoreCardByDealcode(dealcode);
+		model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
+		
 		return "modules/dunning/tMisDunningTaskFather";
 	}
-	
-	public String getCalculateScore(Double score){
-//		null != this.incomepercent ? NumberUtil.formatToseparaInteger(this.incomepercent) : "";
-		DecimalFormat df = new DecimalFormat("#,###.0");
-		if(score > 650){
-			return "a1";
-		}
-		if(score < 310){
-			return "g5";
-		}
-		return rounddownMap.get(df.format(score * 0.01));
-	}
-	
 	
 	/**
 	 * 展示用户影像资料
@@ -1107,7 +1041,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequestMapping(value = "showBuyerIdCardImg")
 	public void showBuyerIdCardImg(HttpServletRequest request, HttpServletResponse response) {
 		String buyerId = request.getParameter("buyerId");
-		String fileId = tMisDunningTaskService.findBuyerIdCardImg(buyerId);
+		String fileId = tMisDunningTaskService.findBuyerImg(buyerId);
 		String riskadminUrl = DictUtils.getDictValue("riskadmin", "orderUrl", "");
 		String url = riskadminUrl + "file/showPic.a?fileId=" + fileId;
 		InputStream input = null;

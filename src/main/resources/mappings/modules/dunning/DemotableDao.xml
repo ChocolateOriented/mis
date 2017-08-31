@@ -123,20 +123,22 @@
 	</insert>
 	
 	<select id="findPeopleByDemo" resultType="Demotable" >
+	 <![CDATA[
 		SELECT 
 			a.Id as peopleId,
 			a.name as name,
 			SUM(IFNULL(d.dealcodeNum,0)) as dealcodenum,
 			SUM(IFNULL(d.dealcodeAmount,0)) as dealcodeamount,
 			d.datetime as datetime,
-			'Q0' as cycle,
+			#{dunningcycle} as cycle
 		FROM t_mis_dunning_people a
 		LEFT JOIN demotable d on d.peopleId = a.Id 
-		WHERE a.DunningCycle LIKE concat('%','Q0','%')  
+		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
 		and a.Invalid = 't' 
 		and a.auto = 't'
 		GROUP BY a.Id
-		ORDER BY dealcodeAmount,a.Id 
+		ORDER BY #{dealcodetype},a.Id 
+		]]>
 	</select>
 	
 </mapper>

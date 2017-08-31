@@ -1846,9 +1846,10 @@
 	        AND o.buyer_id is not null
     </select>
 
-	<select id="findBuyerIdCardImg" resultType="String">
+	<select id="findBuyerImg" resultType="TRiskBuyerPersonalInfo">
         SELECT
-	        i.img_filed3
+	        i.img_filed3 AS "imgFiled3",
+	        i.img_filed4 AS "imgFiled4"
         FROM t_risk_buyer_idcard AS i
         WHERE
 	        i.buyer_id = #{buyerid}

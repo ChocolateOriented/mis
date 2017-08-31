@@ -25,6 +25,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
@@ -289,10 +290,10 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
 	
 	/**
-	 * 查询用户身份证影像资料
+	 * 查询用户影像资料
 	 * @return
 	 */
-	public String findBuyerIdCardImg(String buyerid);
+	public TRiskBuyerPersonalInfo findBuyerImg(String buyerid);
 	
 	/**
 	 * atuoq0  催收预提醒订单的优质老用户（历史逾期1天内还清）

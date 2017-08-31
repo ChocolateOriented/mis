@@ -19,7 +19,7 @@
 				$('#btnDeduct').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
-			if("daikoufalse"==window.parent.$("#daikouStatus").val()){
+			if("false"==window.parent.$("#daikouStatus").val()){
 				$("#btnDeduct").attr("disabled",true);
 			}
 		});
@@ -76,7 +76,7 @@
         <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">扣款信息</a></li></shiro:hasPermission>
 	</ul> 
 	
-	<form:form class="submitForm"  action="${ctx}/dunning/tMisContantRecord/list" method="get" style="display: none;">
+	<form:form class="submitForm"  action="${ctx}/dunning/tMisDunnedConclusion/list" method="get" style="display: none;">
 		<input class="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input class="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/>
@@ -177,7 +177,7 @@
 	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-	<input id="btnDeduct" name="btnCollection" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
+	<input id="btnTag" name="btnCollection" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
 	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />

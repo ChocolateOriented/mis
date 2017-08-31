@@ -26,7 +26,7 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 @Transactional(readOnly = true)
 public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDunningTag> {
 	
-	public static ConcurrentHashMap<String, Long> dealcodeTagType = new ConcurrentHashMap<String, Long>();
+	public static final ConcurrentHashMap<String, Long> dealcodeTagType = new ConcurrentHashMap<String, Long>();
 	
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;

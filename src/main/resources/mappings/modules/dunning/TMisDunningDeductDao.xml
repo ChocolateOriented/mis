@@ -260,11 +260,14 @@
 	]]>
 	</select>
 	
-	<select id="getDeductListByStatus" resultType="TMisDunningDeduct">
+	<select id="getSubmittedDeductList" resultType="TMisDunningDeduct">
 		SELECT 
 			<include refid="TMisDunningDeductColumns"/>
 		FROM t_mis_dunning_deduct a
-		WHERE a.status = #{status}
+		WHERE a.status = 'submitted'
+		<![CDATA[
+		AND a.createdate < DATE_ADD(NOW(), INTERVAL -5 MINUTE)
+		]]>
 	</select>
 	
 	<select id="getPeopleIdByUsers" resultType="String">
