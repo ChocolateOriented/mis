@@ -133,16 +133,20 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
+				<th>队列</th>
 				<th>催收员</th>
 				<th>户数</th>
 				<th>金额</th>
 				<th>日期</th>
-				<shiro:hasPermission name="dunning:demotable:edit"><th>操作</th></shiro:hasPermission>
+<%-- 				<shiro:hasPermission name="dunning:demotable:edit"><th>操作</th></shiro:hasPermission> --%>
 			</tr>
 		</thead>
 		<tbody>
 		<c:forEach items="${page.list}" var="demotable">
 			<tr>
+				<td>
+					${demotable.cycle}
+				</td>
 				<td><a href="${ctx}/dunning/demotable/form?id=${demotable.id}">
 					${demotable.name}
 				</a></td>
@@ -153,12 +157,12 @@
 					${demotable.dealcodeamount}
 				</td>
 				<td>
-					<fmt:formatDate value="${demotable.datetime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<fmt:formatDate value="${demotable.datetime}" pattern="yyyy-MM-dd"/>
 				</td>
-				<shiro:hasPermission name="dunning:demotable:edit"><td>
-    				<a href="${ctx}/dunning/demotable/form?id=${demotable.id}">修改</a>
-					<a href="${ctx}/dunning/demotable/delete?id=${demotable.id}" onclick="return confirmx('确认要删除该徐盛吗？', this.href)">删除</a>
-				</td></shiro:hasPermission>
+<%-- 				<shiro:hasPermission name="dunning:demotable:edit"><td> --%>
+<%--     				<a href="${ctx}/dunning/demotable/form?id=${demotable.id}">修改</a> --%>
+<%-- 					<a href="${ctx}/dunning/demotable/delete?id=${demotable.id}" onclick="return confirmx('确认要删除该徐盛吗？', this.href)">删除</a> --%>
+<%-- 				</td></shiro:hasPermission> --%>
 			</tr>
 		</c:forEach>
 		</tbody>

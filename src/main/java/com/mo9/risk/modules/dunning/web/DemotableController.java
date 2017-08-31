@@ -95,7 +95,7 @@ public class DemotableController extends BaseController {
 //				dunningPeople.setName("催收员" + i);
 //				dunningPeoples2.add(dunningPeople);
 //			}
-			List<Demotable> dunningPeoples = demotableService.findPeopleByDemo(dealcodetype,cycle);
+			List<Demotable> dunningPeoples = demotableService.findPeopleByDemo(cycle,dealcodetype);
 			
 			ArrayList<Integer> tasks = new ArrayList<Integer>();
 			for (int i = 0; i < Integer.parseInt(dealcodenum2000); i++) {
@@ -121,14 +121,15 @@ public class DemotableController extends BaseController {
 				} else {
 					j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
 				}
-				System.out.println(j);
 				Integer dealcodeamount = tasks.get(i);
+				System.out.println(dunningPeoples.get(j).getName()+"金额"+dunningPeoples.get(j).getDealcodeamount()+"户数"+dunningPeoples.get(j).getDealcodenum());
 				Demotable demotable = new Demotable();
-				demotable.setId(dunningPeoples.get(j).getId());
+				demotable.setPeopleId(dunningPeoples.get(j).getPeopleId());
 				demotable.setName(dunningPeoples.get(j).getName());
 				demotable.setDealcodenum(1);
 				demotable.setDealcodeamount(BigDecimal.valueOf(dealcodeamount));
 				demotable.setDatetime(day);
+				demotable.setCycle(cycle);
 				demotables.add(demotable);
 //				dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
 			}

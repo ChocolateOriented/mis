@@ -109,7 +109,8 @@
 			dealcodenum,
 			dealcodeamount,
 			datetime,
-			peopleId
+			peopleId,
+			cycle
 		) VALUES
 		<foreach collection="list" item="item" index="index" separator=",">
 		 (
@@ -117,7 +118,8 @@
 			#{item.dealcodenum},
 			#{item.dealcodeamount},
 			#{item.datetime},
-			#{item.peopleId}
+			#{item.peopleId},
+			#{item.cycle}
 		)
 		</foreach>
 	</insert>
@@ -137,7 +139,7 @@
 		and a.Invalid = 't' 
 		and a.auto = 't'
 		GROUP BY a.Id
-		ORDER BY #{dealcodetype},a.Id 
+		ORDER BY #{dealcodetype} 
 		]]>
 	</select>
 	
