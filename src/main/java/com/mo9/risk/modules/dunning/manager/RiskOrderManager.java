@@ -71,11 +71,12 @@ public class RiskOrderManager {
 	 * @param dealcode 订单号
 	 * @param buyerId 用户id
 	 * @param orderId 订单id
+	 * @param oldOrder 是否老订单
 	 * @return java.lang.String 评分
 	 */
-	public String scApplicationCol(String mobile, String dealcode, String buyerId, String orderId) throws IOException {
+	public String scApplicationCol(String mobile, String dealcode, String buyerId, String orderId, boolean oldOrder) throws IOException {
 
-		String url = riskUrl + "scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile=" +mobile+ "&dealcode=" +dealcode+ "&buyerId=" +buyerId+ "&orderId=" +orderId+ "&old=true";
+		String url = riskUrl + "scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile=" +mobile+ "&dealcode=" +dealcode+ "&buyerId=" +buyerId+ "&orderId=" +orderId+ "&old=" + oldOrder;
 
 		logger.debug("接口url：" + url);
 		String res = java.net.URLDecoder.decode(PostRequest.postRequest(url, new HashMap<String, String>()), "utf-8");
