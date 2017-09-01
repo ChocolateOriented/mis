@@ -158,13 +158,20 @@ public class TMisMigrationRateReportController extends BaseController {
 		migrationData.put("cycle", cycle);
 		
 		//获取4个队列数据数据
-		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
-		List<TMisMigrationRateReport> findMigrateChartList;
+		List<TMisMigrationRateReport> findMigrateChartList=null;
 		try{
 			
-			 findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+			DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+			findMigrateChartList = tMisMigrationRateReportService.findMigrateChartList(tMisMigrationRateReport);
+		}catch (Exception e) {
+			logger.warn("迁徙查询.切换江湖救急只读库失败");
+			return null;
 		}finally{
 			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		if(null==findMigrateChartList){
+			logger.warn("迁徙查询失败");
+			return null;
 		}
 		List<TMisMigrationData>  smdList1=new ArrayList<TMisMigrationData>();
 		List<TMisMigrationData>  smdList2=new ArrayList<TMisMigrationData>();
