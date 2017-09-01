@@ -51,7 +51,9 @@ public class MailSender {
 
 	private List<File> attachFiles = new ArrayList<File>();//附件文件集合
 
-	private Map<DataSource,String> attachSource ; //附件数据集合
+	private Map<String,DataSource> attachSource ; //附件数据集合
+
+	private Map<String,DataSource> imgs ; //图片集合
 
 	public String getProtocol() {
 		return protocol;
@@ -178,15 +180,26 @@ public class MailSender {
 	}
 	/**
 	 * @Description 添加附件
-	 * @param null
 	 * @return
 	 */
 	public void addAttachSource(DataSource dataSource ,String fileName) {
 		if (attachSource == null){
-			attachSource = new HashMap<DataSource, String>();
+			attachSource = new HashMap<String, DataSource>();
 		}
-		attachSource.put(dataSource,fileName);
+		attachSource.put(fileName,dataSource);
 	}
+
+	/**
+	 * @Description 添加图片
+	 * @return
+	 */
+	public void addImage(DataSource dataSource ,String contentId) {
+		if (imgs == null){
+			imgs = new HashMap<String, DataSource>();
+		}
+		imgs.put(contentId, dataSource);
+	}
+
 	/**
 	 * 发送邮件
 	 * @throws MessagingException 
@@ -262,10 +275,18 @@ public class MailSender {
 				}
 			}
 			if(attachSource != null){
-				for (Entry<DataSource,String> dataSource:attachSource.entrySet()) {
+				for (Entry<String, DataSource> dataSource:attachSource.entrySet()) {
 					MimeBodyPart mbpFile = new MimeBodyPart();
-					mbpFile.setDataHandler(new DataHandler(dataSource.getKey()));
-					mbpFile.setFileName(dataSource.getValue());
+					mbpFile.setDataHandler(new DataHandler(dataSource.getValue()));
+					mbpFile.setFileName(dataSource.getKey());
+					mp.addBodyPart(mbpFile);
+				}
+			}
+			if(imgs != null){
+				for (Entry<String, DataSource> dataSource: imgs.entrySet()) {
+					MimeBodyPart mbpFile = new MimeBodyPart();
+					mbpFile.setDataHandler(new DataHandler(dataSource.getValue()));
+					mbpFile.setHeader("Content-ID", dataSource.getKey());
 					mp.addBodyPart(mbpFile);
 				}
 			}

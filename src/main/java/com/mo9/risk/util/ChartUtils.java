@@ -141,31 +141,6 @@ public class ChartUtils {
 
     }
 
-    /**
-     * 创建类别数据集合
-     */
-    public static DefaultCategoryDataset createDefaultCategoryDataset(List<TMisMigrateMail> series, String[] categories) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        for (TMisMigrateMail serie : series) {
-            String name = serie.getName();
-            List<Object> data = serie.getData();
-            if (data != null && categories != null && data.size() == categories.length) {
-                for (int index = 0; index < data.size(); index++) {
-                    String value = data.get(index) == null ? "" : data.get(index).toString();
-                    if (isPercent(value)) {
-                        value = value.substring(0, value.length() - 1);
-                    }
-                    if (isNumber(value)) {
-                        dataset.setValue(Double.parseDouble(value), name, categories[index]);
-                    }
-                }
-            }
-
-        }
-        return dataset;
-
-    }
 
     /**
      * 创建饼图数据集合

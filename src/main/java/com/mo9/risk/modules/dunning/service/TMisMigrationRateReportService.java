@@ -3,28 +3,37 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
+import com.mo9.risk.modules.dunning.entity.TMisMigrateMail;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
+import com.mo9.risk.util.DateUtils;
+import com.mo9.risk.util.MailSender;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.MessagingException;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 迁徙率Service
@@ -499,5 +508,161 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		
 		return tMisMigrationRateReportDao.newfindMigrateChartList(tMisMigrationRateReport);
 	}
-	
+	/**
+	 * 创建类别数据集合
+	 */
+	public static DefaultCategoryDataset createDefaultCategoryDataset(List<TMisMigrateMail> series, String[] categories) {
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+		for (TMisMigrateMail serie : series) {
+			String name = serie.getName();
+			List<Object> data = serie.getData();
+			if(series!=null&&data.size()<16){
+				int size = data.size();
+				for (int i = 0; i < 16-size; i++) {
+					data.add(null);
+				}
+			}
+			if (data != null && categories != null && data.size() == categories.length) {
+				for (int index = 0; index < data.size(); index++) {
+					String value = data.get(index) == null ? "" : data.get(index).toString();
+					if (isPercent(value)) {
+						value = value.substring(0, value.length() - 1);
+					}
+					if (isNumber(value)) {
+						dataset.setValue(Double.parseDouble(value), name, categories[index]);
+					}
+				}
+			}
+
+		}
+		return dataset;
+
+	}
+	/**
+	 *
+	 * @param tmMigrationRateReport 必须合理指定该对象的cyclenum 长度和migrate的值
+	 * @return
+	 */
+	public   List<TMisMigrateMail>  getCycleData(TMisMigrationRateReport tmMigrationRateReport){
+
+		if(tmMigrationRateReport.getCycleNum()>5||tmMigrationRateReport.getCycleNum()<2){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		List<TMisMigrationRateReport> migrateList;
+		try{
+
+			migrateList = tMisMigrationRateReportService.newfindMigrateChartList(tmMigrationRateReport);
+		}finally{
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+		if(null==migrateList){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+		List<TMisMigrateMail> series = new ArrayList<TMisMigrateMail>();
+		// 柱子名称：柱子所有的值集合
+		int z=0;
+		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		for (int i = 0; i < tmMigrationRateReport.getCycleNum(); i++) {
+
+			List<Object> data= new ArrayList<Object>(20);
+			int y=0;
+			while( true) {
+				//每个周期的第一个数据肯定保存起来
+				if(y==0){
+					BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
+					data.add(bigDecimal.doubleValue());
+				}
+				//关于第二个数据就要判断是否是和之前一个是同一个周期.不是跳出内循环.
+				if(y>0){
+					if(migrateList.get(z).getCycle().equals(migrateList.get(z-1).getCycle())){
+						//周期相同是同一个周期
+						BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
+						data.add(bigDecimal.doubleValue());
+					}else{
+						//不是同一个周期,封装对象,添加到集合
+						TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
+						tMisMigrateMail.setData(data);
+						String start = sd.format(migrateList.get(z-1).getDatetimeStart());
+						String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
+						tMisMigrateMail.setName(start+"-"+end);
+						series.add(tMisMigrateMail);
+						break;
+					}
+				}
+				//最后一个数据要注意
+				if(migrateList.size()==(z+1)){
+					TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
+					tMisMigrateMail.setData(data);
+					String start = sd.format(migrateList.get(z-1).getDatetimeStart());
+					String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
+					tMisMigrateMail.setName(start+"-"+end);
+					series.add(tMisMigrateMail);
+					break;
+				}
+				y++;
+				z++;
+			}
+		}
+		return series;
+	}
+
+	/**
+	 * @return void
+	 * @Description 自动邮件
+	 */
+	@Scheduled(cron = "0 0 8 * * ?")
+	public void autoSendMail() {
+		String receiver = DictUtils.getDictValue("migration_rate_report_receiver", "sys_email", "");
+		if (StringUtils.isBlank(receiver)){
+			logger.warn("自动发送迁徙率报表失败, 未配置收件人邮箱");
+			return;
+		}
+		logger.info("自动发送迁徙率报表邮件至"+receiver);
+		MailSender mailSender = new MailSender(receiver);
+		String data = DateUtils.getDate("MM月dd日");
+		mailSender.setSubject("截止"+data+"迁徙率");
+
+		StringBuilder content = new StringBuilder();
+		content.append("<p>下图为截止"+data+"迁徙数据，烦请查阅</p>");
+		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
+		content.append("<tr><th>C-P1</th><th>20170817-20170831</th><th>20170801-20170816</th><th>同比</th></tr>");
+		content.append("<tr><td>户数迁徙</td><td>5.92%</td><td>5.98%</td><td>-1.00%</td></tr>");
+		content.append("<tr><td>本金迁徙</td><td>5.92%</td><td>5.98%</td><td>-1.00%</td></tr>");
+		content.append("</table>");
+
+		content.append("<p>户数迁徙</p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("</table>");
+
+		content.append("<p>本金迁徙</p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("</table>");
+
+		mailSender.setContent(content.toString());
+		//添加图片
+		DataSource dataSource;
+		try {
+			dataSource = new FileDataSource("C:/Users/jxLi/git/misrepo/LineChart.jpeg") ;
+		}catch (Exception e) {
+			logger.warn("迁徙率报表自动邮件添加图片失败", e);
+			return;
+		}
+		mailSender.addImage(dataSource,"testImage");
+
+		//发送
+		try {
+			mailSender.sendMail();
+			logger.debug("迁徙率报表邮件发送成功");
+		} catch (Exception e) {
+			logger.warn("迁徙率报表自动邮件发送失败", e);
+		}
+	}
 }

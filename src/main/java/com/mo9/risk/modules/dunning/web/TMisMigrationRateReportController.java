@@ -419,67 +419,7 @@ public class TMisMigrationRateReportController extends BaseController {
 		
 		return migrationData;
 	}
-	/**
-	 * 
-	 * @param tmMigrationRateReport 必须合理指定该对象的cyclenum 长度和migrate的值
-	 * @return 
-	 */
-	public   List<TMisMigrateMail>  getCycleData(TMisMigrationRateReport tmMigrationRateReport){
-        
-		if(tmMigrationRateReport.getCycleNum()>5||tmMigrationRateReport.getCycleNum()<2){
-			logger.warn("迁徙为查到数据,请传合理的参数");
-			return null;
-		}
-		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
-		List<TMisMigrationRateReport> migrateList;
-		try{
-			
-			migrateList = tMisMigrationRateReportService.findMigrateChartList(tmMigrationRateReport);
-		}finally{
-			DynamicDataSource.setCurrentLookupKey("dataSource");
-		}
-		if(null==migrateList){
-			logger.warn("迁徙为查到数据,请传合理的参数");
-			return null;
-		}
-        List<TMisMigrateMail> series = new ArrayList<TMisMigrateMail>();
-        // 柱子名称：柱子所有的值集合
-        int z=0;
-        SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
-        for (int i = 0; i < tmMigrationRateReport.getCycleNum(); i++) {
-			
-        	List<Object> data= new ArrayList<Object>(16);
-        	int y=0;
-	        while( true) {
-	        	//每个周期的第一个数据肯定保存起来
-				if(y==0){
-					BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
-					data.add(bigDecimal.doubleValue());
-				}
-				//关于第二个数据就要判断是否是和之前一个是同一个周期.不是跳出内循环.
-				if(y>0){
-					if(migrateList.get(z).getCycle().equals(migrateList.get(z-1).getCycle())){
-						//周期相同是同一个周期
-						BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
-						data.add(bigDecimal.doubleValue());
-					}else{
-						//不是同一个周期,封装对象,添加到集合
-						TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
-						tMisMigrateMail.setData(data);
-						String start = sd.format(migrateList.get(z-1).getDatetimeStart());
-						String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
-						tMisMigrateMail.setName(start+"-"+end);
-						series.add(tMisMigrateMail);
-						break;
-					}
-				}
-				y++;
-				z++;
-			}
-        }
-        return series;
-	}
-	
+
 	/**
 	 * 贷后报表测试用例
 	 * @return
@@ -612,7 +552,5 @@ public class TMisMigrationRateReportController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisMigrationRateReport/list";
     }
-	
-	
-	
+
 }
