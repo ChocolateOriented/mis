@@ -3,20 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
@@ -32,7 +18,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.PostRequest;
 import com.mo9.risk.util.RequestParamSign;
@@ -40,6 +25,18 @@ import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收代扣接口调用Service
@@ -66,8 +63,8 @@ public class TMisDunningDeductCallService {
 	private TMisDunningConfigureDao tMisDunningConfigureDao;
 	
 	@Autowired
-	private RiskOrderManager riskOrderManager;
-	
+	private TMisDunningOrderService orderService;
+
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningDeductCallService.class);
 	
 	/**
@@ -172,7 +169,7 @@ public class TMisDunningDeductCallService {
 		BigDecimal bd = BigDecimal.valueOf(paidAmount);
 		
 		try {
-			riskOrderManager.repay(dealcode, paychannel, remark, paidType, bd, delayDay);
+			orderService.repayWithCheack(dealcode, paychannel, remark, paidType, bd, delayDay);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);

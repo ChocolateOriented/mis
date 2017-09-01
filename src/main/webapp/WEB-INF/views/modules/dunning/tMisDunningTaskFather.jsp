@@ -10,7 +10,7 @@
 			border: solid 1px #fac450;
 			border-radius: 3px;
 			display: inline-block;
-			font-size: 15px;
+			font-size: 14px;
 			font-weight: normal;
 			padding: 1px;
 			margin-right: 5px;
@@ -134,6 +134,11 @@
 			$("#changeMobile").prop("disabled", true);
 			$("#changeBankcard").prop("disabled", true);
 			$("#butnSms").prop("disabled", true);
+			$("#butnIdCardImg").prop("disabled", true);
+			
+			var tags = $("#tags").children("div");
+			tags.children("#editTag").remove();
+			tags.children("#closeTag").remove();
 		}
 		
 		function getBuyerIdCardImg() {
@@ -142,6 +147,7 @@
 			});
 		}
 		
+		//打开添加标签弹窗
 		function tagPopup(obj) {
 			$.get("${ctx}/dunning/tMisDunningTag/preCheck", {dealcode:"${dealcode}"}, function(data) {
 				if(data == "OK") {
@@ -180,11 +186,12 @@
 			});
 		}
 		
+		//添加标签后添加元素
 		function addTag(tagId) {
 			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
 				var templ = $("#tagTemplate");
 				var elem = templ.clone(true);
-				elem.children("#title").append(data.tagtypeDesc);
+				elem.children("#title").text(data.tagtypeDesc);
 				elem.prop("id", data.tagtype);
 				elem.attr("tagId", tagId);
 				elem.find("#tagtype span").text(data.tagtypeDesc);
@@ -201,6 +208,7 @@
 			});
 		}
 		
+		//编辑后刷新标签明细
 		function refreshTag(tagId) {
 			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
 				var elem = $(".tag[tagId='" + tagId + "']");
@@ -219,14 +227,14 @@
 </head>
 <body>
 	<h4>&nbsp;&nbsp; </h4>
-	<h4 style="display:inline-block;margin-bottom:3.5px;">&nbsp;&nbsp;个人信息&nbsp;&nbsp;</h4>
-	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;position:relative;top:-4px;font-size:0px;">
+	<h4 style="display:inline-block;position:relative;top:5px;">&nbsp;&nbsp;个人信息&nbsp;&nbsp;</h4>
+	<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;font-size:0px;">
 		<c:forEach items="${tags}" var="tag">
 			<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
-				<span id="title">&nbsp;${tag.tagtype.desc}</span>
+				<span id="title" style="margin:0px 3px 0px 3px;">${tag.tagtype.desc}</span>
 				<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-					<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
-					<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
+					<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+					<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 				</shiro:hasPermission>
 				<div class="suspense" style="display:none;" tabindex="0">
 					<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>
@@ -240,10 +248,10 @@
 			</div>
 		</c:forEach>
 		<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">
-			<span id="title">&nbsp;</span>
+			<span id="title" style="margin:0px 3px 0px 3px;"></span>
 			<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-				<i class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
-				<span onclick="closeTag(this);" style="cursor:pointer;">&times;&nbsp;</span>
+				<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
+				<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 			</shiro:hasPermission>
 			<div class="suspense" style="display:none;" tabindex="0">
 				<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>
@@ -295,7 +303,7 @@
 				<td>续期次数：${personalInfo.delayCount}次</td>
 				<td>逾期费：${personalInfo.overdueAmount/100}元&nbsp;(${personalInfo.overdueDays}天)</td>
 				<td>减免金额：${personalInfo.modifyAmount/100}元</td>
-				<td style="color:red;">当前应催金额：${personalInfo.creditAmount/100}元</td>
+				<td colspan="2" style="color:red;">当前应催金额：${personalInfo.creditAmount/100}元</td>
 			</tr>
 			<tr>
 				<td>还款总额：${personalInfo.balance/100}元</td>

@@ -24,6 +24,12 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	public static final String STATUS_PAYOFF = "payoff"; //已还清
 	public static final String STATUS_PAYMENT = "payment";  //未还清
 
+	/**
+	 * 还款类型
+	 */
+	public static final String PAYTYPE_LOAN = "loan"; //还清
+	public static final String PAYTYPE_PARTIAL = "partial"; //部分还款
+
 	private Integer buyerid;
 	private String realname;// # 姓名
 	private String dealcode;// # 订单编号
@@ -91,6 +97,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date latestlogintime;	//最近登录时间
 	private Date beginlatestlogintime;	//最近登录时间
 	private Date endlatestlogintime;	//最近登录时间
+	
+	private Boolean firstOrder;		//初次订单
 	
 	public String getPlatformExt() {
 		return platformExt;
@@ -565,6 +573,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setEndlatestlogintime(Date endlatestlogintime) {
 		this.endlatestlogintime =  null != endlatestlogintime ? DateUtils.endDate(endlatestlogintime) : endlatestlogintime;
+	}
+
+	public Boolean getFirstOrder() {
+		return firstOrder;
+	}
+
+	public void setFirstOrder(Boolean firstOrder) {
+		this.firstOrder = firstOrder;
 	}
 
 }

@@ -526,7 +526,7 @@ public class TMisRemittanceConfirmController extends BaseController {
 			confirm.setRemittanceTag(remittanceTag);
 		}
 		//若还款类型为还清则判断  还款金额<应催金额
-		if (TMisRemittanceConfirm.PAYTYPE_LOAN.equals(paytype)){
+		if (DunningOrder.PAYTYPE_LOAN.equals(paytype)){
 			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
 				return "金额不匹配，入账失败";
 			}
@@ -578,27 +578,6 @@ public class TMisRemittanceConfirmController extends BaseController {
 			}
 			return result.toString();
 	}
-
-
-   	public static String convertStreamToString(InputStream is) {
-           BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-           StringBuilder sb = new StringBuilder();
-           String line = null;
-           try {
-               while ((line = reader.readLine()) != null) {
-                   sb.append(line + "\n");
-               }
-           } catch (IOException e) {
-               e.printStackTrace();
-           } finally {
-               try {
-                   is.close();
-               } catch (IOException e) {
-                  e.printStackTrace();
-               }
-           }
-           return sb.toString();
-       }
 
    	@RequiresPermissions("dunning:tMisRemittanceConfirm:view")
 	@RequestMapping(value = "/uploadImage")

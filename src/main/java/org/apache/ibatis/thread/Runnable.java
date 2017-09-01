@@ -84,7 +84,7 @@ public class Runnable implements java.lang.Runnable {
 				try {
 					Thread.sleep(delaySeconds * 1000);
 				} catch (InterruptedException e2) {
-					e2.printStackTrace();
+					log.info(e2);
 				}
 				refresh = true;
 
@@ -94,13 +94,13 @@ public class Runnable implements java.lang.Runnable {
 					try {
 						runnable.refresh(location, beforeTime);
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						log.info(e1);
 					}
 
 					try {
 						Thread.sleep(sleepSeconds * 1000);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						log.info(e);
 					}
 
 				}

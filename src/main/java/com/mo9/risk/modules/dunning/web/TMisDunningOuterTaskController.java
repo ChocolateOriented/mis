@@ -31,13 +31,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
+import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
+import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
+import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -71,6 +78,14 @@ public class TMisDunningOuterTaskController extends BaseController {
 	private TBuyerContactService tBuyerContactService;
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
+	@Autowired
+	private TMisChangeCardRecordService tMisChangeCardRecordService;
+	@Autowired
+	private TMisDunningDeductService tMisDunningDeductService;
+	@Autowired
+	private TMisDunningTagService tMisDunningTagService;
+	@Autowired
+	private TMisDunningScoreCardService tMisDunningScoreCardService;
 	
 	@ModelAttribute("dunningOrder")
 	public DunningOrder getDunningOrder(@RequestParam(required=false) String id) {
@@ -167,6 +182,32 @@ public class TMisDunningOuterTaskController extends BaseController {
 			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 			model.addAttribute("personalInfo", personalInfo);
 			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+			TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
+			
+			if (tMisChangeCardRecord == null) {
+				tMisChangeCardRecord = new TMisChangeCardRecord();
+				if (personalInfo != null) {
+					tMisChangeCardRecord.setBankcard(personalInfo.getRemitBankNo());
+					tMisChangeCardRecord.setBankname(personalInfo.getRemitBankName());
+					tMisChangeCardRecord.setIdcard(personalInfo.getIdcard());
+					tMisChangeCardRecord.setMobile(personalInfo.getMobile());
+				}
+			}
+			
+			boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
+			//根据资方和逾期天数判断是否开启代扣
+			boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
+			model.addAttribute("changeCardRecord", tMisChangeCardRecord);
+			model.addAttribute("deductable", deductable && daikouStatus);
+			model.addAttribute("daikouStatus", daikouStatus);
+			
+			TMisDunningTag tMisDunningTag = new TMisDunningTag();
+			tMisDunningTag.setDealcode(dealcode);
+			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
+			model.addAttribute("tags", tags);
+			
+			TMisDunningScoreCard tMisDunningScoreCard = tMisDunningScoreCardService.getScoreCardByDealcode(dealcode);
+			model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
 		} catch (Exception e) {
 			logger.info("切换只读库查询失败：" + e.getMessage());
 			return "views/error/500";
@@ -202,7 +243,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("加载委外手动分配页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOutDistribution";

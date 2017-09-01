@@ -1107,7 +1107,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						//逾期天数
 						overDueDays = daysBetween(repaymentTime, nowDate);
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.info(e);
 					}
 				}else{
 					logger.info("错误，催收任务为null");
@@ -1256,7 +1256,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 				logger.info("redis清理已还清通话记录完成:" + new Date());
 			} catch (Exception e) {
-				e.printStackTrace();
 				logger.warn("redis清理已还清通话记录异常", e);
 			}
 		}
@@ -2748,41 +2747,29 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 
 	}
 
-	public String findOrderByPayCode(TMisDunningOrder order) {
+	public boolean findOrderByPayCode(TMisDunningOrder order) {
 		String payCode = order.getPayCode();
 		if(StringUtils.isEmpty(payCode)){
-			return "daikoufalse";
+			return false;
 		}
 		
 		List<Dict> captials = DictUtils.getDictList("captial_deduct");
 		if (captials == null || captials.size() == 0) {
-			return "daikoutrue";
+			return true;
 		}
 		
 		int overdayas = TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
-		/*if(payCode.contains("mindaipay")){
-			if(overdayas<2){
-				return "daikoufalse";	
-			}
-		}
-		if(payCode.contains("lianlianpay")||payCode.contains("yilianpay")||payCode.contains("suixinpay")||payCode.contains("unspay")||
-			payCode.contains("chinapay")||payCode.contains("manualpay")||payCode.contains("baofoopay")||payCode.contains("yichuangpay")||
-			payCode.contains("koudaipay")||payCode.contains("kaolapay")||payCode.contains("dianrongpay")){
-			if(overdayas<0){
-				return "daikoufalse";
-			}
-		}*/
 		
 		for (Dict captial : captials) {
 			String captialName = captial.getLabel();
 			int days = Integer.parseInt(captial.getValue());
 			
 			if (payCode.contains(captialName) && overdayas >= days) {
-				return "daikoutrue";
+				return true;
 			}
 		}
 		
-		return "daikoufalse";
+		return false;
 	}
 	/**
 	 * 验证手机号码和电话号码的格式是否对.第一个参数为号码.第二个参数为类型(1表示手机号码.2表示电话号码)
@@ -2805,12 +2792,17 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	/**
-	 * 查询用户身份证影像资料
+	 * 查询用户影像资料
 	 * @param buyerid
 	 * @return
 	 */
-	public String findBuyerIdCardImg(String buyerid) {
-		return tMisDunningTaskDao.findBuyerIdCardImg(buyerid);
+	public String findBuyerImg(String buyerid) {
+		TRiskBuyerPersonalInfo personInfo = tMisDunningTaskDao.findBuyerImg(buyerid);
+		
+		if (personInfo == null) {
+			return "";
+		}
+		return StringUtils.isBlank(personInfo.getImgFiled4()) ? personInfo.getImgFiled3() : personInfo.getImgFiled4(); 
 	}
 
 	/**
@@ -3142,7 +3134,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			Date Yesterday = TMisMigrationRateReportService.getDate(-1);
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(Yesterday);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info(e);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}

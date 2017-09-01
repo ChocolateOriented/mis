@@ -51,7 +51,6 @@ public class InsertRedisThread  implements Runnable{
 				logger.info("线程" + Thread.currentThread().getName() +"查询预提醒新进入正在催收案件buyerid为0个" + new Date());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.warn("线程" + Thread.currentThread().getName() +"redis缓存预提醒通话记录异常", e);
 		}
 	}
@@ -73,9 +72,9 @@ public class InsertRedisThread  implements Runnable{
 				Map<String, Object> map2 = new HashMap<String, Object>();
 				DbUtils dbUtils = new DbUtils();
 //				List<TRiskBuyerContactRecords> contactRecordsList = null;
-				System.out.println("预缓存通话记录切源查询buyerId：" + buyerId);
+				logger.info("预缓存通话记录切源查询buyerId：" + buyerId);
 				List<TRiskBuyerContactRecords> contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
-				System.out.println("buyerId：" + buyerId + "预缓存通话记录条数：" + contactRecordsList.size());
+				logger.info("buyerId：" + buyerId + "预缓存通话记录条数：" + contactRecordsList.size());
 				
 				if(!contactRecordsList.isEmpty()){
 					for(TRiskBuyerContactRecords records : contactRecordsList){
@@ -101,11 +100,10 @@ public class InsertRedisThread  implements Runnable{
 				}
 				JedisUtils.setObject(pagecount, contactRecordsList.size(), cacheSeconds);
 			}else{
-				System.out.println("buyerId:" + buyerId + "缓存已存在");
+				logger.info("buyerId:" + buyerId + "缓存已存在");
 			}
 		} catch (Exception e) {
-			System.out.println("预缓存通讯失败：buyerid-"+buyerId);
-			e.printStackTrace();
+			logger.info("预缓存通讯失败：buyerid-"+buyerId,e);
 			return "f";
 		}
 		return "t";

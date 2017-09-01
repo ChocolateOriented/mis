@@ -467,13 +467,13 @@
 			<li><label>订单号</label>
 				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			<li><label>是否优质</label>
+			<%-- <li><label>是否优质</label>
 				<form:select  id="quality" path="quality" class="input-medium">
 					<form:option selected="selected" value="" label="全部"/>
 					<form:option value="y" label="是"/>
 					<form:option value="n" label="否"/>
 				</form:select>
-			</li>
+			</li> --%>
 			<c:if test="${tmiscycle eq 'numberClean' }">
 			
 				<li><label>号码清洗</label>
@@ -652,7 +652,7 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-				<th>是否优质</th>
+				<!-- <th>是否优质</th> -->
 				<c:if test="${tmiscycle eq 'numberClean' }">
 				<th>号码清洗</th>
 				</c:if>
@@ -733,7 +733,7 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-				<td>
+				<%-- <td>
 					<c:choose>  
 						<c:when test="${dunningOrder.quality  eq 'y'}">  
 							<c:out value="是" />
@@ -743,7 +743,7 @@
 						</c:otherwise>  
 					</c:choose>
 
-				</td>
+				</td> --%>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
 					  <c:if test="${dunningOrder.status eq 'payment'}">

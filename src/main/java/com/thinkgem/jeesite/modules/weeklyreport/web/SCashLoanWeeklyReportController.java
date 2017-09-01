@@ -148,7 +148,7 @@ public class SCashLoanWeeklyReportController extends BaseController {
 //				map.put("amplitudePercentage", amplitudePercentages);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("获取累计订单数",e);
 		}
 		return map;
 	}
