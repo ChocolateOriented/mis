@@ -669,9 +669,10 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 					data.add(null);
 				}
 			}
-
+			//fixme NullPointerException at java.lang.Double.parseDouble(Double.java:540)
 			for (int index = 0; index < data.size(); index++) {
-				String value = data.get(index) == null ? "" : data.get(index).toString();
+
+				String value = data.get(index) == null ? null : data.get(index).toString();
 				dataset.setValue(Double.parseDouble(value), name, categories[index]);
 			}
 		}
