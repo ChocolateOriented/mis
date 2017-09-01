@@ -929,7 +929,8 @@
 	<select id="newfindMigrateChartList" resultType="TMisMigrationRateReport">
 	SELECT
 		a.datetime AS "datetime",
-		a.#{migrate}*100 AS "cpvalue",
+		a.${migrate}*100 AS "cpvalue",
+		a.cycle AS "cycle",
 		c.datetime_start AS "datetimeStart",
 		c.datetime_end AS "datetimeEnd"
 	FROM

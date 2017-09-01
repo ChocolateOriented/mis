@@ -10,6 +10,7 @@ import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
+import com.mo9.risk.util.ChartUtils;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -18,6 +19,11 @@ import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -30,8 +36,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import javax.mail.util.ByteArrayDataSource;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 2017-07-24
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisMigrationRateReportService extends CrudService<TMisMigrationRateReportDao, TMisMigrationRateReport> {
 	
@@ -574,14 +587,27 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 自动邮件
 	 */
-	@Scheduled(cron = "0 0 8 * * ?")
+	@Scheduled(cron = "0 * * * * ?")
+//	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
 		String receiver = DictUtils.getDictValue("migration_rate_report_receiver", "sys_email", "");
 		if (StringUtils.isBlank(receiver)){
 			logger.warn("自动发送迁徙率报表失败, 未配置收件人邮箱");
 			return;
 		}
+
 		logger.info("自动发送迁徙率报表邮件至"+receiver);
+		//获取迁徙率
+		Collection<MigrateChart> migrateCharts = this.getCycleData(Migrate.cp1new,5);
+		//生成图表
+		DataSource cp1newChart;
+		try {
+			cp1newChart = new ByteArrayDataSource(this.createChart(migrateCharts,"户数迁徙_C-P1"), "image/png");
+		} catch (IOException e) {
+			logger.warn("月报表自动邮件添加附件失败", e);
+			return;
+		}
+		//发送邮件
 		MailSender mailSender = new MailSender(receiver);
 		String data = DateUtils.getDate("MM月dd日");
 		mailSender.setSubject("截止"+data+"迁徙率");
@@ -596,26 +622,19 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		content.append("<p>户数迁徙</p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
 		content.append("</table>");
 
 		content.append("<p>本金迁徙</p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:testImage'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
 		content.append("</table>");
 
 		mailSender.setContent(content.toString());
 		//添加图片
-		DataSource dataSource;
-		try {
-			dataSource = new FileDataSource("C:/Users/jxLi/git/misrepo/LineChart.jpeg") ;
-		}catch (Exception e) {
-			logger.warn("迁徙率报表自动邮件添加图片失败", e);
-			return;
-		}
-		mailSender.addImage(dataSource,"testImage");
+		mailSender.addImage(cp1newChart,"cp1newChart");
 
 		//发送
 		try {
@@ -625,4 +644,69 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			logger.warn("迁徙率报表自动邮件发送失败", e);
 		}
 	}
+
+	//创建
+	public ByteArrayInputStream createChart(Collection<MigrateChart> migrateCharts,String title) {
+		//横坐标节点个数为16(天)
+		int xSize = 16 ;
+		String[] categories = new String[16];
+		for (int i = 0; i < xSize; i++) {
+			categories[i]=(i+1)+"";
+		}
+
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		logger.debug(migrateCharts.size()+"");
+		for (MigrateChart serie : migrateCharts) {
+			String name = serie.getName();
+			List<Object> data = serie.getData();
+			if (data == null) {
+				continue;
+			}
+			//若数据不足,则填充null
+			if (data.size() < xSize) {
+				int size = data.size();
+				for (int i = 0; i < 16 - size; i++) {
+					data.add(null);
+				}
+			}
+
+			for (int index = 0; index < data.size(); index++) {
+				String value = data.get(index) == null ? "" : data.get(index).toString();
+				dataset.setValue(Double.parseDouble(value), name, categories[index]);
+			}
+		}
+
+		// 2：创建Chart[创建不同图形]
+		JFreeChart chart = ChartFactory.createLineChart(title, "", "单位 (%)",dataset );
+		ChartUtils.setChartTheme();
+		// 3:设置抗锯齿，防止字体显示不清楚
+		ChartUtils.setAntiAlias(chart);// 抗锯齿
+		// 4:对柱子进行渲染[[采用不同渲染]]
+		ChartUtils.setLineRender(chart.getCategoryPlot(), false,true);//
+		// 5:对其他部分进行渲染
+		ChartUtils.setXAixs(chart.getCategoryPlot());// X坐标轴渲染
+		ChartUtils.setYAixs(chart.getCategoryPlot());// Y坐标轴渲染
+		// 设置标注无边框
+		chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
+		//最大设为30k
+		ByteArrayOutputStream out = new ByteArrayOutputStream(30*1024);
+		try {
+			ChartUtilities.writeChartAsPNG(out, chart, 800, 400);
+			out.flush();
+		} catch (Exception e) {
+			logger.info("创建图表"+title+"失败", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+			}
+		}
+		ByteArrayInputStream in;
+		in = new ByteArrayInputStream(out.toByteArray());
+		return in;
+	}
+
 }
