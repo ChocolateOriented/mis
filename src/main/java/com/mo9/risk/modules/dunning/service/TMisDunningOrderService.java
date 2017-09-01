@@ -165,7 +165,7 @@ public class TMisDunningOrderService extends BaseService{
 	 */
 		public List<String> findAbnormalOrderFromRisk(List<String> shouldPayoffOrderDelcodes) {
 			try {
-				DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+				DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
 				return orderForRiskService.findPaymentOrederWithNewTransactional(shouldPayoffOrderDelcodes);
 			} finally {
 				DynamicDataSource.setCurrentLookupKey("dataSource");
@@ -179,7 +179,7 @@ public class TMisDunningOrderService extends BaseService{
 	 */
 	public DunningOrder findOrderByDealcodeFromRisk(String dealcode) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+			DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
 			return orderForRiskService.findOrderByDealcodeWithNewTransactional(dealcode);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
