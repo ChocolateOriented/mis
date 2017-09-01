@@ -35,7 +35,7 @@ public class TMisDunningOrderService extends BaseService{
 	@Autowired
 	private RiskOrderManager orderManager;
 	@Autowired
-	private TMisDunningOrderForRiskService orderForRiskService;
+	private TMisDunningForRiskService orderForRiskService;
 
 
 	/***

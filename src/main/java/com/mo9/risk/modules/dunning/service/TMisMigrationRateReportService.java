@@ -3,12 +3,13 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.bean.MigrateChart;
 import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
-import com.mo9.risk.modules.dunning.entity.TMisMigrateMail;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -23,12 +24,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.MessagingException;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -46,7 +48,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	
 	@Autowired
 	private TMisMigrationRateReportDao tMisMigrationRateReportDao;
-	
+	@Autowired
+	private TMisDunningForRiskService forRiskService;
 
 	public TMisMigrationRateReport get(String id) {
 		return super.get(id);
@@ -503,111 +506,68 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		
 		return tMisMigrationRateReportDao.findMigrateChartList(tMisMigrationRateReport);
 	}
-	
-	public List<TMisMigrationRateReport> newfindMigrateChartList(TMisMigrationRateReport tMisMigrationRateReport){
-		
-		return tMisMigrationRateReportDao.newfindMigrateChartList(tMisMigrationRateReport);
-	}
+
 	/**
-	 * 创建类别数据集合
+	 * @Description  查询最近几个周期的迁徙率
+	 * @param migrate 迁徙率类型
+	 * @param cycleNum 周期数量
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport>
 	 */
-	public static DefaultCategoryDataset createDefaultCategoryDataset(List<TMisMigrateMail> series, String[] categories) {
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-		for (TMisMigrateMail serie : series) {
-			String name = serie.getName();
-			List<Object> data = serie.getData();
-			if(series!=null&&data.size()<16){
-				int size = data.size();
-				for (int i = 0; i < 16-size; i++) {
-					data.add(null);
-				}
-			}
-			if (data != null && categories != null && data.size() == categories.length) {
-				for (int index = 0; index < data.size(); index++) {
-					String value = data.get(index) == null ? "" : data.get(index).toString();
-					if (isPercent(value)) {
-						value = value.substring(0, value.length() - 1);
-					}
-					if (isNumber(value)) {
-						dataset.setValue(Double.parseDouble(value), name, categories[index]);
-					}
-				}
-			}
-
-		}
-		return dataset;
-
-	}
-	/**
-	 *
-	 * @param tmMigrationRateReport 必须合理指定该对象的cyclenum 长度和migrate的值
-	 * @return
-	 */
-	public   List<TMisMigrateMail>  getCycleData(TMisMigrationRateReport tmMigrationRateReport){
-
-		if(tmMigrationRateReport.getCycleNum()>5||tmMigrationRateReport.getCycleNum()<2){
-			logger.warn("迁徙为查到数据,请传合理的参数");
-			return null;
-		}
+	public List<TMisMigrationRateReport> newfindMigrateChartListFromRisk(Migrate migrate,Integer cycleNum){
 		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
-		List<TMisMigrationRateReport> migrateList;
 		try{
-
-			migrateList = tMisMigrationRateReportService.newfindMigrateChartList(tmMigrationRateReport);
+			return forRiskService.newfindMigrateChartList(migrate,cycleNum);
 		}finally{
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
+	}
+
+/**
+ * @Description  查询最近几个周期的迁徙率, 按周期分组
+ * @param migrate 迁徙率类型
+ * @param cycleNum 周期数量
+ * @return java.util.Collection<com.mo9.risk.modules.dunning.bean.MigrateChart>
+ */
+	public Collection<MigrateChart> getCycleData(Migrate migrate,Integer cycleNum){
+
+		if(cycleNum>5 || cycleNum<2){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+
+		List<TMisMigrationRateReport> migrateList = this.newfindMigrateChartListFromRisk(migrate, cycleNum);
+
 		if(null==migrateList){
 			logger.warn("迁徙为查到数据,请传合理的参数");
 			return null;
 		}
-		List<TMisMigrateMail> series = new ArrayList<TMisMigrateMail>();
-		// 柱子名称：柱子所有的值集合
-		int z=0;
-		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
-		for (int i = 0; i < tmMigrationRateReport.getCycleNum(); i++) {
 
-			List<Object> data= new ArrayList<Object>(20);
-			int y=0;
-			while( true) {
-				//每个周期的第一个数据肯定保存起来
-				if(y==0){
-					BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
-					data.add(bigDecimal.doubleValue());
-				}
-				//关于第二个数据就要判断是否是和之前一个是同一个周期.不是跳出内循环.
-				if(y>0){
-					if(migrateList.get(z).getCycle().equals(migrateList.get(z-1).getCycle())){
-						//周期相同是同一个周期
-						BigDecimal bigDecimal=migrateList.get(z).getCpvalue();
-						data.add(bigDecimal.doubleValue());
-					}else{
-						//不是同一个周期,封装对象,添加到集合
-						TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
-						tMisMigrateMail.setData(data);
-						String start = sd.format(migrateList.get(z-1).getDatetimeStart());
-						String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
-						tMisMigrateMail.setName(start+"-"+end);
-						series.add(tMisMigrateMail);
-						break;
-					}
-				}
-				//最后一个数据要注意
-				if(migrateList.size()==(z+1)){
-					TMisMigrateMail tMisMigrateMail=new TMisMigrateMail();
-					tMisMigrateMail.setData(data);
-					String start = sd.format(migrateList.get(z-1).getDatetimeStart());
-					String end = sd.format(migrateList.get(z-1).getDatetimeEnd());
-					tMisMigrateMail.setName(start+"-"+end);
-					series.add(tMisMigrateMail);
-					break;
-				}
-				y++;
-				z++;
+		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		//将数据按周期分组
+		Map<String, MigrateChart> migrateCycleData = new HashMap<String, MigrateChart>();
+
+		for (int i = 0; i < migrateList.size(); i++) {
+			TMisMigrationRateReport migrationRateReport = migrateList.get(i);
+			String cycle = migrationRateReport.getCycle();
+
+			//获取对应周期的数据集合
+			List<Object> data;
+			if (!migrateCycleData.containsKey(cycle)){//若不存在则新建一个MigrateChart
+				data = new ArrayList<Object>();
+				MigrateChart migrateChart = new MigrateChart();
+				migrateChart.setData(data);
+				String start = sd.format(migrationRateReport.getDatetimeStart());
+				String end = sd.format(migrationRateReport.getDatetimeEnd());
+				migrateChart.setName(start+"-"+end);
+
+				migrateCycleData.put(cycle, migrateChart);
+			}else {
+				data = migrateCycleData.get(cycle).getData();
 			}
+			data.add(migrationRateReport.getCpvalue());
 		}
-		return series;
+
+		return migrateCycleData.values();
 	}
 
 	/**

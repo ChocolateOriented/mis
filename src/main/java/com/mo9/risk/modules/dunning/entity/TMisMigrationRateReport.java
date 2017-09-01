@@ -281,8 +281,14 @@ public class TMisMigrationRateReport extends DataEntity<TMisMigrationRateReport>
 		this.monthUpDown = monthUpDown;
 	}
 
-
-	
-	
-	
+	public enum Migrate {
+		cp1new,
+		cp2new,
+		cp3new,
+		cp4new,
+		cp1corpus,
+		cp2corpus,
+		cp3corpus,
+		cp4corpus
+	}
 }

@@ -1,4 +1,4 @@
-package com.mo9.risk.modules.dunning.entity;
+package com.mo9.risk.modules.dunning.bean;
 
 	import java.io.Serializable;
 	import java.util.ArrayList;
@@ -14,13 +14,13 @@ package com.mo9.risk.modules.dunning.entity;
 	 * </p>
 	 * 
 	 */
-	public class TMisMigrateMail implements Serializable {
+	public class MigrateChart implements Serializable {
 
 	    private static final long serialVersionUID = 1L;
 	    private String name;// 名字
 	    private List<Object> data;// 数据值ֵ
 
-	    public TMisMigrateMail() {
+	    public MigrateChart() {
 
 	    }
 
@@ -31,7 +31,7 @@ package com.mo9.risk.modules.dunning.entity;
 	     * @param data
 	     *            数据（线条上的所有数据值）
 	     */
-	    public TMisMigrateMail(String name, List<Object> data) {
+	    public MigrateChart(String name, List<Object> data) {
 
 	        this.name = name;
 	        this.data = data;
@@ -44,7 +44,7 @@ package com.mo9.risk.modules.dunning.entity;
 	     * @param array
 	     *            数据（线条上的所有数据值）
 	     */
-	    public TMisMigrateMail(String name, Object[] array) {
+	    public MigrateChart(String name, Object[] array) {
 	        this.name = name;
 	        if (array != null) {
 	            data = new ArrayList<Object>(array.length);
