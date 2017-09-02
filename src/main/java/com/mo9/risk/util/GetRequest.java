@@ -52,6 +52,24 @@ public class GetRequest
      */
     public static String getRequest(String uri, Map<String, String> params) throws IOException
     {
+    	return getRequest(uri, params, 30000);
+    }
+	
+    /**
+     * Post请求
+     * 
+     * @param url
+     *            请求的URL
+     * @param params
+     *            请求参数
+     * @param timeout
+     *            超时时间
+     * @return 应答报文
+     * @throws IOException
+     *             如果请求失败，抛出该异常
+     */
+    public static String getRequest(String uri, Map<String, String> params, int timeout) throws IOException
+    {
         // 拼接请求参数
         StringBuffer param = new StringBuffer();
         Set<String> keys = params.keySet();
@@ -61,7 +79,7 @@ public class GetRequest
             String value = URLEncoder.encode(params.get(key), "UTF-8");
             param.append("&" + key + "=" + value);
         }
-        return getRequest(uri, param.toString());
+        return getRequest(uri, param.toString(), timeout);
     }
     
     /**
@@ -102,6 +120,24 @@ public class GetRequest
      */
     public static String getRequest(String uri, String data) throws IOException
     {
+    	return getRequest(uri, data, 30000);
+    }
+    
+    /**
+     * Post请求
+     * 
+     * @param url
+     *            请求的URL
+     * @param params
+     *            请求参数
+     * @param timeout
+     *            超时时间
+     * @return 应答报文
+     * @throws IOException
+     *             如果请求失败，抛出该异常
+     */
+    public static String getRequest(String uri, String data, int timeout) throws IOException
+    {
         trustAllHosts();// 信任所有主机
         // 拼接请求参数
         StringBuffer param = new StringBuffer(data);
@@ -121,8 +157,8 @@ public class GetRequest
         conn.setRequestMethod("GET");
         if(url.getHost().contains("mo9.com"))
         {/**mo9类部地址,仅仅允许2秒超时.*/
-            conn.setConnectTimeout(30000);// 连接超时
-            conn.setReadTimeout(30000);// 超时时限
+            conn.setConnectTimeout(timeout);// 连接超时
+            conn.setReadTimeout(timeout);// 超时时限
         }
         else
         {

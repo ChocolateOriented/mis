@@ -5,6 +5,8 @@ package com.mo9.risk.modules.dunning.entity;
 
 import org.hibernate.validator.constraints.Length;
 import java.util.Date;
+
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -40,6 +42,7 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 		return contactName;
 	}
 
+	@JSONField(name="contact_name")
 	public void setContactName(String contactName) {
 		this.contactName = contactName;
 	}
@@ -49,6 +52,7 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 		return contactMobile;
 	}
 
+	@JSONField(name="contact_mobile")
 	public void setContactMobile(String contactMobile) {
 		this.contactMobile = contactMobile;
 	}

@@ -63,7 +63,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	@Autowired
 	private TRiskBuyerWorkinfoDao tRiskBuyerWorkinfoDao;
 	@Autowired
-	private TBuyerContactDao  tBuyerContactDao;
+	private TBuyerContactService  tBuyerContactService;
 	@Autowired
 	private TRiskBuyerContactRecordsDao tRiskBuyerContactRecordsDao;
 	@Autowired
@@ -124,7 +124,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		} else if ("communcate".equals(type)) {// 通话记录
 			return this.findCommunicateByBuyerId(buyerId);
 		} else if ("cantact".equals(type)) {// 通讯录
-			return tBuyerContactDao.getContactsByBuyerId(buyerId);
+			return tBuyerContactService.getContactsByBuyerId(buyerId);
 		} else {// 夫妻(married),同事(workmate),父母(parent),子女(children),朋友(friend),亲戚(relatives)
 			return tRiskBuyer2contactsDao.getSendMsgByBuyerIdAndType(buyerId, type);
 		}

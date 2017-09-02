@@ -5,8 +5,9 @@ package com.mo9.risk.modules.dunning.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.thinkgem.jeesite.common.persistence.CrudDao;
-import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
@@ -22,4 +23,12 @@ public interface TBuyerContactDao extends CrudDao<TBuyerContact> {
 	public List<TBuyerContact> findList(TBuyerContact tBuyerContact);
 	
 	public List<TMisSendMsgInfo> getContactsByBuyerId(String buyerId);
+	
+	/**
+	 * 查询通讯录号码的电话短信催收记录数
+	 * @param tBuyerContact
+	 * @param dealcode
+	 * @return
+	 */
+    public List<TBuyerContact> getContantRecordCnt(@Param("contacts") List<TBuyerContact> tBuyerContact, @Param("dealcode") String dealcode);
 }
