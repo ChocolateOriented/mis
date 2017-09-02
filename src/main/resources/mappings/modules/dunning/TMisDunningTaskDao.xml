@@ -1845,6 +1845,24 @@
 	        AND DATEDIFF(curdate(), o.repayment_time) = #{day}
 	        AND o.buyer_id is not null
     </select>
+    
+    
+    <select id="findThreadBuyeridByNewTask" resultType="com.mo9.risk.modules.dunning.bean.ThreadBuyerid">
+        SELECT
+	        o.buyer_id as buyerid,
+	        b.mobile AS "mobile"
+        FROM t_mis_dunning_task AS t
+	        LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+	        LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
+        WHERE
+			o.type = 'loan'
+	        AND o.merchant_id = 7
+			AND o.status = 'payment'
+	        AND t.dunningtaskstatus ='dunning'
+	        AND DATEDIFF(curdate(), o.repayment_time) = #{day}
+	        AND o.buyer_id is not null
+    </select>
+    
 
 	<select id="findBuyerImg" resultType="TRiskBuyerPersonalInfo">
         SELECT

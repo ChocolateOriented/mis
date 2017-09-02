@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.mo9.risk.modules.dunning.bean.ThreadBuyerid;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -288,6 +289,13 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
+	
+	
+	/**
+	 * 查询预提醒新进入正在催收案件buyerid和mobile
+	 * @return
+	 */
+	public Vector<ThreadBuyerid> findThreadBuyeridByNewTask(@Param("day")String day);
 	
 	/**
 	 * 查询用户影像资料

@@ -20,9 +20,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mo9.risk.modules.dunning.bean.ThreadBuyerid;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerContactRecordsDao;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
+import com.mo9.risk.modules.dunning.manager.RiskContactRecordsManager;
 import com.mo9.risk.util.InsertRedisThread;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
@@ -62,22 +64,33 @@ public class TRiskBuyerContactRecordsService {
 	 * @param buyerId
 	 * @return
 	 */
-	public Page<TRiskBuyerContactRecords> findPageByRediscache(Page<TRiskBuyerContactRecords> page, TRiskBuyerContactRecords tRiskBuyerContactRecords,String buyerId) {
+	public Page<TRiskBuyerContactRecords> findPageByRediscache(Page<TRiskBuyerContactRecords> page, TRiskBuyerContactRecords tRiskBuyerContactRecords,String buyerId,String mobile) {
 		String pageKey =   "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_buyerId:"+ tRiskBuyerContactRecords.getBuyerId() + "_PageNo:" + page.getPageNo() + "_PageSize:" + page.getPageSize() ;
 		String pagecount = "TRiskBuyerContactRecords_findBuyerContactRecordsListByBuyerId_listSize_buyerId:"+ tRiskBuyerContactRecords.getBuyerId();
 		if(null == JedisUtils.getObjectMap(pageKey)){
+			logger.info("手机号码" + mobile +"&buyerId" + buyerId + "未找到缓存，预先进入http接口返回通讯录");
 			int index = 1;
 			int PageNo = 1;
 			Map<String, Object> map2 = new HashMap<String, Object>();
 //			List<TRiskBuyerContactRecords> contactRecordsList = tRiskBuyerContactRecordsDao.findBuyerContactRecordsListByBuyerId(tRiskBuyerContactRecords);
 			DbUtils dbUtils = new DbUtils();
-			List<TRiskBuyerContactRecords> contactRecordsList = null;
+			List<TRiskBuyerContactRecords> contactRecordsList = null;            
+			RiskContactRecordsManager contactRecordsManager = new RiskContactRecordsManager();
 			try {
-				logger.info("通话记录buyerId切源查询:" + buyerId);
-				contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
-				logger.info("通话记录条数："+contactRecordsList.size());
-			} catch (Exception e) {
-				logger.info("通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId(),e);
+				contactRecordsList = contactRecordsManager.findByByMobile(mobile);
+				logger.info("http接口返回通讯录条数：" + contactRecordsList.size());
+			} catch (Exception e1) {
+				logger.warn("http接口返回通讯录失败：mobile-"+ mobile, e1);
+			}
+			
+			if(null == contactRecordsList || contactRecordsList.isEmpty()){
+				try {
+					logger.info("http接口返回null,通话记录buyerId切源查询:" + buyerId);
+					contactRecordsList = dbUtils.findBuyerContactRecordsListByBuyerId(buyerId);
+					logger.info("切源查询通话记录条数："+contactRecordsList.size());
+				} catch (Exception e) {
+					logger.warn("切源查询通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId(),e);
+				}
 			}
 			if(!contactRecordsList.isEmpty()){
 				for(TRiskBuyerContactRecords records : contactRecordsList){
@@ -175,8 +188,59 @@ public class TRiskBuyerContactRecordsService {
 	
 	
 	
+//	/**
+//	 *  定时缓存预提醒通话记录任务
+//	 */
+//	@Transactional(readOnly = false)
+//	public void insertDunningTaskJedisJob(){
+//		
+//		String scheduledBut =  DictUtils.getDictValue("insertDunningTaskJedis","Scheduled","false");
+//		if(scheduledBut.equals("true")){
+//			
+//			logger.info("redis开始预缓存提醒通话记录任务:" + new Date());
+//			String begin_Q0 = tMisDunningTaskService.getCycleDict_Q0().get("begin");
+//			logger.info("redis预提醒DAY:" + begin_Q0);
+//			Vector<String> buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
+////			List<String>  buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
+//			
+//			if(!buyerids.isEmpty()){
+//				logger.info("redis缓存预提醒通话记录总条数:" + buyerids.size());
+////				for(String buyerid : buyerids){
+////					String mes = insertDunningTaskJedis(buyerid);
+////					if("f".equals(mes)){
+////						logger.warn("缓存失败buyerid:"+ buyerid + new Date());
+////					}
+////				}
+//				int index = 0;
+//				List<Vector<String>> result = new ArrayList<Vector<String>>();
+//				Integer threadNum = Integer.parseInt(DictUtils.getDictDescription("insertDunningTaskJedis","Scheduled","10"));
+//				for (int i = 0; i < threadNum; i++) {
+//					result.add(new Vector<String>());
+//				}
+//				for (int i = 0; i < buyerids.size(); i++) {
+//					result.get(index).add(buyerids.get(i));
+//					if (++index >= threadNum) {
+//						index = 0;
+//					}
+//				}
+//				for(Vector<String> threadBuyerids : result){
+//					InsertRedisThread insertRedisThread = new InsertRedisThread();
+//					insertRedisThread.setBuyerids(threadBuyerids);
+//					insertRedisThread.setCacheSeconds(cacheSeconds);
+//					new Thread(insertRedisThread).start();
+//				}
+//				logger.info("redis缓存预通话记录定时多线程任务完成:" + new Date());
+//			}else{
+//				logger.info("查询预提醒新进入正在催收案件buyerid为0个" + new Date());
+//			}
+//			
+//		}
+//		
+//	}
+	
+	
 	/**
-	 *  定时缓存预提醒通话记录任务
+	 *  定时缓存预提醒通话记录任务 - new 
 	 */
 	@Scheduled(cron = "0 20 3 * * ?")  //每天上午4点10
 	@Transactional(readOnly = false)
@@ -188,22 +252,15 @@ public class TRiskBuyerContactRecordsService {
 			logger.info("redis开始预缓存提醒通话记录任务:" + new Date());
 			String begin_Q0 = tMisDunningTaskService.getCycleDict_Q0().get("begin");
 			logger.info("redis预提醒DAY:" + begin_Q0);
-			Vector<String> buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
-//			List<String>  buyerids = tMisDunningTaskDao.findBuyeridByNewTask(begin_Q0);
+			Vector<ThreadBuyerid> buyerids = tMisDunningTaskDao.findThreadBuyeridByNewTask(begin_Q0);
 			
 			if(!buyerids.isEmpty()){
 				logger.info("redis缓存预提醒通话记录总条数:" + buyerids.size());
-//				for(String buyerid : buyerids){
-//					String mes = insertDunningTaskJedis(buyerid);
-//					if("f".equals(mes)){
-//						logger.warn("缓存失败buyerid:"+ buyerid + new Date());
-//					}
-//				}
 				int index = 0;
-				List<Vector<String>> result = new ArrayList<Vector<String>>();
+				List<Vector<ThreadBuyerid>> result = new ArrayList<Vector<ThreadBuyerid>>();
 				Integer threadNum = Integer.parseInt(DictUtils.getDictDescription("insertDunningTaskJedis","Scheduled","10"));
 				for (int i = 0; i < threadNum; i++) {
-					result.add(new Vector<String>());
+					result.add(new Vector<ThreadBuyerid>());
 				}
 				for (int i = 0; i < buyerids.size(); i++) {
 					result.get(index).add(buyerids.get(i));
@@ -211,9 +268,9 @@ public class TRiskBuyerContactRecordsService {
 						index = 0;
 					}
 				}
-				for(Vector<String> threadBuyerids : result){
+				for(Vector<ThreadBuyerid> threadBuyerids : result){
 					InsertRedisThread insertRedisThread = new InsertRedisThread();
-					insertRedisThread.setBuyerids(threadBuyerids);
+					insertRedisThread.setThreadBuyerids(threadBuyerids);
 					insertRedisThread.setCacheSeconds(cacheSeconds);
 					new Thread(insertRedisThread).start();
 				}
@@ -225,7 +282,6 @@ public class TRiskBuyerContactRecordsService {
 		}
 		
 	}
-	
 
 	
 	
