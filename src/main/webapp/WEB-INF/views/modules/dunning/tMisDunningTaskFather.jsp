@@ -233,7 +233,7 @@
 			 if($(obj).attr('name')=="customerDetails"){
 		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/customerDetails?"+param;
 			 }
-			 if($(obj).attr('nam')=="communicationDetails"){
+			 if($(obj).attr('name')=="communicationDetails"){
 		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/communicationDetails?"+param;
 			 }
 			 if($(obj).attr('name')=="communicationRecord"){

@@ -81,17 +81,17 @@
 	</ul> --%>
 <!-- 	通讯录 -->
 	<sys:message content="${message}"/>
-	<form:form class="submitForm"  action="${ctx}/dunning/tMisDunningTask/communicationDetails" method="get" style="display: none;">
-		<input class="pageNo" name="pageNo" type="hidden" value="${contactPage.pageNo}"/>
-		<input class="pageSize" name="pageSize" type="hidden" value="${contactPage.pageSize}"/>
-		<input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/>
-		<input id ="dealcode" name="dealcode" type="hidden" value="${dealcode}"/>
-		<input id = "dunningtaskdbid" name="dunningtaskdbid" type="hidden" value="${dunningtaskdbid}"/>
-		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
-		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
-		<input id = "dunningCycle" name="dunningCycle" type="hidden" value="${dunningCycle}"/>
- 		<input id = "overdueDays" name="overdueDays" type="hidden" value="${overdueDays}"/>
-	</form:form>
+<%-- 	<form:form class="submitForm"  action="${ctx}/dunning/tMisDunningTask/communicationDetails" method="get" style="display: none;"> --%>
+<%-- 		<input class="pageNo" name="pageNo" type="hidden" value="${contactPage.pageNo}"/> --%>
+<%-- 		<input class="pageSize" name="pageSize" type="hidden" value="${contactPage.pageSize}"/> --%>
+<%-- 		<input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/> --%>
+<%-- 		<input id ="dealcode" name="dealcode" type="hidden" value="${dealcode}"/> --%>
+<%-- 		<input id = "dunningtaskdbid" name="dunningtaskdbid" type="hidden" value="${dunningtaskdbid}"/> --%>
+<%-- 		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/> --%>
+<%-- 		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/> --%>
+<%-- 		<input id = "dunningCycle" name="dunningCycle" type="hidden" value="${dunningCycle}"/> --%>
+<%--  		<input id = "overdueDays" name="overdueDays" type="hidden" value="${overdueDays}"/> --%>
+<%-- 	</form:form> --%>
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">		
 		<thead>
 			<th>序号</th>
