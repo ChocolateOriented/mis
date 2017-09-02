@@ -1177,7 +1177,7 @@ public class TMisDunningTaskController extends BaseController {
 				logger.warn("订单不存在，订单号：" + dealcode);
 				return "views/error/500";
 			}
-			contacts = tBuyerContactService.getBuyerContacts(dealcode, mobile);
+			contacts = tBuyerContactService.getBuyerContacts(dealcode, mobile, buyerId);
 			//contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
 			//task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		} catch (Exception e) {

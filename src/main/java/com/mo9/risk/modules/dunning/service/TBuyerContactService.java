@@ -77,15 +77,15 @@ public class TBuyerContactService {
 	 * @param mobile
 	 * @return
 	 */
-	public List<TBuyerContact> getBuyerContacts(String dealcode, String mobile) {
+	public List<TBuyerContact> getBuyerContacts(String dealcode, String mobile, String buyerId) {
 		List<TBuyerContact> tBuyerContacts = null;
 		try {
 			tBuyerContacts = riskBuyerContactManager.getBuyerContactInfo(mobile);
 			if (tBuyerContacts != null && tBuyerContacts.size() != 0) {
 				fillContantRecordCnt(tBuyerContacts, dealcode);
+				return tBuyerContacts;
 			}
 			
-			return tBuyerContacts;
 		} catch (Exception e) {
 			logger.info("调用江湖救急通讯录接口失败：" + e.getMessage());
 		}
@@ -93,6 +93,7 @@ public class TBuyerContactService {
 		//异常或接口无数据时查询mis库
 		TBuyerContact tBuyerContact = new TBuyerContact();
 		tBuyerContact.setDealcode(dealcode);
+		tBuyerContact.setBuyerId(buyerId);
 		return tBuyerContactDao.findList(tBuyerContact);
 	}
 	
