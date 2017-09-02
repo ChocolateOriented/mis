@@ -1,7 +1,9 @@
 package com.mo9.risk.modules.dunning.manager;
 
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,10 @@ public class RiskContactRecordsManager {
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords>
 	 */
 	public List<TRiskBuyerContactRecords> findByByMobile(String mobile){
+//		if (StringUtils.isBlank(mobile)){
+//			return
+//		}
+
 		return null ;
 	}
 }
