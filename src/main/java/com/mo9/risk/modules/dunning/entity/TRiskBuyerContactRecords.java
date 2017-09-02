@@ -181,4 +181,27 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	public void setInDuration(Integer inDuration) {
 		this.inDuration = inDuration;
 	}
+
+	@Override
+	public String toString() {
+		return "TRiskBuyerContactRecords{" +
+				"name='" + name + '\'' +
+				", familyRelation='" + familyRelation + '\'' +
+				", tel='" + tel + '\'' +
+				", location='" + location + '\'' +
+				", times='" + times + '\'' +
+				", smsNum=" + smsNum +
+				", telNum=" + telNum +
+				", dealcode='" + dealcode + '\'' +
+				", rcname='" + rcname + '\'' +
+				", contactType='" + contactType + '\'' +
+				", buyerId='" + buyerId + '\'' +
+				", number=" + number +
+				", sumtime=" + sumtime +
+				", cnt=" + cnt +
+				", duration=" + duration +
+				", inCnt=" + inCnt +
+				", inDuration=" + inDuration +
+				'}';
+	}
 }
