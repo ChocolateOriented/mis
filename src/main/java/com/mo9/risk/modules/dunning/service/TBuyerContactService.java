@@ -62,9 +62,9 @@ public class TBuyerContactService {
 					tMisSendMsgInfo.setName(contact.getContactName());
 					results.add(tMisSendMsgInfo);
 				}
+				return results;
 			}
 			
-			return results;
 		} catch (Exception e) {
 			logger.info("调用江湖救急通讯录接口失败：" + e.getMessage());
 		}
