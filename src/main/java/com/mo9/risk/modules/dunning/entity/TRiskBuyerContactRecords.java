@@ -3,11 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
-import org.hibernate.validator.constraints.Length;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * 通话记录Entity
@@ -30,7 +27,10 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private String buyerId;		// buyer_id
 	private Integer number;
 	private Integer sumtime;
-	
+	private Integer cnt; //通话次数
+	private Integer duration;//通话时长(秒)
+	private Integer inCnt;//被叫次数
+	private Integer inDuration;//被呼叫时长(秒)
 	
 	public TRiskBuyerContactRecords() {
 		super();
@@ -149,7 +149,36 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	public void setSumtime(Integer sumtime) {
 		this.sumtime = sumtime;
 	}
-	
-	
-	
+
+	public Integer getCnt() {
+		return cnt;
+	}
+
+	public void setCnt(Integer cnt) {
+		this.cnt = cnt;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+
+	public Integer getInCnt() {
+		return inCnt;
+	}
+
+	public void setInCnt(Integer inCnt) {
+		this.inCnt = inCnt;
+	}
+
+	public Integer getInDuration() {
+		return inDuration;
+	}
+
+	public void setInDuration(Integer inDuration) {
+		this.inDuration = inDuration;
+	}
 }
