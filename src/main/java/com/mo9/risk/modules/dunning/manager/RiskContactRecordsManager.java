@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 通讯录接口
+ * 通话记录接口
  * Created by jxli on 2017/9/2.
  */
 @Service
@@ -39,7 +39,10 @@ public class RiskContactRecordsManager {
 		}
 
 		String url = riskUrl + "riskbehavior/inner/queryCalllogsInfoByMobile.do?mobile="+mobile;
+		logger.debug("获取通话记录URL"+url);
 		String res = GetRequest.getRequest(url, "");
+		logger.debug(url+"响应结果"+res);
+
 		if (StringUtils.isBlank(res)) {
 			throw new ServiceException("通讯录接口响应异常");
 		}
