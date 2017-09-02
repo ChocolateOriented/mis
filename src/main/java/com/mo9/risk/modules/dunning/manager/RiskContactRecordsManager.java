@@ -9,7 +9,6 @@ import com.mo9.risk.util.GetRequest;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
-import com.thinkgem.jeesite.util.ListSortUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,10 +16,13 @@ import java.util.Comparator;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
+ * 通讯录接口
  * Created by jxli on 2017/9/2.
  */
+@Service
 public class RiskContactRecordsManager {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -38,14 +40,13 @@ public class RiskContactRecordsManager {
 
 		String url = riskUrl + "riskbehavior/inner/queryCalllogsInfoByMobile.do?mobile="+mobile;
 		String res = GetRequest.getRequest(url, "");
-
 		if (StringUtils.isBlank(res)) {
 			throw new ServiceException("通讯录接口响应异常");
 		}
 		RiskContactRecordResponse result = JSON.parseObject(res,RiskContactRecordResponse.class);
 		if (!RiskBaseResponse.RESULT_CODE_SUCCESS.equals(result.getResultCode())){
 			//抛异常回滚
-			logger.info("获取通讯录失败,失败信息: " +result.getResultMsg());
+			logger.info("获取"+mobile+"通讯录失败,失败信息: " +result.getResultMsg());
 			throw new ServiceException(result.getResultMsg());
 		}
 

@@ -3,23 +3,6 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.jboss.logging.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
@@ -36,18 +19,34 @@ import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.manager.RiskContactRecordsManager;
 import com.mo9.risk.util.MsfClient;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 催收任务联系记录Service
@@ -79,6 +78,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	private TMisDunningPeopleDao tmisPeopleDao;
 	@Autowired
 	private TmisDunningSmsTemplateDao tdstDao;
+	@Autowired
+	private RiskContactRecordsManager recordsManager;
 
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
@@ -138,8 +139,38 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		//优先调用接口查询
 		//通过buyerId查询手机号
 		String mobile = tRiskBuyerPersonalInfoDao.findMobileByBuyerId(buyerId);
+		if (StringUtils.isNotBlank(mobile)){
+			List<TRiskBuyerContactRecords> contactRecords;
+			try {
+				contactRecords = recordsManager.findByByMobile(mobile);
+				if (null != contactRecords && contactRecords.size() > 0) {
+					return this.convertContactRecord2MsgInfo(contactRecords);
+				}
+			} catch (Exception e) {
+				logger.info("获取"+mobile+"通讯录失败",e);
+			}
+		}
 		//若未查找则查询数据库
 		return tRiskBuyerContactRecordsDao.getCommunicateByBuyerId(buyerId);
+	}
+
+	/**
+	 * @Description  将通话记录转为SendMsgInfo
+	 * @param contactRecords
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo>
+	 */
+	private List<TMisSendMsgInfo> convertContactRecord2MsgInfo(List<TRiskBuyerContactRecords> contactRecords) {
+		List<TMisSendMsgInfo> msgInfos = new ArrayList<TMisSendMsgInfo>(contactRecords.size());
+		for (TRiskBuyerContactRecords records: contactRecords) {
+			if (records == null){
+				continue;
+			}
+			TMisSendMsgInfo msgInfo = new TMisSendMsgInfo();
+			msgInfo.setMemo(records.getDuration()+"");
+			msgInfo.setTel(records.getTel());
+			msgInfos.add(msgInfo);
+		}
+		return msgInfos;
 	}
 
 	/**
