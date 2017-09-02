@@ -39,7 +39,7 @@ public class RiskContactRecordsManager {
 		}
 
 		String url = riskUrl + "riskbehavior/inner/queryCalllogsInfoByMobile.do?mobile="+mobile;
-		logger.debug("获取通讯录URL"+url);
+		logger.debug("获取通话记录URL"+url);
 		String res = GetRequest.getRequest(url, "");
 		logger.debug(url+"响应结果"+res);
 
