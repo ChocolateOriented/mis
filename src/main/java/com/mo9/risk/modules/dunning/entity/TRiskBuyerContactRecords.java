@@ -27,8 +27,9 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private String buyerId;		// buyer_id
 	private Integer number;
 	private Integer sumtime;
-	private Integer cnt; //通话次数
+//	private Integer cnt; //通话次数
 	private Integer duration;//通话时长(秒)
+
 	private Integer inCnt;//被叫次数
 	private Integer inDuration;//被呼叫时长(秒)
 	
@@ -150,20 +151,20 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 		this.sumtime = sumtime;
 	}
 
-	public Integer getCnt() {
-		return cnt;
-	}
-
 	public void setCnt(Integer cnt) {
-		this.cnt = cnt;
-	}
-
-	public Integer getDuration() {
-		return duration;
+		this.number = cnt;
 	}
 
 	public void setDuration(Integer duration) {
 		this.duration = duration;
+		long hour=duration/3600;
+		long minute=duration%3600/60;
+		long second=duration%60;
+		this.times = hour+"小时"+minute+"分"+second+"秒";
+	}
+
+	public Integer getDuration() {
+		return duration;
 	}
 
 	public Integer getInCnt() {
@@ -180,5 +181,27 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 
 	public void setInDuration(Integer inDuration) {
 		this.inDuration = inDuration;
+	}
+
+	@Override
+	public String toString() {
+		return "TRiskBuyerContactRecords{" +
+				"name='" + name + '\'' +
+				", familyRelation='" + familyRelation + '\'' +
+				", tel='" + tel + '\'' +
+				", location='" + location + '\'' +
+				", times='" + times + '\'' +
+				", smsNum=" + smsNum +
+				", telNum=" + telNum +
+				", dealcode='" + dealcode + '\'' +
+				", rcname='" + rcname + '\'' +
+				", contactType='" + contactType + '\'' +
+				", buyerId='" + buyerId + '\'' +
+				", number=" + number +
+				", sumtime=" + sumtime +
+				", duration=" + duration +
+				", inCnt=" + inCnt +
+				", inDuration=" + inDuration +
+				'}';
 	}
 }

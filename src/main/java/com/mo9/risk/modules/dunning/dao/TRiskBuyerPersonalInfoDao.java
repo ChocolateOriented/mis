@@ -28,4 +28,6 @@ public interface TRiskBuyerPersonalInfoDao {
 	public List<TRiskBuyerPersonalInfo> getMessgeByRepaymentTime();
 	
 	public TRiskBuyerPersonalInfo getbuyerIfo(String dealcode);
+
+	String findMobileByBuyerId(String buyerId);
 }

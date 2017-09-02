@@ -102,10 +102,10 @@
 			<th>操作</th>
 		</thead>
 		<tbody id = "contactTbody">
-			<c:forEach items="${contactPage.list}" var="cp" varStatus="vs">
+			<c:forEach items="${contacts}" var="cp" varStatus="vs">
 			<tr>
 				<td>
-					${(vs.index+1) + (page.pageNo-1) * page.pageSize} 
+					${(vs.index+1)}
 				</td>
 				<td>${cp.contactName}</td>
 <!-- 				<td> -->
@@ -150,7 +150,7 @@
 			</c:forEach>
 		</tbody>	
 	</table>
-	<div class="pagination">${contactPage}</div>
+	<%-- <div class="pagination">${contactPage}</div> --%>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactMobile="${personMobile}" contactstype="${overdueDays<=1 ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
 	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>

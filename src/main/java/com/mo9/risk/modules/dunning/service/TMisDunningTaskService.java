@@ -1454,8 +1454,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		/**
 		 * 倒叙Q5-Q0
 		 */
-		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
-		sortList.sort(dicts, "label", "desc"); 
+		ListSortUtil.sort(dicts, "label", "desc");
 		
 		for(Dict dict : dicts){
 			if(!dict.getLabel().equals(P4_P5) && !dict.getLabel().equals(P3_P4)){
@@ -1496,8 +1495,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //			}
 		}
 		
-		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
-		sortList.sort(dicts, "label", "desc"); 
+		ListSortUtil.sort(dicts, "label", "desc");
 		
 		
 //		/**
