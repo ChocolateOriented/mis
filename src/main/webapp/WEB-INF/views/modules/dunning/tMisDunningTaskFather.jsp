@@ -45,6 +45,8 @@
 			if("${ispayoff}" == "true"){
 				disableBtn();
 			}
+			var	customerDetails=document.getElementById("customerDetails");
+			childPage(customerDetails);
 // 			var s = window.frames["iframe_text"].document.getElementById("aaa").innerHTML;
 // 			$("#btnOk",document.frames("ifm").document).click();
 		});
@@ -222,7 +224,49 @@
 				$.jBox.tip("修改成功", "info");
 			});
 		}
-
+		
+		 var currentPageUrl = null;
+		 function childPage(obj){
+			 $("li").removeClass("active");
+			 $(obj).parent().addClass("active");
+			 var param="mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}";
+			 if($(obj).attr('name')=="customerDetails"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/customerDetails?"+param;
+			 }
+			 if($(obj).attr('nam')=="communicationDetails"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/communicationDetails?"+param;
+			 }
+			 if($(obj).attr('name')=="communicationRecord"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/communicationRecord?"+param;
+			 }
+			 if($(obj).attr('name')=="conclusion"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunnedConclusion/list?"+param;
+			 }
+			 if($(obj).attr('name')=="contantRecord"){
+		      currentPageUrl = "${ctx}/dunning/tMisContantRecord/list?"+param;
+			 }
+			 if($(obj).attr('name')=="orderHistoryList"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/orderHistoryList?"+param;
+			 }
+			 if($(obj).attr('name')=="insertRemittanceConfirmForm"){
+		      currentPageUrl = "${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?"+param;
+			 }
+			 if($(obj).attr('name')=="apploginlogList"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningTask/apploginlogList?"+param;
+			 }
+			 if($(obj).attr('name')=="dunningDeduct"){
+		      currentPageUrl = "${ctx}/dunning/tMisDunningDeduct/list?"+param;
+			 }
+		     page(1);
+	      }
+		 
+			var url = "mobile=" + $('#mobile', parent.document).val();//日志按钮的参数
+		      function page(n, s) {
+		        if (n) $("#pageNo").val(n);
+		        if (s) $("#pageSize").val(s);
+		        $("#ifm").attr("src", currentPageUrl);
+		        return false;
+		      }
 	</script>
 </head>
 <body>
@@ -361,15 +405,25 @@
 	</table>
 	</shiro:hasPermission>
 <br/>
-<c:choose>
-	<c:when test="${personalInfo.overdueDays<=1}">
-		<iframe id="ifm" src="${ctx}/dunning/tMisDunnedConclusion/list?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}&overdueDays=${personalInfo.overdueDays}" frameborder="0"  style="width:100%;height:600px;">
-		</iframe> 
-	</c:when>
-	<c:otherwise>
-		<iframe id="ifm" src="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&mobileSelf=${personalInfo.mobile}&dunningCycle=${dunningCycle}&overdueDays=${personalInfo.overdueDays}" frameborder="0"  style="width:100%;height:600px;">
-		</iframe> 
-	</c:otherwise>
-</c:choose>
+<ul class="nav nav-tabs">
+		<c:if test="${overdueDays>1}">
+			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a id="customerDetails" name="customerDetails" onclick="childPage(this)">单位&联系人</a></li></shiro:hasPermission>
+			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="communicationDetails" onclick="childPage(this)">通讯录</a></li></shiro:hasPermission>
+	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a  name="communicationRecord" onclick="childPage(this)">通话记录</a></li></shiro:hasPermission>
+		</c:if>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="conclusion" onclick="childPage(this)">电催结论记录</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="contantRecord" onclick="childPage(this)">催款历史</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="orderHistoryList" onclick="childPage(this)">历史借款信息</a></li></shiro:hasPermission>
+		<shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm">
+			<c:if test="${not ispayoff}"><li><a name="insertRemittanceConfirmForm" onclick="childPage(this)">汇款信息</a></li></c:if>
+		</shiro:hasPermission> 
+		<shiro:hasPermission name="dunning:tMisDunningTask:view">
+	        <li><a name="apploginlogList" onclick="childPage(this)">登录日志</a></li>
+        </shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningDeduct:view">
+        <li><a name="dunningDeduct" onclick="childPage(this)">扣款信息</a></li>
+        </shiro:hasPermission>
+	</ul> 
+	<iframe id="ifm" name="ifm" frameborder="0" style="width:100%;height: 500px;"></iframe>
 </body>
 </html>

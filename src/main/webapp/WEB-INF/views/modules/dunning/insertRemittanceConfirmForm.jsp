@@ -7,9 +7,6 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			
-			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}&mobile=" + $('#mobile', parent.document).val();
-			$("#applogiglog_a").attr("href",url);
-			
 			//$("#name").focus();
 			$("#inputForm").validate({
 				submitHandler: function(form){
@@ -57,24 +54,6 @@
 		<li class="active">
 		<a> 催收信息 </a></li>
 	</ul> -->
-	<ul class="nav nav-tabs">
-		<c:if test="${overdueDays>1}">
-			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li ><a href="${ctx}/dunning/tMisDunningTask/customerDetails?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">单位&联系人</a></li></shiro:hasPermission>
-			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationDetails?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">${hasContact=='true' ? '通讯录' :  '通讯录(无)'}</a></li></shiro:hasPermission>
-	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationRecord?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">通话记录</a></li></shiro:hasPermission>
-		</c:if>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunnedConclusion/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">电催结论记录</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisContantRecord/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">催款历史</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/orderHistoryList?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">历史借款信息</a></li></shiro:hasPermission>
-		<shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm">
-			<c:if test="${not ispayoff}"><li class="active"><a href="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">汇款信息</a></li></c:if>
-		</shiro:hasPermission> 
-		<shiro:hasPermission name="dunning:tMisDunningTask:view">
-	        <li><a id="applogiglog_a" href="#" >登录日志</a></li>
-        </shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">扣款信息</a></li></shiro:hasPermission>
-	</ul> 
-	
 	<form:form id="inputForm" modelAttribute="TMisRemittanceConfirm" action="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirm" method="post" class="form-horizontal" enctype="multipart/form-data">
 		<sys:message content="${message}"/>		
 		<form:hidden path="id"/>
@@ -83,7 +62,6 @@
 		<input type="hidden" name="buyerId" value="${buyerId}" />
 		<input type="hidden" name="formurl" value="insertRemittanceConfirmForm" />
 		<input id = "mobileSelf" name="mobileSelf" type="hidden" value="${mobileSelf}"/>
-		<input id = "hasContact" name="hasContact" type="hidden" value="${hasContact}"/>
 		<input id = "dunningCycle" name="dunningCycle" type="hidden" value="${dunningCycle}"/>
  		<input id = "overdueDays" name="overdueDays" type="hidden" value="${overdueDays}"/>
 		<div class="control-group">

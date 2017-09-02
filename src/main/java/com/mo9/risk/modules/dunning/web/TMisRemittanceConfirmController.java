@@ -91,14 +91,13 @@ public class TMisRemittanceConfirmController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisRemittanceConfirm:insertForm")
 	@RequestMapping(value = "insertRemittanceConfirmForm")
-	public String insertRemittanceConfirmForm(String buyerId,String dealcode,String dunningtaskdbid,boolean hasContact,String dunningCycle,String overdueDays,String mobileSelf, Model model) {
+	public String insertRemittanceConfirmForm(String buyerId,String dealcode,String dunningtaskdbid,String dunningCycle,String overdueDays,String mobileSelf, Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
-		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);

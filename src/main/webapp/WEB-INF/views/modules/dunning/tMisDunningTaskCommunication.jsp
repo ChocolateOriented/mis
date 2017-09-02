@@ -7,8 +7,6 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#btnPaid').attr("disabled","disabled");
-			var url = "${ctx}/dunning/tMisDunningTask/apploginlogList?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}&mobile=" + $('#mobile', parent.document).val();
-			$("#applogiglog_a").attr("href",url);
 			
 			if("${ispayoff}" == "true"){
 // 				$('#btnSms').attr("disabled","disabled");
@@ -81,23 +79,6 @@
 		<li class="active">
 		<a>催收信息</a></li>
 	</ul> --%>
-	<ul class="nav nav-tabs">
-		<c:if test="${overdueDays>1}">
-			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li ><a href="${ctx}/dunning/tMisDunningTask/customerDetails?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">单位&联系人</a></li></shiro:hasPermission>
-			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li class="active"><a href="${ctx}/dunning/tMisDunningTask/communicationDetails?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">${hasContact=='true' ? '通讯录' :  '通讯录(无)'}</a></li></shiro:hasPermission>
-	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/communicationRecord?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">通话记录</a></li></shiro:hasPermission>
-		</c:if>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunnedConclusion/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">电催结论记录</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisContantRecord/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">催款历史</a></li></shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="${ctx}/dunning/tMisDunningTask/orderHistoryList?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">历史借款信息</a></li></shiro:hasPermission>
-		<shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm">
-			<c:if test="${not ispayoff}"><li><a href="${ctx}/dunning/tMisRemittanceConfirm/insertRemittanceConfirmForm?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">汇款信息</a></li></c:if>
-		</shiro:hasPermission> 
-		<shiro:hasPermission name="dunning:tMisDunningTask:view">
-	        <li><a id="applogiglog_a" href="#" >登录日志</a></li>
-        </shiro:hasPermission>
-        <shiro:hasPermission name="dunning:tMisDunningDeduct:view"><li><a href="${ctx}/dunning/tMisDunningDeduct/list?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&hasContact=${hasContact}&dunningCycle=${dunningCycle}&overdueDays=${overdueDays}">扣款信息</a></li></shiro:hasPermission>
-	</ul> 
 <!-- 	通讯录 -->
 	<sys:message content="${message}"/>
 	<form:form class="submitForm"  action="${ctx}/dunning/tMisDunningTask/communicationDetails" method="get" style="display: none;">
@@ -115,7 +96,7 @@
 		<thead>
 			<th>序号</th>
 			<th>通讯录姓名</th>
-			<th>匹配</th>
+<!-- 			<th>匹配</th> -->
 			<th>号码</th>
 			<th>历史记录</th>
 			<th>操作</th>
@@ -127,27 +108,27 @@
 					${(vs.index+1) + (page.pageNo-1) * page.pageSize} 
 				</td>
 				<td>${cp.contactName}</td>
-				<td>
-					<c:choose>
-						<c:when test = "${cp.rcname != '未知'}">
-						${cp.rcname}
-							<c:choose>
-								<c:when test = "${cp.familyrelation=='married'}">(夫妻)</c:when>
-								<c:when test = "${cp.familyrelation=='workmate'}">(同事)</c:when>
-								<c:when test = "${cp.familyrelation=='parent'}">(父母)</c:when>
-								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when>
-								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
-								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
-								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
-								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
-								<c:otherwise></c:otherwise>
-							</c:choose>
-						</c:when>
-						<c:otherwise>
+<!-- 				<td> -->
+<%-- 					<c:choose> --%>
+<%-- 						<c:when test = "${cp.rcname != '未知'}"> --%>
+<%-- 						${cp.rcname} --%>
+<%-- 							<c:choose> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='married'}">(夫妻)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='workmate'}">(同事)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='parent'}">(父母)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when> --%>
+<%-- 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when> --%>
+<%-- 								<c:otherwise></c:otherwise> --%>
+<%-- 							</c:choose> --%>
+<%-- 						</c:when> --%>
+<%-- 						<c:otherwise> --%>
 						 
-						</c:otherwise>
-					</c:choose>
-				</td>
+<%-- 						</c:otherwise> --%>
+<%-- 					</c:choose> --%>
+<!-- 				</td> -->
 				<td>${cp.contactMobile}</td>
 				<td>
 					短信
