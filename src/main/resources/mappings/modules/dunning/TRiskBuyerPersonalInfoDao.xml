@@ -230,4 +230,12 @@
 	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status ='payment' and o.dealcode = #{dealcode} 
 	</select>
 
+	<select id="findMobileByBuyerId" resultType="String">
+		SELECT
+		b.mobile AS "mobile"
+		FROM
+		t_risk_buyer AS b
+		WHERE
+		b.id = #{buyerId}
+	</select>
 </mapper>
