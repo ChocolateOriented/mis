@@ -45,8 +45,13 @@
 			if("${ispayoff}" == "true"){
 				disableBtn();
 			}
-			var	customerDetails=document.getElementById("customerDetails");
-			childPage(customerDetails);
+			var obj=null;
+			if(parseInt("${overdueDays}")>1){
+				obj=document.getElementById("customerDetails");
+			}else{
+				obj=document.getElementById("conclusion");
+			}
+			childPage(obj);
 // 			var s = window.frames["iframe_text"].document.getElementById("aaa").innerHTML;
 // 			$("#btnOk",document.frames("ifm").document).click();
 		});
@@ -411,7 +416,7 @@
 			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="communicationDetails" onclick="childPage(this)">通讯录</a></li></shiro:hasPermission>
 	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a  name="communicationRecord" onclick="childPage(this)">通话记录</a></li></shiro:hasPermission>
 		</c:if>
-        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="conclusion" onclick="childPage(this)">电催结论记录</a></li></shiro:hasPermission>
+        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a id="conclusion" name="conclusion" onclick="childPage(this)">电催结论记录</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="contantRecord" onclick="childPage(this)">催款历史</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a name="orderHistoryList" onclick="childPage(this)">历史借款信息</a></li></shiro:hasPermission>
 		<shiro:hasPermission name="dunning:tMisRemittanceConfirm:insertForm">
