@@ -6,9 +6,9 @@ import java.util.List;
 
 /**
  * Created by jxli on 2017/9/2.
- * 江湖救急响应结果
+ * 江湖救急通话记录响应结果
  */
-public class RiskContactRecordResponse extends RiskResponse{
+public class RiskContactRecordResponse extends RiskBaseResponse{
 
 	public ContactRecordResponseDatas datas;
 

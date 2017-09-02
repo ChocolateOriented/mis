@@ -4,7 +4,7 @@ package com.mo9.risk.modules.dunning.bean;
  * Created by jxli on 2017/9/2.
  * 江湖救急响应结果
  */
-public class RiskResponse {
+public class RiskBaseResponse {
 	public final static String RESULT_CODE_SUCCESS = "200";//响应码_成功
 	public final static String RESULT_CODE_ERROR = "500";//响应码_失败
 
