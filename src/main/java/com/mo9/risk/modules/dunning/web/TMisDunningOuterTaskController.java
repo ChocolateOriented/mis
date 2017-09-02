@@ -171,7 +171,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 		TBuyerContact tBuyerContact = new TBuyerContact();
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
-		Page<TBuyerContact> contactPage = new Page<TBuyerContact>(request, response);
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
@@ -179,9 +178,15 @@ public class TMisDunningOuterTaskController extends BaseController {
 				logger.warn("订单不存在，订单号：" + dealcode);
 				return "views/error/500";
 			}
+			boolean ispayoff = false;
+			if (order != null && "payoff".equals(order.getStatus())) {
+				ispayoff = true;
+			}
+			model.addAttribute("ispayoff", ispayoff);
 			TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 			model.addAttribute("personalInfo", personalInfo);
-			contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
+			model.addAttribute("overdueDays",personalInfo.getOverdueDays());
+			model.addAttribute("mobileSelf",personalInfo.getMobile());
 			TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
 			
 			if (tMisChangeCardRecord == null) {
@@ -219,11 +224,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 		model.addAttribute("buyerId", buyerId);
 		//model.addAttribute("isDelayable", isDelayable);
 		
-		boolean hasContact = false;
-		if(contactPage.getCount() > 0L){
-			hasContact = true;
-		}
-		model.addAttribute("hasContact", hasContact);
 		
 		return "modules/dunning/tMisDunningTaskFather";
 	}

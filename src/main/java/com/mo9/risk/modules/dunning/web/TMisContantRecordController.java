@@ -150,7 +150,6 @@ public class TMisContantRecordController extends BaseController {
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
-		String hasContact = request.getParameter("hasContact");
 		String dunningCycle = request.getParameter("dunningCycle");
 		String overdueDays = request.getParameter("overdueDays");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
@@ -223,7 +222,6 @@ public class TMisContantRecordController extends BaseController {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
-		model.addAttribute("hasContact", hasContact);
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);
