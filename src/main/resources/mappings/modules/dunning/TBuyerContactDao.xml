@@ -52,7 +52,21 @@
 		</choose>
 	</select>
 
-
+	<select id="getContantRecordCnt" resultType="TBuyerContact">
+		SELECT 
+			a.contanttarget AS "contactMobile",
+			SUM(CASE WHEN a.ContantType = 'sms' THEN 1 ELSE 0 END) AS "smsNum",
+			SUM(CASE WHEN a.ContantType = 'tel' THEN 1 ELSE 0 END) AS "telNum"
+		FROM t_mis_contant_record a
+ 		WHERE a.dealcode = #{dealcode}
+ 		<if test="contacts != null and contacts.size > 0">
+		 	AND	a.contanttarget in
+ 			<foreach collection="contacts" item="contact" open="(" close=")" separator=",">
+ 				#{contact.contactMobile}
+ 			</foreach>
+ 		</if>
+ 		GROUP BY a.contanttarget
+	</select>
 	
 	<select id="getContactsByBuyerId" resultType = "TMisSendMsgInfo">
 	    SELECT 
