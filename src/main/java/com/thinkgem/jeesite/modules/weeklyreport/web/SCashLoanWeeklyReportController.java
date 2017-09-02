@@ -197,8 +197,7 @@ public class SCashLoanWeeklyReportController extends BaseController {
 			String weekNumber = request.getParameter("weekNumber");
 			List<SCashLoanWeeklyReport> list = sCashLoanWeeklyReportService.findOrdernumneworderperiodpercent(Integer.parseInt(weekNumber));
 			if(null != list && !list.isEmpty()){
-				ListSortUtil<SCashLoanWeeklyReport> sortList = new ListSortUtil<SCashLoanWeeklyReport>();  
-				sortList.sort(list, "intervaldatetime", "asc");  
+				ListSortUtil.sort(list, "intervaldatetime", "asc");
 				double lastNum = 0.0;
 				List<String> intervaldatetime = new ArrayList<String>();
 				List<String> ordernumneworderperiodapppercentincludedelay = new ArrayList<String>();
@@ -233,8 +232,7 @@ public class SCashLoanWeeklyReportController extends BaseController {
 			String weekNumber = request.getParameter("weekNumber");
 			List<SCashLoanWeeklyReport> list = sCashLoanWeeklyReportService.findOrdernumneworderperiodamountpercent(Integer.parseInt(weekNumber));
 			if(null != list && !list.isEmpty()){
-				ListSortUtil<SCashLoanWeeklyReport> sortList = new ListSortUtil<SCashLoanWeeklyReport>();  
-				sortList.sort(list, "intervaldatetime", "asc");  
+				ListSortUtil.sort(list, "intervaldatetime", "asc");
 				List<String> intervaldatetime = new ArrayList<String>();
 				List<String> ordernumneworderperiodamount500percentincludedelay = new ArrayList<String>();
 				List<String> ordernumneworderperiodamount1000percentincludedelay = new ArrayList<String>();
@@ -298,8 +296,7 @@ public class SCashLoanWeeklyReportController extends BaseController {
 			String weekNumber = request.getParameter("weekNumber");
 			List<SCashLoanWeeklyReport> list = sCashLoanWeeklyReportService.findSingleusernum(Integer.parseInt(weekNumber));
 			if(null != list && !list.isEmpty()){
-				ListSortUtil<SCashLoanWeeklyReport> sortList = new ListSortUtil<SCashLoanWeeklyReport>();  
-				sortList.sort(list, "intervaldatetime", "asc");  
+				ListSortUtil.sort(list, "intervaldatetime", "asc");
 				List<String> intervaldatetime = new ArrayList<String>();
 				List<String> singleusernum = new ArrayList<String>();
 				for (SCashLoanWeeklyReport sc : list) {

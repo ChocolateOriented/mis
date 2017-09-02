@@ -121,12 +121,25 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		} else if ("worktel".equals(type)) {// 工作电话
 			return tRiskBuyerWorkinfoDao.getWorkTelByBuyerId(buyerId);
 		} else if ("communcate".equals(type)) {// 通话记录
-			return tRiskBuyerContactRecordsDao.getCommunicateByBuyerId(buyerId);
+			return this.findCommunicateByBuyerId(buyerId);
 		} else if ("cantact".equals(type)) {// 通讯录
 			return tBuyerContactDao.getContactsByBuyerId(buyerId);
 		} else {// 夫妻(married),同事(workmate),父母(parent),子女(children),朋友(friend),亲戚(relatives)
 			return tRiskBuyer2contactsDao.getSendMsgByBuyerIdAndType(buyerId, type);
 		}
+	}
+
+	/**
+	 * @Description 通过用户ID查询通讯录
+	 * @param buyerId
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo>
+	 */
+	private List<TMisSendMsgInfo> findCommunicateByBuyerId(String buyerId) {
+		//优先调用接口查询
+		//通过buyerId查询手机号
+		String mobile = tRiskBuyerPersonalInfoDao.findMobileByBuyerId(buyerId);
+		//若未查找则查询数据库
+		return tRiskBuyerContactRecordsDao.getCommunicateByBuyerId(buyerId);
 	}
 
 	/**
