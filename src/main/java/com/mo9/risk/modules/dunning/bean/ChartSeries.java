@@ -14,13 +14,13 @@ package com.mo9.risk.modules.dunning.bean;
 	 * </p>
 	 * 
 	 */
-	public class MigrateChart implements Serializable {
+	public class ChartSeries implements Serializable {
 
 	    private static final long serialVersionUID = 1L;
 	    private String name;// 名字
 	    private List<Object> data;// 数据值ֵ
 
-	    public MigrateChart() {
+	    public ChartSeries() {
 
 	    }
 
@@ -31,7 +31,7 @@ package com.mo9.risk.modules.dunning.bean;
 	     * @param data
 	     *            数据（线条上的所有数据值）
 	     */
-	    public MigrateChart(String name, List<Object> data) {
+	    public ChartSeries(String name, List<Object> data) {
 
 	        this.name = name;
 	        this.data = data;
@@ -44,7 +44,7 @@ package com.mo9.risk.modules.dunning.bean;
 	     * @param array
 	     *            数据（线条上的所有数据值）
 	     */
-	    public MigrateChart(String name, Object[] array) {
+	    public ChartSeries(String name, Object[] array) {
 	        this.name = name;
 	        if (array != null) {
 	            data = new ArrayList<Object>(array.length);

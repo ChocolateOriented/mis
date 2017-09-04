@@ -3,7 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.modules.dunning.bean.MigrateChart;
+import com.mo9.risk.modules.dunning.bean.ChartSeries;
+import com.mo9.risk.modules.dunning.bean.MigrateChange;
 import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
@@ -22,15 +23,14 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -536,12 +536,12 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	}
 
 /**
- * @Description  查询最近几个周期的迁徙率, 按周期分组
+ * @Description  查询最近几个周期的迁徙率, 按周期分组,按周期降序
  * @param migrate 迁徙率类型
  * @param cycleNum 周期数量
- * @return java.util.Collection<com.mo9.risk.modules.dunning.bean.MigrateChart>
+ * @return java.util.Collection<com.mo9.risk.modules.dunning.bean.ChartSeries>
  */
-	public Collection<MigrateChart> getCycleData(Migrate migrate,Integer cycleNum){
+	public List<ChartSeries> getCycleData(Migrate migrate,Integer cycleNum){
 
 		if(cycleNum>5 || cycleNum<2){
 			logger.warn("迁徙为查到数据,请传合理的参数");
@@ -557,7 +557,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
 		//将数据按周期分组
-		Map<String, MigrateChart> migrateCycleData = new HashMap<String, MigrateChart>();
+		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
+		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
 
 		for (int i = 0; i < migrateList.size(); i++) {
 			TMisMigrationRateReport migrationRateReport = migrateList.get(i);
@@ -565,22 +566,23 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 			//获取对应周期的数据集合
 			List<Object> data;
-			if (!migrateCycleData.containsKey(cycle)){//若不存在则新建一个MigrateChart
+			if (!migrateCycleMap.containsKey(cycle)){//若不存在则新建一个MigrateChart
 				data = new ArrayList<Object>();
-				MigrateChart migrateChart = new MigrateChart();
-				migrateChart.setData(data);
+				ChartSeries chartSeries = new ChartSeries();
+				chartSeries.setData(data);
 				String start = sd.format(migrationRateReport.getDatetimeStart());
 				String end = sd.format(migrationRateReport.getDatetimeEnd());
-				migrateChart.setName(start+"-"+end);
+				chartSeries.setName(start+"-"+end);
 
-				migrateCycleData.put(cycle, migrateChart);
+				migrateCycleMap.put(cycle, chartSeries);
+				migrateCycleData.add(chartSeries);
 			}else {
-				data = migrateCycleData.get(cycle).getData();
+				data = migrateCycleMap.get(cycle).getData();
 			}
 			data.add(migrationRateReport.getCpvalue());
 		}
 
-		return migrateCycleData.values();
+		return migrateCycleData;
 	}
 
 	/**
@@ -596,17 +598,48 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			return;
 		}
 
-		logger.info("自动发送迁徙率报表邮件至"+receiver);
-		//获取迁徙率
-		Collection<MigrateChart> migrateCharts = this.getCycleData(Migrate.cp1new,5);
-		//生成图表
+		logger.info("自动发送迁徙率报表邮件至" + receiver);
 		DataSource cp1newChart;
+		DataSource cp2newChart;
+		DataSource cp3newChart;
+		DataSource cp4newChart;
+
+		DataSource cp1corpusChart;
+		DataSource cp2corpusChart;
+		DataSource cp3corpusChart;
+		DataSource cp4corpusChart;
+
+		List<ChartSeries> cp1newSeries = this.getCycleData(Migrate.cp1new, 5);
+		List<ChartSeries> cp2newSeries = this.getCycleData(Migrate.cp2new, 4);
+		List<ChartSeries> cp3newSeries = this.getCycleData(Migrate.cp3new, 3);
+		List<ChartSeries> cp4newSeries = this.getCycleData(Migrate.cp4new, 2);
+
+		List<ChartSeries> cp1corpusSeries = this.getCycleData(Migrate.cp1corpus, 5);
+		List<ChartSeries> cp2corpusSeries = this.getCycleData(Migrate.cp2corpus, 4);
+		List<ChartSeries> cp3corpusSeries = this.getCycleData(Migrate.cp3corpus, 3);
+		List<ChartSeries> cp4corpusSeries = this.getCycleData(Migrate.cp4corpus, 2);
 		try {
-			cp1newChart = new ByteArrayDataSource(this.createChart(migrateCharts,"户数迁徙_C-P1"), "image/png");
-		} catch (IOException e) {
+			//获取户数迁徙率
+			cp1newChart = this.createChart(cp1newSeries, "户数迁徙_C-P1");
+			cp2newChart = this.createChart(cp2newSeries, "户数迁徙_C-P2");
+			cp3newChart = this.createChart(cp3newSeries, "户数迁徙_C-P3");
+			cp4newChart = this.createChart(cp4newSeries, "户数迁徙_C-P4");
+
+			//获取本金迁徙率
+			cp1corpusChart = this.createChart(cp1corpusSeries, "本金迁徙_C-P1");
+			cp2corpusChart = this.createChart(cp2corpusSeries, "本金迁徙_C-P2");
+			cp3corpusChart = this.createChart(cp3corpusSeries, "本金迁徙_C-P3");
+			cp4corpusChart = this.createChart(cp4corpusSeries, "本金迁徙_C-P4");
+
+		} catch (Exception e) {
 			logger.warn("月报表自动邮件添加附件失败", e);
 			return;
 		}
+
+		//获取最新的一天迁徙率及上一周期同天迁徙率, 计算同比
+		MigrateChange cp1newChange = this.computeMigrateChange(cp1newSeries);
+		MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
+
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver);
 		String data = DateUtils.getDate("MM月dd日");
@@ -615,26 +648,34 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		StringBuilder content = new StringBuilder();
 		content.append("<p>下图为截止"+data+"迁徙数据，烦请查阅</p>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
-		content.append("<tr><th>C-P1</th><th>20170817-20170831</th><th>20170801-20170816</th><th>同比</th></tr>");
-		content.append("<tr><td>户数迁徙</td><td>5.92%</td><td>5.98%</td><td>-1.00%</td></tr>");
-		content.append("<tr><td>本金迁徙</td><td>5.92%</td><td>5.98%</td><td>-1.00%</td></tr>");
+		content.append("<tr><th>C-P1</th><th>"+cp1newSeries.get(0).getName()+"</th><th>"+cp1newSeries.get(1).getName()+"</th><th>同比</th></tr>");
+		content.append("<tr><td>户数迁徙</td><td>"+cp1newChange.getCurrentVlue()+"</td><td>"+cp1newChange.getLastVlue()+"</td><td>"+cp1newChange.getChange()+"</td></tr>");
+		content.append("<tr><td>本金迁徙</td><td>"+cp1corpusChange.getCurrentVlue()+"</td><td>"+cp1corpusChange.getLastVlue()+"</td><td>"+cp1corpusChange.getChange()+"</td></tr>");
 		content.append("</table>");
 
 		content.append("<p>户数迁徙</p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("</table>");
 
 		content.append("<p>本金迁徙</p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
-		content.append("<tr><td><img src='cid:testImage'></td><td><img src='cid:cp1newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("</table>");
 
 		mailSender.setContent(content.toString());
 		//添加图片
 		mailSender.addImage(cp1newChart,"cp1newChart");
+		mailSender.addImage(cp2newChart,"cp2newChart");
+		mailSender.addImage(cp3newChart,"cp3newChart");
+		mailSender.addImage(cp4newChart,"cp4newChart");
+
+		mailSender.addImage(cp1corpusChart,"cp1corpusChart");
+		mailSender.addImage(cp2corpusChart,"cp2corpusChart");
+		mailSender.addImage(cp3corpusChart,"cp3corpusChart");
+		mailSender.addImage(cp4corpusChart,"cp4corpusChart");
 
 		//发送
 		try {
@@ -645,41 +686,68 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 	}
 
-	//创建
-	public ByteArrayInputStream createChart(Collection<MigrateChart> migrateCharts,String title) {
-		//横坐标节点个数为16(天)
-		int xSize = 16 ;
-		String[] categories = new String[16];
-		for (int i = 0; i < xSize; i++) {
-			categories[i]=(i+1)+"";
+	/**
+	 * @Description  计算周期同比变化
+	 * @param nearSeries
+	 * @return com.mo9.risk.modules.dunning.bean.MigrateChange
+	 */
+	private MigrateChange computeMigrateChange(List<ChartSeries> nearSeries) {
+		List<Object> currentCycleData = nearSeries.get(0).getData();
+		int index = currentCycleData.size() -1;
+		//获取最新一天的迁徙率
+		Double currentValue = Double.parseDouble(currentCycleData.get(index).toString());
+		String current = currentValue.toString()+"%" ;
+		String last = "" ;
+		String change = "";
+		List<Object> lastCycleData = nearSeries.get(1).getData();
+		//若有对应的上一周期天数, 则计算同比
+		if (lastCycleData.size() >= index) {
+			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
+			last = lastValue + "%";
+			DecimalFormat df = new DecimalFormat("#.00%");
+			change = df.format(1 - (lastValue / currentValue));
 		}
+		return new MigrateChange(current, last, change);
+	}
 
+	/**
+	 * @Description 创建图表
+	 * @param chartSeries 数据
+	 * @param title 图表标题
+	 * @return java.io.ByteArrayDataSource
+	 */
+	public ByteArrayDataSource createChart(List<ChartSeries> chartSeries,String title) throws IOException {
+		//横坐标节点个数为16(天)
+		final int xSize = 16 ;
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		logger.debug(migrateCharts.size()+"");
-		for (MigrateChart serie : migrateCharts) {
+		//遍历多组数据
+		for (ChartSeries serie : chartSeries) {
 			String name = serie.getName();
 			List<Object> data = serie.getData();
 			if (data == null) {
 				continue;
 			}
-			//若数据不足,则填充null
-			if (data.size() < xSize) {
-				int size = data.size();
-				for (int i = 0; i < 16 - size; i++) {
-					data.add(null);
-				}
-			}
-			//fixme NullPointerException at java.lang.Double.parseDouble(Double.java:540)
-			for (int index = 0; index < data.size(); index++) {
 
-				String value = data.get(index) == null ? null : data.get(index).toString();
-				dataset.setValue(Double.parseDouble(value), name, categories[index]);
+			//装填一组数据
+			for (int index = 0; index < xSize ; index++) {
+				Double result = null;
+				if (index< data.size()){
+					Object value = data.get(index);
+					if (value != null) {
+						result = Double.parseDouble(value.toString());
+					}
+				}
+				dataset.setValue(result, name, index+1+"");
 			}
 		}
 
+		//初始化
+		ChartUtils chartUtils = new ChartUtils();
+		//最大设为30k
 		// 2：创建Chart[创建不同图形]
 		JFreeChart chart = ChartFactory.createLineChart(title, "", "单位 (%)",dataset );
-		ChartUtils.setChartTheme();
+		// 设置标注无边框
+		chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
 		// 3:设置抗锯齿，防止字体显示不清楚
 		ChartUtils.setAntiAlias(chart);// 抗锯齿
 		// 4:对柱子进行渲染[[采用不同渲染]]
@@ -687,9 +755,6 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		// 5:对其他部分进行渲染
 		ChartUtils.setXAixs(chart.getCategoryPlot());// X坐标轴渲染
 		ChartUtils.setYAixs(chart.getCategoryPlot());// Y坐标轴渲染
-		// 设置标注无边框
-		chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
-		//最大设为30k
 		ByteArrayOutputStream out = new ByteArrayOutputStream(30*1024);
 		try {
 			ChartUtilities.writeChartAsPNG(out, chart, 800, 400);
@@ -707,7 +772,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 		ByteArrayInputStream in;
 		in = new ByteArrayInputStream(out.toByteArray());
-		return in;
+		return new ByteArrayDataSource(in, "image/png");
 	}
 
 }
