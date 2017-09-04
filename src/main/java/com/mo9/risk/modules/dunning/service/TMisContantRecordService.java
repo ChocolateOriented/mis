@@ -166,7 +166,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				continue;
 			}
 			TMisSendMsgInfo msgInfo = new TMisSendMsgInfo();
-			msgInfo.setMemo(records.getDuration()+"");
+			msgInfo.setMemo(records.getSumtime()+"");
 			msgInfo.setTel(records.getTel());
 			msgInfos.add(msgInfo);
 		}

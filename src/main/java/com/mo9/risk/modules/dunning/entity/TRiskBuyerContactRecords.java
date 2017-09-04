@@ -28,7 +28,7 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private Integer number;
 	private Integer sumtime;
 //	private Integer cnt; //通话次数
-	private Integer duration;//通话时长(秒)
+//	private Integer duration;//通话时长(秒)
 
 	private Integer inCnt;//被叫次数
 	private Integer inDuration;//被呼叫时长(秒)
@@ -155,16 +155,13 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 		this.number = cnt;
 	}
 
+	//通话时长, 用于接收通讯录接口JSON
 	public void setDuration(Integer duration) {
-		this.duration = duration;
+		this.sumtime = duration;
 		long hour=duration/3600;
 		long minute=duration%3600/60;
 		long second=duration%60;
 		this.times = hour+"小时"+minute+"分"+second+"秒";
-	}
-
-	public Integer getDuration() {
-		return duration;
 	}
 
 	public Integer getInCnt() {
@@ -199,7 +196,6 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 				", buyerId='" + buyerId + '\'' +
 				", number=" + number +
 				", sumtime=" + sumtime +
-				", duration=" + duration +
 				", inCnt=" + inCnt +
 				", inDuration=" + inDuration +
 				'}';

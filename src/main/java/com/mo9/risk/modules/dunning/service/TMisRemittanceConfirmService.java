@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -40,6 +41,8 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	private TMisRemittanceConfirmLogService tMisRemittanceConfirmLogService;
 	@Autowired
 	private TMisDunningOrderService orderService ;
+	@Autowired
+	private RiskOrderManager orderManager;
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 
@@ -249,9 +252,9 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 		//回调江湖救急接口
 		try {
-			return orderService.repayWithCheack(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
+			return orderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
 		} catch (IOException e) {
-			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,remittanceamount,"网络异常:"+e.getMessage());
+//			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,remittanceamount,"网络异常:"+e.getMessage());
 			throw e;
 		}
 	}
@@ -292,9 +295,9 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String paychannel = confirm.getRemittancechannel();
 		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
 		try {
-			orderService.repayWithCheack(dealcode,paychannel,remark,paidType,payamount,delayDay);
+			orderManager.repay(dealcode,paychannel,remark,paidType,payamount,delayDay);
 		} catch (IOException e) {
-			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,payamount,"网络异常:"+e.getMessage());
+//			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,payamount,"网络异常:"+e.getMessage());
 			throw e;
 		}
 	}
