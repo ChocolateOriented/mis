@@ -37,7 +37,6 @@ public class RiskContactRecordsManager {
 		if (StringUtils.isBlank(mobile)){
 			throw new IllegalArgumentException("电话不能为空");
 		}
-
 		String url = riskUrl + "riskbehavior/inner/queryCalllogsInfoByMobile.do?mobile="+mobile;
 		logger.debug("获取通话记录URL"+url);
 		String res = GetRequest.getRequest(url, "");
@@ -64,7 +63,7 @@ public class RiskContactRecordsManager {
 		//使用通话时长排序, 降序
 		Collections.sort(records, new Comparator<TRiskBuyerContactRecords>(){
 			public int compare(TRiskBuyerContactRecords o1, TRiskBuyerContactRecords o2) {
-				return o2.getDuration() - o1.getDuration();
+				return o2.getSumtime() - o1.getSumtime();
 			}
 		});
 		return records;
