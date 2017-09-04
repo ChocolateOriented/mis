@@ -18,6 +18,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
+import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.PostRequest;
 import com.mo9.risk.util.RequestParamSign;
@@ -61,9 +62,9 @@ public class TMisDunningDeductCallService {
 	
 	@Autowired
 	private TMisDunningConfigureDao tMisDunningConfigureDao;
-	
+
 	@Autowired
-	private TMisDunningOrderService orderService;
+	private RiskOrderManager riskOrderManager;
 
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningDeductCallService.class);
 	
@@ -169,7 +170,7 @@ public class TMisDunningDeductCallService {
 		BigDecimal bd = BigDecimal.valueOf(paidAmount);
 		
 		try {
-			orderService.repayWithCheack(dealcode, paychannel, remark, paidType, bd, delayDay);
+			riskOrderManager.repay(dealcode, paychannel, remark, paidType, bd, delayDay);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);
