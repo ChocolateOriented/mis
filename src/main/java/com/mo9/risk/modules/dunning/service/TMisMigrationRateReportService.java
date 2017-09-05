@@ -589,12 +589,11 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 自动邮件
 	 */
-	@Scheduled(cron = "0 * * * * ?")
-//	@Scheduled(cron = "0 0 8 * * ?")
+	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
 		String receiver = DictUtils.getDictValue("migration_rate_report_receiver", "sys_email", "");
 		if (StringUtils.isBlank(receiver)){
-			logger.warn("自动发送迁徙率报表失败, 未配置收件人邮箱");
+			logger.info("自动发送迁徙率报表失败, 未配置收件人邮箱");
 			return;
 		}
 
