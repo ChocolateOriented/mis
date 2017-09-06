@@ -386,6 +386,9 @@
 		<if test=" remittanceTag!= null and  remittanceTag!= ''">
 			AND m.remittanceTag=#{remittanceTag}
 		</if>
+		<if test=" payType!= null and  payType!= ''">
+			AND m.payType=#{payType}
+		</if>
 		<if test=" dunningPeopleId != null and  dunningPeopleId!= ''">
 			AND p.Id=#{dunningPeopleId}
 		</if>
