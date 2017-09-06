@@ -4,7 +4,10 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
+import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
 import com.thinkgem.jeesite.common.service.BaseService;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class TMisDunningOrderForRiskService extends BaseService{
+public class TMisDunningForRiskService extends BaseService{
 
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
+	@Autowired
+	private TMisMigrationRateReportDao tMisMigrationRateReportDao;
+
 	/**
 	 * @Description 使用新事务(必须使用不同service), 查询未还清订单
 	 * @param deselcodes
@@ -45,5 +51,16 @@ public class TMisDunningOrderForRiskService extends BaseService{
 	@Transactional(readOnly = true,propagation = Propagation.REQUIRES_NEW)
 	public DunningOrder findOrderByDealcodeWithNewTransactional(String dealcode) {
 		return tMisDunningOrderDao.findOrderByDealcode(dealcode);
+	}
+
+	/**
+	 * @Description 使用新事务(必须使用不同service), 查询迁徙率
+	 * @param migrate
+	 * @param cycleNum
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport>
+	 */
+	@Transactional(readOnly = true,propagation = Propagation.REQUIRES_NEW)
+	public List<TMisMigrationRateReport> newfindMigrateChartList(Migrate migrate, Integer cycleNum) {
+		return tMisMigrationRateReportDao.newfindMigrateChartList(migrate,cycleNum);
 	}
 }

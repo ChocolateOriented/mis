@@ -3,28 +3,51 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.mo9.risk.modules.dunning.bean.ChartSeries;
+import com.mo9.risk.modules.dunning.bean.MigrateChange;
 import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
+import com.mo9.risk.util.ChartUtils;
+import com.mo9.risk.util.DateUtils;
+import com.mo9.risk.util.MailSender;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.activation.DataSource;
+import javax.mail.util.ByteArrayDataSource;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 迁徙率Service
@@ -32,12 +55,14 @@ import com.thinkgem.jeesite.common.service.ServiceException;
  * @version 2017-07-24
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisMigrationRateReportService extends CrudService<TMisMigrationRateReportDao, TMisMigrationRateReport> {
 	
 	@Autowired
 	private TMisMigrationRateReportDao tMisMigrationRateReportDao;
-	
+	@Autowired
+	private TMisDunningForRiskService forRiskService;
 
 	public TMisMigrationRateReport get(String id) {
 		return super.get(id);
@@ -494,5 +519,259 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		
 		return tMisMigrationRateReportDao.findMigrateChartList(tMisMigrationRateReport);
 	}
-	
+
+	/**
+	 * @Description  查询最近几个周期的迁徙率
+	 * @param migrate 迁徙率类型
+	 * @param cycleNum 周期数量
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport>
+	 */
+	public List<TMisMigrationRateReport> newfindMigrateChartListFromRisk(Migrate migrate,Integer cycleNum){
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		try{
+			return forRiskService.newfindMigrateChartList(migrate,cycleNum);
+		}finally{
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+	}
+
+/**
+ * @Description  查询最近几个周期的迁徙率, 按周期分组,按周期降序
+ * @param migrate 迁徙率类型
+ * @param cycleNum 周期数量
+ * @return java.util.Collection<com.mo9.risk.modules.dunning.bean.ChartSeries>
+ */
+	public List<ChartSeries> getCycleData(Migrate migrate,Integer cycleNum){
+
+		if(cycleNum>5 || cycleNum<2){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+
+		List<TMisMigrationRateReport> migrateList = this.newfindMigrateChartListFromRisk(migrate, cycleNum);
+
+		if(null==migrateList){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+
+		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		//将数据按周期分组
+		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
+		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
+
+		for (int i = 0; i < migrateList.size(); i++) {
+			TMisMigrationRateReport migrationRateReport = migrateList.get(i);
+			String cycle = migrationRateReport.getCycle();
+
+			//获取对应周期的数据集合
+			List<Object> data;
+			if (!migrateCycleMap.containsKey(cycle)){//若不存在则新建一个MigrateChart
+				data = new ArrayList<Object>();
+				ChartSeries chartSeries = new ChartSeries();
+				chartSeries.setData(data);
+				String start = sd.format(migrationRateReport.getDatetimeStart());
+				String end = sd.format(migrationRateReport.getDatetimeEnd());
+				chartSeries.setName(start+"-"+end);
+
+				migrateCycleMap.put(cycle, chartSeries);
+				migrateCycleData.add(chartSeries);
+			}else {
+				data = migrateCycleMap.get(cycle).getData();
+			}
+			data.add(migrationRateReport.getCpvalue());
+		}
+
+		return migrateCycleData;
+	}
+
+	/**
+	 * @return void
+	 * @Description 自动邮件
+	 */
+	@Scheduled(cron = "0 0 8 * * ?")
+	public void autoSendMail() {
+		String receiver = DictUtils.getDictValue("migration_rate_report_receiver", "sys_email", "");
+		if (StringUtils.isBlank(receiver)){
+			logger.info("自动发送迁徙率报表失败, 未配置收件人邮箱");
+			return;
+		}
+
+		logger.info("自动发送迁徙率报表邮件至" + receiver);
+		DataSource cp1newChart;
+		DataSource cp2newChart;
+		DataSource cp3newChart;
+		DataSource cp4newChart;
+
+		DataSource cp1corpusChart;
+		DataSource cp2corpusChart;
+		DataSource cp3corpusChart;
+		DataSource cp4corpusChart;
+
+		List<ChartSeries> cp1newSeries = this.getCycleData(Migrate.cp1new, 5);
+		List<ChartSeries> cp2newSeries = this.getCycleData(Migrate.cp2new, 4);
+		List<ChartSeries> cp3newSeries = this.getCycleData(Migrate.cp3new, 3);
+		List<ChartSeries> cp4newSeries = this.getCycleData(Migrate.cp4new, 2);
+
+		List<ChartSeries> cp1corpusSeries = this.getCycleData(Migrate.cp1corpus, 5);
+		List<ChartSeries> cp2corpusSeries = this.getCycleData(Migrate.cp2corpus, 4);
+		List<ChartSeries> cp3corpusSeries = this.getCycleData(Migrate.cp3corpus, 3);
+		List<ChartSeries> cp4corpusSeries = this.getCycleData(Migrate.cp4corpus, 2);
+		try {
+			//获取户数迁徙率
+			cp1newChart = this.createChart(cp1newSeries, "户数迁徙_C-P1");
+			cp2newChart = this.createChart(cp2newSeries, "户数迁徙_C-P2");
+			cp3newChart = this.createChart(cp3newSeries, "户数迁徙_C-P3");
+			cp4newChart = this.createChart(cp4newSeries, "户数迁徙_C-P4");
+
+			//获取本金迁徙率
+			cp1corpusChart = this.createChart(cp1corpusSeries, "本金迁徙_C-P1");
+			cp2corpusChart = this.createChart(cp2corpusSeries, "本金迁徙_C-P2");
+			cp3corpusChart = this.createChart(cp3corpusSeries, "本金迁徙_C-P3");
+			cp4corpusChart = this.createChart(cp4corpusSeries, "本金迁徙_C-P4");
+
+		} catch (Exception e) {
+			logger.warn("月报表自动邮件添加附件失败", e);
+			return;
+		}
+
+		//获取最新的一天迁徙率及上一周期同天迁徙率, 计算同比
+		MigrateChange cp1newChange = this.computeMigrateChange(cp1newSeries);
+		MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
+
+		//发送邮件
+		MailSender mailSender = new MailSender(receiver);
+		String data = DateUtils.getDate("MM月dd日");
+		mailSender.setSubject("截止"+data+"迁徙率");
+
+		StringBuilder content = new StringBuilder();
+		content.append("<p>下图为截止"+data+"迁徙数据，烦请查阅</p>");
+		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
+		content.append("<tr><th>C-P1</th><th>"+cp1newSeries.get(0).getName()+"</th><th>"+cp1newSeries.get(1).getName()+"</th><th>同比</th></tr>");
+		content.append("<tr><td>户数迁徙</td><td>"+cp1newChange.getCurrentVlue()+"</td><td>"+cp1newChange.getLastVlue()+"</td><td>"+cp1newChange.getChange()+"</td></tr>");
+		content.append("<tr><td>本金迁徙</td><td>"+cp1corpusChange.getCurrentVlue()+"</td><td>"+cp1corpusChange.getLastVlue()+"</td><td>"+cp1corpusChange.getChange()+"</td></tr>");
+		content.append("</table>");
+
+		content.append("<p>户数迁徙</p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		content.append("</table>");
+
+		content.append("<p>本金迁徙</p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("</table>");
+
+		mailSender.setContent(content.toString());
+		//添加图片
+		mailSender.addImage(cp1newChart,"cp1newChart");
+		mailSender.addImage(cp2newChart,"cp2newChart");
+		mailSender.addImage(cp3newChart,"cp3newChart");
+		mailSender.addImage(cp4newChart,"cp4newChart");
+
+		mailSender.addImage(cp1corpusChart,"cp1corpusChart");
+		mailSender.addImage(cp2corpusChart,"cp2corpusChart");
+		mailSender.addImage(cp3corpusChart,"cp3corpusChart");
+		mailSender.addImage(cp4corpusChart,"cp4corpusChart");
+
+		//发送
+		try {
+			mailSender.sendMail();
+			logger.debug("迁徙率报表邮件发送成功");
+		} catch (Exception e) {
+			logger.warn("迁徙率报表自动邮件发送失败", e);
+		}
+	}
+
+	/**
+	 * @Description  计算周期同比变化
+	 * @param nearSeries
+	 * @return com.mo9.risk.modules.dunning.bean.MigrateChange
+	 */
+	private MigrateChange computeMigrateChange(List<ChartSeries> nearSeries) {
+		List<Object> currentCycleData = nearSeries.get(0).getData();
+		int index = currentCycleData.size() -1;
+		//获取最新一天的迁徙率
+		Double currentValue = Double.parseDouble(currentCycleData.get(index).toString());
+		String current = currentValue.toString()+"%" ;
+		String last = "" ;
+		String change = "";
+		List<Object> lastCycleData = nearSeries.get(1).getData();
+		//若有对应的上一周期天数, 则计算同比
+		if (lastCycleData.size() >= index) {
+			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
+			last = lastValue + "%";
+			DecimalFormat df = new DecimalFormat("#.00%");
+			change = df.format(1 - (lastValue / currentValue));
+		}
+		return new MigrateChange(current, last, change);
+	}
+
+	/**
+	 * @Description 创建图表
+	 * @param chartSeries 数据
+	 * @param title 图表标题
+	 * @return java.io.ByteArrayDataSource
+	 */
+	public ByteArrayDataSource createChart(List<ChartSeries> chartSeries,String title) throws IOException {
+		//横坐标节点个数为16(天)
+		final int xSize = 16 ;
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		//遍历多组数据
+		for (ChartSeries serie : chartSeries) {
+			String name = serie.getName();
+			List<Object> data = serie.getData();
+			if (data == null) {
+				continue;
+			}
+
+			//装填一组数据
+			for (int index = 0; index < xSize ; index++) {
+				Double result = null;
+				if (index< data.size()){
+					Object value = data.get(index);
+					if (value != null) {
+						result = Double.parseDouble(value.toString());
+					}
+				}
+				dataset.setValue(result, name, index+1+"");
+			}
+		}
+
+		//初始化
+		ChartUtils chartUtils = new ChartUtils();
+		//最大设为30k
+		// 2：创建Chart[创建不同图形]
+		JFreeChart chart = ChartFactory.createLineChart(title, "", "单位 (%)",dataset );
+		// 设置标注无边框
+		chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
+		// 3:设置抗锯齿，防止字体显示不清楚
+		ChartUtils.setAntiAlias(chart);// 抗锯齿
+		// 4:对柱子进行渲染[[采用不同渲染]]
+		ChartUtils.setLineRender(chart.getCategoryPlot(), false,true);//
+		// 5:对其他部分进行渲染
+		ChartUtils.setXAixs(chart.getCategoryPlot());// X坐标轴渲染
+		ChartUtils.setYAixs(chart.getCategoryPlot());// Y坐标轴渲染
+		ByteArrayOutputStream out = new ByteArrayOutputStream(30*1024);
+		try {
+			ChartUtilities.writeChartAsPNG(out, chart, 800, 400);
+			out.flush();
+		} catch (Exception e) {
+			logger.info("创建图表"+title+"失败", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+			}
+		}
+		ByteArrayInputStream in;
+		in = new ByteArrayInputStream(out.toByteArray());
+		return new ByteArrayDataSource(in, "image/png");
+	}
+
 }
