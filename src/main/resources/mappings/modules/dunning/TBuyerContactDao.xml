@@ -68,6 +68,22 @@
  		GROUP BY a.contanttarget
 	</select>
 	
+	<select id="getContactRelation" resultType="TBuyerContact">
+		SELECT DISTINCT
+			c.tel AS "contactMobile",
+			b.family_relation AS "familyrelation",
+			c.name AS "rcname"
+		FROM t_risk_buyer2contacts b
+		JOIN t_risk_contact c ON b.buyer_contact_id = c.id
+ 		WHERE b.buyer_id = #{buyerId}
+ 		<if test="contacts != null and contacts.size > 0">
+		 	AND	c.tel in
+ 			<foreach collection="contacts" item="contact" open="(" close=")" separator=",">
+ 				#{contact.contactMobile}
+ 			</foreach>
+ 		</if>
+	</select>
+	
 	<select id="getContactsByBuyerId" resultType = "TMisSendMsgInfo">
 	    SELECT 
 			a.buyer_id as "buyerId",

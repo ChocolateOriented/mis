@@ -1149,13 +1149,12 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "communicationDetails")
-	public String communicationDetails(HttpServletRequest request, HttpServletResponse response,String  mobileSelf, Model model) {
+	public String communicationDetails(HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String dunningCycle = request.getParameter("dunningCycle");
 		String overdueDays = request.getParameter("overdueDays");
-		String mobile = request.getParameter("mobile");;
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1177,7 +1176,7 @@ public class TMisDunningTaskController extends BaseController {
 				logger.warn("订单不存在，订单号：" + dealcode);
 				return "views/error/500";
 			}
-			contacts = tBuyerContactService.getBuyerContacts(dealcode, mobile, buyerId);
+			contacts = tBuyerContactService.getBuyerContacts(dealcode, mobileSelf, buyerId);
 			//contactPage = tBuyerContactService.findPage(contactPage, tBuyerContact);
 			//task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		} catch (Exception e) {

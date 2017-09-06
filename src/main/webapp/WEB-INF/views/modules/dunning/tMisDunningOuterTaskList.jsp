@@ -11,6 +11,21 @@ $(document).ready(function() {
 		$("a").css("color","");
 		$(this).css("color","#FF8C00");
 	}); 
+
+	$("#searchForm").validate({
+		submitHandler: function(form){
+			form.submit();
+		},
+		errorContainer: "#messageBox",
+		errorPlacement: function(error, element) {
+			$("#messageBox").text("输入有误，请先更正。");
+			if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+				error.appendTo(element.parent().parent());
+			} else {
+				error.insertAfter(element);
+			}
+		}
+	});
 	
 	// 清空查询功能
 	 $("#empty").click(function(){
@@ -210,8 +225,8 @@ function formatPeopleList( item ){
 					<form:option value="payment" label="未还清" />
 				</form:select></li>
 
-			<li><label>逾期天数</label> <form:input path="beginOverduedays" htmlEscape="false" maxlength="3" class="digits" style="width:35px;" /> - <form:input path="endOverduedays" htmlEscape="false" maxlength="3" class="digits" style="width:35px;" /></li>
-
+			<li><label>逾期天数</label> <form:input path="beginOverduedays" htmlEscape="false" maxlength="3" style="width:35px;" /> - <form:input path="endOverduedays" htmlEscape="false" maxlength="3" style="width:35px;" /></li>
+			<li><label>欠款金额</label> <form:input path="beginAmount" htmlEscape="false" maxlength="4" class="digits" style="width:35px;" /> - <form:input path="endAmount" htmlEscape="false" maxlength="4" class="digits" style="width:35px;" /></li>
 			<li><label>分案日期</label> <input name="beginOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" value="<fmt:formatDate value="${dunningOrder.beginOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /> 至 <input name="endOutsourcingBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 				value="<fmt:formatDate value="${dunningOrder.endOutsourcingBeginDate}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /></li>
 			<li><label>催收截止</label> <input name="beginOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" value="<fmt:formatDate value="${dunningOrder.beginOutsourcingEndDate}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /> 至 <input name="endOutsourcingEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"

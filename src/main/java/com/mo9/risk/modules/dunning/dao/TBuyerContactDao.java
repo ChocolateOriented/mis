@@ -26,9 +26,17 @@ public interface TBuyerContactDao extends CrudDao<TBuyerContact> {
 	
 	/**
 	 * 查询通讯录号码的电话短信催收记录数
-	 * @param tBuyerContact
+	 * @param tBuyerContacts
 	 * @param dealcode
 	 * @return
 	 */
-    public List<TBuyerContact> getContantRecordCnt(@Param("contacts") List<TBuyerContact> tBuyerContact, @Param("dealcode") String dealcode);
+    public List<TBuyerContact> getContantRecordCnt(@Param("contacts") List<TBuyerContact> tBuyerContacts, @Param("dealcode") String dealcode);
+    
+	/**
+	 * 查询通讯录联系人关系
+	 * @param tBuyerContacts
+	 * @param buyerId
+	 * @return
+	 */
+    public List<TBuyerContact> getContactRelation(@Param("contacts") List<TBuyerContact> tBuyerContacts, @Param("buyerId") String buyerId);
 }

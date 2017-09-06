@@ -162,7 +162,9 @@
 		c.sex As sex,
 		IFNULL(q.bank_no,"") AS remitBankNo,
 		IFNULL(q.bank_id,"") AS remitBankName,
-		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0)  - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END )* 100 as "repaymentAmount"
+		(IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0)  - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END )* 100 as "repaymentAmount",
+		w.payday AS "payday",
+		w.salary AS "salary"
 	FROM t_risk_order AS o
 	LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
@@ -180,6 +182,7 @@
 	) AS r on o.root_order_id = r.root_order_id
 	LEFT JOIN t_risk_buyer2bankinfo AS p ON o.buyer_id = p.buyer_id 
 	LEFT JOIN  t_risk_bankinfo AS q ON p.bank_id = q.id
+	LEFT JOIN t_risk_buyer_workinfo AS w ON b.id = w.buyer_id
 	WHERE o.type = 'loan' AND o.merchant_id = 7 AND o.status in ('payment', 'payoff') and o.dealcode = #{dealcode}
 	<![CDATA[
 		AND NOT EXISTS (
