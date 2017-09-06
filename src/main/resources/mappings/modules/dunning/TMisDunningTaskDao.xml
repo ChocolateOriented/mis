@@ -1144,7 +1144,16 @@
                 <!-- 			    # 委外主管过滤 -->
 <!--                 ${sqlMap.overdueday} #{overduedays} -->
 <!--             </if> -->
-
+			<if test="beginAmount != null">
+            	<![CDATA[
+    			AND amount >= #{beginAmount}
+      			]]>
+			</if>
+			<if test="endAmount != null">
+            	<![CDATA[
+    			AND amount <= #{endAmount}   
+      			]]>
+			</if>
         </where>
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">

@@ -68,6 +68,7 @@ public class TBuyerContactService {
 		} catch (Exception e) {
 			logger.info("调用江湖救急通讯录接口失败：" + e.getMessage());
 		}
+		//异常或接口无数据时查询mis库
 		return tBuyerContactDao.getContactsByBuyerId(buyerId);
 	}
 	
@@ -83,6 +84,7 @@ public class TBuyerContactService {
 			tBuyerContacts = riskBuyerContactManager.getBuyerContactInfo(mobile);
 			if (tBuyerContacts != null && tBuyerContacts.size() != 0) {
 				fillContantRecordCnt(tBuyerContacts, dealcode);
+				fillContactRelation(tBuyerContacts, buyerId);
 				return tBuyerContacts;
 			}
 			
@@ -130,6 +132,34 @@ public class TBuyerContactService {
 				if (contact.getContactMobile().equals(recordCnt.getContactMobile())) {
 					contact.setSmsNum(recordCnt.getSmsNum());
 					contact.setTelNum(recordCnt.getTelNum());
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 补充通讯录联系人关系
+	 * @param tBuyerContacts
+	 * @param buyerId
+	 * @return
+	 */
+	private void fillContactRelation(List<TBuyerContact> tBuyerContacts, String buyerId) {
+		List<TBuyerContact> contactRelations = tBuyerContactDao.getContactRelation(tBuyerContacts, buyerId);
+		
+		if (contactRelations == null || contactRelations.size() == 0) {
+			return;
+		}
+		
+		for (TBuyerContact contact : tBuyerContacts) {
+			if (contact.getContactMobile() == null) {
+				continue;
+			}
+			
+			for (TBuyerContact relation : contactRelations) {
+				if (contact.getContactMobile().equals(relation.getContactMobile())) {
+					contact.setRcname(relation.getRcname());
+					contact.setFamilyrelation(relation.getFamilyrelation());
 					break;
 				}
 			}

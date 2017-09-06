@@ -73,8 +73,8 @@
 	</script>
 </head>
 <body>
-	<ul class="nav nav-tabs">
 	<%-- <ul class="nav nav-tabs">
+	<ul class="nav nav-tabs">
 		<li><a href="${ctx}/dunning/tMisDunningTask/">催收任务列表</a></li>
 		<li class="active">
 		<a>催收信息</a></li>
@@ -96,7 +96,7 @@
 		<thead>
 			<th>序号</th>
 			<th>通讯录姓名</th>
-<!-- 			<th>匹配</th> -->
+			<th>匹配</th>
 			<th>号码</th>
 			<th>历史记录</th>
 			<th>操作</th>
@@ -108,27 +108,27 @@
 					${(vs.index+1)}
 				</td>
 				<td>${cp.contactName}</td>
-<!-- 				<td> -->
-<%-- 					<c:choose> --%>
-<%-- 						<c:when test = "${cp.rcname != '未知'}"> --%>
-<%-- 						${cp.rcname} --%>
-<%-- 							<c:choose> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='married'}">(夫妻)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='workmate'}">(同事)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='parent'}">(父母)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when> --%>
-<%-- 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when> --%>
-<%-- 								<c:otherwise></c:otherwise> --%>
-<%-- 							</c:choose> --%>
-<%-- 						</c:when> --%>
-<%-- 						<c:otherwise> --%>
+				<td>
+					<c:choose>
+						<c:when test = "${not empty cp.rcname && cp.rcname != '未知'}">
+						${cp.rcname}
+							<c:choose>
+								<c:when test = "${cp.familyrelation=='married'}">(夫妻)</c:when>
+								<c:when test = "${cp.familyrelation=='workmate'}">(同事)</c:when>
+								<c:when test = "${cp.familyrelation=='parent'}">(父母)</c:when>
+								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when>
+								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
+								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
+								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
+								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
+								<c:otherwise></c:otherwise>
+							</c:choose>
+						</c:when>
+						<c:otherwise>
 						 
-<%-- 						</c:otherwise> --%>
-<%-- 					</c:choose> --%>
-<!-- 				</td> -->
+						</c:otherwise>
+					</c:choose>
+				</td>
 				<td>${cp.contactMobile}</td>
 				<td>
 					短信
@@ -150,6 +150,7 @@
 			</c:forEach>
 		</tbody>	
 	</table>
+	<br/>
 	<%-- <div class="pagination">${contactPage}</div> --%>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactMobile="${personMobile}" contactstype="${overdueDays<=1 ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
