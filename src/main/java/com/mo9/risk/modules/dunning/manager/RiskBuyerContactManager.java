@@ -35,9 +35,9 @@ public class RiskBuyerContactManager {
 	public List<TBuyerContact> getBuyerContactInfo(String mobile) throws IOException {
 		String url = riskUrl + "riskbehavior/inner/queryContactInfoByMobile.do?mobile=" + mobile;
 
-		logger.info("接口url：" + url);
+		logger.debug("接口url：" + url);
 		String res = java.net.URLDecoder.decode(GetRequest.getRequest(url, new HashMap<String, String>(), 3000), "utf-8");
-		logger.info("接口url返回参数" + res);
+		logger.debug("接口url返回参数" + res);
 
 		if (StringUtils.isBlank(res)) {
 			throw new ServiceException("获取通讯录信息失败");
