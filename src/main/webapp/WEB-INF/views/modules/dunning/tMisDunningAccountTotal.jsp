@@ -373,9 +373,17 @@
         </li>
 
         <li><label>入账标签</label>
-            <form:select id="status" path="remittanceTag" class="input-medium">
+            <form:select id="remittanceTag" path="remittanceTag" class="input-medium">
                 <form:option selected="selected" value="" label="全部状态"/>
                 <form:options items="${remittanceTagList}" itemLabel="desc" />
+            </form:select>
+        </li>
+
+        <li><label>入账类型</label>
+            <form:select id="payType" path="payType" class="input-medium">
+                <form:option selected="selected" value="" label="全部状态"/>
+                <form:option value="loan" label="还清"/>
+                <form:option value="partial" label="部分还款"/>
             </form:select>
         </li>
 

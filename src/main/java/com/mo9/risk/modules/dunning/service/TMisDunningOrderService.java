@@ -35,7 +35,7 @@ public class TMisDunningOrderService extends BaseService{
 	@Autowired
 	private RiskOrderManager orderManager;
 	@Autowired
-	private TMisDunningOrderForRiskService orderForRiskService;
+	private TMisDunningForRiskService orderForRiskService;
 
 
 	/***
@@ -145,15 +145,10 @@ public class TMisDunningOrderService extends BaseService{
 			try {
 				orderManager.repay(dealcode, remittancechannel, remark, DunningOrder.PAYTYPE_LOAN, remittanceamount, "7");
 			}catch (Exception e) {
+				logger.info("应还清的异常订单自动修复发生错误", e);
 				continue;
 			}
-			//调用成功查看订单状态是否改变
-			List<String> shouldPayoffOrderDelcodes = new ArrayList<String>();
-			shouldPayoffOrderDelcodes.add(dealcode);
-			List<String> abnormalOrders = this.findAbnormalOrderFromRisk(shouldPayoffOrderDelcodes);
-			if (abnormalOrders.size() == 0){
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}

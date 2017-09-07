@@ -6,7 +6,8 @@ package com.mo9.risk.modules.dunning.entity;
 import org.hibernate.validator.constraints.Length;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.mo9.risk.modules.dunning.enums.WorkPayday;
+import com.mo9.risk.modules.dunning.enums.WorkSalary;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
@@ -52,6 +53,9 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 	
 	private String imgFiled3;//影像资料3
 	private String imgFiled4;//影像资料4
+	
+	private Integer payday;		//发薪日
+	private Integer salary;		//薪水
 	
 	public String getFinProduct() {
 		return finProduct;
@@ -337,4 +341,33 @@ public class TRiskBuyerPersonalInfo extends DataEntity<TRiskBuyerPersonalInfo> {
 		this.imgFiled4 = imgFiled4;
 	}
 
+	public Integer getPayday() {
+		return payday;
+	}
+
+	public void setPayday(Integer payday) {
+		this.payday = payday;
+	}
+
+	public String getPaydayDesc() {
+		if (this.payday == null) {
+			return "";
+		}
+		return WorkPayday.valueOf(this.payday).getDesc();
+	}
+
+	public Integer getSalary() {
+		return salary;
+	}
+
+	public void setSalary(Integer salary) {
+		this.salary = salary;
+	}
+
+	public String getSalaryDesc() {
+		if (this.salary == null) {
+			return "";
+		}
+		return WorkSalary.valueOf(this.salary).getDesc();
+	}
 }

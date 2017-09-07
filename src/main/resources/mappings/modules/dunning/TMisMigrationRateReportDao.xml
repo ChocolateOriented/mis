@@ -925,4 +925,27 @@
 	
 	
 	</select>
+	<!-- 新图表的数据查询	 -->
+	<select id="newfindMigrateChartList" resultType="TMisMigrationRateReport">
+	SELECT
+		a.datetime AS "datetime",
+		a.${migrate}*100 AS "cpvalue",
+		a.cycle AS "cycle",
+		c.datetime_start AS "datetimeStart",
+		c.datetime_end AS "datetimeEnd"
+	FROM
+		tmp_move_cycle c
+	inner JOIN `t_mis_migration_rate_report` a ON a.Cycle = c.cycle  INNER
+	join (
+	SELECT
+		cycle
+	FROM
+		`tmp_move_cycle`
+	ORDER BY
+		cycle DESC
+	LIMIT #{cycleNum}
+		) t on t.cycle = a.cycle
+	ORDER BY  a.cycle desc,a.DateTime ASC
+
+	</select>
 </mapper>

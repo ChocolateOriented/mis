@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
@@ -218,6 +219,11 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 * @return
 	 */
 	public List<TMisMigrationRateReport> findMigrateChartList(TMisMigrationRateReport tMisMigrationRateReport);
-	
-	
+
+	/**
+	 * 查询图表数据新方法
+	 * @return
+	 */
+	List<TMisMigrationRateReport> newfindMigrateChartList(@Param("migrate")Migrate migrate,@Param("cycleNum")Integer cycleNum);
+
 }

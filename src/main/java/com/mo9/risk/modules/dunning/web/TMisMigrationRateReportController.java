@@ -23,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -32,13 +31,9 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanMonthReportBean;
-import com.thinkgem.jeesite.modules.weeklyreport.bean.SCashLoanWeekReportBean;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
-import com.alibaba.fastjson.JSON;
-import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
 import com.mo9.risk.modules.dunning.service.TMisMigrationRateReportService;
@@ -422,7 +417,7 @@ public class TMisMigrationRateReportController extends BaseController {
 		
 		return migrationData;
 	}
-	
+
 	/**
 	 * 贷后报表测试用例
 	 * @return
@@ -555,7 +550,5 @@ public class TMisMigrationRateReportController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisMigrationRateReport/list";
     }
-	
-	
-	
+
 }
