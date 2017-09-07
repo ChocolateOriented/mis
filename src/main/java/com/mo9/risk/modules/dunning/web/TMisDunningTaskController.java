@@ -228,15 +228,23 @@ public class TMisDunningTaskController extends BaseController {
 		NumberCleanResult[] values = NumberCleanResult.values();
 		List<NumberCleanResult> numberList = Arrays.asList(values);
 		User user=UserUtils.getUser();
+		//控制页面只有对应的队列显示号码清洗
+		String dunningCycles=DictUtils.getDictValue("dunningCycle", "cleanNumber", "Q0,Q1");
+		String[] cycles = dunningCycles.split(",");
 		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(user.getId());
 		String tmiscycle=null;
 		if(null==tMisDunningPeople){
 //			tmiscycle="numberClean";
 		}else{
 			String dunningCycle=tMisDunningPeople.getDunningcycle();
-			if(StringUtils.isNotBlank(dunningCycle)){
-				if(dunningCycle.contains("Q0")||dunningCycle.contains("Q1")){
-					tmiscycle="numberClean";
+			if(StringUtils.isNotBlank(dunningCycle)&&null!=cycles&&cycles.length>0){
+				for (int i = 0; i < cycles.length; i++) {
+					
+					if(dunningCycle.contains(cycles[i])){
+						tmiscycle="numberClean";
+						break;
+					}
+					
 				}
 			}
 		}
@@ -1019,11 +1027,12 @@ public class TMisDunningTaskController extends BaseController {
 				tMisChangeCardRecord.setMobile(personalInfo.getMobile());
 			}
 		}
-		
+		//根据逾期天数控制子页面显示;
+		String controlDay=DictUtils.getDictValue("overdueDay", "controlPage", "1");
+		model.addAttribute("controlDay", controlDay);
 		boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
 		//根据资方和逾期天数判断是否开启代扣
 		boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
-		
 		model.addAttribute("changeCardRecord", tMisChangeCardRecord);
 		model.addAttribute("deductable", deductable && daikouStatus);
 		model.addAttribute("daikouStatus", daikouStatus);

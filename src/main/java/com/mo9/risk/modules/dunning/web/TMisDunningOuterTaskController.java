@@ -51,6 +51,7 @@ import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 
@@ -198,7 +199,9 @@ public class TMisDunningOuterTaskController extends BaseController {
 					tMisChangeCardRecord.setMobile(personalInfo.getMobile());
 				}
 			}
-			
+			//根据逾期天数控制子页面显示;
+			String controlDay=DictUtils.getDictValue("overdueDay", "controlPage", "1");
+			model.addAttribute("controlDay", controlDay);
 			boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
 			//根据资方和逾期天数判断是否开启代扣
 			boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
