@@ -48,11 +48,12 @@ public class RiskBuyerContactManager {
 			throw new ServiceException(response.getResultMsg());
 		}
 
-		JSONObject datas = response.getDatas();
-		if (datas == null) {
+		String datas = response.getDatas();
+		if (StringUtils.isBlank(datas)) {
 			return new ArrayList<TBuyerContact>();
 		}
-		List<TBuyerContact> contacts = JSON.parseArray(datas.getString("contact"),TBuyerContact.class);
+		JSONObject dataJson = JSON.parseObject(datas);
+		List<TBuyerContact> contacts = JSON.parseArray(dataJson.getString("contact"),TBuyerContact.class);
 		return contacts == null? new ArrayList<TBuyerContact>() : contacts;
 	}
 
@@ -78,11 +79,11 @@ public class RiskBuyerContactManager {
 			logger.info("获取"+mobile+"通讯录失败,失败信息: " +result.getResultMsg());
 			throw new ServiceException(result.getResultMsg());
 		}
-
-		JSONObject dataJson = result.getDatas();
-		if (dataJson == null){
+		String datas = result.getDatas();
+		if (StringUtils.isBlank(datas)) {
 			return new ArrayList<TRiskBuyerContactRecords>();
 		}
+		JSONObject dataJson = JSON.parseObject(datas);
 		List<TRiskBuyerContactRecords> records = JSON.parseArray(dataJson.getString("callLog"),TRiskBuyerContactRecords.class);
 		if (records ==null){
 			return new ArrayList<TRiskBuyerContactRecords>();

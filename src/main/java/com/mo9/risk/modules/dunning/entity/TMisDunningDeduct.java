@@ -47,7 +47,7 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	private String paychannel;		//扣款渠道
 
 	private Date finishtime;		//扣款成功时间
-	
+
 	private Double chargerate;		//扣款费率
 
 	private PayStatus status;		//扣款状态
@@ -59,9 +59,9 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	private PayStatus repaymentstatus;		//还款状态
 
 	private String repaymentdetail;		//还款状态明细
-	
+
 	private String operationtype;		//操作类型
-    
+
 	public TMisDunningDeduct() {
 		super();
 	}
@@ -78,7 +78,7 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	public void setDbid(String dbid) {
 		this.dbid = dbid;
 	}
-	
+
 	@Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
 	public String getDealcode() {
 		return dealcode;
@@ -193,7 +193,7 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	public void setFinishtime(Date finishtime) {
 		this.finishtime = finishtime;
 	}
-	
+
 	public Double getChargerate() {
 		return chargerate;
 	}
@@ -205,7 +205,7 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	public PayStatus getStatus() {
 		return status;
 	}
-	
+
 	public void setStatus(PayStatus status) {
 		this.status = status;
 	}
@@ -241,7 +241,7 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 	public void setRepaymentdetail(String repaymentdetail) {
 		this.repaymentdetail = repaymentdetail;
 	}
-	
+
 	public String getOperationtype() {
 		return operationtype;
 	}
@@ -250,25 +250,30 @@ public class TMisDunningDeduct extends DataEntity<TMisDunningDeduct> {
 		this.operationtype = operationtype;
 	}
 
+	//用于江湖救急还款接口
+	public String getThirdCode(){
+		return TMisDunningDeduct.class.getSimpleName()+deductcode;
+	}
+
 	public String getStatusDesc() {
 		if (status == null) {
 			return "";
 		}
-		
+
 		if (status != PayStatus.failed) {
 			return status.getDesc();
 		}
-		
+
 		if (statusdetail == null || "".equals(statusdetail)) {
 			return status.getDesc();
 		}
-		
+
 		int index = statusdetail.indexOf("-->");
-		
+
 		if (index < 0 || statusdetail.length() <= index + 3) {
 			return status.getDesc() + "(" + statusdetail + ")";
 		}
-		
+
 		return status.getDesc() + "(" + statusdetail.substring(index + 3, statusdetail.length()) + ")";
 	}
 

@@ -13,7 +13,7 @@ public class RiskResponse {
 	public String resultCode;//响应吗
 	public String result ;//响应结果
 	public String resultMsg;//信息
-	public JSONObject datas;//数据
+	public String datas;//数据
 
 	public String getResultCode() {
 		return resultCode;
@@ -39,11 +39,11 @@ public class RiskResponse {
 		this.resultMsg = resultMsg;
 	}
 
-	public JSONObject getDatas() {
+	public String getDatas() {
 		return datas;
 	}
 
-	public void setDatas(JSONObject datas) {
+	public void setDatas(String datas) {
 		this.datas = datas;
 	}
 

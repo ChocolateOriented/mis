@@ -327,7 +327,10 @@ public class TMisRemittanceConfirm extends DataEntity<TMisRemittanceConfirm> {
 			RemittanceTag remittanceTag) {
 		this.remittanceTag = remittanceTag;
 	}
-
+	//用于江湖救急还款接口
+	public String getThirdCode(){
+		return TMisRemittanceConfirm.class.getSimpleName()+ remittancechannel+ financialserialnumber;
+	}
 	@Override
 	public String toString() {
 		return "TMisRemittanceConfirm{" +

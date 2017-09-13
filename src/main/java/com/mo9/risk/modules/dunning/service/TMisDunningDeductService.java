@@ -705,7 +705,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	}
 
 	/**
-	 * @Description 尝试修复代扣异常订单
+	 * @Description 尝试修复代扣异常订单, 当江湖救急响应码可靠时, 可以删除
 	 * @param
 	 * @return java.util.List<java.lang.String>
 	 */
@@ -729,7 +729,6 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 		}
 
 		//调用接口
-		String remark = "代扣";
 		String paychannel = "bank";
 
 		for (TMisDunningDeduct deduct : abnormalDeducts) {
@@ -739,7 +738,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			String dealcode = deduct.getDealcode();
 			BigDecimal payamount = new BigDecimal(deduct.getPayamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel ,remark ,payamount );
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel, DunningOrder.PAYTYPE_LOAN,payamount ,deduct.getThirdCode());
 			if (success) {
 				successCount++;
 				//更新代扣
@@ -748,7 +747,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 				logger.debug("代扣信息:" + deduct.getId() + "订单" + deduct.getDealcode() + "修复成功");
 				continue;
 			}
-			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
+			orderService.sendAbnormalOrderEmail("代扣",paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
 		}
 		logger.info("代扣状态异常订单成功修复:" + successCount + "条");
 	}

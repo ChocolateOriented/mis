@@ -326,10 +326,7 @@
 
 	<select id="findAbnormalDeduct" resultType="TMisDunningDeduct">
 		SELECT
-		a.id as "id",
-		a.dealcode as "dealcode",
-		a.mobile as "mobile",
-		a.payamount as "payamount"
+		<include refid="TMisDunningDeductColumns"/>
 		FROM t_mis_dunning_deduct a
 		LEFT JOIN t_risk_order AS o ON a.dealcode = o.dealcode
 		WHERE
