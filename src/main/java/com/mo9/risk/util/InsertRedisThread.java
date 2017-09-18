@@ -1,5 +1,6 @@
 package com.mo9.risk.util;
 
+import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.bean.ThreadBuyerid;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
-import com.mo9.risk.modules.dunning.manager.RiskContactRecordsManager;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 
 
@@ -83,9 +83,9 @@ public class InsertRedisThread  implements Runnable{
 				Map<String, Object> map2 = new HashMap<String, Object>();
 				DbUtils dbUtils = new DbUtils();
 				List<TRiskBuyerContactRecords> contactRecordsList = null;
-				RiskContactRecordsManager contactRecordsManager = new RiskContactRecordsManager();
+				RiskBuyerContactManager contactRecordsManager = new RiskBuyerContactManager();
 				try {
-					contactRecordsList = contactRecordsManager.findByByMobile(mobile);
+					contactRecordsList = contactRecordsManager.findContactRecordsByMobile(mobile);
 					logger.info("预缓存http接口返回通讯录条数：" + contactRecordsList.size());
 				} catch (Exception e1) {
 					logger.warn("预缓存http接口返回通讯录失败：mobile-"+ mobile, e1);

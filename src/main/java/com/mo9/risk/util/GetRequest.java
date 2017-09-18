@@ -42,7 +42,7 @@ public class GetRequest
     /**
      * Post请求
      * 
-     * @param url
+     * @param uri
      *            请求的URL
      * @param params
      *            请求参数
@@ -58,7 +58,7 @@ public class GetRequest
     /**
      * Post请求
      * 
-     * @param url
+     * @param uri
      *            请求的URL
      * @param params
      *            请求参数
@@ -85,7 +85,7 @@ public class GetRequest
     /**
      * Post请求
      * 
-     * @param url
+     * @param uri
      *            请求的URL
      * @param params
      *            请求参数
@@ -110,9 +110,9 @@ public class GetRequest
     /**
      * Post请求
      * 
-     * @param url
+     * @param uri
      *            请求的URL
-     * @param params
+     * @param data
      *            请求参数
      * @return 应答报文
      * @throws IOException
@@ -120,15 +120,24 @@ public class GetRequest
      */
     public static String getRequest(String uri, String data) throws IOException
     {
-    	return getRequest(uri, data, 30000);
+        int timeout ;
+        if(uri.contains("mo9.com"))
+        {/**mo9类部地址,仅仅允许2秒超时.*/
+            timeout = 30000;
+        }
+        else
+        {
+            timeout = 8000;
+        }
+    	return getRequest(uri, data, timeout);
     }
     
     /**
      * Post请求
      * 
-     * @param url
+     * @param uri
      *            请求的URL
-     * @param params
+     * @param data
      *            请求参数
      * @param timeout
      *            超时时间
@@ -154,17 +163,10 @@ public class GetRequest
         {// 设置证书验证.
             ((HttpsURLConnection) conn).setHostnameVerifier(verifier);
         }
+        conn.setConnectTimeout(timeout);// 连接超时
+        conn.setReadTimeout(timeout);// 超时时限
         conn.setRequestMethod("GET");
-        if(url.getHost().contains("mo9.com"))
-        {/**mo9类部地址,仅仅允许2秒超时.*/
-            conn.setConnectTimeout(timeout);// 连接超时
-            conn.setReadTimeout(timeout);// 超时时限
-        }
-        else
-        {
-            conn.setConnectTimeout(5000);// 5s超时
-            conn.setReadTimeout(8000);// 超时时限
-        }
+
         conn.setDoOutput(false);
         // 到这里已经完成了，不过我们还是看看返回信息吧，他的注册返回信息也在此页面
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));

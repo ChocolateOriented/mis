@@ -43,11 +43,13 @@ import org.apache.log4j.Logger;
 public class PostRequest {
 
 	private static Logger log = Logger.getLogger(PostRequest.class);
+	private static final int DEFAULT_TIMEOUT = 45000;
+	private static final String DEFAULT_CHARSET = "UTF-8";
 
 	/**
 	 * Post请求(默认使用UTF-8)
 	 * 
-	 * @param url
+	 * @param uri
 	 *            请求的URL
 	 * @param data
 	 *            请求参数,待请求的参数采用name=value&name=value模式集成.
@@ -55,7 +57,7 @@ public class PostRequest {
 	 * @throws IOException
 	 *             如果请求失败，抛出该异常
 	 */
-	public static String postRequest(String uri, String data) throws IOException {
+	public static String postRequest(String uri, String data, Integer timeout) throws IOException {
 
 		log.info("POST:"+uri+", msg:"+data);
 		trustAllHosts();// 信任所有HTTPS主机.
@@ -67,61 +69,13 @@ public class PostRequest {
 			if ( url.getProtocol().equalsIgnoreCase("HTTPS") ) {// 为HTTPS地址，添加域名验证策略
 				((HttpsURLConnection) conn).setHostnameVerifier(verifier);
 			}
-			
-		    conn.setConnectTimeout(45000);// 连接超时
-            conn.setReadTimeout(45000);// 超时时限
 
-			conn.setRequestMethod("POST");
-			// 这里是关键，表示我们要向链接里输出内容
-			conn.setDoOutput(true);
-			// 获得连接输出流
-			OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-			// 把数据写入
-			StringBuffer param = new StringBuffer(data);
-			if ( param.length() > 0 && param.charAt(0) == '&' ) {// Post请求，删除第一个'&符号'
-				out.write(param.substring(1));
-			} else {
-				out.write(param.toString());
-			}
-			out.flush();
-			out.close();
-			// 到这里已经完成了，不过我们还是看看返回信息吧，他的注册返回信息也在此页面
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-			String inputLine = reader.readLine();
-			while (inputLine != null) {
-				resp.append(inputLine);
-				inputLine = reader.readLine();
-			}
-			reader.close();
-		} finally {
-			if ( conn != null ) {
-				conn.disconnect();
-			}
-		}
-		log.info("POST RESULT:"+resp.toString());
-		return resp.toString();
-	}
-	
-	public static String postRequest(String uri, String data,Integer timeout ) throws IOException {
-
-		log.info("POST:"+uri+", msg:"+data);
-		trustAllHosts();// 信任所有HTTPS主机.
-		URL url = new URL(uri);
-		HttpURLConnection conn = null;
-		StringBuffer resp = new StringBuffer();
-		try {
-			conn = (HttpURLConnection) url.openConnection();
-			if ( url.getProtocol().equalsIgnoreCase("HTTPS") ) {// 为HTTPS地址，添加域名验证策略
-				((HttpsURLConnection) conn).setHostnameVerifier(verifier);
-			}
-			
 			if(timeout == null || timeout == 0){
-				timeout = 45000;
+				timeout = DEFAULT_TIMEOUT;
 			}
-			conn.setConnectTimeout(timeout);
+			conn.setConnectTimeout(timeout);// 连接超时
 			conn.setReadTimeout(timeout);// 超时时限
-			
+
 			conn.setRequestMethod("POST");
 			// 这里是关键，表示我们要向链接里输出内容
 			conn.setDoOutput(true);
@@ -137,7 +91,7 @@ public class PostRequest {
 			out.flush();
 			out.close();
 			// 到这里已经完成了，不过我们还是看看返回信息吧，他的注册返回信息也在此页面
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),DEFAULT_CHARSET));
 
 			String inputLine = reader.readLine();
 			while (inputLine != null) {
@@ -155,9 +109,8 @@ public class PostRequest {
 	}
 
 	/**
-	 * Post请求(默认使用UTF-8)
-	 * 
-	 * @param url
+	 * Post请求(使用默认编码UTF-8,默认超时时间)
+	 * @param uri
 	 *            请求的URL
 	 * @param params
 	 *            请求参数
@@ -166,14 +119,21 @@ public class PostRequest {
 	 *             如果请求失败，抛出该异常
 	 */
 	public static String postRequest(String uri, Map<String, String> params) throws IOException {
+		return postRequest(uri, params, DEFAULT_CHARSET , DEFAULT_TIMEOUT);
+	}
 
-		return postRequest(uri, params, "UTF-8");
+	public static String postRequest(String uri, Map<String, String> params, String charSet) throws IOException {
+		return postRequest(uri, params,charSet,DEFAULT_TIMEOUT);
+	}
+
+	public static String postRequest(String uri, Map<String, String> params, Integer timeout) throws IOException {
+		return postRequest(uri, params,DEFAULT_CHARSET,timeout);
 	}
 
 	/**
 	 * 按照指定的编码发起Post请求.
 	 * 
-	 * @param url
+	 * @param uri
 	 *            请求的URL
 	 * @param params
 	 *            请求参数
@@ -181,7 +141,7 @@ public class PostRequest {
 	 * @throws IOException
 	 *             如果请求失败，抛出该异常
 	 */
-	public static String postRequest(String uri, Map<String, String> params, String charSet) throws IOException {
+	public static String postRequest(String uri, Map<String, String> params, String charSet, Integer timeout) throws IOException {
 
 		StringBuffer param = new StringBuffer();
 		Set<String> keys = params.keySet();
@@ -190,7 +150,7 @@ public class PostRequest {
 			String value = URLEncoder.encode(params.get(key), charSet);
 			param.append("&" + key + "=" + value);
 		}
-		return postRequest(uri, param.toString());
+		return postRequest(uri, param.toString(),timeout);
 	}
 
 	/**
