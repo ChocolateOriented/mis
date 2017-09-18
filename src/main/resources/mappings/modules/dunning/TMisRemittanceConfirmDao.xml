@@ -376,13 +376,7 @@
 
 	<select id="findAbnormalRemittanceConfirm" resultType="TMisRemittanceConfirm">
 		SELECT
-		m.Id AS "id",
-		m.RemittanceChannel AS "remittancechannel",
-		m.Remark AS "remark",
-		m.PayType AS "paytype",
-		m.RemittanceAmount AS "remittanceamount",
-		m.dealcode AS "dealcode",
-		m.mobile AS "mobile"
+		<include refid="tMisRemittanceConfirmColumns"/>
 		FROM
 		t_mis_remittance_confirm m
 		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode

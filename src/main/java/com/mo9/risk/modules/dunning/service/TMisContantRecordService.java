@@ -6,7 +6,6 @@ package com.mo9.risk.modules.dunning.service;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
-import com.mo9.risk.modules.dunning.dao.TBuyerContactDao;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
@@ -28,7 +27,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
-import com.mo9.risk.modules.dunning.manager.RiskContactRecordsManager;
+import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.MsfClient;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -79,7 +78,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	@Autowired
 	private TmisDunningSmsTemplateDao tdstDao;
 	@Autowired
-	private RiskContactRecordsManager recordsManager;
+	private RiskBuyerContactManager recordsManager;
 
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
@@ -142,7 +141,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		if (StringUtils.isNotBlank(mobile)){
 			List<TRiskBuyerContactRecords> contactRecords;
 			try {
-				contactRecords = recordsManager.findByByMobile(mobile);
+				contactRecords = recordsManager.findContactRecordsByMobile(mobile);
 				if (null != contactRecords && contactRecords.size() > 0) {
 					return this.convertContactRecord2MsgInfo(contactRecords);
 				}

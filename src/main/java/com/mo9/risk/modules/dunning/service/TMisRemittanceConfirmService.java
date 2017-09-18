@@ -4,8 +4,10 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
+import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -229,12 +231,11 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	@Transactional
 	public String checkConfirm(TMisPaid paid, String isMergeRepayment, String confirmid, String platform, String[] relatedId) throws IOException {
+		TMisRemittanceConfirm confirm = this.getLockedRemittanceConfirm(confirmid);
 		String dealcode = paid.getDealcode();
 		String paychannel = paid.getPaychannel();
-		String remark = paid.getRemark();
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
-		String delayDay = paid.getDelayDay();
 		BigDecimal remittanceamount = new BigDecimal(paidAmount);
 
 		if ("1".equals(isMergeRepayment)) {
@@ -251,28 +252,49 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		try {
-			return orderManager.repay(dealcode, paychannel, remark, paidType, remittanceamount, delayDay);
-		} catch (IOException e) {
-//			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,remittanceamount,"网络异常:"+e.getMessage());
-			throw e;
-		}
+		return orderService.repayWithPersistence(dealcode, paychannel, paidType, remittanceamount, confirm.getThirdCode());
 	}
 
 	/**
-	 * @Description 提交查账流程--入账
-	 * @param confirm
+	 * @Description  提交查账流程--入账
+	 * @param remittanceConfirmId 汇款确认ID
+	 * @param paytype 还款类型
+	 * @param remittanceTag 还款标签
 	 * @return void
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void auditConfrim (TMisRemittanceConfirm confirm) throws IOException {
+	public void auditConfrim (String remittanceConfirmId,String paytype,RemittanceTag remittanceTag)throws IOException {
 		//数据库加行锁控制并发
-		logger.debug("正在获取锁TMisRemittanceConfirm:"+confirm.getId());
-		TMisRemittanceConfirm lockedConfirm = this.getLockedRemittanceConfirm(confirm.getId());
-		logger.debug("成功获取锁TMisRemittanceConfirm:"+confirm.getId());
-		if (!TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(lockedConfirm.getConfirmstatus())){
+		TMisRemittanceConfirm confirm = this.getLockedRemittanceConfirm(remittanceConfirmId);
+
+		if (confirm == null){
+			throw new ServiceException("未查询到汇确认信息");
+		}
+		if (!TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
 			throw new ServiceException("汇款确认信息状态不为'已查账'");
 		}
+		String dealcode = confirm.getDealcode();
+		DunningOrder order = orderService.findOrderByDealcode(dealcode);
+		if (order == null) {
+			throw new ServiceException("错误，订单不存在");
+		}
+		if(order.getStatus().equals(DunningOrder.STATUS_PAYOFF)){
+			throw new ServiceException("错误，订单已还清");
+		}
+		if (remittanceTag == null){
+			if (confirm.getRemittanceTag() == null){
+				throw new ServiceException("还款标签不能为空");
+			}
+		}else {//若入账标记还款标签,则以入账时为准
+			confirm.setRemittanceTag(remittanceTag);
+		}
+		//若还款类型为还清, 则还款金额应该大于应催金额
+		if (DunningOrder.PAYTYPE_LOAN.equals(paytype)){
+			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
+				throw new ServiceException("金额不匹配，入账失败");
+			}
+		}
+		confirm.setPaytype(paytype);
 
 		//更新汇款确认信息
 		confirm.preUpdate();
@@ -281,25 +303,17 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		misRemittanceConfirmDao.auditConfrimUpdate(confirm);
 		tMisRemittanceConfirmLogService.saveLog(confirm);
 
-		String paidType = confirm.getPaytype();
-		String dealcode = confirm.getDealcode();
 		/**
 		 * 部分还款，生成部分还款任务日志
 		 */
-		if("partial".equals(paidType)){
+		if(DunningOrder.PAYTYPE_PARTIAL.equals(paytype)){
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		String delayDay = "7";
-		String remark = "对公转账";
 		String paychannel = confirm.getRemittancechannel();
 		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
-		try {
-			orderManager.repay(dealcode,paychannel,remark,paidType,payamount,delayDay);
-		} catch (IOException e) {
-//			orderService.sendAbnormalOrderEmail(remark, paychannel, dealcode,payamount,"网络异常:"+e.getMessage());
-			throw e;
-		}
+		String thirdCode = confirm.getThirdCode();
+		orderService.repayWithPersistence(dealcode,paychannel,paytype,payamount,thirdCode);
 	}
 
 	/**
@@ -309,13 +323,16 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	@Transactional(propagation = Propagation.MANDATORY)
 	private TMisRemittanceConfirm getLockedRemittanceConfirm(String id) {
-		return dao.selectByIdForUpdate(id);
+		logger.debug("正在获取锁TMisRemittanceConfirm:"+id);
+		TMisRemittanceConfirm confirm = dao.selectByIdForUpdate(id);
+		logger.debug("成功获取锁TMisRemittanceConfirm:"+confirm.getId());
+		return confirm;
 	}
 
 
 	/**
 	 * 定时检查催收已确认还清, 但是江湖救急处理异常的订单, 尝试重新调用3次还清接口, 若还是不行发送邮件
-	 * 每6小时触发一次, 临时解决方案
+	 * 每6小时触发一次, 临时解决方案, 当江湖救急响应码可靠时, 可以删除
 	 */
 	@Scheduled(cron = "0 0 5,11,17,23 * * ?")
 	public void tryRepairAbnormalRemittanceConfirm() {
@@ -337,8 +354,6 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		}
 
 		//调用接口
-		String remark = "对公转账";
-
 		for (TMisRemittanceConfirm remittanceConfirm : abnormalRemittanceConfirm) {
 			if (!abnormalOrders.contains(remittanceConfirm.getDealcode())) {
 				continue;
@@ -347,13 +362,13 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			String paychannel = remittanceConfirm.getRemittancechannel();
 			BigDecimal payamount = new BigDecimal(remittanceConfirm.getRemittanceamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,remark ,payamount);
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,DunningOrder.PAYTYPE_LOAN ,payamount,remittanceConfirm.getThirdCode());
 			if (success) {
 				successCount++;
 				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
 				continue;
 			}
-			orderService.sendAbnormalOrderEmail(remark,paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
+			orderService.sendAbnormalOrderEmail("对公转账",paychannel,dealcode,payamount,"应还清订单, 自动修复失败");
 		}
 		logger.info("对公交易状态异常订单成功修复:" + successCount + "条");
 	}

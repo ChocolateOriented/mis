@@ -162,15 +162,11 @@ public class TMisDunningDeductCallService {
 	public boolean updateRepaymentStatus(TMisDunningDeduct tMisDunningDeduct) {
 		String dealcode = tMisDunningDeduct.getDealcode();
 		String paychannel = "bank";
-		String remark = "代扣";
 		String paidType = tMisDunningDeduct.getPaytype();
 		Double paidAmount = tMisDunningDeduct.getPayamount();
-		String delayDay = "7";
-		
-		BigDecimal bd = BigDecimal.valueOf(paidAmount);
-		
+		String thirdCode = tMisDunningDeduct.getThirdCode();
 		try {
-			riskOrderManager.repay(dealcode, paychannel, remark, paidType, bd, delayDay);
+			riskOrderManager.repay(dealcode, paychannel, paidType, BigDecimal.valueOf(paidAmount),thirdCode);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);
