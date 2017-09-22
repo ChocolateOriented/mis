@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
-import com.sun.tools.javac.util.List;
+//import com.sun.tools.javac.util.List;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
 public class Demo {
