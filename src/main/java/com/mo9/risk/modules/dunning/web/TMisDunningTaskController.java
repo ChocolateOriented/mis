@@ -954,19 +954,17 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载用户信息页面1
-	 * @param tMisDunningTask
+	 * @param status buyerId dealcode dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "pageFather")
 	public String pageFather(String status,String buyerId, String dealcode,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,Model model) {
+
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
-		
-		
-		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
 		
 		TRiskBuyerPersonalInfo personalInfo = null;
 		TBuyerContact tBuyerContact = new TBuyerContact();
@@ -1038,7 +1036,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("daikouStatus", daikouStatus);
 		
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
-		tMisDunningTag.setDealcode(dealcode);
+		tMisDunningTag.setBuyerid(buyerId);
 		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 		model.addAttribute("tags", tags);
 		
@@ -1050,7 +1048,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 展示用户影像资料
-	 * @param buyerId
+	 * @param
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
@@ -1098,7 +1096,7 @@ public class TMisDunningTaskController extends BaseController {
 
 	/**
 	 * 加载用户信息页面
-	 * @param tMisDunningTask
+	 * @param buyerId
 	 * @param model
 	 * @return
 	 */
@@ -1152,7 +1150,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载通讯录页面
-	 * @param tMisDunningTask
+	 * @param mobileSelf
 	 * @param model
 	 * @return
 	 */
@@ -1217,7 +1215,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载通话记录页面
-	 * @param tMisDunningTask
+	 * @param mobileSelf
 	 * @param model
 	 * @return
 	 */
@@ -1268,7 +1266,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载历史借款信息页面
-	 * @param tMisDunningTask
+	 * @param buyerId dealcode dunningCycle overdueDays dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
@@ -1311,7 +1309,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载登录日志页面
-	 * @param tMisDunningTask
+	 * @param buyerId dealcode dunningCycle overdueDays dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
@@ -1391,41 +1389,7 @@ public class TMisDunningTaskController extends BaseController {
 			logger.warn("任务不存在，订单号：" + dealcode);
 			return null;
 		}
-		
-//		String selfMobile = "";
-//		List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,"self");
-//		if(list != null && list.size() > 0){
-//			selfMobile = list.get(0).getTel();
-//		}
-//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-//		if(personalInfo == null){
-//			return "views/error/500";
-//		}
-//		Integer odds = Integer.valueOf(personalInfo.getOverdueDays());
-//		String smsT = "";
-//		boolean chooseSelf = true;
-//		if(odds == 0 || odds < 0){
-//			smsT = "ST_0";
-//		}
-//		else if(0 < odds && odds < 8){
-//			smsT = "ST__1_7";
-//		}else if(7 < odds && odds < 15){
-//			smsT = "ST_8_14";
-//		}else if(14 < odds && odds < 22){
-//			smsT = "ST_15_21";
-//		}else if(21 < odds && odds < 36){
-//			smsT = "ST_22_35";
-//		}else{
-//			chooseSelf = false;
-//			smsT = "ST_15_PLUS";
-//			selfMobile = "";
-//		}
-//		
-//		
-//		TMisContantRecord t = new TMisContantRecord();
-//		t.setSmstemp(SmsTemp.valueOf(smsT));
-//		String smsContext = "";
-//		smsContext = tMisContantRecordService.smsGetTemp(task,order, t);
+
 		String contatType="";
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
@@ -1467,7 +1431,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "collectionTel")
 	public String collectionTel(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
-//		model.addAttribute("tMisDunningTask", tMisDunningTask);
+
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -1489,7 +1453,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载电催结论页面
-	 * @param tMisDunningConclusion
+	 * @param tMisDunningTask
 	 * @param model
 	 * @return
 	 */
@@ -1520,7 +1484,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载敏感标签页面
-	 * @param tMisDunningConclusion
+	 * @param tMisDunningTask
 	 * @param model
 	 * @return
 	 */
@@ -1538,7 +1502,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("tMisDunningTag", tMisDunningTag);
 		} else {
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
-			tMisDunningTag.setDealcode(dealcode);
+			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 			
 			if(tags != null && tags.size() > 0) {

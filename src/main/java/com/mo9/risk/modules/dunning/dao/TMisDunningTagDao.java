@@ -27,8 +27,9 @@ public interface TMisDunningTagDao extends CrudDao<TMisDunningTag> {
 
 	/**
 	 * 查询已存在的标签
-	 * @param dealcode
+	 * @param buyerid
 	 * @return
 	 */
-	public List<String> getExistTagByDealcode(String dealcode);
+
+	public List<String> getExistTagByBuyerid(String buyerid);
 }
