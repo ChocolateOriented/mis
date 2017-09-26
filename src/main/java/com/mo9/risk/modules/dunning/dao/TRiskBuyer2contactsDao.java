@@ -21,4 +21,11 @@ public interface TRiskBuyer2contactsDao {
 	public List<TRiskBuyer2contacts> getContactsByBuyerId(@Param("buyerId")String buyerId,@Param("dealcode")String dealcode);
 	
 	public List<TMisSendMsgInfo> getSendMsgByBuyerIdAndType(String buyerId,String type);
+	/**
+	 * 查询该用户联系人的所有电话
+	 * @param buyerId
+	 * @return
+	 */
+	public List<String> findContactMobile(@Param("buyerId")String buyerId);
+	
 }
