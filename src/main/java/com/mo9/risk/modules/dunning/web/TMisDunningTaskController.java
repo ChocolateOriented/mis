@@ -1056,13 +1056,14 @@ public class TMisDunningTaskController extends BaseController {
 	public void showBuyerIdCardImg(HttpServletRequest request, HttpServletResponse response) {
 		String buyerId = request.getParameter("buyerId");
 		String fileId = tMisDunningTaskService.findBuyerImg(buyerId);
-		String riskadminUrl = DictUtils.getDictValue("riskadmin", "orderUrl", "");
+		String riskadminUrl = DictUtils.getDictValue("riskportal", "orderUrl", "");
 		String url = riskadminUrl + "file/showPic.a?fileId=" + fileId;
 		InputStream input = null;
 		OutputStream output = null;
+		HttpURLConnection connection = null;
 		try {
 			URL httpUrl = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) httpUrl.openConnection();
+			connection = (HttpURLConnection) httpUrl.openConnection();
 			connection.setRequestProperty("connection", "Keep-Alive");
 			connection.setRequestProperty("Content-Type", "image/jpg");
 			connection.setRequestProperty("accept", "*/*");
@@ -1087,6 +1088,9 @@ public class TMisDunningTaskController extends BaseController {
 				}
 				if (output != null) {
 					output.close();
+				}
+				if (connection != null) {
+					connection.disconnect();
 				}
 			} catch (IOException e) {
 				//nothing to do
