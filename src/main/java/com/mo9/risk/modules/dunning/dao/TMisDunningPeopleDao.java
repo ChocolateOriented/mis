@@ -44,6 +44,13 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	public List<TMisDunningPeople> findPeopleByDunningcycle(String dunningcycle);
 	
 	/**
+	 * 根据周期查询催收人员按金额排序
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(String dunningcycle);
+	
+	/**
 	 * 批量更新完成的任务
 	 * @param ids
 	 * @return

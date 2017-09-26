@@ -18,7 +18,6 @@
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
 				$('#btnDeduct').attr("disabled","disabled");
-				$('#btnTag').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
 			
@@ -250,7 +249,7 @@
 	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-	<input id="btnTag" name="btnCollection" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
+	<input id="btnTag" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
 	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />

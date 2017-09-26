@@ -1619,15 +1619,31 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 根据队列找出催收人员集合
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+					/**
+					 * 根据周期查询催收人员按金额排序
+					 */
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey());
 					
 					/**
 					 *  平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+						/**  平均分配法    */
+//						int j = i % dunningPeoples.size();                            			 // 平均分配法
+						
+						/**  蛇形分配法    */
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
+						System.out.println(dunningPeoples.get(j).getName()+"分配金额"+dunningTask.getCapitalamount());
+						
+						
 						/**  任务催收人员添加    */
 						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
@@ -1775,15 +1791,31 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 根据队列找出催收人员集合
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
+//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
+					/**
+					 * 根据周期查询催收人员按金额排序
+					 */
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey());
+					
 					/**
 					 * 平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
 					logger.info("共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
+					
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+//						int j = i % dunningPeoples.size();  
+						/**  蛇形分配法    */
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
+						System.out.println(dunningPeoples.get(j).getName()+"分配金额"+dunningTask.getCapitalamount());
+						
+						
 						/**  任务催收人员添加    */
 						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());

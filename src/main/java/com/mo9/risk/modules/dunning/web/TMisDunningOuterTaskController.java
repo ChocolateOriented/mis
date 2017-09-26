@@ -215,7 +215,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("daikouStatus", daikouStatus);
 			
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
-			tMisDunningTag.setDealcode(dealcode);
+			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 			model.addAttribute("tags", tags);
 			
