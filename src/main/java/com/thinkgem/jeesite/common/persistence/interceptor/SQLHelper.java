@@ -113,6 +113,9 @@ public class SQLHelper {
             countSql = "select count(1) from (" + sql + ") tmp_count";
         } else {
             countSql = "select count(1) from (" + removeOrders(sql) + ") tmp_count";
+//			System.out.println(sql+"==================1111");
+//			System.out.println(removeOrders(sql)+"==================222");
+//			System.out.println(removeSelect(removeOrders(sql))+"==================33");
 //	        countSql = "select count(1) " + removeSelect(removeOrders(sql));
         }
         Connection conn = connection;
