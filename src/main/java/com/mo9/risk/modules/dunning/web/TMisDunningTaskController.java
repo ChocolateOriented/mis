@@ -54,6 +54,7 @@ import com.mo9.risk.modules.dunning.entity.DerateReason;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
@@ -1477,7 +1478,9 @@ public class TMisDunningTaskController extends BaseController {
 		
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
-		
+		MobileResult[] values = MobileResult.values();
+		List<MobileResult> mobileResultList = Arrays.asList(values);
+		model.addAttribute("mobileResultList", mobileResultList);
 		model.addAttribute("contactMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
 		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() :"");
 		

@@ -154,7 +154,7 @@
 	<%-- <div class="pagination">${contactPage}</div> --%>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactMobile="${personMobile}" contactstype="${overdueDays<=1 ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>
+<!-- 	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/> -->
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />

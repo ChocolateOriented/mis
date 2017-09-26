@@ -18,7 +18,9 @@ import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
+import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -29,9 +31,12 @@ import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.MsfClient;
+import com.sun.tools.corba.se.idl.StringGen;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,10 +44,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 import org.jboss.logging.Logger;
+import org.jfree.data.time.Hour;
+import org.omg.CORBA.INTERNAL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +89,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	private TmisDunningSmsTemplateDao tdstDao;
 	@Autowired
 	private RiskBuyerContactManager recordsManager;
-
+	@Autowired
+	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
 	private DecimalFormat decimalFormat = new DecimalFormat("####.00"); // 数字格式化
@@ -378,6 +389,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			dunning.setPromisepaydate(tMisContantRecord.getPromisepaydate());
 			// 联系人姓名
 			dunning.setContactsname(tMisContantRecord.getContactsname());
+			dunning.setDunningCycle(task.getDunningcycle());
 			save(dunning);
 			if (!"".equals(dunningtaskdbid) && null != dunningtaskdbid) {
 				dunningTaskDao.updatedunningtime(dunningtaskdbid);
@@ -386,6 +398,125 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 //			throw new ServiceException(e);
 			logger.warn("订单号为:"+order.getDealcode()+",保存到催收历史失败");
 		}
+		//----------------做自动电催结论-------------
+		if(tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.tel){
+			String contactsType = tMisContantRecord.getContactstype().toString();
+			if("SELF".equals(contactsType)||"MARRIED".equals(contactsType)||"PARENT".equals(contactsType)||"CHILDREN".equals(contactsType)||
+					"RELATIVES".equals(contactsType)||"FRIEND".equals(contactsType)||"WORKMATE".equals(contactsType)){
+				dirTelConclusion(task, order, tMisContantRecord, dunningtaskdbid);
+			}
+		}
+	}
+
+	private void dirTelConclusion(TMisDunningTask task, TMisDunningOrder order, TMisContantRecord tMisContantRecord,
+			String dunningtaskdbid) {
+		//如果此次action为半失联且时间是在下午大于12点10分,就要进行判断该用户是否符合n:3:2
+			String status=tMisContantRecord.getTelstatus().toString();
+			if("BUSY".equals(status)||"CUT".equals(status)||"NOAS".equals(status)||"OFF".equals(status)||"NOTK".equals(status)){
+				 Calendar calendar = Calendar.getInstance();  
+				 int hour= calendar.get(Calendar.HOUR_OF_DAY);
+				 int minutes= calendar.get(Calendar.MINUTE);
+				if(hour>12||(minutes>=10&&hour>=12)){
+					List<TMisContantRecord> dirTelConsuion=tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle());
+					if(dirTelConsuion==null){
+						return;
+					}
+					SimpleDateFormat sd1=new SimpleDateFormat("yyyy-MM-dd");
+					List<String> contactMobile=tRiskBuyer2contactsDao.findContactMobile(tMisContantRecord.getBuyerId());
+					if(contactMobile==null){
+						logger.info(tMisContantRecord.getDealcode()+"该订单无联系人");
+						return;
+					}
+					Set<String> saveMobile1=new HashSet<String>();
+					Set<String> saveMobile2=new HashSet<String>();
+					int dayNum=0;
+					int cycle=0;
+					String control="true";
+					StringBuilder remark=new StringBuilder();
+					String date=sd1.format(dirTelConsuion.get(0).getCreateDate());
+					for (int i = 0; i < dirTelConsuion.size(); i++) {
+						//电催结论备注
+						if(cycle++<20){
+							remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
+									dirTelConsuion.get(i).getTelstatus().toString());
+							if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
+								remark.append(";");
+							}else{
+								remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
+							}
+						}
+						//表示同一天
+						if(date.equals(sd1.format(dirTelConsuion.get(i).getCreateDate()))){
+							if("false".equals(control)){
+								continue;
+							}
+							String telStuts = dirTelConsuion.get(i).getTelstatus().toString();
+							if(!("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts))){
+								control="false";
+								continue;
+							}
+							//分别对上下午进行处理
+							calendar.setTime(dirTelConsuion.get(i).getCreateDate());
+							 int conhour= calendar.get(Calendar.HOUR_OF_DAY);
+							 int conminutes= calendar.get(Calendar.MINUTE);
+							 int consecond= calendar.get(Calendar.SECOND);
+							 int createTime=conhour*60*60+conminutes*60+consecond;
+							 int compareTime=12*60*60+10*60;
+							if(createTime<compareTime){
+								//上午要所有的联系人都要有打过
+								saveMobile1.add( dirTelConsuion.get(i).getContanttarget());
+							}else{
+								//下午要所有的联系人都要有打过
+								saveMobile2.add( dirTelConsuion.get(i).getContanttarget());
+							}
+						}else{
+							if(saveMobile1!=null&&saveMobile2!=null&&saveMobile1.size()>0&&saveMobile2.size()>0){
+								
+								if(contactMobile.size()+1==saveMobile1.size()&&contactMobile.size()+1==saveMobile2.size()){
+									++dayNum;
+								}
+							}
+							saveMobile1.clear();
+							saveMobile2.clear();
+							date=sd1.format(dirTelConsuion.get(i).getCreateDate());
+							control="true";
+							--i;
+						}
+						if(i==dirTelConsuion.size()-1){
+								if(saveMobile1!=null&&saveMobile2!=null&&saveMobile1.size()>0&&saveMobile2.size()>0){
+									if(contactMobile.size()+1==saveMobile1.size()&&contactMobile.size()+1==saveMobile2.size()){
+										++dayNum;
+								}
+							}
+						}
+						//如果大于三天则要开始做电催结论为完全失联
+						if(dayNum>=3){
+							// 就要给前一个用户做电催结论
+							TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
+							//是否有效联系
+							tMisDunnedConclusion.setIseffective(false);
+							//下次跟进时间
+							String nextTelDate=DictUtils.getDictValue("LOOO", "dunning_result_code", "");
+							if(StringUtils.isEmpty(nextTelDate)){
+								logger.info(new Date()+"改结果码数据字典未配置");
+								return ;
+							}
+							Calendar calendar2 = Calendar.getInstance();
+							calendar2.add(Calendar.DATE, Integer.parseInt(nextTelDate));
+							Date nextfollowDate = calendar2.getTime();
+							tMisDunnedConclusion.setNextfollowdate(nextfollowDate);
+							//结果码
+							tMisDunnedConclusion.setResultcode(TelStatus.valueOf("LOOO"));
+							//备注
+							tMisDunnedConclusion.setRemark(remark.toString());
+							tMisDunnedConclusion.setDealcode(tMisContantRecord.getDealcode());
+							tMisDunnedConclusion.setTaskid(dunningtaskdbid);
+							boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, tMisContantRecord.getDealcode(), dunningtaskdbid);
+							return;
+						}
+					}
+				}
+			}
 	}
 
 	/**

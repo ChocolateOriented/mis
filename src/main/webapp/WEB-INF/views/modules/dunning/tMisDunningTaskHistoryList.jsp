@@ -124,7 +124,7 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th><input id="allAction" type="checkbox"/></th>
+<!-- 				<th><input id="allAction" type="checkbox"/></th> -->
 				<th>序号</th>
 				<th>订单ID</th>
 				<th>还款到期日</th>
@@ -146,12 +146,12 @@
 		<tbody>
  		<c:forEach items="${page.list}" var="tMisContantRecord" varStatus="vs"> 
 			<tr> 
-				<td>
-					<input type="checkbox" name="actions" value="${tMisContantRecord.id}" iseffective="${tMisContantRecord.iseffective}" telstatus="${tMisContantRecord.telstatus}"
-						contactstypestr="${tMisContantRecord.contactstypestr}" contactsname="${tMisContantRecord.contactsname}" contanttarget="${tMisContantRecord.contanttarget}"
-						telstatusstr="${tMisContantRecord.telstatusstr}" dunningtime="${tMisContantRecord.dunningtime}"
-						<c:if test="${not empty tMisContantRecord.conclusionid || empty tMisContantRecord.iseffective || tMisContantRecord.dunningpeoplename != fns:getUser() || tMisContantRecord.contanttype == 'sms'}">disabled</c:if> />
-				</td>
+<!-- 				<td> -->
+<%-- 					<input type="checkbox" name="actions" value="${tMisContantRecord.id}" iseffective="${tMisContantRecord.iseffective}" telstatus="${tMisContantRecord.telstatus}" --%>
+<%-- 						contactstypestr="${tMisContantRecord.contactstypestr}" contactsname="${tMisContantRecord.contactsname}" contanttarget="${tMisContantRecord.contanttarget}" --%>
+<%-- 						telstatusstr="${tMisContantRecord.telstatusstr}" dunningtime="${tMisContantRecord.dunningtime}" --%>
+<%-- 						<c:if test="${not empty tMisContantRecord.conclusionid || empty tMisContantRecord.iseffective || tMisContantRecord.dunningpeoplename != fns:getUser() || tMisContantRecord.contanttype == 'sms'}">disabled</c:if> /> --%>
+<!-- 				</td> -->
 				<td>
 					${(vs.index+1) + (page.pageNo-1) * page.pageSize} 
 				</td>
@@ -208,7 +208,8 @@
 					</c:choose>
 				</td>
 				<td>
-					${tMisContantRecord.telstatusstr}
+<%-- 					${tMisContantRecord.telstatusstr} --%>
+					${tMisContantRecord.telstatus}
 				</td>
 				<td>
 <%-- 					<c:choose>   --%>
@@ -239,7 +240,7 @@
 	<div class="pagination">${page}</div>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactstype="${overdueDays<=1 ? 'SELF' : ''}"  method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="telAction(this)" class="btn btn-primary" method="TelConclusion"  type="button" value="电催结论"/>
+<!-- 	<input id="btnTel" name="btnCollection" onclick="telAction(this)" class="btn btn-primary" method="TelConclusion"  type="button" value="电催结论"/> -->
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />
