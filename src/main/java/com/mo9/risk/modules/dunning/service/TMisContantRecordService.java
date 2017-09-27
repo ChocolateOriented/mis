@@ -31,7 +31,7 @@ import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.MsfClient;
-import com.sun.tools.corba.se.idl.StringGen;
+//import com.sun.tools.corba.se.idl.StringGen;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
