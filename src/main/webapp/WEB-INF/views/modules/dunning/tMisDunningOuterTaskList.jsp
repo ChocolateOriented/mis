@@ -148,6 +148,66 @@ $(document).ready(function() {
 			});
 			
 	 });
+	//电催结论1
+	$("#diancui1").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui1",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
+	//电催结论2
+	$("#diancui2").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui2",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
+	//电催结论3
+	$("#diancui3").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui3",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
 
   // 委外导出功能
   $("#exportOuterFile").click(function () {
@@ -267,6 +327,15 @@ function formatPeopleList( item ){
 	<input id="distribution" class="btn btn-primary" type="button" value="手动分配" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui1" class="btn btn-primary" type="button" value="电催结论(Q0,Q1)" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui2" class="btn btn-primary" type="button" value="电催结论(Q2,Q3,Q4)上午" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui3" class="btn btn-primary" type="button" value="电催结论(Q2,Q3,Q4)下午" />
 	</shiro:hasPermission>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>

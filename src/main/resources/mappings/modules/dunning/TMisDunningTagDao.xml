@@ -43,7 +43,7 @@
 			a.updateby as "updateby",
 			a.updatedate as "updatedate"
 		FROM t_mis_dunning_tag a
-		WHERE a.dealcode = #{dealcode}
+		WHERE a.buyerid = #{buyerid}
 		AND delflag = '0'
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -163,11 +163,11 @@
 		)
 	</insert>
 	
-	<select id="getExistTagByDealcode" resultType="String">
+	<select id="getExistTagByBuyerid" resultType="String">
 		SELECT
 			DISTINCT a.tagtype
 		FROM t_mis_dunning_tag a
-		WHERE a.dealcode = #{dealcode}
+		WHERE a.buyerid = #{buyerid}
 		AND delflag = '0'
 	</select>
 

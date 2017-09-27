@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
+import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.util.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
@@ -110,6 +112,9 @@ public class TMisDunningOuterTaskController extends BaseController {
 
 		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
 		//催收小组列表
+		MobileResult[] values = MobileResult.values();
+		List<MobileResult> mobileResultList = Arrays.asList(values);
+		model.addAttribute("mobileResultList", mobileResultList);
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
@@ -210,7 +215,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("daikouStatus", daikouStatus);
 			
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
-			tMisDunningTag.setDealcode(dealcode);
+			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 			model.addAttribute("tags", tags);
 			
@@ -332,6 +337,36 @@ public class TMisDunningOuterTaskController extends BaseController {
 	public void numberCleanBackTest() {
 		tMisDunningTaskService.callBackTest();
 	}
-
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui1")
+	@ResponseBody
+	public  String  dianCui1(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion1();
+		logger.info(new Date()+"电催结论(Q0,Q1)成功");
+		return "OK";
+	}
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui2")
+	@ResponseBody
+	public  String  dianCui2(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion2();
+		logger.info(new Date()+"电催结论(Q2,Q3,Q4)上午");
+		return "OK";
+	}
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui3")
+	@ResponseBody
+	public  String  dianCui3(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion3();
+		logger.info(new Date()+"电催结论(Q2,Q3,Q4)下午");
+		return "OK";
+	}
+	
 	
 }
