@@ -360,7 +360,7 @@
 		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
 		</if>
 	    order by
-	    a.dealcode,a.CreateDate contactMobile
+	    a.dealcode,a.CreateDate 
 	</select>
 	<select id="findDirTelConculsion" resultType="TMisContantRecord">
 		select 
