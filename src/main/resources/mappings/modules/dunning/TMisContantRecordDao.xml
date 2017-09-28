@@ -360,7 +360,7 @@
 		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
 		</if>
 	    order by
-	    a.dealcode,a.CreateDate desc
+	    a.dealcode,a.CreateDate contactMobile
 	</select>
 	<select id="findDirTelConculsion" resultType="TMisContantRecord">
 		select 
@@ -373,12 +373,56 @@
 			a.dunningpeoplename=#{dunningpeopleId}
 		and
 			a.dunningCycle=#{dunningCycle}
+		<if test="createDate!=null">
+		and
+			a.CreateDate &gt;=#{createDate}
+		</if>
 		and
 			a.ContantType='tel'
 		and
 			a.ContactsType in('SELF','MARRIED','PARENT','CHILDREN','RELATIVES','FRIEND','WORKMATE')
 		order by
-	   		a.CreateDate desc	
+	   		a.CreateDate 	
 	</select>	
+	<select id="findDirCreate" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_dunned_conclusion`
+		WHERE
+			conclusionType = 'dir'
+		ORDER BY
+			CreateDate DESC
+		LIMIT 1;
+		
+	</select>
+	<select id="findIsEffective" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_dunned_conclusion`
+		WHERE
+			CreateDate &lt;curdate()
+		and
+			CreateDate &gt;#{dirDate}
+		and
+			isEffective='1'
+		LIMIT 1;
+	</select>
+	<select id="findActionTime" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_contant_record`
+		WHERE
+			CreateDate &gt;curdate()
+		and
+			CreateDate &lt;#{dirDate}
+		and
+			isEffective='1'
+		ORDER BY
+			CreateDate 
+		LIMIT 1;
+	</select>
 	<!-- 自动电催结论结束-->
 </mapper>
