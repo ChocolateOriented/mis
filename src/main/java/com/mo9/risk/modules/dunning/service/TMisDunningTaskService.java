@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
+import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
@@ -37,6 +38,7 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -1548,6 +1550,52 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //		}
 	}
 	
+	public TmpMoveCycle getTmpMoveCycle(String cycle){
+		TmpMoveCycle tmpMoveCycle = new TmpMoveCycle();
+		try {
+//			String Q0 =  DictUtils.getDictValue("Q0", "dunningCycle1", "-1_0");
+			if("Q0".equals(cycle)){
+				tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+				tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+				return tmpMoveCycle;
+			}else{
+				switch (getDaysOfMonth(new Date())) {
+				case 30:
+					if(getDays() < 16){
+						tmpMoveCycle.setDatetimestart(DateUtils.getMonthFirstDayDate());
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}else{
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(16));
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}
+				case 31:
+					if(getDays() < 17){
+						tmpMoveCycle.setDatetimestart(DateUtils.getMonthFirstDayDate());
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}else{
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(17));
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}
+				case 28:
+					return tmpMoveCycle;
+				default:
+					tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+					tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+					return tmpMoveCycle;
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("tmpMoveCycle返回失败默认赋值昨天日期"+ new Date());
+			logger.error("错误信息"+e.getMessage());
+			tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+			tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+			return tmpMoveCycle;
+		}
+	}
 	
 	/**
 	 * 过期自动分案
@@ -1620,10 +1668,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					 * 根据队列找出催收人员集合
 					 */
 //					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+					
 					/**
 					 * 根据周期查询催收人员按金额排序
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey());
+					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
 					
 					/**
 					 *  平均分配队列集合的催收人员
@@ -1641,7 +1691,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						} else {
 							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
 						}
-						System.out.println(dunningPeoples.get(j).getName()+"分配金额"+dunningTask.getCapitalamount());
+						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						
 						/**  任务催收人员添加    */
@@ -1795,7 +1845,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 根据周期查询催收人员按金额排序
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey());
+					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
 					
 					/**
 					 * 平均分配队列集合的催收人员
@@ -1813,8 +1864,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						} else {
 							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
 						}
-						System.out.println(dunningPeoples.get(j).getName()+"分配金额"+dunningTask.getCapitalamount());
-						
+						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						/**  任务催收人员添加    */
 						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
