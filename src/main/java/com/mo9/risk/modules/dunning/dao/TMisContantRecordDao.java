@@ -67,13 +67,13 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 	/**
 	 * 获取最新一次的n:3:2时间
 	 */
-	public Date findDirCreate();
+	public Date findDirCreate(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle);
 	/**
 	 * 获取最新一次的n:3:2和定时任务时间之间是有效联系的时间
 	 */
-	public Date findIsEffective(Date dirDate);
+	public Date findIsEffective(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle,@Param("dirDate")Date dirDate);
 	/**
 	 * 获取最新一次的n:3:2后的action为有效的时间
 	 */
-	public Date findActionTime(Date dirDate);
+	public Date findActionTime(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle,@Param("dirDate")Date dirDate);
 }
