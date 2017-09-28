@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -26,6 +27,6 @@ public interface TRiskBuyer2contactsDao {
 	 * @param buyerId
 	 * @return
 	 */
-	public List<String> findContactMobile(@Param("buyerId")String buyerId);
+	public Set<String> findContactMobile(@Param("buyerId")String buyerId);
 	
 }

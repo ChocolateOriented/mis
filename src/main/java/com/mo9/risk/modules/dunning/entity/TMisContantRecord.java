@@ -49,7 +49,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private String contactsname;		//联系人姓名
 	private String conclusionid;		//电催结论id
 	private String dunningCycle;		//订单所属队列
-	private String buyerId;		//订单所属队列
+	private String buyerId;		//订单用户id
 	
 	private Integer buyerid;
 	

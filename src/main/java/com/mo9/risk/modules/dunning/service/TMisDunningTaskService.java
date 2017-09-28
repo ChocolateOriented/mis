@@ -3296,7 +3296,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 				}
 				//电催结论备注
-				if(cycle++<20){
+				if(++cycle<20){
 					remark.append(recordList.get(i).getContactstype().getDesc()+"-"+recordList.get(i).getContactsname()+"-"+recordList.get(i).getContanttarget()+"-"+
 							recordList.get(i).getTelstatus().toString());
 					if(StringUtils.isEmpty(recordList.get(i).getRemark())){
@@ -3365,6 +3365,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		if (telconclusion.get(statusConclusion) <= 3) {
 			tMisDunnedConclusion.setIseffective(true);
+		}else if(telconclusion.get(statusConclusion)==4){
+			tMisDunnedConclusion.setIseffective(false);
+			Date findDirCreate = tcontDao.findDirCreate();
+			if(findDirCreate!=null){
+				Date findIsEffective = tcontDao.findIsEffective(findDirCreate);
+				if(findIsEffective==null){
+					recordTemp.put("telStatus", TelStatus.valueOf("LOOO"));
+				}
+			}
 		}else{
 			tMisDunnedConclusion.setIseffective(false);
 		}
@@ -3385,6 +3394,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		tMisDunnedConclusion.setRemark(remark.toString());
 		tMisDunnedConclusion.setDealcode(decalode);
 		tMisDunnedConclusion.setTaskid(taskId);
+		tMisDunnedConclusion.setConclusionType("auto");
 		boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, decalode, taskId);
 		return result;
 	}

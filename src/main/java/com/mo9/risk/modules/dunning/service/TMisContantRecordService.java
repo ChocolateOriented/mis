@@ -45,6 +45,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -403,94 +404,174 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			String contactsType = tMisContantRecord.getContactstype().toString();
 			if("SELF".equals(contactsType)||"MARRIED".equals(contactsType)||"PARENT".equals(contactsType)||"CHILDREN".equals(contactsType)||
 					"RELATIVES".equals(contactsType)||"FRIEND".equals(contactsType)||"WORKMATE".equals(contactsType)){
-				dirTelConclusion(task, order, tMisContantRecord, dunningtaskdbid);
+				String status=tMisContantRecord.getTelstatus().toString();
+				if("BUSY".equals(status)||"CUT".equals(status)||"NOAS".equals(status)||"OFF".equals(status)||"NOTK".equals(status)){
+					dirTelConclusion(task, order, tMisContantRecord, dunningtaskdbid);
+				}
 			}
 		}
 	}
 
 	private void dirTelConclusion(TMisDunningTask task, TMisDunningOrder order, TMisContantRecord tMisContantRecord,
 			String dunningtaskdbid) {
-		//如果此次action为半失联且时间是在下午大于12点10分,就要进行判断该用户是否符合n:3:2
-			String status=tMisContantRecord.getTelstatus().toString();
-			if("BUSY".equals(status)||"CUT".equals(status)||"NOAS".equals(status)||"OFF".equals(status)||"NOTK".equals(status)){
-				 Calendar calendar = Calendar.getInstance();  
-				 int hour= calendar.get(Calendar.HOUR_OF_DAY);
-				 int minutes= calendar.get(Calendar.MINUTE);
-				if(hour>12||(minutes>=10&&hour>=12)){
-					List<TMisContantRecord> dirTelConsuion=tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle());
+					//如果此次action为半失联,就要进行判断该用户是否符合n:3:2
+				
+					Date findDirCreate = tMisContantRecordDao.findDirCreate();
+					Date findActionTime=null;
+					if(findDirCreate!=null){
+						 findActionTime = tMisContantRecordDao.findActionTime(findDirCreate);
+						if(findActionTime==null){
+							return;
+						}
+							
+					}
+				 	//从这次下的以及之前的action
+					List<TMisContantRecord> dirTelConsuion=	tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findActionTime);
 					if(dirTelConsuion==null){
 						return;
 					}
 					SimpleDateFormat sd1=new SimpleDateFormat("yyyy-MM-dd");
-					List<String> contactMobile=tRiskBuyer2contactsDao.findContactMobile(tMisContantRecord.getBuyerId());
+					//取得本人和所有联系人的电话号码
+					Set<String> contactMobile=tRiskBuyer2contactsDao.findContactMobile(tMisContantRecord.getBuyerId());
 					if(contactMobile==null){
 						logger.info(tMisContantRecord.getDealcode()+"该订单无联系人");
 						return;
 					}
-					Set<String> saveMobile1=new HashSet<String>();
-					Set<String> saveMobile2=new HashSet<String>();
-					int dayNum=0;
+					//上午最终的结果
+					Map<String, Integer> monmobileMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						monmobileMap.put(mobile, 0);
+					}
+					//下午最终结果
+					Map<String, Integer> aftmobileMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						aftmobileMap.put(mobile, 0);
+					}
+					//上午的判断map如果为true就给最终monmobileMap的对应电话+1
+					Map<String, Boolean> monmobileJudge=new HashMap<String, Boolean>();
+					//下午的判断map如果为true就给最终aftmobileMap的对应电话+1
+					Map<String, Boolean> aftmobileJudge=new HashMap<String, Boolean>();
+					//记录不是半失联的电话码上午的的号码
+//					List<String> monfailMobile=new ArrayList<String>();
+					//记录不是半失联的电话码上午的的号码
+//					List<String> aftfailMobile=new ArrayList<String>();
 					int cycle=0;
-					String control="true";
 					StringBuilder remark=new StringBuilder();
 					String date=sd1.format(dirTelConsuion.get(0).getCreateDate());
-					for (int i = 0; i < dirTelConsuion.size(); i++) {
-						//电催结论备注
-						if(cycle++<20){
-							remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
-									dirTelConsuion.get(i).getTelstatus().toString());
-							if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
-								remark.append(";");
-							}else{
-								remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
-							}
-						}
-						//表示同一天
-						if(date.equals(sd1.format(dirTelConsuion.get(i).getCreateDate()))){
-							if("false".equals(control)){
+						for (int i = 0; i < dirTelConsuion.size(); i++) {
+							if(monmobileMap.get(dirTelConsuion.get(i).getContanttarget())==null){
 								continue;
 							}
-							String telStuts = dirTelConsuion.get(i).getTelstatus().toString();
-							if(!("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts))){
-								control="false";
-								continue;
-							}
-							//分别对上下午进行处理
-							calendar.setTime(dirTelConsuion.get(i).getCreateDate());
-							 int conhour= calendar.get(Calendar.HOUR_OF_DAY);
-							 int conminutes= calendar.get(Calendar.MINUTE);
-							 int consecond= calendar.get(Calendar.SECOND);
-							 int createTime=conhour*60*60+conminutes*60+consecond;
-							 int compareTime=12*60*60+10*60;
-							if(createTime<compareTime){
-								//上午要所有的联系人都要有打过
-								saveMobile1.add( dirTelConsuion.get(i).getContanttarget());
+						
+							//表示同一天
+							if(date.equals(sd1.format(dirTelConsuion.get(i).getCreateDate()))){
+								String telStuts = dirTelConsuion.get(i).getTelstatus().toString();
+							
+								//分别对上下午进行处理
+								Calendar calendar = Calendar.getInstance(); 
+								calendar.setTime(dirTelConsuion.get(i).getCreateDate());
+								 int conhour= calendar.get(Calendar.HOUR_OF_DAY);
+								 int conminutes= calendar.get(Calendar.MINUTE);
+								 int consecond= calendar.get(Calendar.SECOND);
+								 int createTime=conhour*60*60+conminutes*60+consecond;
+								 int compareTime=12*60*60+10*60;
+								if(createTime<compareTime){
+									//上午
+									//如果上午存在有效联系的那么联系人,且之前的记录都清空.
+									if(dirTelConsuion.get(i).getIseffective()){
+											monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											monmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
+//											monfailMobile.add(dirTelConsuion.get(i).getContanttarget());
+											cycle=0;
+											remark.setLength(0);
+											continue;
+									}
+									//电催结论备注
+									if(++cycle<20){
+										remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
+												dirTelConsuion.get(i).getTelstatus().toString());
+										if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
+											remark.append(";");
+										}else{
+											remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
+										}
+									}
+									if("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts)){
+										monmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), true);
+									}
+								}else{
+										//下午
+										//如果下午存在不是半失联的那么联系人该上午不能做记录,且之前的记录都清空.
+										if(dirTelConsuion.get(i).getIseffective()){
+												monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												aftmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
+	//											aftfailMobile.add(dirTelConsuion.get(i).getContanttarget());
+												cycle=0;
+												remark.setLength(0);
+												continue;
+										}
+									//电催结论备注
+									if(++cycle<20){
+										remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
+												dirTelConsuion.get(i).getTelstatus().toString());
+										if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
+											remark.append(";");
+										}else{
+											remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
+										}
+									}
+									if("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts)){
+										aftmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), true);
+									}
+								}
 							}else{
-								//下午要所有的联系人都要有打过
-								saveMobile2.add( dirTelConsuion.get(i).getContanttarget());
+								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
+										Integer num = monmobileMap.get(contMobile);
+										monmobileMap.put(contMobile, num+1);
+										monmobileJudge.put(contMobile,false);
+									}
+									if(aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = aftmobileMap.get(contMobile);
+										aftmobileMap.put(contMobile, num+1);
+										aftmobileJudge.put(contMobile,false);
+									}
+								}
+//								monfailMobile.clear();
+//								aftfailMobile.clear();
+								date=sd1.format(dirTelConsuion.get(i).getCreateDate());
+								--i;
 							}
-						}else{
-							if(saveMobile1!=null&&saveMobile2!=null&&saveMobile1.size()>0&&saveMobile2.size()>0){
-								
-								if(contactMobile.size()+1==saveMobile1.size()&&contactMobile.size()+1==saveMobile2.size()){
-									++dayNum;
+							if(i==dirTelConsuion.size()-1){
+								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
+										Integer num = monmobileMap.get(contMobile);
+										monmobileMap.put(contMobile, num+1);
+										monmobileJudge.put(contMobile,false);
+									}
+									if(aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = aftmobileMap.get(contMobile);
+										aftmobileMap.put(contMobile, num+1);
+										aftmobileJudge.put(contMobile,false);
+									}
 								}
 							}
-							saveMobile1.clear();
-							saveMobile2.clear();
-							date=sd1.format(dirTelConsuion.get(i).getCreateDate());
-							control="true";
-							--i;
 						}
-						if(i==dirTelConsuion.size()-1){
-								if(saveMobile1!=null&&saveMobile2!=null&&saveMobile1.size()>0&&saveMobile2.size()>0){
-									if(contactMobile.size()+1==saveMobile1.size()&&contactMobile.size()+1==saveMobile2.size()){
-										++dayNum;
-								}
+						//如果存在n:3:2则下个完全失联
+						boolean doConcluSion=false;
+						for (String mobile : contactMobile) {
+							Integer monNum = monmobileMap.get(mobile);
+							Integer aftNum = aftmobileMap.get(mobile);
+							if(monNum!=null&&aftNum!=null&&monNum!=0&&aftNum!=0&&monNum+aftNum>=3){
+								doConcluSion=true;
+							}else{
+								doConcluSion=false;
+								return;
 							}
 						}
-						//如果大于三天则要开始做电催结论为完全失联
-						if(dayNum>=3){
+						if(doConcluSion){
 							// 就要给前一个用户做电催结论
 							TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
 							//是否有效联系
@@ -511,12 +592,10 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 							tMisDunnedConclusion.setRemark(remark.toString());
 							tMisDunnedConclusion.setDealcode(tMisContantRecord.getDealcode());
 							tMisDunnedConclusion.setTaskid(dunningtaskdbid);
+							tMisDunnedConclusion.setConclusionType("dir");
 							boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, tMisContantRecord.getDealcode(), dunningtaskdbid);
 							return;
 						}
-					}
-				}
-			}
 	}
 
 	/**
