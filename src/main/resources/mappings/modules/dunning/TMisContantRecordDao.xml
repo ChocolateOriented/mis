@@ -388,9 +388,15 @@
 		SELECT
 			CreateDate
 		FROM
-			`t_mis_dunned_conclusion`
+			`t_mis_dunned_conclusion` a
 		WHERE
-			conclusionType = 'dir'
+			a.conclusionType = 'dir'
+		and
+			a.dealcode=#{dealcode}
+		and
+			a.dunningpeopleId=#{dunningpeopleId}
+		and
+			a.dunningCycle=#{dunningCycle}
 		ORDER BY
 			CreateDate DESC
 		LIMIT 1;
@@ -407,6 +413,12 @@
 			CreateDate &gt;#{dirDate}
 		and
 			isEffective='1'
+		and
+			dealcode=#{dealcode}
+		and
+			dunningpeopleId=#{dunningpeopleId}
+		and
+			dunningCycle=#{dunningCycle}
 		LIMIT 1;
 	</select>
 	<select id="findActionTime" resultType="java.util.Date">
@@ -415,11 +427,17 @@
 		FROM
 			`t_mis_contant_record`
 		WHERE
-			CreateDate &gt;curdate()
+			CreateDate &lt;curdate()
 		and
-			CreateDate &lt;#{dirDate}
+			CreateDate &gt;#{dirDate}
 		and
 			isEffective='1'
+		and
+			dealcode=#{dealcode}
+		and
+			dunningpeoplename=#{dunningpeopleId}
+		and
+			dunningCycle=#{dunningCycle}
 		ORDER BY
 			CreateDate 
 		LIMIT 1;

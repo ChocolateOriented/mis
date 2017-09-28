@@ -3282,6 +3282,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		List<String> actions=new ArrayList<String>();
 		String decalode=recordList.get(0).getDealcode();
 		String taskId=recordList.get(0).getTaskid();
+		String dunningCycle=recordList.get(0).getDunningCycle();
 		StringBuilder remark=new StringBuilder();
 		int cycle=0;
 		for (int i=0;i<recordList.size();i++) {
@@ -3320,7 +3321,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 				//遍历最后一个时保存电催结论
 				if(i==recordList.size()-1){
-					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark);
+					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle);
 					if (!result) {
 						logger.info(decalode+"该订单电催结论失败.");
 					}else{
@@ -3331,7 +3332,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 			}else{
 					//保存电催结论
-					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark);
+					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle);
 					if (!result) {
 						logger.info(decalode+"该订单电催结论失败.");
 					}else{
@@ -3352,7 +3353,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	}
 	private boolean saveConclusion(Map<String, Object> recordTemp, List<String> actions, String decalode, String taskId,
-			StringBuilder remark) {
+			StringBuilder remark,String dunningCycle) {
 		// 就要给前一个用户做电催结论
 		TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
 		//承诺还款时间
@@ -3367,9 +3368,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			tMisDunnedConclusion.setIseffective(true);
 		}else if(telconclusion.get(statusConclusion)==4){
 			tMisDunnedConclusion.setIseffective(false);
-			Date findDirCreate = tcontDao.findDirCreate();
+			Date findDirCreate = tcontDao.findDirCreate(taskId,decalode,dunningCycle);
 			if(findDirCreate!=null){
-				Date findIsEffective = tcontDao.findIsEffective(findDirCreate);
+				Date findIsEffective = tcontDao.findIsEffective(taskId,decalode,dunningCycle,findDirCreate);
 				if(findIsEffective==null){
 					recordTemp.put("telStatus", TelStatus.valueOf("LOOO"));
 				}

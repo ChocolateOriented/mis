@@ -57,6 +57,8 @@
 		LEFT JOIN t_risk_contact b ON a.buyer_contact_id = b.id
 		WHERE
 			a.buyer_id =#{buyerId}
+			and
+			a.type is not null
 		union ALL
 		select mobile from 
 		t_risk_buyer WHERE

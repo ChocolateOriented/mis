@@ -416,10 +416,10 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			String dunningtaskdbid) {
 					//如果此次action为半失联,就要进行判断该用户是否符合n:3:2
 				
-					Date findDirCreate = tMisContantRecordDao.findDirCreate();
+					Date findDirCreate = tMisContantRecordDao.findDirCreate(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle());
 					Date findActionTime=null;
 					if(findDirCreate!=null){
-						 findActionTime = tMisContantRecordDao.findActionTime(findDirCreate);
+						 findActionTime = tMisContantRecordDao.findActionTime(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findDirCreate);
 						if(findActionTime==null){
 							return;
 						}
@@ -446,6 +446,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					Map<String, Integer> aftmobileMap=new HashMap<String, Integer>();
 					for (String mobile : contactMobile) {
 						aftmobileMap.put(mobile, 0);
+					}
+					//用来记录如果上下午都是半失联的加一天
+					Map<String, Integer> sameDayMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						sameDayMap.put(mobile, 0);
 					}
 					//上午的判断map如果为true就给最终monmobileMap的对应电话+1
 					Map<String, Boolean> monmobileJudge=new HashMap<String, Boolean>();
@@ -481,6 +486,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 									if(dirTelConsuion.get(i).getIseffective()){
 											monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
 											aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											sameDayMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
 											monmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
 //											monfailMobile.add(dirTelConsuion.get(i).getContanttarget());
 											cycle=0;
@@ -506,6 +512,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 										if(dirTelConsuion.get(i).getIseffective()){
 												monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
 												aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												sameDayMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
 												aftmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
 	//											aftfailMobile.add(dirTelConsuion.get(i).getContanttarget());
 												cycle=0;
@@ -528,6 +535,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 								}
 							}else{
 								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)&&
+											aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = sameDayMap.get(contMobile);
+										sameDayMap.put(contMobile, num+1);
+									}
 									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
 										Integer num = monmobileMap.get(contMobile);
 										monmobileMap.put(contMobile, num+1);
@@ -538,6 +550,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 										aftmobileMap.put(contMobile, num+1);
 										aftmobileJudge.put(contMobile,false);
 									}
+									
 								}
 //								monfailMobile.clear();
 //								aftfailMobile.clear();
@@ -546,6 +559,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 							}
 							if(i==dirTelConsuion.size()-1){
 								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)&&
+											aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = sameDayMap.get(contMobile);
+										sameDayMap.put(contMobile, num+1);
+									}
 									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
 										Integer num = monmobileMap.get(contMobile);
 										monmobileMap.put(contMobile, num+1);
@@ -556,6 +574,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 										aftmobileMap.put(contMobile, num+1);
 										aftmobileJudge.put(contMobile,false);
 									}
+									
 								}
 							}
 						}
@@ -564,7 +583,14 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 						for (String mobile : contactMobile) {
 							Integer monNum = monmobileMap.get(mobile);
 							Integer aftNum = aftmobileMap.get(mobile);
-							if(monNum!=null&&aftNum!=null&&monNum!=0&&aftNum!=0&&monNum+aftNum>=3){
+							Integer same = sameDayMap.get(mobile);
+							int day=0;
+							if(same!=null){
+								day=monNum+aftNum-same;
+							}else{
+								day=monNum+aftNum;
+							}
+							if(monNum!=null&&aftNum!=null&&monNum!=0&&aftNum!=0&&day>=3){
 								doConcluSion=true;
 							}else{
 								doConcluSion=false;
