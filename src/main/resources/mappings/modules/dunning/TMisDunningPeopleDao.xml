@@ -284,6 +284,7 @@
 			AND date(t.createdate) BETWEEN date(#{begindatetime}) AND date(#{enddatetime})
 			AND  t.behaviorstatus = 'in' 
 			AND  t.createby = 'auto_admin'
+			AND  t.DunningCycle = #{dunningcycle}
 		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  AND a.Invalid = 't' AND a.auto = 't'
 			GROUP BY a.Id
 			ORDER BY sumcorpusamount
