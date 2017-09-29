@@ -408,7 +408,7 @@
 		FROM
 			`t_mis_dunned_conclusion`
 		WHERE
-			CreateDate &lt;curdate()
+			CreateDate &lt;NOW()
 		and
 			CreateDate &gt;#{dirDate}
 		and
@@ -427,11 +427,13 @@
 		FROM
 			`t_mis_contant_record`
 		WHERE
-			CreateDate &lt;curdate()
+			CreateDate &lt;NOW()
 		and
 			CreateDate &gt;#{dirDate}
 		and
 			isEffective='1'
+		and
+			ContantType='tel'
 		and
 			dealcode=#{dealcode}
 		and
