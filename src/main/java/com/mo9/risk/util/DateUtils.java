@@ -234,26 +234,92 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return new SimpleDateFormat("yyyy/MM/dd").format(cal.getTime());
 	}
 
+
+	/**
+	 * 根據參數返回日期
+	 * @param amount
+	 * @return
+	 */
+	public static Date getDate(int amount){
+		Calendar cal=Calendar.getInstance();
+		cal.add(Calendar.DATE,amount);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		Date time = cal.getTime();
+		return time;
+	}
+
+	/**
+	 * 当月最后一天
+	 * @return
+	 */
+	public static Date getMonthLastDayDate(){
+		Calendar cal=Calendar.getInstance();
+//		cal.add(Calendar.DATE,1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		Date time = cal.getTime();
+		return time;
+	}
+
+	/**
+	 * 当月第一天
+	 * @return
+	 */
+	public static Date getMonthFirstDayDate(){
+		Calendar cal=Calendar.getInstance();
+//		cal.add(Calendar.DATE,1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.DAY_OF_MONTH,1);
+		Date time = cal.getTime();
+		return time;
+	}
+
+	/**
+	 * 返回指定日期
+	 * @param day
+	 * @return
+	 */
+	 public static Date getDateOfMonth(int day) {
+	    Calendar cal = Calendar.getInstance();
+	    cal.set(Calendar.DATE, day);
+	    cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+	    return cal.getTime();
+	  }
+
 	/**
 	 * @param args
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws ParseException {
+		System.out.println(getDateOfMonth(27));
+
 		// System.out.println(formatDate(parseDate("2010/3/6")));
 		// System.out.println(getDate("yyyy年MM月dd日 E"));
 		// long time = new Date().getTime()-parseDate("2012-11-19").getTime();
 		// System.out.println(time/(24*60*60*1000));
 
-		Calendar cal = Calendar.getInstance();
-		// 不加下面2行，就是取当前时间前一个月的第一天及最后一天
-		cal.set(Calendar.YEAR, 2012);
-		cal.set(Calendar.MONTH, 6);
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-		cal.add(Calendar.DAY_OF_MONTH, -1);
-		Date lastDate = cal.getTime();
-
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-		Date firstDate = cal.getTime();
+//		Calendar cal = Calendar.getInstance();
+//		// 不加下面2行，就是取当前时间前一个月的第一天及最后一天
+//		cal.set(Calendar.YEAR, 2012);
+//		cal.set(Calendar.MONTH, 6);
+//		cal.set(Calendar.DAY_OF_MONTH, 1);
+//		cal.add(Calendar.DAY_OF_MONTH, -1);
+//		Date lastDate = cal.getTime();
+//
+//		cal.set(Calendar.DAY_OF_MONTH, 1);
+//		Date firstDate = cal.getTime();
 
 	}
 }

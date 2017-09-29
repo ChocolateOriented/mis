@@ -50,11 +50,18 @@
 		WHERE a.buyer_id = #{0} and a.family_relation =  #{1}
 	</select>
 	<select id="findContactMobile" resultType="java.lang.String">
-		select  
+		SELECT
 			b.tel
-		from t_risk_buyer2contacts a     
-		LEFT JOIN t_risk_contact b  
-		ON a.buyer_contact_id = b.id 
-		where a.buyer_id=#{buyerId}
+		FROM
+			t_risk_buyer2contacts a
+		LEFT JOIN t_risk_contact b ON a.buyer_contact_id = b.id
+		WHERE
+			a.buyer_id =#{buyerId}
+			and
+			a.type is not null
+		union ALL
+		select mobile from
+		t_risk_buyer WHERE
+			id= #{buyerId}
 	</select>
 </mapper>
