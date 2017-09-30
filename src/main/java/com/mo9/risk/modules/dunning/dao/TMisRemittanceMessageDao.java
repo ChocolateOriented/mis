@@ -29,7 +29,7 @@ public interface TMisRemittanceMessageDao extends CrudDao<TMisRemittanceMessage>
 
 	void batchUpdateMatched(List<TMisRemittanceMessage> successMatchList);
 
-	public List<TMisRemittanceMessage> findAccountPageList( TMisRemittanceMessage entity);
+	public List<TMisRemittanceMessage> findAcountPageList( TMisRemittanceMessage entity);
 
 	List<TMisRemittanceMessage> findAfterFinancialTimeNotAuditList(Date date);
 

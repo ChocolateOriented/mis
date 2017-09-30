@@ -1,7 +1,5 @@
 package com.mo9.risk.modules.dunning.bean;
 
-import com.alibaba.fastjson.JSONObject;
-
 /**
  * Created by jxli on 2017/9/2.
  * 江湖救急响应结果

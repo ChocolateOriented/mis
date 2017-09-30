@@ -117,4 +117,12 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	List<TMisRemittanceConfirm> findAbnormalRemittanceConfirm();
 
 	List<String> findPaymentOreder(List<String> shouldPayoffOrderDelcodes);
+
+	/**
+	 * @Description 查询
+	 * @param remittanceSerialNumber
+	 * @param remittanceChannel
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm>
+	 */
+	List<TMisRemittanceConfirm> findCompleteAuditBySerialNumber(@Param("remittanceSerialNumber")String remittanceSerialNumber, @Param("remittanceChannel")String remittanceChannel);
 }

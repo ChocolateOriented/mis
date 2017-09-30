@@ -31,8 +31,8 @@ public class RiskOrderManager {
 	@Autowired
 	private TMisDunningConfigureService tMisDunningConfigureService;
 	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-	private static final String SUCCESS_CODE = "0000";
-	private static final String REPEAT_CODE = "-8";
+	private static final String SUCCESS_CODE = "0000";//还款成功响应码
+	private static final String REPEAT_CODE = "-8";//重复消息响应码
 
 	/**
 	 * @Description  江湖救急订单还款接口

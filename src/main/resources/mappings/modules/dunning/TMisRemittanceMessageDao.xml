@@ -2,6 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao">
 
+	<resultMap id="RemittanceMessagePage" type="TMisRemittanceMessage" autoMapping="true">
+		<id property="dbid" column="dbid"/>
+		<collection property="refunds" ofType="com.mo9.risk.modules.dunning.entity.TMisDunningRefund">
+			<id property="refundCode" column="refundCode"/>
+			<result property="auditTime" column="RefundAuditTime"/>
+			<result property="refundTime" column="RefundTime"/>
+			<result property="auditor" column="RefundAuditor"/>
+			<result property="refundStatus" column="RefundStatus"/>
+			<result property="amount" column="RefundAmount"/>
+		</collection>
+	</resultMap>
+
+	<resultMap id="MessagCheckedPage" type="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked" autoMapping="true">
+    <result column="remittanceSerialNumber" property="remittanceSerialNumber"/>
+		<collection property="refunds" column="{remittanceSerialNumber=remittanceSerialNumber,remittanceChannel=remittanceChannel}" select="com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao.findValidBySerialNumber"/>
+	</resultMap>
+
 	<sql id="tMisRemittanceMessageColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
@@ -152,7 +169,7 @@
 		</if>
 	</select>
 
-	<select id="findAccountPageList" resultType="TMisRemittanceMessage">
+	<select id="findAcountPageList" resultMap="RemittanceMessagePage">
 		select
 		m.dbid AS "dbid",
 		m.id AS "id",
@@ -166,60 +183,73 @@
 		m.remark AS "remark",
 		m.createdate AS "createDate",
 		c.ConfirmStatus AS "accountStatus",
-		m.remittanceSerialNumber AS "remittanceSerialNumber"
+		m.remittanceSerialNumber AS "remittanceSerialNumber",
+		r.RefundCode AS "refundCode",
+		r.AuditTime AS "RefundAuditTime",
+		r.refundTime AS "RefundTime",
+		r.refundStatus AS "refundStatus",
+		r.auditor AS "RefundAuditor",
+		r.amount AS "RefundAmount"
 		from
 		t_mis_remittance_message m
-		LEFT JOIN t_mis_remittance_confirm AS c 
-				ON m.remittanceSerialNumber = c.Financialserialnumber and  m.RemittanceChannel=c.RemittanceChannel
-				 and c.ConfirmFlow="AUDIT" and c.invalid="t"
+		LEFT JOIN t_mis_remittance_confirm AS c
+		ON m.remittanceSerialNumber = c.Financialserialnumber and m.RemittanceChannel=c.RemittanceChannel
+		and c.ConfirmFlow="AUDIT" and c.invalid="t"
+		<!--关联两次退款表, 第一次作为汇款关联的全部退款信息, 第二次用作查询过滤, 因为即使要查退款中的汇款, 若是关联了其他已退款的记录也应展示出来-->
+		LEFT JOIN t_mis_dunning_refund AS r
+		ON m.remittanceSerialNumber = r.remittanceSerialNumber
+		AND m.remittancechannel = r.remittancechannel
+		AND r.RefundStatus IN ("LAUNCH","PROCESS","FINISH")
+		LEFT JOIN t_mis_dunning_refund AS rq
+		ON m.remittanceSerialNumber = rq.remittanceSerialNumber
+		AND m.remittancechannel = rq.remittancechannel
+		AND rq.RefundStatus IN ("LAUNCH","PROCESS","FINISH")
 		<where>
-			
-		<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
-			and m.remittanceSerialNumber =#{ remittanceSerialNumber}
-		</if>
-<!-- 		 <if test="begindealtime != null and enddealtime != null and begindealtime != '' and enddealtime != ''"> -->
-<!--                 AND  m.remittancetime BETWEEN #{begindealtime} AND #{enddealtime} -->
-<!--             </if> -->
-		<if test=" begindealtime!= null and  begindealtime!= ''">
-			 <![CDATA[
-    			and m.remittancetime >= #{begindealtime} 
-   		 	]]> 
-		</if>
-		<if test=" enddealtime!= null and  enddealtime!= ''">
-			 <![CDATA[
-     			and m.remittancetime <=#{enddealtime} 
-       		 ]]> 
-		</if>
-		<if test="  remittanceAmount!= null and   remittanceAmount!= ''">
-			and m.remittanceamount =#{ remittanceAmount}
-		</if>
-		<if test="  remittanceAccount!= null and   remittanceAccount!= ''">
-			and m.remittanceaccount like concat(concat('%',#{ remittanceAccount}),'%')
-		</if>
-		<if test="  remittanceName!= null and   remittanceName!= ''">
-			and m.remittancename like concat(concat('%',#{ remittanceName}),'%')
-		</if>
-		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
-			and c.ConfirmStatus =#{ accountStatus}
-		</if>
-		<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
-			and c.id is null
-		</if>
-		
+			<if test="  remittanceSerialNumber!= null and   remittanceSerialNumber!= ''">
+				and m.remittanceSerialNumber =#{ remittanceSerialNumber}
+			</if>
+			<if test=" begindealtime!= null and  begindealtime!= ''">
+				<![CDATA[
+              and m.remittancetime >= #{begindealtime}
+              ]]>
+			</if>
+			<if test=" enddealtime!= null and  enddealtime!= ''">
+				<![CDATA[
+               and m.remittancetime <=#{enddealtime}
+                ]]>
+			</if>
+			<if test="  remittanceAmount!= null and   remittanceAmount!= ''">
+				and m.remittanceamount =#{ remittanceAmount}
+			</if>
+			<if test="  remittanceAccount!= null and   remittanceAccount!= ''">
+				and m.remittanceaccount like concat(concat('%',#{ remittanceAccount}),'%')
+			</if>
+			<if test="  remittanceName!= null and   remittanceName!= ''">
+				and m.remittancename like concat(concat('%',#{ remittanceName}),'%')
+			</if>
+			<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus!= 'not_audit'">
+				and c.ConfirmStatus =#{ accountStatus}
+			</if>
+			<if test="  accountStatus!= null and   accountStatus!= '' and accountStatus== 'not_audit'">
+				and c.id is null
+			</if>
+			<if test="refundStatus!= null and refundStatus!= ''">
+				and rq.refundStatus =#{refundStatus}
+			</if>
 		</where>
-		
+
 		<choose>
-            <when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
-                ORDER BY ${ page.orderBy}
-            </when>
-            <otherwise>
-              ORDER BY remittancetime desc
-            </otherwise>
-        </choose>
+			<when test=" page !=null and  page.orderBy != null and  page.orderBy != ''">
+				ORDER BY ${ page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY remittancetime desc
+			</otherwise>
+		</choose>
 	</select>
-	
-	<update id="updateList" >
-<!-- 			<foreach collection="list" item="item" index="index" open="" close="" separator=";"> -->
+
+      <update id="updateList" >
+    <!-- 			<foreach collection="list" item="item" index="index" open="" close="" separator=";"> -->
 			update t_mis_remittance_message
 <!-- 		<set> -->set
 			id=#{item.id},
@@ -324,7 +354,8 @@
 		</choose>
 	</select>
 
-	<select id="findMessagFinishList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">
+	<!--<select id="findMessagFinishList" resultType="com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked">-->
+	<select id="findMessagFinishList" resultMap="MessagCheckedPage">
 		select
 		mix.*,
 		g.updateBy AS "checkedPeople"
@@ -341,6 +372,7 @@
 		<include refid="countRemainAmmount"/>
 		AS "remainAmmount",
 		m.financialserialnumber AS "remittanceSerialNumber",
+		m.RemittanceChannel AS "remittanceChannel",
 		m.updateBy AS "completePeople",
 		o.status AS "orderStatus",
 		m.RemittanceTag AS "remittanceTag",
