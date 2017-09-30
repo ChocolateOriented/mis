@@ -46,7 +46,7 @@
 				disableBtn();
 			}*/
 			var obj=null;
-			if(parseInt("${overdueDays}")>1){
+			if(parseInt("${overdueDays}")>parseInt("${controlDay}")){
 				obj=document.getElementById("customerDetails");
 			}else{
 				obj=document.getElementById("conclusion");
