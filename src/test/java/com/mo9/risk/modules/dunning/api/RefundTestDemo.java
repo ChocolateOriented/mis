@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 /**
  * Created by jxli on 2017/9/22.
  */
-public class RefundTest {
+public class RefundTestDemo {
 
 	private static final String key = "57caef73ce1b7448275797444e78e68815459953d7feb48ddaf7f57862af3e30";
 	private static final String baseUrl = "http://localhost:8080";
