@@ -48,13 +48,13 @@ public class TMisDunningTagController extends BaseController {
 	@ResponseBody
 	public Map<String, String> saveTag(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
-		String dealcode = tMisDunningTag.getDealcode();
-		if (dealcode == null || "".equals(dealcode) || tMisDunningTag.getTagtype() == null) {
+		String buyerid=tMisDunningTag.getBuyerid();
+		if (buyerid == null || "".equals(buyerid) || tMisDunningTag.getTagtype() == null) {
 			result.put("status", "NO");
 			result.put("msg", "添加标签失败");
 			return result;
 		}
-		String lockStr = dealcode + "." + tMisDunningTag.getTagtype().toString();
+		String lockStr = buyerid + "." + tMisDunningTag.getTagtype().toString();
 		
 		boolean addable = false;
 		try {
@@ -64,7 +64,7 @@ public class TMisDunningTagController extends BaseController {
 			while (value != null && timestamp - value < 5000) {
 				value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
 			}
-			addable = tMisDunningTagService.preCheckExist(tMisDunningTag.getDealcode());
+			addable = tMisDunningTagService.preCheckExist(tMisDunningTag.getBuyerid());
 		} catch (Exception e) {
 			TMisDunningTagService.dealcodeTagType.remove(lockStr);
 		}
@@ -108,7 +108,8 @@ public class TMisDunningTagController extends BaseController {
 	@RequestMapping(value = "preCheck")
 	@ResponseBody
 	public String preCheck(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-		boolean exist = tMisDunningTagService.preCheckExist(tMisDunningTag.getDealcode());
+
+		boolean exist = tMisDunningTagService.preCheckExist(tMisDunningTag.getBuyerid());
 		return exist ? "OK" : "NO";
 	}
 	

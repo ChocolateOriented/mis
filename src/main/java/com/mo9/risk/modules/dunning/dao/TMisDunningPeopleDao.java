@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.dao;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 
+import java.util.Date;
 import java.util.List;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
@@ -42,6 +43,13 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public List<TMisDunningPeople> findPeopleByDunningcycle(String dunningcycle);
+	
+	/**
+	 * 根据周期查询催收人员按金额排序
+	 * @param dunningcycle
+	 * @return
+	 */
+	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(@Param("dunningcycle")String dunningcycle,@Param("begindatetime")Date begindatetime,@Param("enddatetime")Date enddatetime);
 	
 	/**
 	 * 批量更新完成的任务

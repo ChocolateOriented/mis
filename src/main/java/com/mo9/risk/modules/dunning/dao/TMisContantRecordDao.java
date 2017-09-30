@@ -3,8 +3,10 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -47,5 +49,31 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 
 
 	public void updateList(TMisContantRecord tMisContantRecord);
-	
+
+	/**
+	 * 自动电催结论
+	 * @param date
+	 * @return
+	 */
+	public List<TMisContantRecord> findautoTelConclusion(@Param("cycleAndTime")String cycleAndTime);
+
+	/**
+	 * n:3;2电催结论
+	 * @param dunningpeopleid
+	 * @param dealcode
+	 * @return 
+	 */
+	public List<TMisContantRecord> findDirTelConculsion(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle, @Param("createDate")Date createDate);
+	/**
+	 * 获取最新一次的n:3:2时间
+	 */
+	public Date findDirCreate(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle);
+	/**
+	 * 获取最新一次的n:3:2和定时任务时间之间是有效联系的时间
+	 */
+	public Date findIsEffective(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle,@Param("dirDate")Date dirDate);
+	/**
+	 * 获取最新一次的n:3:2后的action为有效的时间
+	 */
+	public Date findActionTime(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle,@Param("dirDate")Date dirDate);
 }

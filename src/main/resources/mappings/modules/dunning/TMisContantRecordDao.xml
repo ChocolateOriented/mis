@@ -25,6 +25,7 @@
 		a.promisepaydate AS "promisepaydate",
 		a.contactsname AS "contactsname",
 		a.conclusionid AS "conclusionid",
+		a.dunningCycle AS "dunningCycle",
 		a.createby AS "createBy.name",
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.name",
@@ -145,6 +146,7 @@
 			iseffective,
 			promisepaydate,
 			contactsname,
+			dunningCycle,
 			createby,
 			createdate,
 			updateby,
@@ -171,6 +173,7 @@
 			#{iseffective},
 			#{promisepaydate},
 			#{contactsname},
+			#{dunningCycle},
 			#{createBy.name},
 			#{createDate},
 			#{updateBy.name},
@@ -202,6 +205,7 @@
 			iseffective,
 			promisepaydate,
 			contactsname,
+			dunningCycle,
 			createby,
 			createdate,
 			updateby,
@@ -227,6 +231,7 @@
 			#{item.smsType},
 			#{item.field1},
 			#{item.dunningpeoplename},
+			#{item.dunningCycle},
 			#{item.repaymenttime},
 			#{item.iseffective},
 			#{item.promisepaydate},
@@ -265,6 +270,7 @@
 			promisepaydate = #{promisepaydate},
 			contactsname = #{contactsname},
 			conclusionid = #{conclusionid},
+			dunningCycle = #{dunningCycle},
 <!-- 			createby = #{createBy.name}, -->
 <!-- 			createdate = #{createdate}, -->
 			updateby = #{updateBy.name},
@@ -312,5 +318,131 @@
 <!-- 		DELETE FROM t_mis_contant_record -->
 <!-- 		WHERE id = #{id} -->
 <!-- 	</update> -->
-	
+<!-- 自动电催结论开始 -->
+	<select id="findautoTelConclusion" resultType="TMisContantRecord">
+		select 
+			<include refid="tMisContantRecordColumns"/>
+		from
+		t_mis_contant_record a
+			INNER  JOIN
+			t_mis_dunning_task t
+		ON
+			a.Dealcode=t.Dealcode AND
+			a.DunningPeopleName=t.DunningPeopleId
+		INNER JOIN
+		t_mis_dunning_people p
+		ON
+			a.DunningPeopleName=p.id
+		where 
+		a.ContantType='tel'
+		and
+		a.ConclusionId is null
+		<if test="cycleAndTime=='cycleAndTime1'">
+			and
+		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
+		    and
+		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
+<!-- 		    and p.DunningCycle regexp '.*(Q0|Q1).*' -->
+		    and (p.DunningCycle like('%Q0%') or p.DunningCycle like('%Q1%'))
+		</if>
+		<if test="cycleAndTime=='cycleAndTime2'">
+			and
+		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
+		    and
+		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
+		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
+		</if>
+		<if test="cycleAndTime=='cycleAndTime3'">
+			and
+		    a.CreateDate &gt;= DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
+		    and
+		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
+		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
+		</if>
+	    order by
+	    a.dealcode,a.CreateDate 
+	</select>
+	<select id="findDirTelConculsion" resultType="TMisContantRecord">
+		select 
+			<include refid="tMisContantRecordColumns"/>
+		from
+			t_mis_contant_record a
+		where
+			a.dealcode=#{dealcode}
+		and
+			a.dunningpeoplename=#{dunningpeopleId}
+		and
+			a.dunningCycle=#{dunningCycle}
+		<if test="createDate!=null">
+		and
+			a.CreateDate &gt;=#{createDate}
+		</if>
+		and
+			a.ContantType='tel'
+		and
+			a.ContactsType in('SELF','MARRIED','PARENT','CHILDREN','RELATIVES','FRIEND','WORKMATE')
+		order by
+	   		a.CreateDate 	
+	</select>	
+	<select id="findDirCreate" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_dunned_conclusion` a
+		WHERE
+			a.conclusionType = 'dir'
+		and
+			a.dealcode=#{dealcode}
+		and
+			a.dunningpeopleId=#{dunningpeopleId}
+		and
+			a.dunningCycle=#{dunningCycle}
+		ORDER BY
+			CreateDate DESC
+		LIMIT 1;
+		
+	</select>
+	<select id="findIsEffective" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_dunned_conclusion`
+		WHERE
+			CreateDate &lt;NOW()
+		and
+			CreateDate &gt;#{dirDate}
+		and
+			isEffective='1'
+		and
+			dealcode=#{dealcode}
+		and
+			dunningpeopleId=#{dunningpeopleId}
+		and
+			dunningCycle=#{dunningCycle}
+		LIMIT 1;
+	</select>
+	<select id="findActionTime" resultType="java.util.Date">
+		SELECT
+			CreateDate
+		FROM
+			`t_mis_contant_record`
+		WHERE
+			CreateDate &lt;NOW()
+		and
+			CreateDate &gt;#{dirDate}
+		and
+			isEffective='1'
+		and
+			ContantType='tel'
+		and
+			dealcode=#{dealcode}
+		and
+			dunningpeoplename=#{dunningpeopleId}
+		and
+			dunningCycle=#{dunningCycle}
+		ORDER BY
+			CreateDate 
+		LIMIT 1;
+	</select>
+	<!-- 自动电催结论结束-->
 </mapper>

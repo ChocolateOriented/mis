@@ -40,6 +40,7 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 	private String dunningcycle;		// 催收周期(队列)
 	private List<String> actions;		//关联的actionId
 	
+	private String conclusionType;		// 时定时任务还是n:3:2 ,dir是n:3:2 auto是定时任务
 	private Integer buyerid;
     
 	public TMisDunnedConclusion() {
@@ -211,6 +212,14 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 
 	public void setActions(List<String> actions) {
 		this.actions = actions;
+	}
+
+	public String getConclusionType() {
+		return conclusionType;
+	}
+
+	public void setConclusionType(String conclusionType) {
+		this.conclusionType = conclusionType;
 	}
 
 }
