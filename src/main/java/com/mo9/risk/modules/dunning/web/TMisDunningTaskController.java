@@ -995,7 +995,7 @@ public class TMisDunningTaskController extends BaseController {
 			
 			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 			model.addAttribute("personalInfo", personalInfo);
-			model.addAttribute("overdueDays",personalInfo.getOverdueDays());
+			model.addAttribute("overdueDays",Integer.parseInt(personalInfo.getOverdueDays()));
 			model.addAttribute("mobileSelf",personalInfo.getMobile());
 		} catch (Exception e) {
 			logger.info("切换只读库查询失败：" + e.getMessage());
@@ -1028,7 +1028,7 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		//根据逾期天数控制子页面显示;
 		String controlDay=DictUtils.getDictValue("overdueDay", "controlPage", "1");
-		model.addAttribute("controlDay", controlDay);
+		model.addAttribute("controlDay", Integer.parseInt(controlDay));
 		boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
 		//根据资方和逾期天数判断是否开启代扣
 		boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
