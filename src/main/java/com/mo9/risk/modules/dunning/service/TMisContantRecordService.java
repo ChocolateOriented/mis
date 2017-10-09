@@ -31,7 +31,7 @@ import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.MsfClient;
-//import com.sun.tools.corba.se.idl.StringGen;
+import com.sun.tools.corba.se.idl.StringGen;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -415,7 +415,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	private void dirTelConclusion(TMisDunningTask task, TMisDunningOrder order, TMisContantRecord tMisContantRecord,
 			String dunningtaskdbid) {
 					//如果此次action为半失联,就要进行判断该用户是否符合n:3:2
-
+				
 					Date findDirCreate = tMisContantRecordDao.findDirCreate(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle());
 					Date findActionTime=null;
 					if(findDirCreate!=null){
@@ -423,7 +423,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 						if(findActionTime==null){
 							return;
 						}
-
+							
 					}
 				 	//从这次下的以及之前的action
 					List<TMisContantRecord> dirTelConsuion=	tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findActionTime);
@@ -467,13 +467,13 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 							if(monmobileMap.get(dirTelConsuion.get(i).getContanttarget())==null){
 								continue;
 							}
-
+						
 							//表示同一天
 							if(date.equals(sd1.format(dirTelConsuion.get(i).getCreateDate()))){
 								String telStuts = dirTelConsuion.get(i).getTelstatus().toString();
-
+							
 								//分别对上下午进行处理
-								Calendar calendar = Calendar.getInstance();
+								Calendar calendar = Calendar.getInstance(); 
 								calendar.setTime(dirTelConsuion.get(i).getCreateDate());
 								 int conhour= calendar.get(Calendar.HOUR_OF_DAY);
 								 int conminutes= calendar.get(Calendar.MINUTE);
@@ -550,7 +550,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 										aftmobileMap.put(contMobile, num+1);
 										aftmobileJudge.put(contMobile,false);
 									}
-
+									
 								}
 //								monfailMobile.clear();
 //								aftfailMobile.clear();
@@ -574,7 +574,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 										aftmobileMap.put(contMobile, num+1);
 										aftmobileJudge.put(contMobile,false);
 									}
-
+									
 								}
 							}
 						}

@@ -1596,7 +1596,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			return tmpMoveCycle;
 		}
 	}
-
+	
 	/**
 	 * 过期自动分案
 	 */
@@ -1668,7 +1668,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					 * 根据队列找出催收人员集合
 					 */
 //					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
-
+					
 					/**
 					 * 根据周期查询催收人员按金额排序
 					 */

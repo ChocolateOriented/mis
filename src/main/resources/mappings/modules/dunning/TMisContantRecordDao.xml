@@ -360,7 +360,7 @@
 		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
 		</if>
 	    order by
-	    a.dealcode,a.CreateDate
+	    a.dealcode,a.CreateDate 
 	</select>
 	<select id="findDirTelConculsion" resultType="TMisContantRecord">
 		select 
@@ -382,7 +382,7 @@
 		and
 			a.ContactsType in('SELF','MARRIED','PARENT','CHILDREN','RELATIVES','FRIEND','WORKMATE')
 		order by
-	   		a.CreateDate
+	   		a.CreateDate 	
 	</select>	
 	<select id="findDirCreate" resultType="java.util.Date">
 		SELECT
@@ -400,7 +400,7 @@
 		ORDER BY
 			CreateDate DESC
 		LIMIT 1;
-
+		
 	</select>
 	<select id="findIsEffective" resultType="java.util.Date">
 		SELECT
@@ -441,7 +441,7 @@
 		and
 			dunningCycle=#{dunningCycle}
 		ORDER BY
-			CreateDate
+			CreateDate 
 		LIMIT 1;
 	</select>
 	<!-- 自动电催结论结束-->

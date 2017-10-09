@@ -234,9 +234,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return new SimpleDateFormat("yyyy/MM/dd").format(cal.getTime());
 	}
 
-
+	
 	/**
-	 * 根據參數返回日期
+	 * 根據參數返回日期 
 	 * @param amount
 	 * @return
 	 */
@@ -250,7 +250,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		Date time = cal.getTime();
 		return time;
 	}
-
+	
 	/**
 	 * 当月最后一天
 	 * @return
@@ -262,11 +262,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));  
 		Date time = cal.getTime();
 		return time;
 	}
-
+	
 	/**
 	 * 当月第一天
 	 * @return
@@ -278,11 +278,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.DAY_OF_MONTH,1);
+		cal.set(Calendar.DAY_OF_MONTH,1);  
 		Date time = cal.getTime();
 		return time;
 	}
-
+	
 	/**
 	 * 返回指定日期
 	 * @param day
@@ -297,14 +297,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		cal.set(Calendar.MILLISECOND, 0);
 	    return cal.getTime();
 	  }
-
+	
 	/**
 	 * @param args
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws ParseException {
 		System.out.println(getDateOfMonth(27));
-
+		
 		// System.out.println(formatDate(parseDate("2010/3/6")));
 		// System.out.println(getDate("yyyy年MM月dd日 E"));
 		// long time = new Date().getTime()-parseDate("2012-11-19").getTime();

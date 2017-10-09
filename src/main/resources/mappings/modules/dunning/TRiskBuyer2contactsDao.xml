@@ -60,7 +60,7 @@
 			and
 			a.type is not null
 		union ALL
-		select mobile from
+		select mobile from 
 		t_risk_buyer WHERE
 			id= #{buyerId}
 	</select>
