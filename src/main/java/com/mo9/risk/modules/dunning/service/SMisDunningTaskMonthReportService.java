@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,7 +69,11 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 	 */
 	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
-		String receiver = DictUtils.getDictValue("month_report_receiver", "sys_email", "");
+		StringBuilder receiver = new StringBuilder();
+		List<Dict> emails = DictUtils.getDictList("month_report_email");
+		for (Dict email: emails) {
+			receiver.append(email.getValue()+",");
+		}
 		if (StringUtils.isBlank(receiver)){
 			logger.warn("自动发送月报失败, 未配置收件人邮箱");
 			return;
@@ -84,7 +89,7 @@ public class SMisDunningTaskMonthReportService extends CrudService<SMisDunningTa
 		String yesterday = DateUtils.formatDate(calendar.getTime());
 
 		//创建邮件
-		MailSender mailSender = new MailSender(receiver);
+		MailSender mailSender = new MailSender(receiver.toString());
 		mailSender.setSubject("绩效月报-" + yesterday);
 
 		//获取截止到当前的月报
