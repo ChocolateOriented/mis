@@ -64,7 +64,7 @@ public class TMisDunningDeductCallService {
 	private TMisDunningConfigureDao tMisDunningConfigureDao;
 
 	@Autowired
-	private RiskOrderManager riskOrderManager;
+	private TMisDunningOrderService orderService ;
 
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningDeductCallService.class);
 	
@@ -166,7 +166,7 @@ public class TMisDunningDeductCallService {
 		Double paidAmount = tMisDunningDeduct.getPayamount();
 		String thirdCode = tMisDunningDeduct.getThirdCode();
 		try {
-			riskOrderManager.repay(dealcode, paychannel, paidType, BigDecimal.valueOf(paidAmount),thirdCode);
+			orderService.repayWithPersistence(dealcode, paychannel, paidType, BigDecimal.valueOf(paidAmount),thirdCode);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);

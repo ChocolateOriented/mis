@@ -46,8 +46,6 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	@Autowired
 	private TMisDunningOrderService orderService ;
 	@Autowired
-	private RiskOrderManager orderManager;
-	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 	@Autowired
 	private TMisDunningRefundDao refundDao;

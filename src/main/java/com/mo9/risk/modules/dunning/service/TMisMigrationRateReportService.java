@@ -19,6 +19,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -591,7 +592,12 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 */
 	@Scheduled(cron = "0 0 8 * * ?")
 	public void autoSendMail() {
-		String receiver = DictUtils.getDictValue("migration_rate_report_receiver", "sys_email", "");
+		StringBuilder receiver = new StringBuilder();
+		List<Dict> emails = DictUtils.getDictList("migration_rate_report_email");
+		for (Dict email: emails) {
+			receiver.append(email.getValue()+",");
+		}
+
 		if (StringUtils.isBlank(receiver)){
 			logger.info("自动发送迁徙率报表失败, 未配置收件人邮箱");
 			return;
@@ -640,7 +646,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
 
 		//发送邮件
-		MailSender mailSender = new MailSender(receiver);
+		MailSender mailSender = new MailSender(receiver.toString());
 		String data = DateUtils.getDate("MM月dd日");
 		mailSender.setSubject("截止"+data+"迁徙率");
 
