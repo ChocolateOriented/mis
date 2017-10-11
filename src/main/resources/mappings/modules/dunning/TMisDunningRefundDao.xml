@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao">
+    
+	<sql id="tMisDunningRefundColumns">
+		a.refundcode AS "refundCode",
+		a.amount AS "amount",
+		a.remittanceserialnumber AS "remittanceSerialNumber",
+		a.remittancechannel AS "remittanceChannel",
+		a.refundstatus AS "refundStatus",
+		a.auditor AS "auditor",
+		a.audittime AS "auditTime",
+		a.refundtime AS "refundTime"
+	</sql>
+	
+	<sql id="tMisDunningRefundJoins">
+	</sql>
+    
+	<select id="get" resultType="TMisDunningRefund">
+		SELECT 
+			<include refid="tMisDunningRefundColumns"/>
+		FROM t_mis_dunning_refund a
+		<include refid="tMisDunningRefundJoins"/>
+		WHERE a.refundCode = #{refundCode}
+	</select>
+	
+	<select id="findList" resultType="TMisDunningRefund">
+		SELECT 
+			<include refid="tMisDunningRefundColumns"/>
+		FROM t_mis_dunning_refund a
+		<include refid="tMisDunningRefundJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisDunningRefund">
+		SELECT 
+			<include refid="tMisDunningRefundColumns"/>
+		FROM t_mis_dunning_refund a
+		<include refid="tMisDunningRefundJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_refund(
+			refundcode,
+			amount,
+			remittanceserialnumber,
+			remittancechannel,
+			refundstatus
+		) VALUES (
+			#{refundCode},
+			#{amount},
+			#{remittanceSerialNumber},
+			#{remittanceChannel},
+			#{refundStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_refund SET 	
+			auditor = #{auditor},
+			auditTime = #{auditTime},
+			refundstatus = #{refundStatus},
+			refundtime = #{refundTime}
+		WHERE refundcode = #{refundCode}
+	</update>
+
+	<select id="findValidBySerialNumber" resultType="TMisDunningRefund">
+		SELECT
+		<include refid="tMisDunningRefundColumns"/>
+		FROM t_mis_dunning_refund a
+		<include refid="tMisDunningRefundJoins"/>
+		WHERE
+		a.refundstatus IN ("LAUNCH","PROCESS","FINISH")
+		AND a.remittanceserialnumber = #{remittanceSerialNumber}
+		AND a.remittancechannel = #{remittanceChannel}
+	</select>
+</mapper>

@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.web;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningRefund;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceMessagChecked;
@@ -15,6 +16,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisRemittanceMessageService;
 import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
@@ -137,6 +139,7 @@ public class TMisRemittanceMessageController extends BaseController {
 	public String detail(TMisRemittanceMessage tMisRemittanceMessage,Model model,HttpServletRequest request, HttpServletResponse response) {
 		Page<TMisRemittanceMessage> page = tMisRemittanceMessageService.findAcountPageList(new Page<TMisRemittanceMessage>(request, response), tMisRemittanceMessage);
 		model.addAttribute("page",page);
+		model.addAttribute("RefundStatusList", TMisDunningRefund.VALID_REFUND_STATUS_LIST);
 		return "modules/dunning/tMisDunningAccountDetail";
 	}
 
@@ -268,11 +271,12 @@ public class TMisRemittanceMessageController extends BaseController {
 		if (StringUtils.isBlank(remittanceConfirm.getDealcode())){
 			return  "订单号不能为空";
 		}
-		boolean success = tMisRemittanceMessageService.handleAudit(remittanceConfirm);
-		if (success){
-			return "success";
+		try{
+			tMisRemittanceMessageService.handleAudit(remittanceConfirm);
+		}catch (ServiceException e){
+			return "查账失败,"+e.getMessage();
 		}
-		return "查账失败";
+		return "success";
 	}
 
 

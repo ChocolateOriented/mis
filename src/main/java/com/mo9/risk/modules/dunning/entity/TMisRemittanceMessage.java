@@ -4,11 +4,13 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mo9.risk.modules.dunning.entity.TMisDunningRefund.RefundStatus;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 财务确认汇款信息Entity
@@ -32,6 +34,8 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 
 	private Date begindealtime;//用来查询开始时间
 	private Date enddealtime;//用来查询的结束时间
+	private RefundStatus refundStatus;//用于查询退款状态
+	private List<TMisDunningRefund> refunds;//退款信息
 	
 	public Date getBegindealtime() {
 		return begindealtime;
@@ -169,8 +173,24 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 		return accountStatus;
 	}
 
+	public List<TMisDunningRefund> getRefunds() {
+		return refunds;
+	}
+
+	public void setRefunds(List<TMisDunningRefund> refunds) {
+		this.refunds = refunds;
+	}
+
 	public void setAccountStatus(String accountStatus) {
 		this.accountStatus = accountStatus;
+	}
+
+	public RefundStatus getRefundStatus() {
+		return refundStatus;
+	}
+
+	public void setRefundStatus(RefundStatus refundStatus) {
+		this.refundStatus = refundStatus;
 	}
 
 	@Override
@@ -182,12 +202,22 @@ public class TMisRemittanceMessage extends DataEntity<TMisRemittanceMessage> {
 
 	@Override
 	public String toString() {
-		return "TMisRemittanceMessage [dbid=" + dbid + ", remittanceName=" + remittanceName + ", remittanceTime="
-				+ remittanceTime + ", remittanceAmount=" + remittanceAmount + ", remittanceChannel=" + remittanceChannel
-				+ ", remittanceAccount=" + remittanceAccount + ", financialUser=" + financialUser + ", financialTime="
-				+ financialTime + ", remark=" + remark + ", remittanceSerialNumber=" + remittanceSerialNumber
-				+ ", accountStatus=" + accountStatus + ", begindealtime=" + begindealtime + ", enddealtime="
-				+ enddealtime + "]";
+		return "TMisRemittanceMessage{" +
+				"dbid='" + dbid + '\'' +
+				", remittanceName='" + remittanceName + '\'' +
+				", remittanceTime=" + remittanceTime +
+				", remittanceAmount=" + remittanceAmount +
+				", remittanceChannel='" + remittanceChannel + '\'' +
+				", remittanceAccount='" + remittanceAccount + '\'' +
+				", financialUser='" + financialUser + '\'' +
+				", financialTime=" + financialTime +
+				", remark='" + remark + '\'' +
+				", remittanceSerialNumber='" + remittanceSerialNumber + '\'' +
+				", accountStatus='" + accountStatus + '\'' +
+				", begindealtime=" + begindealtime +
+				", enddealtime=" + enddealtime +
+				", refunds=" + refunds +
+				'}';
 	}
 
 	@Override

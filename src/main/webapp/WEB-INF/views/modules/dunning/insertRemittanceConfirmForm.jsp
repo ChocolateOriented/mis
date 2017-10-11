@@ -88,7 +88,7 @@
 			<label class="control-label">汇款渠道：</label>
 			<div class="controls">
 				<form:select id="remittancechannel" path="remittancechannel" class="input-xlarge ">
-					<form:options items="${fns:getDictList('remittancechannel')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:option value="支付宝" label="支付宝"/>
 				</form:select>
 			</div>
 		</div>

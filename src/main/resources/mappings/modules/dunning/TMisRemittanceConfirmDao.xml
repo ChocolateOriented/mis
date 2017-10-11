@@ -390,4 +390,16 @@
 		AND m.invalid="t"
 	</select>
 
+	<select id="findCompleteAuditBySerialNumber" resultType="TMisRemittanceConfirm">
+		SELECT
+		<include refid="tMisRemittanceConfirmColumns"/>
+		FROM
+		t_mis_remittance_confirm a
+		WHERE
+		a.ConfirmFlow="AUDIT"
+		AND a.ConfirmStatus = "complete_audit"
+		AND a.financialserialnumber = #{remittanceSerialNumber}
+		AND a.RemittanceChannel = #{remittanceChannel}
+		AND a.invalid="t"
+	</select>
 </mapper>

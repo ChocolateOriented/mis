@@ -3,8 +3,10 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningRefund;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
@@ -47,6 +49,8 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	private RiskOrderManager orderManager;
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
+	@Autowired
+	private TMisDunningRefundDao refundDao;
 
 	public TMisRemittanceConfirm get(String id) {
 		return super.get(id);
@@ -273,6 +277,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		if (!TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
 			throw new ServiceException("汇款确认信息状态不为'已查账'");
 		}
+		//检查订单状态
 		String dealcode = confirm.getDealcode();
 		DunningOrder order = orderService.findOrderByDealcode(dealcode);
 		if (order == null) {
@@ -281,6 +286,13 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		if(order.getStatus().equals(DunningOrder.STATUS_PAYOFF)){
 			throw new ServiceException("错误，订单已还清");
 		}
+		//检查是否有退款信息
+		String serialNumber =  confirm.getFinancialserialnumber();
+		List<TMisDunningRefund> refunds = refundDao.findValidBySerialNumber(serialNumber, confirm.getRemittancechannel());
+		if (refunds!=null && refunds.size()>0){//该汇款存在退款记录
+			throw new ServiceException("该汇款存在退款记录");
+		}
+
 		if (remittanceTag == null){
 			if (confirm.getRemittanceTag() == null){
 				throw new ServiceException("还款标签不能为空");
@@ -382,4 +394,13 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		return dao.findAbnormalRemittanceConfirm();
 	}
 
+	/**
+	 * @Description  通过流水号查询已完成查账的汇款确认信息
+	 * @param remittanceSerialNumber
+	 * @param remittanceChannel
+	 * @return List<TMisRemittanceConfirm>
+	 */
+	public List<TMisRemittanceConfirm> findCompleteAuditBySerialNumber(String remittanceSerialNumber, String remittanceChannel) {
+		return dao.findCompleteAuditBySerialNumber(remittanceSerialNumber,remittanceChannel);
+	}
 }

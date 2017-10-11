@@ -1,23 +1,21 @@
 /**
  * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
  */
-package com.mo9.risk.modules.dunning.bean;
+package com.mo9.risk.modules.dunning.bean.dto;
 
-import java.io.Serializable;
+import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
+import com.thinkgem.jeesite.common.utils.Reflections;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.thinkgem.jeesite.common.utils.Reflections;
 
 /**
  * 调用mo9代扣接口订单Entity
  * @author shijlu
  * @version 2017-04-11
  */
-public class Mo9DeductOrder implements Serializable {
+public class Mo9DeductOrder{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -213,21 +211,26 @@ public class Mo9DeductOrder implements Serializable {
 		this.channel = channel;
 	}
 
+	/**
+	 * @Description 转换为属性名为key,值为value的Map<String, String>
+	 * @param
+	 * @return java.util.Map<java.lang.String,java.lang.String>
+	 */
 	public Map<String, String> toMap() {
 		Map<String, String> map = new HashMap<String, String>();
-		
+
 		Field[] fields = this.getClass().getDeclaredFields();
 		for (Field field : fields) {
 			if(Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
-			
+
 			Object value = Reflections.invokeGetter(this, field.getName());
-			if (value != null && !"".equals(value.toString())) {
+			if (value != null) {
 				map.put(field.getName(), value.toString());
 			}
 		}
-		
+
 		return map;
 	}
 }

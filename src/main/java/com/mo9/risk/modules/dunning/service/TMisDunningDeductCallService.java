@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
-import com.mo9.risk.modules.dunning.bean.Mo9DeductOrder;
+import com.mo9.risk.modules.dunning.bean.dto.Mo9DeductOrder;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.dao.TMisDunningConfigureDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
