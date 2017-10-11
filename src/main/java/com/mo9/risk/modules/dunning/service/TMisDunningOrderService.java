@@ -222,9 +222,12 @@ public class TMisDunningOrderService extends BaseService{
 		String msg = "";
 		try {
 			msg = orderManager.repay(dealcode,paychannel,paytype,payamount,thirdCode);
-		} catch (IOException e) {
+		}catch (IOException e) {
 			logger.info("订单"+dealcode+"调用江湖救急接口发生网络异常,等待重试",e);
 			return msg;
+		}catch (RuntimeException e){//发生业务异常也删除
+			requestRecordDao.delete(requestRecord);
+			throw e;
 		}
 		//成功则删除
 		requestRecordDao.delete(requestRecord);
@@ -236,7 +239,7 @@ public class TMisDunningOrderService extends BaseService{
 	 * @param
 	 * @return void
 	 */
-	@Scheduled(cron = "0 0 * * * ?")
+	@Scheduled(cron = "0 50 * * * ?")
 	@Transactional
 	public void autoRepairAbnormalRepayRequest() {
 		//查询发生异常的请求记录
