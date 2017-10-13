@@ -3,22 +3,24 @@
  */
 package com.mo9.risk.modules.dunning.bean.dto;
 
-import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
-import com.thinkgem.jeesite.common.utils.Reflections;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
+import com.thinkgem.jeesite.common.utils.Reflections;
 
 /**
  * 调用mo9代扣接口订单Entity
  * @author shijlu
  * @version 2017-04-11
  */
-public class Mo9DeductOrder{
+public class Mo9DeductOrder implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String bizSys;		//业务系统
 
 	private String sign;		//签名
@@ -211,11 +213,6 @@ public class Mo9DeductOrder{
 		this.channel = channel;
 	}
 
-	/**
-	 * @Description 转换为属性名为key,值为value的Map<String, String>
-	 * @param
-	 * @return java.util.Map<java.lang.String,java.lang.String>
-	 */
 	public Map<String, String> toMap() {
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -226,7 +223,7 @@ public class Mo9DeductOrder{
 			}
 
 			Object value = Reflections.invokeGetter(this, field.getName());
-			if (value != null) {
+			if (value != null && !"".equals(value.toString())) {
 				map.put(field.getName(), value.toString());
 			}
 		}
