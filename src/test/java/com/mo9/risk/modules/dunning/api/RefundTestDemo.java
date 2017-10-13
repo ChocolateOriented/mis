@@ -20,7 +20,8 @@ import org.springframework.http.MediaType;
 public class RefundTestDemo {
 
 	private static final String key = "57caef73ce1b7448275797444e78e68815459953d7feb48ddaf7f57862af3e30";
-	private static final String baseUrl = "http://localhost:8080";
+	private static final String baseUrl = "https://riskclone.mo9.com/mis";
+//	private static final String baseUrl = "http://localhost:8080";
 	private String refundCode = "7853275162962";
 	/**
 	 * @Description 申请退款测试
