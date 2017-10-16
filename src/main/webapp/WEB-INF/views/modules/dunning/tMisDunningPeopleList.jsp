@@ -21,7 +21,7 @@ $(document).ready(function() {
 			}
 
 			var url = "${ctx}/dunning/tMisDunningPeople/dialogDunningcycle?peopleids=" + peopleids ;
-			$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+			$.jBox.open("iframe:" + url, "手动分案" , 600, 350, {
 	               buttons: {},
 	               loaded: function (h) {
 	                   $(".jbox-content", document).css("overflow-y", "hidden");

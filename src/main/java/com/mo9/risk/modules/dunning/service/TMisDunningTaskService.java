@@ -2170,7 +2170,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     }  
     
     /**
-     * 手动分配
+     * 手动分案
      * @param dealcode
      * @param peopleId
      */
@@ -2245,7 +2245,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     }
     
     /**
-     * 委外手动分配
+     * 委外手动分案
      * @param dealcode
      * @param peopleId
      */

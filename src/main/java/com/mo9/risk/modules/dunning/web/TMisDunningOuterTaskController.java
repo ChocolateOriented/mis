@@ -238,37 +238,62 @@ public class TMisDunningOuterTaskController extends BaseController {
 	
 
 	/**
-	 * 加载委外手动分配页面
-	 * @param tMisDunningTask
+	 * 加载委外手动分案页面
+	 * @param dunningcycle
 	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "dialogOutDistribution")
-	public String dialogOutDistribution( Model model,String orders,String dunningcycle) {
+	public String dialogOutDistribution( Model model,String dunningcycle) {
 		try {
+			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
+			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
+			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
 			logger.info("加载委外手动分配页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOutDistribution";
 	}
-	
-	
+
 	/**
-	 * 委外手动分配
-	 * @param tMisDunningTask
-	 * @param model
-	 * @param redirectAttributes
+	 * 获取手动分案催收人员
+	 * @param request
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequestMapping(value = "dialogDistributionPeople")
+	@ResponseBody
+	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
+		List<TMisDunningPeople> dunningpeople = null;
+		String[] dunningcycle = request.getParameterValues("dunningcycle[]");
+		String[] type = request.getParameterValues("type[]");
+		String[] auto = request.getParameterValues("auto[]");
+		String name = request.getParameter("name");
+		String dunningpeoplename=request.getParameter("dunningpeoplename");
+		try{
+			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
+		}catch (Exception e){
+			logger.info("",e);
+			return null;
+		}
+		return dunningpeople;
+	}
+
+	/**
+	 * 委外手动分案
+	 * @param orders
+	 * @param dunningcycle
+	 * @param outsourcingenddate
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "outDistributionSave")
 	@ResponseBody
-	public String outDistributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request,Date outsourcingenddate) {
+	public String outDistributionSave(String orders,String dunningcycle, HttpServletRequest request,Date outsourcingenddate) {
 		String mes = "";
 		try {
 			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){

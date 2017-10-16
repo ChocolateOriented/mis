@@ -131,17 +131,7 @@ public class TMisDunningPeopleController extends BaseController {
 		if (!beanValidator(model, tMisDunningPeople)){
 			return form(tMisDunningPeople, model);
 		}
-//		if(null != tMisDunningPeople.getDbid()){
-//			TMisDunningPeople oldDunningPeople = get(tMisDunningPeople.getId());
-//			if(!oldDunningPeople.getBegin().equals(tMisDunningPeople.getBegin()) || !oldDunningPeople.getEnd().equals(tMisDunningPeople.getEnd())){
-//			if(!oldDunningPeople.getDunningcycle().equals(tMisDunningPeople.getDunningcycle())){
-//				int count = tMisDunningTaskService.findDunningCount(oldDunningPeople.getId());
-//				if(count > 0){
-//					addMessage(model, "请清空此催收人员的任务!");
-//					return form(tMisDunningPeople, model);
-//				}
-//			}
-//		}
+
 		tMisDunningPeopleService.save(tMisDunningPeople);
 		addMessage(redirectAttributes, "保存催收人员成功");
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
@@ -169,8 +159,8 @@ public class TMisDunningPeopleController extends BaseController {
 	}
 	
 	/**
-	 * 加载手动分配页面
-	 * @param tMisDunningTask
+	 * 加载手动分案页面
+	 * @param peopleids
 	 * @param model
 	 * @return
 	 */
@@ -188,8 +178,8 @@ public class TMisDunningPeopleController extends BaseController {
 	
 	
 	/**
-	 * 手动分配
-	 * @param tMisDunningTask
+	 * 手动分案
+	 * @param peopleids
 	 * @param redirectAttributes
 	 * @return
 	 */
@@ -197,8 +187,7 @@ public class TMisDunningPeopleController extends BaseController {
 	@RequestMapping(value = "distributioncycleSave")
 	@ResponseBody
 	public String distributioncycleSave(String[] peopleids,String dunningcycle, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-//		Set<String> set = new HashSet<String>(Arrays.asList(str));
-//		tMisDunningTaskService.findDunningCount(tMisDunningPeople.getId();
+
 		try {
 			List<String> ids = Arrays.asList(peopleids); 
 			if(ids.isEmpty()){
