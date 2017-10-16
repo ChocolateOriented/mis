@@ -210,6 +210,7 @@
 <body>
 	<ul class="nav nav-tabs">
 	</ul>
+	<br/>
 	<form id="inputForm"  class="form-horizontal" style="margin-left: 20px;">
 		<input type="hidden" id="orders" name="orders"/>
 		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
@@ -251,7 +252,7 @@
 		</div>
 
 		<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-		<div class="control-group">
+		<div class="control-group" style="height: 40px;">
 			<div style="width:20%;display:inline-block;">
 				<input id="groupCheckable" type="checkbox"/><label for="groupCheckable">催收小组</label>
 			</div>
@@ -285,7 +286,7 @@
 			</div>
 		</div>
 
-		<div class="container" style="width:100%;">
+		<div class="container" style="width:100%;height: 120px;">
 			<div id="template" class="people" peopleId="" style="white-space:nowrap;display:none;" onclick="selectPeople(this);">
 				<span id="peopleName"></span>
 				<span style="display:none;" onclick="deletePeople(this);">&times;</span>
