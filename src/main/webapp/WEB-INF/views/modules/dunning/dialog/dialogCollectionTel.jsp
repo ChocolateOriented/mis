@@ -141,6 +141,10 @@
 				$("#iseffective").val("0");
 			}
 		});
+		if(!window.parent.messageHide()){
+			$("[ value='CANTACT'],[ value='COMMUNCATE']").remove();
+		}
+		
 	});
 	
 	function telEmpty(){
