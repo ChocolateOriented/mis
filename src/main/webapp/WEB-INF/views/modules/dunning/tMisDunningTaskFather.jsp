@@ -242,6 +242,11 @@
 			var currentPageUrl = url + param;
 			$("#ifm").attr("src", currentPageUrl);
 	    }
+		
+		function messageHide(){
+			return  parseInt("${overdueDays}")>parseInt("${controlDay}");
+			  
+		}
 	</script>
 </head>
 <body>
