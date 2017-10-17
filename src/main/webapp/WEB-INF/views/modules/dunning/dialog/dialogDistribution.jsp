@@ -4,7 +4,6 @@
 <head>
 	<title>手动分案</title>
 	<meta name="decorator" content="default"/>
-
 	<script type="text/javascript">
         //根据队列,组类型,账号分案状态,组名查询催收人员
         var selectedPeoples = [];
@@ -12,20 +11,33 @@
             var isSelected = $(obj).attr("selected");
             var peopleId = $(obj).attr("peopleId");
             if (isSelected) {
-                $(obj).css("background-color", "white");
-                $(obj).attr("selected", false);
-			} else {
                 for (var i = 0; i < selectedPeoples.length; i++) {
                     if (selectedPeoples[i] == peopleId) {
                         selectedPeoples.splice(i, 1);
                         break;
-					}
+                    }
                 }
+                $(obj).css("background-color", "white");
+                $(obj).attr("selected", false);
+			} else {
                 $(obj).css("background-color", "#2fa4e7");
                 $(obj).attr("selected", true);
                 selectedPeoples.push(peopleId);
 			}
         }
+
+        function moveElement(obj, peopleId) {
+            var newElem = obj.clone(true);
+            newElem.css("background-color", "white");
+            newElem.children("span").css("display", "inline-block");
+            newElem.removeAttr("onclick");
+            newElem.prop("id", peopleId);
+            newElem.children("input").val(peopleId);
+            newElem.children("input").prop("name", "newdunningpeopleids");
+            $("#rightContainer").append(newElem);
+            var curNum = parseInt($("#selectedDunningPeople").text() || "0");
+            $("#selectedDunningPeople").text(curNum + 1);
+		}
 
         function leftMoveToRight() {
             for (var i = 0; i < selectedPeoples.length; i++) {
@@ -36,14 +48,7 @@
                     continue;
 				}
 
-                var newElem = selected.clone(true);
-                newElem.css("background-color", "white");
-                newElem.children("span").css("display", "inline-block");
-                newElem.removeAttr("onclick");
-                newElem.prop("id", selectedPeoples[i]);
-                $("#rightContainer").append(newElem);
-                var curNum = parseInt($("#selectedDunningPeople").text() || "0");
-                $("#selectedDunningPeople").text(curNum + 1);
+                moveElement(selected, selectedPeoples[i]);
             }
         }
 
@@ -55,20 +60,12 @@
 
             leftPeoples.each(function() {
                 var elem = $(this)
-                console.log(elem);
                 var rightElem = $("#rightContainer div[peopleId='" + elem.attr("peopleId") + "']");
                 if (rightElem.length > 0) {
                     return;
                 }
 
-                var newElem = elem.clone(true);
-                newElem.css("background-color", "white");
-                newElem.children("span").css("display", "inline-block");
-                newElem.removeAttr("onclick");
-                newElem.prop("id", elem.attr("peopleId"));
-                $("#rightContainer").append(newElem);
-                var curNum = parseInt($("#selectedDunningPeople").text() || "0");
-                $("#selectedDunningPeople").text(curNum + 1);
+                moveElement(elem, elem.attr("peopleId"));
 			});
         }
 
@@ -94,6 +91,8 @@
             $("input[name='status']:checked").each(function() {
                 status.push($(this).val());
             })
+
+            var name = $("#groupList").val();
 			var dunningpeoplename = $("#searchName").val() || "";
 
             var param = {
@@ -105,6 +104,7 @@
 			};
             $.post("${ctx}/dunning/tMisDunningTask/dialogDistributionPeople", param, function(peopleList) {
                 $("#leftContainer").empty();
+                selectedPeoples = [];
                 if (!peopleList) {
                     return;
 				}
@@ -136,16 +136,38 @@
             $("#selectedOrders").text(check_orders.length);
 
             $('#cyclesCheckable').change(function() {
-                $("input[name='cycles']").prop("disabled", !$('#cyclesCheckable').prop("checked"));
+                var checked = $('#cyclesCheckable').prop("checked");
+                $("input[name='cycles']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='cycles']").prop("checked", false);
+                    getPeople();
+				}
+
             });
             $('#grouptypeCheckable').change(function() {
-                $("input[name='grouptype']").prop("disabled", !$('#grouptypeCheckable').prop("checked"));
+                var checked = $('#grouptypeCheckable').prop("checked");
+                $("input[name='grouptype']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='grouptype']").prop("checked", false);
+                    getPeople();
+                }
             });
             $('#statusCheckable').change(function() {
-                $("input[name='status']").prop("disabled", !$('#statusCheckable').prop("checked"));
+                var checked = $('#statusCheckable').prop("checked");
+                $("input[name='status']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='status']").prop("checked", false);
+                    getPeople();
+                }
             });
             $('#groupCheckable').change(function() {
-                $('#groupList').prop("disabled", !$('#groupCheckable').prop("checked"));
+                var checked = $('#groupCheckable').prop("checked");
+                $('#groupList').prop("disabled", !checked);
+                if (!checked) {
+                    $('#groupList').val("");
+                    $('#s2id_groupList span.select2-chosen').text("");
+                    getPeople();
+                }
             });
             $("input[name='cycles']").change(getPeople);
             $("input[name='grouptype']").change(getPeople);
@@ -154,7 +176,12 @@
             $("#search").click(getPeople);
 
 			$('#distributionSave').click(function() {
- 			 if($("#inputForm").valid()){
+ 			   if($("#inputForm").valid()){
+ 			     if (!$("#rightContainer div").length) {
+                     $.jBox.tip("请选择需要分案的催收人员", "warning");
+                     return;
+				 }
+
  				 $("#distributionSave").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
@@ -290,6 +317,7 @@
 			<div id="template" class="people" peopleId="" style="white-space:nowrap;display:none;" onclick="selectPeople(this);">
 				<span id="peopleName"></span>
 				<span style="display:none;" onclick="deletePeople(this);">&times;</span>
+				<input type="hidden"/>
 			</div>
 			<div id="leftContainer" class="peoplesContainer">
 
