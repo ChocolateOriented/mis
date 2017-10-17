@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.dao;
 
 
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
+import com.thinkgem.jeesite.common.supcan.treelist.cols.Group;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
 import java.util.Map;
@@ -38,7 +40,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	public List<TMisDunningPeople> findPeopleBybeginEnd(TMisDunningPeople dunningPeople);
 	
 	/**
-	 * 根据周期查询催收人员
+	 * 根据催收队列查询催收人员
 	 * @param dunningcycle
 	 * @return
 	 */
@@ -53,7 +55,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	
 	/**
 	 * 批量更新完成的任务
-	 * @param ids
+	 * @param pids userid dunningcycle
 	 * @return
 	 */
 	public int batchUpdateDunningcycle(@Param("pids")List<String> pids,@Param("userid")String userid,@Param("dunningcycle")String dunningcycle);
@@ -77,7 +79,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	
 	
 	/**
-	 * 根据周期查询催收人员-手动分配
+	 * 根据催收队列查询催收人员-手动分案
 	 * @param dunningcycle
 	 * @return
 	 */
@@ -91,4 +93,13 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople);
+
+	/**
+	 * @Description:根据催收队列,催收员类型,分案状态,催收小组查询催收人员
+	 * @param dunningcycle
+	 * @param type
+	 * @param auto
+	 * @param name
+	 */
+	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(@Param("dunningcycle")String[] dunningcycle, @Param("type")String[] type, @Param("auto")String[] auto, @Param("name")String name,@Param("dunningpeoplename")String dunningpeoplename);
 }

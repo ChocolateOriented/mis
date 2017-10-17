@@ -96,7 +96,7 @@ $(document).ready(function() {
 	 	}
 	 });
 	 	 
-	// 手动分配
+	// 手动分案
 	$("#distribution").click(function(){
 		 var orders = new Array();
 		 var dunningcycle = new Array();
@@ -120,7 +120,7 @@ $(document).ready(function() {
 				return;
 			}
 			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid;
-			$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+			$.jBox.open("iframe:" + url, "手动分案" , 600, 650, {
 	               buttons: {},
 	               loaded: function (h) {
 	                   $(".jbox-content", document).css("overflow-y", "hidden");
@@ -324,7 +324,7 @@ function formatPeopleList( item ){
 			</li>
 		</ul>
 	</form:form>
-	<input id="distribution" class="btn btn-primary" type="button" value="手动分配" />
+	<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />
 	</shiro:hasPermission>

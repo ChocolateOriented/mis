@@ -139,64 +139,7 @@
 			 	}
 			 });
 			 
-			// 群发短信
-// 			 $("#texting").click(function(){
-// 					var orders = new Array();
-// 					var overDuedays = new Array();
-// 					$("[name='orders']").each(function() {
-// 						if(this.checked){
-// // 							orders.push($(this).val());
-// 							orders.push($(this).attr("orders"));
-// 							overDuedays.push($(this).attr("overDuedays"));
-// 						}
-// 					});
-					
-// 					//群发短信必须选择处于同一逾期周期用户的判断
-// 					for(var i = 0; i < overDuedays.length; i++){
-// 						var num = overDuedays[i];
-// 						if(parseInt(num)<parseInt(0) || parseInt(num) == parseInt(0)){
-// 							overDuedays[i] = 'Z';
-// 						}else if(parseInt(num)>parseInt(0) && parseInt(num)<parseInt(8)){
-// 							overDuedays[i] = 'A';
-// 						}else if(parseInt(num)>parseInt(7) && parseInt(num)<parseInt(15)){
-// 							overDuedays[i] = 'B';
-// 						}else if(parseInt(num)>parseInt(14) && parseInt(num)<parseInt(22)){
-// 							overDuedays[i] = 'C';
-// 						}else if(parseInt(num)>parseInt(21) && parseInt(num)<parseInt(36)){
-// 							overDuedays[i] = 'D';
-// 						}else if(parseInt(num)>parseInt(35)){
-// 							overDuedays[i] = 'E';
-// 						}
-// 						if(i > 0){
-// 							if(overDuedays[i] != overDuedays[i-1]){
-// 								$.jBox.tip("群发短信必须选择处于同一逾期周期用户！", 'warning');
-// 								return false;
-// 							}
-// 						}
-// 					}
-					
-// 					if(orders.length==0){
-// 						$.jBox.tip("请勾选发送短信的催收订单", 'warning');
-// 						return;
-// 					}
-// 					var url = "${ctx}/dunning/tMisDunningTask/collectionGroupSms";
-// 								$.jBox.open("iframe:" + url, "群发短信" , 600, 350, {            
-// 					               buttons: {},
-// //		 			                   submit: function (v, h, f) {
-// //				 	                       if (v == "ok") {
-// //				 	                           var iframeName = h.children(0).attr("name");
-// //				 	                           var iframeHtml = window.frames[iframeName];               //获取子窗口的句柄
-// //				 	                           iframeHtml.saveOrUpdate();
-// //				 	                           return false;
-// //				 	                       }
-// //		 			                   },
-// 					               loaded: function (h) {
-// 					                   $(".jbox-content", document).css("overflow-y", "hidden");
-// 					               }
-// 					         });
-// 			 }); 
-			 
-			// 手动分配
+			// 手动分案
 			 $("#distribution").click(function(){
 				 var orders = new Array();
 				 var dunningcycle = new Array();
@@ -208,24 +151,20 @@
 							}
 							orders.push($(this).attr("orders"));
 							dunningcycle.push($(this).attr("dunningcycle"));
-// 							overduedays.push($(this).attr("overDuedays"));
 						}
 					});
 					if(orders.length==0){
 						$.jBox.tip("请选择需要移动的案件", 'warning');
 						return;
 					}
-// 					if(orders.length>300){
-// 						$.jBox.tip("请选择小于300条分配订单", 'warning');
-// 						return;
-// 					}
+
 					var uniqueid = unique(dunningcycle);
 					if(uniqueid.length != 1 ){
 						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid;
-					$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+					$.jBox.open("iframe:" + url, "手动分案" , 600, 600, {
 			               buttons: {},
 			               loaded: function (h) {
 			                   $(".jbox-content", document).css("overflow-y", "hidden");
@@ -335,52 +274,12 @@
 			
 			// 催收留案功能-留案自检 Patch 0001 by GQWU at 2016-11-9 start-->
 			 $("#deferDunningDeadline").click(function(){
-// 				 var dealcodes = new Array();
-				 
-// 				 $("[name='orders']").each(function() {
-// 					 if(this.checked){
-// 						 dealcodes.push($(this).attr("orders"));
-// 					 }
-// 				 });
-				 
-// 				 if(dealcodes.length==0){
-// 						$.jBox.tip("请勾选留案订单", 'warning');
-// 						return;
-// 				 }
-					
-// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogDeferDunningDeadline?dealcodes=" + dealcodes;
-// 				 $.jBox.open("iframe:" + url, "催收留案" , 600, 350, {            
-// 			               buttons: {},
-// 			               loaded: function (h) {
-// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
-// 			               }
-// 			     });
 					
 			 });
 			 // 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 			 
 			// 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 start-->
 			 $("#setOuterOrdersDeadline").click(function(){
-// 				 var dealcodes = new Array();
-				 
-// 				 $("[name='orders']").each(function() {
-// 					 if(this.checked){
-// 						 dealcodes.push($(this).attr("orders"));
-// 					 }
-// 				 });
-				 
-// 				 if(dealcodes.length==0){
-// 						$.jBox.tip("请勾选委外订单", 'warning');
-// 						return;
-// 				 }
-					
-// 				 var url = "${ctx}/dunning/tMisDunningTask/dialogSetOuterOrdersDeadline?dealcodes=" + dealcodes;
-// 				 $.jBox.open("iframe:" + url, "委外订单截止日期修改" , 600, 350, {            
-// 			               buttons: {},
-// 			               loaded: function (h) {
-// 			                   $(".jbox-content", document).css("overflow-y", "hidden");
-// 			               }
-// 			     });
 					
 			 });
 			 // 催收留案功能-委外订单截止日期修改按钮 Patch 0001 by GQWU at 2016-11-25 end-->
@@ -417,11 +316,6 @@
 		// 订单编号跳转
 		function ckFunction(obj){
 			$(obj).css("color","#FF8C00");
-// 			$(obj).addClass
-// 			backgroudcolor=Red;
-// 			var buyerId = $(obj).attr("buyerid");
-// 			var dealcode = $(obj).attr("dealcode");
-//         	window.location.href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId="+ buyerId + "&dealcode="+ dealcode;
         }
 		
 		//格式化peopleList选项
@@ -454,8 +348,6 @@
 	<form:form id="searchForm" modelAttribute="dunningOrder" action="${ctx}/dunning/tMisDunningTask/findOrderPageList" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
-<%-- 		<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview"> --%>
-<%-- 		</shiro:lacksPermission> --%>
 
 		<ul class="ul-form">
 			<li><label>姓名</label>
@@ -467,13 +359,7 @@
 			<li><label>订单号</label>
 				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			<%-- <li><label>是否优质</label>
-				<form:select  id="quality" path="quality" class="input-medium">
-					<form:option selected="selected" value="" label="全部"/>
-					<form:option value="y" label="是"/>
-					<form:option value="n" label="否"/>
-				</form:select>
-			</li> --%>
+
 			<c:if test="${tmiscycle eq 'numberClean' }">
 			
 				<li><label>号码清洗</label>
@@ -579,9 +465,7 @@
 					
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page();"/></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">  --%>
-<!-- 					<li class="btns"><input id="dunningExport" class="btn btn-primary" type="button" value="导出列表" /></li> -->
-<%-- 				</shiro:hasPermission>  --%>
+
 			<shiro:hasPermission name="dunning:tMisDunningTask:exportFile"> 
 				<li class="btns"><input id="outerOrders" name="outerOrders"  type="hidden" value="" />
 				<input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>
@@ -591,22 +475,8 @@
 	</form:form>
 	
 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-		<input id="distribution"  class="btn btn-primary" type="button" value="手动分配" />
+		<input id="distribution"  class="btn btn-primary" type="button" value="手动分案" />
 	</shiro:hasPermission>
-<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview"> --%>
-<!-- 		<input id="texting"   class="btn btn-primary" type="button" value="群发短信"/> -->
-<%-- 	</shiro:hasPermission> --%>
-	
-	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview"> --%>
-<!-- 		<input id="deferDunningDeadline"  class="btn btn-primary" type="button" value="催收留案"  disabled="disabled"/> -->
-<%-- 	</shiro:hasPermission> --%>
-	<!-- 催收留案功能-留案触发按钮 Patch 0001 by GQWU at 2016-11-9 end-->
-	
-	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 start-->
-<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:directorview"> --%>
-<!-- 		<input id="setOuterOrdersDeadline"  class="btn btn-primary" type="button" value="委外订单截止日期设置"  disabled="disabled"/> -->
-<%-- 	</shiro:hasPermission> --%>
 	
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
@@ -619,12 +489,7 @@
 	<shiro:hasPermission name="dunning:tMisDunningDeduct:batch">
 		<input id="batchDeduct" class="btn btn-primary" type="button" value="批量代扣" onclick="return confirmx('确认要批量代扣吗？', batchDeduct);"/>
 	</shiro:hasPermission>
-<%-- 		<form id="searchForm"  action="${ctx}/dunning/tMisDunningTask/exportOuterFile" method="post"> --%>
-<%-- 			<shiro:hasPermission name="dunning:tMisDunningTask:exportFile">  --%>
-<!-- 					<input id="exportOuterFile" class="btn btn-primary" type="button" value="委外导出" /> -->
-<%-- 			</shiro:hasPermission>  --%>
-<!-- 		</form> -->
-	<!-- test start -->
+
 	<shiro:hasPermission name="dunning:tMisDunningTest:view">
 		<a href="${ctx}/dunning/tMisDunningTest/testPage" target="_blank" >test</a>
 	</shiro:hasPermission>
@@ -652,14 +517,11 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-				<!-- <th>是否优质</th> -->
+
 				<c:if test="${tmiscycle eq 'numberClean' }">
 				<th>号码清洗</th>
 				</c:if>
 				<th>最近登录时间</th>
-<!-- 				<th>任务状态</th> -->
-<!-- 				<th>操作</th> -->
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
 			</tr>
 		</thead>
 		<tbody>
@@ -677,7 +539,6 @@
 					</c:if>
 				</td>
 				<td>
-					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank" > --%>
 					<a href="${ctx}/dunning/tMisDunningTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}&status=${dunningOrder.status}" target="_blank" >
 					${dunningOrder.realname}
 				</td>
@@ -724,7 +585,7 @@
 					<fmt:formatDate value="${dunningOrder.payofftime}" pattern="yyyy-MM-dd HH:mm"/>
 				</td>
 				<td>
-					<%-- <a href="${ctx}/dunning/tMisDunningTask/customerDetails?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}"   > --%>
+
 					${dunningOrder.dealcode}
 				</td>
 				<td>
@@ -733,17 +594,7 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-				<%-- <td>
-					<c:choose>  
-						<c:when test="${dunningOrder.quality  eq 'y'}">  
-							<c:out value="是" />
-						</c:when>
-						<c:otherwise>
-							<c:out value="" />
-						</c:otherwise>  
-					</c:choose>
 
-				</td> --%>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
 					  <c:if test="${dunningOrder.status eq 'payment'}">
@@ -779,13 +630,7 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.latestlogintime}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-<!-- 				<td> -->
-<%-- 					${dunningOrder.dunningtaskstatusText} --%>
-<!-- 				</td> -->
-<%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><td> --%>
-<%--     				<a href="${ctx}/dunning/tMisDunningTask/form?id=${tMisDunningTask.id}">修改</a> --%>
-<%-- 					<a href="${ctx}/dunning/tMisDunningTask/delete?id=${tMisDunningTask.id}" onclick="return confirmx('确认要删除该催收任务吗？', this.href)">删除</a> --%>
-<%-- 				</td></shiro:hasPermission> --%>
+
 			</tr>
 		</c:forEach>
 		</tbody>

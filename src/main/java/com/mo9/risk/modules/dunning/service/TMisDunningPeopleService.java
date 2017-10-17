@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.thinkgem.jeesite.common.supcan.treelist.cols.Group;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,7 +152,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	
 	
 	/**
-	 * 根据周期查询催收人员
+	 * 根据周期队列查询催收人员
 	 * @param dunningcycle
 	 * @return
 	 */
@@ -213,5 +215,17 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	@Transactional(readOnly = false)
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople) {
 		return dao.updatePeopleNameById(dunningPeople);
+	}
+
+	/**
+	 * @Description:根据催收队列,催收员类型,分案状态,催收小组查询催收人员
+	 * @param dunningcycle
+	 * @param type
+	 * @param auto
+	 * @param name
+	 */
+	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(String[] dunningcycle,String[] type,String[] auto,String name,String dunningpeoplename){
+
+		return tMisDunningPeopleDao.findPeopleByCycleTypeAutoName(dunningcycle, type,auto,name,dunningpeoplename);
 	}
 }
