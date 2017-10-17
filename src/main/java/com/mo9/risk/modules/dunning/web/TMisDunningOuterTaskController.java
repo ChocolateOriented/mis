@@ -254,7 +254,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
-			logger.info("加载委外手动分配页面失败",e);
+			logger.info("加载委外手动分案页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOutDistribution";
@@ -273,6 +273,12 @@ public class TMisDunningOuterTaskController extends BaseController {
 		String[] type = request.getParameterValues("type[]");
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
+
+		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name)) {
+			return new ArrayList<TMisDunningPeople>();
+		}
+
 		String dunningpeoplename=request.getParameter("dunningpeoplename");
 		try{
 			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
@@ -306,7 +312,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 				}
 			}
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
-//			tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
 			String outAssignmes = tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
 			mes = "OK,手动勾选"+dealcodes.size()+"条订单," + outAssignmes;
 		} catch (Exception e) {

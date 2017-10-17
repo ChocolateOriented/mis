@@ -11,19 +11,32 @@
             var isSelected = $(obj).attr("selected");
             var peopleId = $(obj).attr("peopleId");
             if (isSelected) {
-                $(obj).css("background-color", "white");
-                $(obj).attr("selected", false);
-            } else {
                 for (var i = 0; i < selectedPeoples.length; i++) {
                     if (selectedPeoples[i] == peopleId) {
                         selectedPeoples.splice(i, 1);
                         break;
                     }
                 }
+                $(obj).css("background-color", "white");
+                $(obj).attr("selected", false);
+            } else {
                 $(obj).css("background-color", "#2fa4e7");
                 $(obj).attr("selected", true);
                 selectedPeoples.push(peopleId);
             }
+        }
+
+        function moveElement(obj, peopleId) {
+            var newElem = obj.clone(true);
+            newElem.css("background-color", "white");
+            newElem.children("span").css("display", "inline-block");
+            newElem.removeAttr("onclick");
+            newElem.prop("id", peopleId);
+            newElem.children("input").val(peopleId);
+            newElem.children("input").prop("name", "newdunningpeopleids");
+            $("#rightContainer").append(newElem);
+            var curNum = parseInt($("#selectedDunningPeople").text() || "0");
+            $("#selectedDunningPeople").text(curNum + 1);
         }
 
         function leftMoveToRight() {
@@ -35,14 +48,7 @@
                     continue;
                 }
 
-                console.log(selected);
-                var newElem = selected.clone(true);
-                newElem.css("background-color", "white");
-                newElem.children("span").css("display", "inline-block");
-                newElem.removeAttr("onclick");
-                $("#rightContainer").append(newElem);
-                var curNum = parseInt($("#selectedDunningPeople").text() || "0");
-                $("#selectedDunningPeople").text(curNum + 1);
+                moveElement(selected, selectedPeoples[i]);
             }
         }
 
@@ -54,20 +60,12 @@
 
             leftPeoples.each(function() {
                 var elem = $(this)
-                console.log(elem);
                 var rightElem = $("#rightContainer div[peopleId='" + elem.attr("peopleId") + "']");
                 if (rightElem.length > 0) {
                     return;
                 }
 
-                var newElem = elem.clone(true);
-                newElem.css("background-color", "white");
-                newElem.children("span").css("display", "inline-block");
-                newElem.removeAttr("onclick");
-                newElem.prop("id", elem.attr("peopleId"));
-                $("#rightContainer").append(newElem);
-                var curNum = parseInt($("#selectedDunningPeople").text() || "0");
-                $("#selectedDunningPeople").text(curNum + 1);
+                moveElement(elem, elem.attr("peopleId"));
             });
         }
 
@@ -93,6 +91,8 @@
             $("input[name='status']:checked").each(function() {
                 status.push($(this).val());
             })
+
+            var name = $("#groupList").val();
             var dunningpeoplename = $("#searchName").val() || "";
 
             var param = {
@@ -104,6 +104,7 @@
             };
             $.post("${ctx}/dunning/tMisDunningOuterTask/dialogDistributionPeople", param, function(peopleList) {
                 $("#leftContainer").empty();
+                selectedPeoples = [];
                 if (!peopleList) {
                     return;
                 }
@@ -135,27 +136,52 @@
             $("#selectedOrders").text(check_orders.length);
 
             $('#cyclesCheckable').change(function() {
-                $("input[name='cycles']").prop("disabled", !$('#cyclesCheckable').prop("checked"));
+                var checked = $('#cyclesCheckable').prop("checked");
+                $("input[name='cycles']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='cycles']").prop("checked", false);
+                    getPeople();
+                }
+
             });
             $('#grouptypeCheckable').change(function() {
-                $("input[name='grouptype']").prop("disabled", !$('#grouptypeCheckable').prop("checked"));
+                var checked = $('#grouptypeCheckable').prop("checked");
+                $("input[name='grouptype']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='grouptype']").prop("checked", false);
+                    getPeople();
+                }
             });
             $('#statusCheckable').change(function() {
-                $("input[name='status']").prop("disabled", !$('#statusCheckable').prop("checked"));
+                var checked = $('#statusCheckable').prop("checked");
+                $("input[name='status']").prop("disabled", !checked);
+                if (!checked) {
+                    $("input[name='status']").prop("checked", false);
+                    getPeople();
+                }
             });
             $('#groupCheckable').change(function() {
-                $('#groupList').prop("disabled", !$('#groupCheckable').prop("checked"));
+                var checked = $('#groupCheckable').prop("checked");
+                $('#groupList').prop("disabled", !checked);
+                if (!checked) {
+                    $('#groupList').val("");
+                    $('#s2id_groupList span.select2-chosen').text("");
+                    getPeople();
+                }
             });
             $("input[name='cycles']").change(getPeople);
             $("input[name='grouptype']").change(getPeople);
             $("input[name='status']").change(getPeople);
             $("#groupList").change(getPeople);
             $("#search").click(getPeople);
-			
-			
-			$('#distributionSave').click(function() {
- 			 if($("#inputForm").valid()){
- 				 $("#distributionSave").attr('disabled',"true");
+
+            $('#distributionSave').click(function() {
+                if($("#inputForm").valid()){
+                    if (!$("#rightContainer div").length) {
+                        $.jBox.tip("请选择需要分案的催收人员", "warning");
+                        return;
+                    }
+				$("#distributionSave").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
  	                    url : "${ctx}/dunning/tMisDunningOuterTask/outDistributionSave",
@@ -223,8 +249,8 @@
 					<input id="cycle1" type="checkbox" name="cycles" value="Q1" disabled/><label for="cycle1">Q1<label/>&nbsp;
 					<input id="cycle2" type="checkbox" name="cycles" value="Q2" disabled/><label for="cycle2">Q2</label>&nbsp;
 					<input id="cycle3" type="checkbox" name="cycles" value="Q3" disabled/><label for="cycle3">Q3<label/>&nbsp;
-						<input id="cycle4" type="checkbox" name="cycles" value="Q4" disabled/><label for="cycle4">Q4</label>&nbsp;
-						<input id="cycle5" type="checkbox" name="cycles" value="Q5" disabled/><label for="cycle5">Q5</label>
+					<input id="cycle4" type="checkbox" name="cycles" value="Q4" disabled/><label for="cycle4">Q4</label>&nbsp;
+					<input id="cycle5" type="checkbox" name="cycles" value="Q5" disabled/><label for="cycle5">Q5</label>
 				</div>
 			</div>
 			<div class="control-group">
@@ -287,6 +313,7 @@
 			<div id="template" class="people" peopleId="" style="white-space:nowrap;display:none;" onclick="selectPeople(this);">
 				<span id="peopleName"></span>
 				<span style="display:none;" onclick="deletePeople(this);">&times;</span>
+				<input type="hidden"/>
 			</div>
 			<div id="leftContainer" class="peoplesContainer">
 

@@ -561,7 +561,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
-			logger.info("",e);
+			logger.info("加载手动分案页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogDistribution";
@@ -580,6 +580,12 @@ public class TMisDunningTaskController extends BaseController {
 		String[] type = request.getParameterValues("type[]");
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
+
+		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name)) {
+			return new ArrayList<TMisDunningPeople>();
+		}
+
 		String dunningpeoplename=request.getParameter("dunningpeoplename");
 		try{
 			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
