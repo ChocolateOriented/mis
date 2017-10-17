@@ -181,6 +181,7 @@
                         $.jBox.tip("请选择需要分案的催收人员", "warning");
                         return;
                     }
+
 				$("#distributionSave").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
