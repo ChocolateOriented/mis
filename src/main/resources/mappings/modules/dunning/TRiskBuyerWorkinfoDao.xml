@@ -64,4 +64,14 @@
 		WHERE a.buyer_id = #{buyerId}
 	</select>
 	
+	<select id="getWorkTelInfoByBuyerId" resultType="TMisSendMsgInfo">
+	    SELECT 
+			a.buyer_id AS "buyerId",
+			a.company_tel AS "tel",
+			a.company_name AS "name",
+			'worktel' AS "relation"
+		FROM t_risk_buyer_workinfo a  
+		WHERE a.buyer_id = #{buyerId}
+		limit 1
+	</select>
 </mapper>

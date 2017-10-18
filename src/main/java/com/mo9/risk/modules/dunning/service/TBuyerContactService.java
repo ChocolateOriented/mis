@@ -4,7 +4,9 @@
 package com.mo9.risk.modules.dunning.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
@@ -35,6 +40,9 @@ public class TBuyerContactService {
 	
 	@Autowired
 	private RiskBuyerContactManager riskBuyerContactManager;
+	
+	@Autowired
+	private TRiskBuyerWorkinfoService tRiskBuyerWorkinfoService;
 	
 	private static Logger logger = LoggerFactory.getLogger(TBuyerContactService.class);
 	
@@ -96,7 +104,10 @@ public class TBuyerContactService {
 		TBuyerContact tBuyerContact = new TBuyerContact();
 		tBuyerContact.setDealcode(dealcode);
 		tBuyerContact.setBuyerId(buyerId);
-		return tBuyerContactDao.findList(tBuyerContact);
+		tBuyerContacts = tBuyerContactDao.findList(tBuyerContact);
+		fillWorkRelation(tBuyerContacts, buyerId);
+		matchRelativeKeyword(tBuyerContacts);
+		return tBuyerContacts;
 	}
 	
     public List<TBuyerContact> getContantRecordCnt(List<TBuyerContact> tBuyerContact, String dealcode) {
@@ -164,5 +175,144 @@ public class TBuyerContactService {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 补充通讯录单位关系
+	 * @param tBuyerContacts
+	 * @param buyerId
+	 * @return
+	 */
+	private void fillWorkRelation(List<TBuyerContact> tBuyerContacts, String buyerId) {
+		if (tBuyerContacts == null || tBuyerContacts.isEmpty()) {
+			return;
+		}
+		
+		TMisSendMsgInfo tMisSendMsgInfo = tRiskBuyerWorkinfoService.getWorkTelInfoByBuyerId(buyerId);
+		String worktel = null;
+		String subWorktel = null;
+		
+		if (tMisSendMsgInfo == null || (worktel = tMisSendMsgInfo.getTel()) == null) {
+			return;
+		}
+		
+		int inx = worktel.indexOf('_');
+		if (inx < 0 || inx == worktel.length() - 1) {
+			subWorktel = "";
+		} else {
+			subWorktel = worktel.substring(inx + 1);
+		}
+		
+		for (TBuyerContact contact : tBuyerContacts) {
+			if (contact.getContactMobile() == null || StringUtils.isNotEmpty(contact.getFamilyrelation())) {
+				continue;
+			}
+			
+			if (contact.getContactMobile().equals(worktel)) {
+				contact.setFamilyrelation(tMisSendMsgInfo.getRelation());
+				contact.setRcname(tMisSendMsgInfo.getName());
+				continue;
+			}
+			
+			if (contact.getContactMobile().equals(subWorktel)) {
+				contact.setFamilyrelation(tMisSendMsgInfo.getRelation());
+				contact.setRcname(tMisSendMsgInfo.getName());
+				continue;
+			}
+		}
+	}
+	
+	/**
+	 * 匹配亲戚关键词
+	 * @param tBuyerContacts
+	 * @return
+	 */
+	private void matchRelativeKeyword(List<TBuyerContact> tBuyerContacts) {
+		if (tBuyerContacts == null || tBuyerContacts.isEmpty()) {
+			return;
+		}
+		
+		List<Dict> dicts = DictUtils.getDictList("relative_keyword");
+		if (dicts == null || dicts.isEmpty()) {
+			return;
+		}
+		
+		//初始化关键词map
+		Map<Character, Object> keywords = new HashMap<Character, Object>(128);
+		for (Dict dict : dicts) {
+			String value = dict.getValue();
+			String[] wordArr = value.split(",");
+			if (wordArr == null || wordArr.length == 0) {
+				continue;
+			}
+			for (int i = 0; i < wordArr.length; i++) {
+				String word = wordArr[i];
+				if (StringUtils.isEmpty(word)) {
+					continue;
+				}
+				addKeywordMap(keywords, wordArr[i]);
+			}
+		}
+		
+		for (TBuyerContact contact : tBuyerContacts) {
+			String name = contact.getContactName();
+			if (name == null) {
+				continue;
+			}
+			
+			boolean match = isMatchKeywordMap(keywords, name);
+			contact.setRelativeMatch(match);
+		}
+	}
+	
+	/**
+	 * 添加关键词map
+	 * @param keywordMap
+	 * @param word
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private void addKeywordMap(Map<Character, Object> keywordMap, String word) {
+		char end = (char) 1; 
+		Map<Character, Object> nodeMap = keywordMap;
+		for (int i = 0; i < word.length(); i++) {
+			char c = word.charAt(i);
+			Map<Character, Object> map = (Map<Character, Object>) nodeMap.get(c);
+			if (map == null) {
+				map = new HashMap<Character, Object>();
+				nodeMap.put(c, map);
+				nodeMap = map;
+			} else {
+				nodeMap = map;
+			}
+		}
+		nodeMap.put(end, null);
+	}
+	
+	/**
+	 * 判断是否匹配关键词
+	 * @param keywordMap
+	 * @param word
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private boolean isMatchKeywordMap(Map<Character, Object> keywordMap, String word) {
+		char end = (char) 1; 
+		Map<Character, Object> nodeMap = null;
+		for (int i = 0; i < word.length(); i++) {
+			nodeMap = keywordMap;
+			for (int j = i; j < word.length(); j++) {
+				Map<Character, Object> map = (Map<Character, Object>) nodeMap.get(word.charAt(j));
+				if (map == null) {
+					break;
+				}
+				if (map.containsKey(end)) {
+					return true;
+				}
+				nodeMap = map;
+			}
+		}
+		
+		return false;
 	}
 }

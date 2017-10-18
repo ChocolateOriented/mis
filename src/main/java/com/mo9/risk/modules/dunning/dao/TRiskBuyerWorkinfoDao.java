@@ -21,4 +21,6 @@ public interface TRiskBuyerWorkinfoDao  {
 	public List<TRiskBuyerWorkinfo> getWorkInfoByBuyerId(@Param("buyerId")String buyerId,@Param("dealcode")String dealcode);
 	
 	public List<TMisSendMsgInfo> getWorkTelByBuyerId(String buyerId);
+	
+	public TMisSendMsgInfo getWorkTelInfoByBuyerId(String buyerId);
 }
