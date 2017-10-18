@@ -107,7 +107,7 @@
 				<td>
 					${(vs.index+1)}
 				</td>
-				<td>${cp.contactName}</td>
+				<td style="${cp.relativeMatch ? 'background-color:#fffe93;color:#a4a912;' : ''}">${cp.contactName}</td>
 				<td>
 					<c:choose>
 						<c:when test = "${not empty cp.rcname && cp.rcname != '未知'}">
@@ -120,6 +120,7 @@
 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
 								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
+								<c:when test = "${cp.familyrelation=='worktel'}">(单位)</c:when>
 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
 								<c:otherwise></c:otherwise>
 							</c:choose>

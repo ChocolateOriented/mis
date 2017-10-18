@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerWorkinfoDao;
+import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
 
 /**
@@ -27,5 +28,9 @@ public class TRiskBuyerWorkinfoService {
 		
 	public List<TRiskBuyerWorkinfo> getWorkInfoByBuyerId(@Param("buyerId")String buyerId,@Param("dealcode")String dealcode){
 		return tRiskBuyerWorkinfoDao.getWorkInfoByBuyerId(buyerId,dealcode);
+	}
+	
+	public TMisSendMsgInfo getWorkTelInfoByBuyerId(String buyerId){
+		return tRiskBuyerWorkinfoDao.getWorkTelInfoByBuyerId(buyerId);
 	}
 }

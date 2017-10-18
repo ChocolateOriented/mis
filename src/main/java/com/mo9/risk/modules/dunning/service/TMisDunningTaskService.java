@@ -2998,7 +2998,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			return appLoginLog;
 		} catch (Exception e) {
 			logger.info("查询最新登录记录异常：" + e.getMessage());
-			return null;
+			throw new ServiceException(e);
 		}
 	}
 
