@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 public class RiskBuyerContactManager {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
 
 	/**
 	 * @Description 江湖救急通讯录接口
@@ -33,7 +32,7 @@ public class RiskBuyerContactManager {
 	 * @return 通讯录
 	 */
 	public List<TBuyerContact> getBuyerContactInfo(String mobile) throws IOException {
-		String url = riskUrl + "riskbehavior/inner/queryContactInfoByMobile.do";
+		String url = DictUtils.getDictValue("riskclone","orderUrl","") + "riskbehavior/inner/queryContactInfoByMobile.do";
 
 		logger.debug("获取通讯录接口url：" + url);
 		String res = GetRequest.getRequest(url,"mobile="+mobile, 3000);
@@ -66,7 +65,7 @@ public class RiskBuyerContactManager {
 		if (StringUtils.isBlank(mobile)){
 			throw new IllegalArgumentException("电话不能为空");
 		}
-		String url = riskUrl + "riskbehavior/inner/queryCalllogsInfoByMobile.do";
+		String url = DictUtils.getDictValue("riskclone","orderUrl","") + "riskbehavior/inner/queryCalllogsInfoByMobile.do";
 		logger.debug("获取通话记录URL"+url);
 		String res = GetRequest.getRequest(url, "mobile="+mobile,5000);
 		logger.debug(url+"响应结果"+res);

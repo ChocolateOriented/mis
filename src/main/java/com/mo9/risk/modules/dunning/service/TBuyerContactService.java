@@ -93,7 +93,6 @@ public class TBuyerContactService {
 			if (tBuyerContacts != null && tBuyerContacts.size() != 0) {
 				fillContantRecordCnt(tBuyerContacts, dealcode);
 				fillContactRelation(tBuyerContacts, buyerId);
-				return tBuyerContacts;
 			}
 			
 		} catch (Exception e) {
@@ -101,10 +100,12 @@ public class TBuyerContactService {
 		}
 		
 		//异常或接口无数据时查询mis库
-		TBuyerContact tBuyerContact = new TBuyerContact();
-		tBuyerContact.setDealcode(dealcode);
-		tBuyerContact.setBuyerId(buyerId);
-		tBuyerContacts = tBuyerContactDao.findList(tBuyerContact);
+		if (tBuyerContacts == null || tBuyerContacts.size() == 0) {
+			TBuyerContact tBuyerContact = new TBuyerContact();
+			tBuyerContact.setDealcode(dealcode);
+			tBuyerContact.setBuyerId(buyerId);
+			tBuyerContacts = tBuyerContactDao.findList(tBuyerContact);
+		}
 		fillWorkRelation(tBuyerContacts, buyerId);
 		matchRelativeKeyword(tBuyerContacts);
 		return tBuyerContacts;
