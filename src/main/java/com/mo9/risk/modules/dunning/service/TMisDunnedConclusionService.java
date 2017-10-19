@@ -69,7 +69,6 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 		}
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
 		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		

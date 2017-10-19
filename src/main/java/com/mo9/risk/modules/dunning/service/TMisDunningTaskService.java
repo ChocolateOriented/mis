@@ -3247,7 +3247,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Transactional(readOnly = false)
 	public void autoTelConclusion1() {
 		//获取昨天晚上20:10到今天晚上20:10的Q0和Q1队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
+		logger.info("Q0和Q1开始电催结论");
 		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime1");
+		logger.info("Q0和Q1共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
 	}
@@ -3257,8 +3259,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 10 12 * * ?")
 	@Transactional(readOnly = false)
 	public void autoTelConclusion2() {
+		logger.info("Q2和Q3和Q4开始中午电催结论");
 		//获取昨天晚上20:10到今天12:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
 		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime2");
+		logger.info("Q2和Q3和Q4中午共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
 	}
@@ -3269,7 +3273,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Transactional(readOnly = false)
 	public void autoTelConclusion3() {
 		//获取今天12:10到今天晚上20:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
+		logger.info("Q2和Q3和Q4开始晚上电催结论");
 		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime3");
+		logger.info("Q2和Q3和Q4晚上共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
 	}
@@ -3289,6 +3295,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		for (int i=0;i<recordList.size();i++) {
 			//判断是否是同一个用户
 			if(decalode.equals(recordList.get(i).getDealcode())){
+				logger.info("订单号:"+decalode+",案件队列为:"+dunningCycle+"数据整理");
 				//同一个用户所有做过电催结论的action的id
 				actions.add(recordList.get(i).getId());
 				//承诺还款时间
@@ -3322,6 +3329,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}
 				//遍历最后一个时保存电催结论
 				if(i==recordList.size()-1){
+					logger.info("最后一个订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
 					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
 					if (!result) {
 						logger.info(decalode+"该订单电催结论失败.");
@@ -3332,6 +3340,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					return;
 				}
 			}else{
+				logger.info("订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
 					//保存电催结论
 					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
 					if (!result) {
@@ -3346,6 +3355,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						recordTemp.clear();
 					decalode=recordList.get(i).getDealcode();
 					taskId=recordList.get(i).getTaskid();
+					dunningCycle=recordList.get(i).getDunningCycle();
+					dunningPeopleId=recordList.get(i).getDunningpeoplename();
 					remark.delete(0, remark.length());
 					cycle=0;
 					--i;
@@ -3382,7 +3393,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		//下次跟进时间
 		String nextTelDate=DictUtils.getDictValue(recordTemp.get("telStatus").toString(), "dunning_result_code", "");
 		if(StringUtils.isEmpty(nextTelDate)){
-			logger.info(new Date()+"改结果码数据字典未配置");
+			logger.info(new Date()+"该结果码数据字典未配置");
 			return false;
 		}
 		Calendar calendar = Calendar.getInstance();
