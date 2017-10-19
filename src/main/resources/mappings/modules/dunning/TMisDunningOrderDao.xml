@@ -89,4 +89,58 @@
 			#{delcode}
 		</foreach>
 	</select>
+
+	<!--消息队列订单同步更新-->
+	<update id="orderSynUpdate" parameterType="com.mo9.risk.modules.dunning.entity.TRiskOrder">
+		UPDATE t_risk_order SET
+		merchant_id = #{merchantId},
+		buyer_id = #{buyerId},
+		partner_id = #{partnerId},
+		amount = #{amount},
+		type = #{type},
+		item_name = #{itemName},
+		balance = #{balance},
+		create_time = #{createTime},
+		buyer_merchant_id = #{buyerMerchantId},
+		status = #{status},
+		update_time = #{updateTime},
+		repayment_time = #{repaymentTime},
+		credit_amount = #{creditAmount},
+		payerid = #{payerid},
+		device = #{device},
+		ip2long = #{ip2long},
+		first_order = #{firstOrder},
+		cost_amount = #{costAmount},
+		overdue_amount = #{overdueAmount},
+		days = #{days},
+		remit_time = #{remitTime},
+		payoff_time = #{payoffTime},
+		version = #{version},
+		msg = #{msg},
+		root_order_id = #{rootOrderId},
+		third_code = #{thirdCode},
+		channel = #{channel},
+		is_delay = #{isDelay},
+		remark = #{remark},
+		sessionid = #{sessionid},
+		pay_code = #{payCode},
+		coupons_id = #{couponsId},
+		platform = #{platform},
+		platform_ext = #{platformExt},
+		default_interest_amount = #{defaultInterestAmount},
+		delay_days = #{delayDays},
+		modify_amount = #{modifyAmount},
+		modify_flag = #{modifyFlag},
+		modify_operator1 = #{modifyOperator1},
+		modify_operator2 = #{modifyOperator2},
+		modify_operator3 = #{modifyOperator3},
+		sub_cost_amount = #{subCostAmount},
+		outerfiletime = #{outerfiletime},
+		audit_flow = #{auditFlow},
+		sc_appl = #{scAppl},
+		sc_applver = #{scApplver},
+		payer_msg = #{payerMsg}
+		WHERE dealcode = #{dealcode}
+	</update>
+
 </mapper>
