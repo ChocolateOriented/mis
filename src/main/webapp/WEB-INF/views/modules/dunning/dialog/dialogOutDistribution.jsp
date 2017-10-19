@@ -181,6 +181,7 @@
                         $.jBox.tip("请选择需要分案的催收人员", "warning");
                         return;
                     }
+
 				$("#distributionSave").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
@@ -304,8 +305,8 @@
 
 		<div class="container" style="width:100%;margin-bottom:8px;">
 			<div style="position:relative;width:30%;">
-				<input id="searchName" type="text" style="width:188px;" maxlength="10"/>
-				<i id="search" class="icon-search" style="position:absolute;top:7px;left:180px;cursor:pointer;"></i>
+				<input id="searchName" type="text" style="width:183px;" maxlength="10"/>
+				<i id="search" class="icon-search" style="position:absolute;top:7px;left:175px;cursor:pointer;"></i>
 			</div>
 		</div>
 

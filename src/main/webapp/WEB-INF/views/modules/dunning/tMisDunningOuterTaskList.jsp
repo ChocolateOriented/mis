@@ -120,7 +120,7 @@ $(document).ready(function() {
 				return;
 			}
 			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid;
-			$.jBox.open("iframe:" + url, "手动分案" , 600, 650, {
+			$.jBox.open("iframe:" + url, "手动分案" , 600, 500, {
 	               buttons: {},
 	               loaded: function (h) {
 	                   $(".jbox-content", document).css("overflow-y", "hidden");
