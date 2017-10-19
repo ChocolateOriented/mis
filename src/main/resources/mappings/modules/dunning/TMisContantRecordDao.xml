@@ -336,23 +336,17 @@
 		a.ConclusionId is null
 		<if test="cycleAndTime=='cycleAndTime1'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
+		    a.CreateDate BETWEEN #{yesterday} AND #{today}
 			and t.DunningCycle in('Q0','Q1')
 		</if>
 		<if test="cycleAndTime=='cycleAndTime2'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
+		    a.CreateDate BETWEEN #{yesterday} AND #{today}
 			and t.DunningCycle in('Q2','Q3','Q4')
 		</if>
 		<if test="cycleAndTime=='cycleAndTime3'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
+		  	 a.CreateDate BETWEEN #{yesterday} AND #{today}
 			and t.DunningCycle in('Q2','Q3','Q4')	
 		</if>
 	    order by

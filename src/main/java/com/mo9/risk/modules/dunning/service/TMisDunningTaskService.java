@@ -3248,7 +3248,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoTelConclusion1() {
 		//获取昨天晚上20:10到今天晚上20:10的Q0和Q1队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
 		logger.info("Q0和Q1开始电催结论");
-		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime1");
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String yesterday =sd.format(DateUtils.getBeforeDay())+" 20:10:00";
+		String today =sd.format(new Date())+" 20:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime1",yesterday,today);
 		logger.info("Q0和Q1共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
@@ -3261,7 +3264,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoTelConclusion2() {
 		logger.info("Q2和Q3和Q4开始中午电催结论");
 		//获取昨天晚上20:10到今天12:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
-		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime2");
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String yesterday =sd.format(DateUtils.getBeforeDay())+" 20:10:00";
+		String today =sd.format(new Date())+" 12:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime2",yesterday,today);
 		logger.info("Q2和Q3和Q4中午共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
@@ -3274,7 +3280,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public void autoTelConclusion3() {
 		//获取今天12:10到今天晚上20:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
 		logger.info("Q2和Q3和Q4开始晚上电催结论");
-		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime3");
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String todayMonning =sd.format(new Date())+" 12:10:00";
+		String today =sd.format(new Date())+" 20:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime3",todayMonning,today);
 		logger.info("Q2和Q3和Q4晚上共查到"+recordList.size());
 		autoSaveTelConclusion(recordList);
 		
