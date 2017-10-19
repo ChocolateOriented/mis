@@ -255,14 +255,42 @@ public class TBuyerContactService {
 			}
 		}
 		
+		//初始化例外关键词map
+		List<Dict> excludeDicts = DictUtils.getDictList("relative_exclude_keyword");
+		Map<Character, Object> excludeKeywords = new HashMap<Character, Object>(32);
+		if (excludeDicts != null) {
+			for (Dict excludeDict : excludeDicts) {
+				String value = excludeDict.getValue();
+				String[] wordArr = value.split(",");
+				if (wordArr == null || wordArr.length == 0) {
+					continue;
+				}
+				for (int i = 0; i < wordArr.length; i++) {
+					String word = wordArr[i];
+					if (StringUtils.isEmpty(word)) {
+						continue;
+					}
+					addKeywordMap(excludeKeywords, wordArr[i]);
+				}
+			}
+		}
+		
 		for (TBuyerContact contact : tBuyerContacts) {
 			String name = contact.getContactName();
+			contact.setRelativeMatch(false);
 			if (name == null) {
 				continue;
 			}
-			
-			boolean match = isMatchKeywordMap(keywords, name);
-			contact.setRelativeMatch(match);
+			//大于5字不匹配
+			if (name.length() > 5) {
+				continue;
+			}
+			//如果匹配例外关键词，则不匹配亲戚关键词
+			boolean matchExclude = isMatchKeywordMap(excludeKeywords, name);
+			if (!matchExclude) {
+				boolean match = isMatchKeywordMap(keywords, name);
+				contact.setRelativeMatch(match);
+			}
 		}
 	}
 	
