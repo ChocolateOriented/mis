@@ -1,4 +1,4 @@
-package com.mo9.risk.modules.dunning.api;
+package com.mo9.risk.modules.dunning.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -59,7 +59,7 @@ public class orderMqSyn {
 	@org.junit.Test
 	public void test2Json()throws Exception {
 		TRiskOrder order = JSON.parseObject(data, TRiskOrder.class);
-		//空字符串会被解析为null
+		//空字符串会被解析为integer值为null, 解析为String值为空字符串
 		System.out.println(order.getBuyerMerchantId());
 	}
 }
