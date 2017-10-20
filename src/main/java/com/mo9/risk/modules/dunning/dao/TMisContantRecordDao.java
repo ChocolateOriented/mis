@@ -55,7 +55,7 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 	 * @param date
 	 * @return
 	 */
-	public List<TMisContantRecord> findautoTelConclusion(@Param("cycleAndTime")String cycleAndTime);
+	public List<TMisContantRecord> findautoTelConclusion(@Param("cycleAndTime")String cycleAndTime,@Param("yesterday")String yesterday,@Param("today")String today);
 
 	/**
 	 * n:3;2电催结论

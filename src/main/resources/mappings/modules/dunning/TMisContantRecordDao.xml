@@ -323,44 +323,34 @@
 		select 
 			<include refid="tMisContantRecordColumns"/>
 		from
-		t_mis_contant_record a
-			INNER  JOIN
 			t_mis_dunning_task t
+		INNER  JOIN
+			t_mis_contant_record a
 		ON
-			a.Dealcode=t.Dealcode AND
-			a.DunningPeopleName=t.DunningPeopleId
-		INNER JOIN
-		t_mis_dunning_people p
-		ON
-			a.DunningPeopleName=p.id
+			t.Dealcode=a.Dealcode
+			AND
+			t.DunningPeopleId=a.DunningPeopleName
 		where 
 		a.ContantType='tel'
 		and
 		a.ConclusionId is null
 		<if test="cycleAndTime=='cycleAndTime1'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
-<!-- 		    and p.DunningCycle regexp '.*(Q0|Q1).*' -->
-		    and (p.DunningCycle like('%Q0%') or p.DunningCycle like('%Q1%'))
+		    a.CreateDate BETWEEN #{yesterday} AND #{today}
+			and t.DunningCycle in('Q0','Q1')
 		</if>
 		<if test="cycleAndTime=='cycleAndTime2'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(date_sub(curdate(),interval 1 day),'%Y-%m-%d 20:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
-		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
+		    a.CreateDate BETWEEN #{yesterday} AND #{today}
+			and t.DunningCycle in('Q2','Q3','Q4')
 		</if>
 		<if test="cycleAndTime=='cycleAndTime3'">
 			and
-		    a.CreateDate &gt;= DATE_FORMAT(curdate(),'%Y-%m-%d 12:10:00')
-		    and
-		    a.CreateDate &lt; DATE_FORMAT(curdate(),'%Y-%m-%d 20:10:00')
-		    and (p.DunningCycle like('%Q2%') or p.DunningCycle like('%Q3%') or p.DunningCycle like('%Q4%'))
+		  	 a.CreateDate BETWEEN #{yesterday} AND #{today}
+			and t.DunningCycle in('Q2','Q3','Q4')	
 		</if>
 	    order by
-	    a.dealcode,a.CreateDate 
+	    a.dealcode,a.CreateDate desc
 	</select>
 	<select id="findDirTelConculsion" resultType="TMisContantRecord">
 		select 

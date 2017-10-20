@@ -28,6 +28,7 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 	private Integer telNum;
 	private String dealcode;
 	private String rcname;
+	private boolean relativeMatch;		//是否匹配亲戚关键字
 	
 	public TBuyerContact() {
 		super();
@@ -114,8 +115,13 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 	public void setRcname(String rcname) {
 		this.rcname = rcname;
 	}
-	
-	
-	
-	
+
+	public boolean getRelativeMatch() {
+		return relativeMatch;
+	}
+
+	public void setRelativeMatch(boolean relativeMatch) {
+		this.relativeMatch = relativeMatch;
+	}
+
 }

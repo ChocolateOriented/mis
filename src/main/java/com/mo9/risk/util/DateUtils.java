@@ -297,7 +297,17 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		cal.set(Calendar.MILLISECOND, 0);
 	    return cal.getTime();
 	  }
-	
+	 /**
+		 * 获取昨天的当前时间日期
+		 * @param newDate
+		 * @return
+		 */
+		public static Date getBeforeDay(){
+			
+			Date today = new Date();
+			Date yesterday = new Date(today.getTime() - 86400000L);
+			return yesterday;
+		}
 	/**
 	 * @param args
 	 * @throws ParseException
