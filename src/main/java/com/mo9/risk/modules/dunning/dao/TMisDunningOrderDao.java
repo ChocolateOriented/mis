@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.dao;
 
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.thinkgem.jeesite.common.persistence.BaseDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface TMisDunningOrderDao extends BaseDao {
 	List<DunningOrder> findPaymentOrderMsg(DunningOrder queryOrder);
 
 	List<String> findPaymentOreder(List<String> deselcodes);
+
+	void orderSynUpdate(TRiskOrder order);
 }
