@@ -607,7 +607,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 //    	if(null!=extensionNumber&&""!=extensionNumber){
         	if(smsCotent.contains("${extensionNumber}")){
         		TMisAgentInfo info=tMisAgentInfoService.getInfoByPeopleId(dunningpeopleid);
-	        	if(info != null ||StringUtils.isNotEmpty(info.getDirect())){
+	        	if(info != null &&StringUtils.isNotEmpty(info.getDirect())){
 	        		map.put("extensionNumber",info.getDirect());
 	        	}
         	}

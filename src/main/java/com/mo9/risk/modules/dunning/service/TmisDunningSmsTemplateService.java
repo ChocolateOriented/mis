@@ -184,7 +184,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
         	if(null!=dunningpeopleid&&""!=dunningpeopleid){
 	        	if(smsCotent.contains("${extensionNumber}")){
 	        		TMisAgentInfo info=tMisAgentInfoService.getInfoByPeopleId(dunningpeopleid);
-		        	if(info != null ||StringUtils.isNotEmpty(info.getDirect())){
+		        	if(info != null &&StringUtils.isNotEmpty(info.getDirect())){
 		        		smsCotent=smsCotent.replace("${extensionNumber}",info.getDirect());
 		        	}
 	        	}
