@@ -25,6 +25,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
@@ -46,11 +47,6 @@ public class TMisCallingRecordController extends BaseController {
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
 	
-	/*@ModelAttribute("tMisCallingRecord")
-	public TMisCallingRecord getTMisCallingRecord(@RequestParam(required=false) String id) {
-		return new TMisCallingRecord();
-	}*/
-	
 	@RequestMapping(value = {"list", ""})
 	public String list(@ModelAttribute("tMisCallingRecord") TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisCallingRecord> page = tMisCallingRecordService.findPage(new Page<TMisCallingRecord>(request, response), tMisCallingRecord);
@@ -70,13 +66,13 @@ public class TMisCallingRecordController extends BaseController {
 		model.addAttribute("supervisorLimit", supervisorLimit);
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
-		model.addAttribute("ctiUrl", "https://www.web-rtc.top:8443/audio/");
-		//model.addAttribute("tMisCallingRecord", tMisCallingRecord);
+		String url = DictUtils.getDictValue("ctiUrl", "callcenter", "") + "audio/";
+		model.addAttribute("ctiUrl", url);
 		return "modules/dunning/tMisCallingRecordList";
 	}
 	
-	@RequestMapping(value = "forwardTask")
-	public String forwardTask(TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
+	@RequestMapping(value = "gotoTask")
+	public String gotoTask(TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		String dealcode = tMisCallingRecord.getDealcode();
 		if (tMisCallingRecord.getDealcode() == null) {
 			return "views/error/500";

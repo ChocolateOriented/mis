@@ -28,7 +28,9 @@ public class CallCenterManager {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final String url = DictUtils.getDictValue("ctiUrl", "callcenter", "https://www.web-rtc.top:8443/") + "cti/cpi";
+	private String getUrl() {
+		return DictUtils.getDictValue("ctiUrl", "callcenter", "") + "cti/cpi";
+	}
 	
 	public <T extends CallCenterBaseResponse> T commonAction(CallCenterBaseAction action, Class<T> clazz) throws IOException, ApiFailException {
 		return commonAction(action, (Type) clazz);
@@ -39,9 +41,9 @@ public class CallCenterManager {
 	}
 	
 	public <T extends CallCenterBaseResponse> T commonAction(CallCenterBaseAction action, Type type) throws IOException, ApiFailException {
-		String res = URLDecoder.decode(PostRequest.postRequest(url, action.toMap()), "utf-8");
+		String res = URLDecoder.decode(PostRequest.postRequest(getUrl(), action.toMap()), "utf-8");
 		T response = JSON.parseObject(res, type);
-		if (response != null && "0".equals(response.getErrorCode())) {
+		if (response != null && !"0".equals(response.getErrorCode())) {
 			logger.info("CTI接口失败,param=" + action.toMap() + ",error_code=" + response.getErrorCode() + ",error_msg=" + response.getErrorMsg());
 			throw new ApiFailException(response == null ? "CTI接口失败" : response.getErrorMsg());
 		}

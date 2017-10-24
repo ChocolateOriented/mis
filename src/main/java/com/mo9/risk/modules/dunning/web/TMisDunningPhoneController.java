@@ -19,9 +19,7 @@ import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.TMisAgentInfoService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPhoneService;
 import com.mo9.risk.util.WebSocketSessionUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -39,9 +37,6 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 public class TMisDunningPhoneController extends BaseController {
 	@Autowired
 	private TMisDunningPhoneService phoneService;
-	
-	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
 	
 	@Autowired
 	private TMisAgentInfoService tMisAgentInfoService;
@@ -119,8 +114,11 @@ public class TMisDunningPhoneController extends BaseController {
 			return false;
 		}
 		CallCenterWebSocketMessage message=new CallCenterWebSocketMessage();
-		TMisDunningPeople people = tMisDunningPeopleService.get(peopleId);
-		String agent = people.getAgent();
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByPeopleId(peopleId);
+		if (agentInfo == null || StringUtils.isEmpty(agentInfo.getAgent())) {
+			return false;
+		}
+		String agent = agentInfo.getAgent();
 		message.setAgent(agent);
 		message.setTarget(target);
 		message.setPeopleId(peopleId);

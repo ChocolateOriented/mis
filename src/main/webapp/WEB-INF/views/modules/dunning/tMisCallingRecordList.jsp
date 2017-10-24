@@ -184,7 +184,7 @@
 					${tMisCallingRecord.durationTimeText}
 				</td>
 				<td>
-					<a href="${ctx}/dunning/tMisCallingRecord/forwardTask?dealcode=${tMisCallingRecord.dealcode}" target="_blank" >
+					<a href="${ctx}/dunning/tMisCallingRecord/gotoTask?dealcode=${tMisCallingRecord.dealcode}" target="_blank" >
 						${tMisCallingRecord.dealcode}
 					</a>
 				</td>

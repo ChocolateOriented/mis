@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentStatus;
 import com.mo9.risk.modules.dunning.bean.CallCenterBaseAction;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.util.WebSocketSessionUtil;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 
@@ -25,7 +25,7 @@ public class TMisDunningPhoneWebsocketService {
 	private static Logger log = LoggerFactory.getLogger(TMisDunningPhoneWebsocketService.class);
 	
 	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
+	private TMisAgentInfoService tMisAgentInfoService;
 	
 	@Autowired
 	TMisDunningPhoneService phoneService;
@@ -38,8 +38,8 @@ public class TMisDunningPhoneWebsocketService {
 	 */
 	@OnOpen
 	public void onOpen(@PathParam("userId") String userId, @PathParam("agent") String agent, @PathParam("status") String status, Session session) {
-		TMisDunningPeople people = tMisDunningPeopleService.get(userId);
-		if (people == null || StringUtils.isBlank(agent) || !agent.equals(people.getAgent())) {
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByPeopleId(userId);
+		if (agentInfo == null || StringUtils.isBlank(agent) || !agent.equals(agentInfo.getAgent())) {
 			return;
 		}
 		

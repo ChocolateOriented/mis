@@ -47,9 +47,6 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	
 	private String extensionNumber;// 催收员分机号
 	
-	private String agent;// 催收员坐席
-	
-
 	public TMisDunningPeople() {
 		super();
 	}
@@ -203,14 +200,6 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	public void setExtensionNumber(String extensionNumber) {
 		this.extensionNumber = extensionNumber;
-	}
-
-	public String getAgent() {
-		return agent;
-	}
-
-	public void setAgent(String agent) {
-		this.agent = agent;
 	}
 
 }

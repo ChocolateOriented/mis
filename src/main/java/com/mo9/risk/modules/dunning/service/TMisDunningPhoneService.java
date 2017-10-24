@@ -19,7 +19,7 @@ import com.mo9.risk.modules.dunning.bean.CallCenterModifyAgent;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
 import com.mo9.risk.util.WebSocketSessionUtil;
@@ -38,9 +38,6 @@ public class TMisDunningPhoneService {
 	
 	@Autowired
 	private CallCenterManager callCenterManager;
-   
-	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
 	
 	@Autowired
 	private TMisAgentInfoService tMisAgentInfoService;
@@ -190,12 +187,12 @@ public class TMisDunningPhoneService {
 	 */
 	@Transactional(readOnly = false)
 	public void changeState(CallCenterAgentInfo noticeInfo) {
-		TMisDunningPeople people = tMisDunningPeopleService.getPeopleByAgent(noticeInfo.getName());
-		if (people == null || people.getId() == null) {
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByAgent(noticeInfo.getName());
+		if (agentInfo == null || agentInfo.getPeopleId() == null) {
 			return;
 		}
 		
-		Session session = WebSocketSessionUtil.get(people.getId());
+		Session session = WebSocketSessionUtil.get(agentInfo.getPeopleId());
 		if (session == null || !session.isOpen()) {
 			return;
 		}

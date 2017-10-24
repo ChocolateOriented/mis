@@ -200,8 +200,7 @@
 			dunningcycle,
 			nickname,
 			groupId,
-			extensionNumber,
-			agent
+			extensionNumber
 		) VALUES (
 			#{id},
 			#{name},
@@ -218,8 +217,7 @@
 			#{dunningcycle},
 			#{nickname},
 			#{group.id},
-			#{extensionNumber},
-			#{agent}
+			#{extensionNumber}
 		)
 	</insert>
 	
@@ -237,8 +235,7 @@
 <!-- 			dunningcycle = #{dunningcycle}, -->
 			nickname = #{nickname},
 			groupId = #{group.id},
-			extensionNumber = #{extensionNumber},
-			agent = #{agent}
+			extensionNumber = #{extensionNumber}
 		WHERE dbid = #{dbid}
 	</update>
 	
@@ -328,7 +325,7 @@
 	</update>
 	
 	
-	 <select id="findAgentPeopleList" resultType="TMisDunningPeople" useCache="false">
+	<select id="findAgentPeopleList" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			a.id,
 			a.nickname
