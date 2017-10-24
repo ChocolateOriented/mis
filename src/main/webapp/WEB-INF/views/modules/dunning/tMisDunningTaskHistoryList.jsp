@@ -138,6 +138,7 @@
 				<th>结果代码</th>
 				<th>备注</th>
 				<th>催收人</th>
+				<th>操作人</th>
 				<th>操作时间</th>
 <%-- 				<shiro:hasPermission name="dunning:tMisDunningTask:edit"><th>操作</th></shiro:hasPermission> --%>
 			</tr>
@@ -223,6 +224,9 @@
 				</td>
 				<td>
 					${tMisContantRecord.peoplename}
+				</td>
+				<td>
+					${tMisContantRecord.createBy.name}
 				</td>
 				<td>
 					<fmt:formatDate value="${tMisContantRecord.dunningtime}" pattern="yyyy-MM-dd HH:mm:ss"/>
