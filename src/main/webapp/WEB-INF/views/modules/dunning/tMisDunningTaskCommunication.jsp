@@ -130,7 +130,12 @@
 						</c:otherwise>
 					</c:choose>
 				</td>
-				<td>${cp.contactMobile}</td>
+				<td>
+					<a href="javascript:void(0)" <shiro:hasPermission name="dunning:phone:view"> onclick="phonePage(this)"</shiro:hasPermission> showName="${cp.contactName}">
+						${cp.contactMobile}
+					</a>
+				
+				</td>
 				<td>
 					短信
 					<a href="javascript:void(0)" title="短信记录" onclick="onClickMonthDetails(this)" mobile="${cp.contactMobile}" method="dialogSmsDetail" type="sms">

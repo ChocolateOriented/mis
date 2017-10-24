@@ -147,7 +147,11 @@
 <%-- 						<c:otherwise></c:otherwise> --%>
 <%-- 					</c:choose> --%>
 <!-- 				</td> -->
-				<td>${p.tel}</td>
+				<td>
+					<a href="javascript:void(0)" <shiro:hasPermission name="dunning:phone:view"> onclick="phonePage(this)"</shiro:hasPermission> showName="${p.name}">
+						${p.tel}
+					</a>
+				</td>
 <%-- 				<td>${p.location}</td> --%>
 				<td>
 					${p.times}

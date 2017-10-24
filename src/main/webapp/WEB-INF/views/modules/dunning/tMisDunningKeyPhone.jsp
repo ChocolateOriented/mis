@@ -345,6 +345,10 @@
 		$(".phoneStatus").css("display", "none");
 		$("#initPhone").css("display", "block");
 		$(".numberSave").css("display", "block");
+		$("#numberValue").attr("readonly",false );
+		$("#deleteNumber").show();
+		
+		
 	}
 	
 	//隐藏电话键盘

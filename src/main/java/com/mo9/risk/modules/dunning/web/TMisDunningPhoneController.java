@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.Session;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +44,7 @@ public class TMisDunningPhoneController extends BaseController {
 	
 		//从首页跳转软电话页面
 	@RequestMapping(value = "${adminPath}/dunning/tMisDunningPhone/judgeAgent")
+	@RequiresPermissions("dunning:phone:view")
 	@ResponseBody
 	public boolean judgeAgent(Model model,HttpServletRequest request, HttpServletResponse response) {
 		String userId = UserUtils.getUser().getId();
@@ -50,6 +52,7 @@ public class TMisDunningPhoneController extends BaseController {
 		return info != null && info.getAgent() != null;
 	}
 	@RequestMapping(value = "${adminPath}/dunning/tMisDunningPhone/phones")
+	@RequiresPermissions("dunning:phone:view")
 	public String phones(Model model,HttpServletRequest request, HttpServletResponse response) {
 		String userId = UserUtils.getUser().getId();
 		TMisAgentInfo info = tMisAgentInfoService.getInfoByPeopleId(userId);
@@ -72,13 +75,15 @@ public class TMisDunningPhoneController extends BaseController {
 			callCenterQueryCallInfo.setPagesize("30");
 		}
 		CallCenterPageResponse<CallCenterCalloutInfo> callOutInfo = phoneService.callOutInfo(callCenterQueryCallInfo);
-		Page<CallCenterCalloutInfo> page=new Page<CallCenterCalloutInfo>(request, response);
-		page.setCount(callOutInfo.getData().getTotal());
-		page.setPageNo(callOutInfo.getData().getPage());
-		page.setPageSize(callOutInfo.getData().getPageSize());
-		page.setList(callOutInfo.getData().getResults());
-		model.addAttribute("page",page);
-		model.addAttribute("call","callout");
+		if(callOutInfo!=null&&callOutInfo.getData()!=null){
+			Page<CallCenterCalloutInfo> page=new Page<CallCenterCalloutInfo>(request, response);
+			page.setCount(callOutInfo.getData().getTotal());
+			page.setPageNo(callOutInfo.getData().getPage());
+			page.setPageSize(callOutInfo.getData().getPageSize());
+			page.setList(callOutInfo.getData().getResults());
+			model.addAttribute("page",page);
+			model.addAttribute("call","callout");
+		}
 		return "/modules/dunning/tMisDunningcallingPhoneInfo";
 	}
 	/**
@@ -92,13 +97,15 @@ public class TMisDunningPhoneController extends BaseController {
 			callCenterQueryCallInfo.setPagesize("30");
 		}
 		CallCenterPageResponse<CallCenterCallinInfo> callinInfo = phoneService.callinInfo(callCenterQueryCallInfo);
-		Page<CallCenterCallinInfo> page=new Page<CallCenterCallinInfo>(request, response);
-		page.setCount(callinInfo.getData().getTotal());
-		page.setPageNo(callinInfo.getData().getPage());
-		page.setPageSize(callinInfo.getData().getPageSize());
-		page.setList(callinInfo.getData().getResults());
-		model.addAttribute("page",page);
-		model.addAttribute("call","callin");
+		if(callinInfo!=null&&callinInfo.getData()!=null){
+			Page<CallCenterCallinInfo> page=new Page<CallCenterCallinInfo>(request, response);
+			page.setCount(callinInfo.getData().getTotal());
+			page.setPageNo(callinInfo.getData().getPage());
+			page.setPageSize(callinInfo.getData().getPageSize());
+			page.setList(callinInfo.getData().getResults());
+			model.addAttribute("page",page);
+			model.addAttribute("call","callin");
+		}
 		return "/modules/dunning/tMisDunningcallingPhoneInfo";
 	}
 	/**

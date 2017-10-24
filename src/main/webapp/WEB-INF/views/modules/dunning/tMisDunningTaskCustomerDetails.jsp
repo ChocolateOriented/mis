@@ -156,7 +156,7 @@
 				</td>
 				<td  >${c.name}</td>
 				<td >
-					<a href="javascript:void(0)"  onclick="phonePage(this)" showName="${c.name}">
+					<a href="javascript:void(0)" <shiro:hasPermission name="dunning:phone:view"> onclick="phonePage(this)"</shiro:hasPermission> showName="${c.name}">
 						${c.tel}
 					</a>
 				</td>
