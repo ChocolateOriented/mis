@@ -194,7 +194,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * 同步CTI通话记录
 	 * @return
 	 */
-	//@Scheduled(cron = "0 0/5 * * * ?")
+	@Scheduled(cron = "0 0/5 * * * ?")
 	@Transactional(readOnly = false)
 	public void syncCallRecord() {
 		Calendar c = Calendar.getInstance();

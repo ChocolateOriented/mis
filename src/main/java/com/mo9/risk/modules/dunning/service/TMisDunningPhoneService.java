@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentInfo;
-import com.mo9.risk.modules.dunning.bean.CallCenterAgentState;
-import com.mo9.risk.modules.dunning.bean.CallCenterBaseResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalling;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
@@ -21,7 +19,6 @@ import com.mo9.risk.modules.dunning.bean.CallCenterModifyAgent;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
-import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
@@ -61,15 +58,12 @@ public class TMisDunningPhoneService {
 		CallCenterModifyAgent action = new CallCenterModifyAgent();
 	    action.setAgent(msg.getAgent());
 	    action.setStatus(msg.getOperation());
-		CallCenterBaseResponse cbr = null;
 		try {
+			callCenterManager.changeAgentStatus(action);
+			msg.setResult("success");
+			tMisAgentInfoService.updateStatus(msg);
+		} catch (Exception e) {
 			msg.setResult("error");
-			cbr = callCenterManager.changeAgentStatus(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-				tMisAgentInfoService.updateStatus(msg);
-			}
-		} catch (IOException e) {
 			logger.info("变更坐席状态失败：" + e.getMessage());
 		}
 		try {
@@ -92,14 +86,11 @@ public class TMisDunningPhoneService {
 		action.setTarget(msg.getTarget());
 		action.setAutoAnswer(true);
 		action.setCustomerno(generateCustomno());
-		CallCenterBaseResponse cbr = null;
 		try {
+			callCenterManager.originate(action);
+			msg.setResult("success");
+		} catch (Exception e) {
 			msg.setResult("error");
-			cbr = callCenterManager.originate(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-			}
-		} catch (IOException e) {
 			logger.info("发起呼叫失败：" + e.getMessage());
 		}
 		try {
@@ -117,17 +108,14 @@ public class TMisDunningPhoneService {
 	public CallCenterWebSocketMessage hangup(CallCenterWebSocketMessage msg) {
 		CallCenterCalling action = new CallCenterCalling();
 		action.setAgent(msg.getAgent());
-		CallCenterBaseResponse cbr = null;
 		try {
-			msg.setResult("error");
-			cbr = callCenterManager.hangup(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-			}
-		} catch (IOException e) {
+			callCenterManager.hangup(action);
+			msg.setResult("success");
+		} catch (Exception e) {
 			logger.info("呼叫中断失败：" + e.getMessage());
 		}
 		try {
+			msg.setResult("error");
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
 			logger.info("WebSocket发送呼叫中断结果消息失败：" + e.getMessage());
@@ -141,14 +129,11 @@ public class TMisDunningPhoneService {
 	public CallCenterWebSocketMessage hold(CallCenterWebSocketMessage msg) {
 		CallCenterCalling action = new CallCenterCalling();
 		action.setAgent(msg.getAgent());
-		CallCenterBaseResponse cbr = null;
 		try {
+			callCenterManager.hold(action);
+			msg.setResult("success");
+		} catch (Exception e) {
 			msg.setResult("error");
-			cbr = callCenterManager.hold(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-			}
-		} catch (IOException e) {
 			logger.info("呼叫保持失败：" + e.getMessage());
 		}
 		try {
@@ -165,14 +150,11 @@ public class TMisDunningPhoneService {
 	public CallCenterWebSocketMessage holdOff(CallCenterWebSocketMessage msg) {
 		CallCenterCalling action = new CallCenterCalling();
 		action.setAgent(msg.getAgent());
-		CallCenterBaseResponse cbr = null;
 		try {
+			callCenterManager.holdOff(action);
+			msg.setResult("success");
+		} catch (Exception e) {
 			msg.setResult("error");
-			cbr = callCenterManager.holdOff(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-			}
-		} catch (IOException e) {
 			logger.info("取消保持失败：" + e.getMessage());
 		}
 		try {
@@ -188,14 +170,11 @@ public class TMisDunningPhoneService {
 	public CallCenterWebSocketMessage answer(CallCenterWebSocketMessage msg) {
 		CallCenterCalling action = new CallCenterCalling();
 		action.setAgent(msg.getAgent());
-		CallCenterBaseResponse cbr = null;
 		try {
+			callCenterManager.answer(action);
+			msg.setResult("success");
+		} catch (Exception e) {
 			msg.setResult("error");
-			cbr = callCenterManager.answer(action);
-			if (cbr != null && "0".equals(cbr.getErrorCode())) {
-				msg.setResult("success");
-			}
-		} catch (IOException e) {
 			logger.info("接听应答失败：" + e.getMessage());
 		}
 		try {
@@ -245,7 +224,7 @@ public class TMisDunningPhoneService {
 		CallCenterPageResponse<CallCenterCalloutInfo> cbr = null;
 		try {
 			cbr = callCenterManager.calloutInfo(action);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.info("获取呼出信息失败,"+ e.getMessage());
 		}
 		return cbr;
@@ -258,7 +237,7 @@ public class TMisDunningPhoneService {
 		CallCenterPageResponse<CallCenterCallinInfo> cbr = null;
 		try {
 			cbr = callCenterManager.callinInfo(action);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.info("获取呼入信息失败,"+ e.getMessage());
 		}
 		return cbr;

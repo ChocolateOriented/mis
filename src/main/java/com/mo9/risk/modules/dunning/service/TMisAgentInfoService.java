@@ -3,24 +3,18 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
 import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.common.utils.StringUtils;
 
 @Service
 @Transactional(readOnly = true)
 public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgentInfo> {
-	
-	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
 	
 	/**
 	 * 更新坐席状态
