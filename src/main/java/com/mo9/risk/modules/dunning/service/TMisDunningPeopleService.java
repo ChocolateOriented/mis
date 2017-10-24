@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.thinkgem.jeesite.common.supcan.treelist.cols.Group;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
-import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup.GroupType;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;

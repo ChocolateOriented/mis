@@ -57,6 +57,7 @@ public class TMisDunningPhoneController extends BaseController {
 		model.addAttribute("userId", userId);
 		model.addAttribute("agent", info.getAgent());
 		model.addAttribute("queue", info.getQueue());
+		model.addAttribute("direct", info.getDirect());
 		model.addAttribute("url", url);
 		return "modules/dunning/tMisDunningKeyPhone";
 	}

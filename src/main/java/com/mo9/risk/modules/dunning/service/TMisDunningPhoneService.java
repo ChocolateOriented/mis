@@ -109,10 +109,10 @@ public class TMisDunningPhoneService {
 			callCenterManager.hangup(action);
 			msg.setResult("success");
 		} catch (Exception e) {
+			msg.setResult("error");
 			logger.info("呼叫中断失败：" + e.getMessage());
 		}
 		try {
-			msg.setResult("error");
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
 			logger.info("WebSocket发送呼叫中断结果消息失败：" + e.getMessage());

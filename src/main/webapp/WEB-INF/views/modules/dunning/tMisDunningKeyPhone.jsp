@@ -474,7 +474,7 @@
 				</div>
 			</div>
 			<div style="height:50%;">
-			<em><font color="gray" size="1" style="float: left;">本机号码:${agent}</font></em>
+			<em><font color="gray" size="1" style="float: left;">本机号码:${direct}</font></em>
 			</div>
 		</div>
 		<hr/>
