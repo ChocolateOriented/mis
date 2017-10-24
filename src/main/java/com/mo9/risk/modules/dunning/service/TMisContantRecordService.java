@@ -18,6 +18,7 @@ import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -80,6 +81,8 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	private TmisDunningSmsTemplateDao tdstDao;
 	@Autowired
 	private RiskContactRecordsManager recordsManager;
+	@Autowired
+	TMisAgentInfoService tMisAgentInfoService;
 
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
@@ -246,7 +249,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 						throw new RuntimeException("发送短信失败");
 					}
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
-							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
+							order.getPlatformExt(), task.getDunningpeopleid());
 					// 模板对应参数
 					params.put("template_data", new JacksonConvertor().serialize(map));
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
@@ -268,7 +271,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 						throw new RuntimeException("发送短信失败");
 					}
 					Map<String, Object> map = this.getCotentValue(tdsTmplate.getSmsCotent(), buyerInfeo,
-							order.getPlatformExt(), task.getDunningpeopleid(), tMisDunningPeople.getExtensionNumber());
+							order.getPlatformExt(), task.getDunningpeopleid());
 					vparams.put("template_data", new JacksonConvertor().serialize(map));
 					String englishTemplateName = tdsTmplate.getEnglishTemplateName();
 					vparams.put("template_name", englishTemplateName);// 模板名称
@@ -550,7 +553,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
      * @param smsCotent
      * @return
      */
-    public Map<String, Object> getCotentValue(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber){
+    public Map<String, Object> getCotentValue(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid){
     	
 //    	String dunningpeopleid = task.getDunningpeopleid();
     	
@@ -603,7 +606,10 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	}
 //    	if(null!=extensionNumber&&""!=extensionNumber){
         	if(smsCotent.contains("${extensionNumber}")){
-        		map.put("extensionNumber",extensionNumber);
+        		TMisAgentInfo info=tMisAgentInfoService.getInfoByPeopleId(dunningpeopleid);
+	        	if(info != null ||StringUtils.isNotEmpty(info.getDirect())){
+	        		map.put("extensionNumber",info.getDirect());
+	        	}
         	}
 //    	}
     	if(smsCotent.contains("${creadateTime}")){

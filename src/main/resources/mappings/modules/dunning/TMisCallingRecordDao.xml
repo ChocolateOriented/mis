@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisCallingRecordDao">
+    
+	<sql id="TMisCallingRecordColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.agent as "agent",
+		a.peopleid as "peopleId",
+		a.CallType as "callType",
+		a.ExtensionNumber as "extensionNumber",
+		a.TargetNumber as "targetNumber",
+		a.SessionId as "sessionId",
+		a.CallTime as "callTime",
+		a.RingTime as "ringTime",
+		a.StartTime as "startTime",
+		a.EndTime as "endTime",
+		a.FinishTime as "finishTime",
+		a.DurationTime as "durationTime",
+		a.AudioId as "audioId",
+		a.createby as "createBy.name",
+		a.createdate as "createDate",
+		a.updateby as "updateBy.name",
+		a.updatedate as "updateDate"
+	</sql>
+    
+	<select id="get" resultType="TMisCallingRecord">
+		SELECT
+			<include refid="TMisCallingRecordColumns"/>
+		FROM t_mis_calling_record a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TMisCallingRecord">
+		SELECT 
+			a.dbid as "dbid",
+			a.id as "id",
+			a.agent as "agent",
+			a.peopleid as "peopleId",
+			p.nickname as "peopleName",
+			a.CallType as "callType",
+			a.ExtensionNumber as "extensionNumber",
+			a.TargetNumber as "targetNumber",
+			a.SessionId as "sessionId",
+			a.CallTime as "callTime",
+			a.RingTime as "ringTime",
+			a.StartTime as "startTime",
+			a.EndTime as "endTime",
+			a.FinishTime as "finishTime",
+			a.DurationTime as "durationTime",
+			(
+				SELECT o.dealcode FROM t_risk_buyer b, t_risk_order o
+				WHERE b.id = o.buyer_id
+				AND b.mobile = a.TargetNumber
+				AND o.merchant_id = 7
+				AND o.type = 'loan'
+				ORDER BY o.id DESC
+				LIMIT 1
+			) as "dealcode",
+			a.AudioId as "audioId",
+			a.createby as "createBy.name",
+			a.createdate as "createDate",
+			a.updateby as "updateBy.name",
+			a.updatedate as "updateDate"
+		FROM t_mis_calling_record a
+		LEFT JOIN t_mis_dunning_people p on a.peopleid = p.id
+		<include refid="pageListCondotion"></include>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.CallTime DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="listCount" resultType="int">
+		SELECT 
+			COUNT(1)
+		FROM t_mis_calling_record a
+		LEFT JOIN t_mis_dunning_people p on a.peopleid = p.id
+		<include refid="pageListCondotion"></include>
+		<where>
+		</where>
+	</select>
+	
+	<sql id="pageListCondotion">
+		<where>
+			a.FinishTime IS NOT NULL
+			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
+				AND p.groupId = #{dunningPeople.group.id}
+			</if>
+			<if test="groupIds != null">
+				AND p.groupId in
+				<if test="groupIds.size == 0">
+					('')
+				</if>
+				<if test="groupIds.size > 0">
+					<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+						#{groupId}
+					</foreach>
+				</if>
+			</if>
+			<if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
+				AND a.peopleId in
+				<foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="peopleId != null and peopleId != ''">
+				AND a.peopleId = #{peopleId}
+			</if>
+			<if test="beginCallTime != null">
+				<![CDATA[ AND a.CallTime >= #{beginCallTime} ]]>
+			</if>
+			<if test="endCallTime != null">
+				<![CDATA[ AND a.CallTime < #{endCallTime} ]]>
+			</if>
+		</where>
+	</sql>
+	
+	<select id="findAllList" resultType="TMisCallingRecord">
+		SELECT 
+			<include refid="TMisCallingRecordColumns"/>
+		FROM t_mis_calling_record a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_calling_record(
+			id,
+			agent,
+			peopleid,
+			CallType,
+			ExtensionNumber,
+			TargetNumber,
+			SessionId,
+			CallTime,
+			RingTime,
+			StartTime,
+			EndTime,
+			FinishTime,
+			DurationTime,
+			audioId,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{agent},
+			#{peopleId},
+			#{callType},
+			#{extensionNumber},
+			#{targetNumber},
+			#{sessionId},
+			#{callTime},
+			#{ringTime},
+			#{startTime},
+			#{endTime},
+			#{finishTime},
+			#{durationTime},
+			#{audioId},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_calling_record SET
+			<if test="agent != null">
+				agent = #{agent},
+			</if>
+			<if test="peopleId != null">
+				peopleid = #{peopleId},
+			</if>
+			<if test="callType != null">
+				callType = #{callType},
+			</if>
+			<if test="extensionNumber != null">
+				extensionNumber = #{extensionNumber},
+			</if>
+			<if test="extensionNumber != null">
+				targetNumber = #{targetNumber},
+			</if>
+			<if test="sessionId != null">
+				sessionId = #{sessionId},
+			</if>
+			<if test="callTime != null">
+				callTime = #{callTime},
+			</if>
+			<if test="ringTime != null">
+				ringTime = #{ringTime},
+			</if>
+			<if test="startTime != null">
+				startTime = #{startTime},
+			</if>
+			<if test="endTime != null">
+				endTime = #{endTime},
+			</if>
+			<if test="finishTime != null">
+				finishTime = #{finishTime},
+			</if>
+			<if test="durationTime != null">
+				durationTime = #{durationTime},
+			</if>
+			<if test="audioId != null">
+				audioId = #{audioId},
+			</if>
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateRecordBySessionId">
+		UPDATE t_mis_calling_record SET
+			<if test="callTime != null">
+				callTime = #{callTime},
+			</if>
+			<if test="ringTime != null">
+				ringTime = #{ringTime},
+			</if>
+			<if test="startTime != null">
+				startTime = #{startTime},
+			</if>
+			<if test="endTime != null">
+				endTime = #{endTime},
+			</if>
+			<if test="finishTime != null">
+				finishTime = #{finishTime},
+			</if>
+			<if test="durationTime != null">
+				durationTime = #{durationTime},
+			</if>
+			<if test="audioId != null">
+				audioId = #{audioId},
+			</if>
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE sessionId = #{sessionId}
+		AND finishTime IS NULL
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_calling_record
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getUnfinishedCallingByAgent" resultType="TMisCallingRecord">
+		SELECT
+			<include refid="TMisCallingRecordColumns"/>
+		FROM t_mis_calling_record a
+		WHERE
+			a.DurationTime is null
+		AND a.Agent = #{agent}
+	</select>
+	
+	<select id="getRecordBySessionId" resultType="TMisCallingRecord">
+		SELECT
+			<include refid="TMisCallingRecordColumns"/>
+		FROM t_mis_calling_record a
+		WHERE a.sessionid = #{sessionId}
+		limit 1
+	</select>
+
+</mapper>

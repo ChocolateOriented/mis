@@ -37,4 +37,8 @@ public class TRiskBuyerPersonalInfoService {
 	public TRiskBuyerPersonalInfo getNewBuyerInfoByDealcode(String dealcode){
 		return personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 	}
+	
+	public TRiskBuyerPersonalInfo getBuyerInfoByMobile(String mobile){
+		return personalInfoDao.getBuyerInfoByMobile(mobile);
+	}
 }

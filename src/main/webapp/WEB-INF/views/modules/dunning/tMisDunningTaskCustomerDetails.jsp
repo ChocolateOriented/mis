@@ -59,6 +59,10 @@
              });
 		}
 		
+		//点击号码跳转软电话页面直接拨打
+		function phonePage(obj) {
+			window.parent.phoneFatherPage($(obj).html(),$(obj).attr("showName"));
+		}
 	</script>
 </head>
 <body>
@@ -150,8 +154,12 @@
 						<c:otherwise>(其他)</c:otherwise>
 					</c:choose>
 				</td>
-				<td>${c.name}</td>
-				<td>${c.tel}</td>
+				<td  >${c.name}</td>
+				<td >
+					<a href="javascript:void(0)"  onclick="phonePage(this)" showName="${c.name}">
+						${c.tel}
+					</a>
+				</td>
 				<td>					
 					短信
 					<a href="javascript:void(0)" title="短信记录" onclick="onClickMonthDetails(this)" mobile="${c.tel}" method="dialogSmsDetail" type="sms">

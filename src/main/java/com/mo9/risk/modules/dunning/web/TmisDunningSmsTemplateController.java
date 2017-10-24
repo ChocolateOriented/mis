@@ -273,11 +273,11 @@ public class TmisDunningSmsTemplateController extends BaseController{
 		TMisDunningOrder order = tdtDao.findOrderByDealcode(dealcode);
 		TMisDunningTask task = tdtDao.get(dunningtaskdbid);
 		TmisDunningSmsTemplate template = tstDao.getByName(templateName);
-		TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
+//		TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
 		TRiskBuyerPersonalInfo buyerInfeo= tpersonalInfoDao.getbuyerIfo(order.getDealcode());
 		String cousmscotent;
 			cousmscotent = tstService.cousmscotent(template.getSmsCotent(),buyerInfeo,
-					order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
+					order.getPlatformExt(),task.getDunningpeopleid());
 		template.setSmsCotent(cousmscotent);
 		tMap.put("tSTemplate", template);
 		tMap.put("contactType", contactType);

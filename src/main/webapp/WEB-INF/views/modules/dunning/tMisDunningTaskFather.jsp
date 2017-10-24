@@ -238,6 +238,18 @@
 			var currentPageUrl = url + param;
 			$("#ifm").attr("src", currentPageUrl);
 	    }
+		
+		//从父页面跳转到软电话页面
+		function phoneFatherPage(phone,name){
+			if(confirm("确定拨打该电话吗")){
+				$.post("${ctx}/dunning/tMisDunningPhone/fatherPageTOPhonePage", {target: phone, peopleId: "${userId}",name:name}, function(data) {
+					if (!data) {
+						alert("当前坐席状态无法外呼");
+						return;
+					}
+				});
+			}
+		}
 	</script>
 </head>
 <body>

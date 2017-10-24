@@ -241,4 +241,14 @@
 		WHERE
 		b.id = #{buyerId}
 	</select>
+	
+	<select id="getBuyerInfoByMobile" resultType="TRiskBuyerPersonalInfo">
+		SELECT
+			b.id AS "buyerId",
+			b.mobile AS "mobile",
+			IFNULL(i.real_name, '未知') AS "realName"
+		FROM t_risk_buyer b
+		LEFT JOIN t_risk_buyer_idcard i ON b.id = i.buyer_id
+		WHERE b.mobile = #{mobile}
+	</select>
 </mapper>

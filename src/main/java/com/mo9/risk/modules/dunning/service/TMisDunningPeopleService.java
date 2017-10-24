@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup.GroupType;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
@@ -32,6 +34,9 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
+	
+	/*@Autowired
+	private TMisAgentInfoService tMisAgentInfoService;*/
 	
 	public List<TMisDunningPeople> findList(TMisDunningPeople tMisDunningPeople) {
 		return super.findList(this.getDunningPeople(tMisDunningPeople));
@@ -68,7 +73,19 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		}else{
 			tMisDunningPeople.preUpdate();
 			dao.update(tMisDunningPeople);
+			
 		}
+		//保存坐席信息
+		/*if(null!=tMisDunningPeople.getAgent()){
+			TMisAgentInfo tAgentInfo = tMisAgentInfoService.getInfoByPeopleId(tMisDunningPeople.getId());
+			if(tAgentInfo==null){
+				tAgentInfo=new TMisAgentInfo();
+			}
+			tAgentInfo.setAgent(tMisDunningPeople.getAgent());
+			tAgentInfo.setPeopleId(tMisDunningPeople.getId());
+			tAgentInfo.setExtension(tMisDunningPeople.getExtensionNumber());
+			tMisAgentInfoService.save(tAgentInfo);	
+		}*/
 	}
 	
 	/**
@@ -213,5 +230,22 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	@Transactional(readOnly = false)
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople) {
 		return dao.updatePeopleNameById(dunningPeople);
+	}
+	
+	/**
+	 * @Description: 根据坐席查询催收人员
+	 * @param agent
+	 * @return
+	 */
+	public TMisDunningPeople getPeopleByAgent(String agent) {
+		return dao.getPeopleByAgent(agent);
+	}
+
+	public TMisDunningPeople getByAgent(String agent) {
+		return tMisDunningPeopleDao.getPeopleByAgent(agent);
+	}
+
+	public List<TMisDunningPeople> findAgentPeopleList() {
+		return tMisDunningPeopleDao.findAgentPeopleList();
 	}
 }

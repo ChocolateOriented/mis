@@ -1045,6 +1045,8 @@ public class TMisDunningTaskController extends BaseController {
 		TMisDunningScoreCard tMisDunningScoreCard = tMisDunningScoreCardService.getScoreCardByDealcode(dealcode);
 		model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
 		
+		User user = UserUtils.getUser();
+		model.addAttribute("userId", user.getId());
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	

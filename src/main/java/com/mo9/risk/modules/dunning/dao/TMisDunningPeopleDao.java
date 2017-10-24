@@ -83,4 +83,14 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople);
+	
+	/**
+	 * @Description: 根据坐席查询催收人员
+	 * @param agent
+	 * @return
+	 */
+	public TMisDunningPeople getPeopleByAgent(String agent);
+
+	public List<TMisDunningPeople> findAgentPeopleList();
+
 }
