@@ -1,7 +1,7 @@
 /**
  * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
  */
-package com.mo9.risk.modules.dunning.bean;
+package com.mo9.risk.modules.dunning.bean.dto;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -20,7 +20,7 @@ import com.thinkgem.jeesite.common.utils.Reflections;
 public class Mo9DeductOrder implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String bizSys;		//业务系统
 
 	private String sign;		//签名
@@ -215,19 +215,19 @@ public class Mo9DeductOrder implements Serializable {
 
 	public Map<String, String> toMap() {
 		Map<String, String> map = new HashMap<String, String>();
-		
+
 		Field[] fields = this.getClass().getDeclaredFields();
 		for (Field field : fields) {
 			if(Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
-			
+
 			Object value = Reflections.invokeGetter(this, field.getName());
 			if (value != null && !"".equals(value.toString())) {
 				map.put(field.getName(), value.toString());
 			}
 		}
-		
+
 		return map;
 	}
 }

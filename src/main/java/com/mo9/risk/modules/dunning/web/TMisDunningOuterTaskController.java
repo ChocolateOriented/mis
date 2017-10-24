@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
+import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.util.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
@@ -110,6 +112,9 @@ public class TMisDunningOuterTaskController extends BaseController {
 
 		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
 		//催收小组列表
+		MobileResult[] values = MobileResult.values();
+		List<MobileResult> mobileResultList = Arrays.asList(values);
+		model.addAttribute("mobileResultList", mobileResultList);
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
@@ -210,7 +215,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			model.addAttribute("daikouStatus", daikouStatus);
 			
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
-			tMisDunningTag.setDealcode(dealcode);
+			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 			model.addAttribute("tags", tags);
 			
@@ -233,37 +238,68 @@ public class TMisDunningOuterTaskController extends BaseController {
 	
 
 	/**
-	 * 加载委外手动分配页面
-	 * @param tMisDunningTask
+	 * 加载委外手动分案页面
+	 * @param dunningcycle
 	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "dialogOutDistribution")
-	public String dialogOutDistribution( Model model,String orders,String dunningcycle) {
+	public String dialogOutDistribution( Model model,String dunningcycle) {
 		try {
+			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
+			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
+			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
-			logger.info("加载委外手动分配页面失败",e);
+			logger.info("加载委外手动分案页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOutDistribution";
 	}
-	
-	
+
 	/**
-	 * 委外手动分配
-	 * @param tMisDunningTask
-	 * @param model
-	 * @param redirectAttributes
+	 * 获取手动分案催收人员
+	 * @param request
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequestMapping(value = "dialogDistributionPeople")
+	@ResponseBody
+	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
+		List<TMisDunningPeople> dunningpeople = null;
+		String[] dunningcycle = request.getParameterValues("dunningcycle[]");
+		String[] type = request.getParameterValues("type[]");
+		String[] auto = request.getParameterValues("auto[]");
+		String name = request.getParameter("name");
+
+		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name)) {
+			return new ArrayList<TMisDunningPeople>();
+		}
+
+		String dunningpeoplename=request.getParameter("dunningpeoplename");
+		try{
+			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
+		}catch (Exception e){
+			logger.info("",e);
+			return null;
+		}
+		return dunningpeople;
+	}
+
+	/**
+	 * 委外手动分案
+	 * @param orders
+	 * @param dunningcycle
+	 * @param outsourcingenddate
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "outDistributionSave")
 	@ResponseBody
-	public String outDistributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request,Date outsourcingenddate) {
+	public String outDistributionSave(String orders,String dunningcycle, HttpServletRequest request,Date outsourcingenddate) {
 		String mes = "";
 		try {
 			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
@@ -276,7 +312,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 				}
 			}
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
-//			tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
 			String outAssignmes = tMisDunningTaskService.outAssign(dealcodes, dunningcycle,newdunningpeopleids,outsourcingenddate);
 			mes = "OK,手动勾选"+dealcodes.size()+"条订单," + outAssignmes;
 		} catch (Exception e) {
@@ -332,6 +367,36 @@ public class TMisDunningOuterTaskController extends BaseController {
 	public void numberCleanBackTest() {
 		tMisDunningTaskService.callBackTest();
 	}
-
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui1")
+	@ResponseBody
+	public  String  dianCui1(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion1();
+		logger.info(new Date()+"电催结论(Q0,Q1)成功");
+		return "OK";
+	}
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui2")
+	@ResponseBody
+	public  String  dianCui2(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion2();
+		logger.info(new Date()+"电催结论(Q2,Q3,Q4)上午");
+		return "OK";
+	}
+	//测试自动电催结论
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequestMapping(value = "diancui3")
+	@ResponseBody
+	public  String  dianCui3(TmisDunningNumberClean tmisDunningNumberClean,HttpServletRequest request){
+		
+		tMisDunningTaskService.autoTelConclusion3();
+		logger.info(new Date()+"电催结论(Q2,Q3,Q4)下午");
+		return "OK";
+	}
+	
 	
 }

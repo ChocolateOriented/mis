@@ -1,7 +1,7 @@
 /**
  * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
  */
-package com.mo9.risk.modules.dunning.web;
+package com.mo9.risk.modules.dunning.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

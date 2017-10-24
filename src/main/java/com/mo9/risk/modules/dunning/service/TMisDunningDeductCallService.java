@@ -7,8 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
-import com.mo9.risk.modules.dunning.bean.Mo9DeductOrder;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
+import com.mo9.risk.modules.dunning.bean.dto.Mo9DeductOrder;
 import com.mo9.risk.modules.dunning.dao.TMisDunningConfigureDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
@@ -18,7 +18,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.PostRequest;
 import com.mo9.risk.util.RequestParamSign;
@@ -64,7 +63,7 @@ public class TMisDunningDeductCallService {
 	private TMisDunningConfigureDao tMisDunningConfigureDao;
 
 	@Autowired
-	private RiskOrderManager riskOrderManager;
+	private TMisDunningOrderService orderService ;
 
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningDeductCallService.class);
 	
@@ -162,15 +161,11 @@ public class TMisDunningDeductCallService {
 	public boolean updateRepaymentStatus(TMisDunningDeduct tMisDunningDeduct) {
 		String dealcode = tMisDunningDeduct.getDealcode();
 		String paychannel = "bank";
-		String remark = "代扣";
 		String paidType = tMisDunningDeduct.getPaytype();
 		Double paidAmount = tMisDunningDeduct.getPayamount();
-		String delayDay = "7";
-		
-		BigDecimal bd = BigDecimal.valueOf(paidAmount);
-		
+		String thirdCode = tMisDunningDeduct.getThirdCode();
 		try {
-			riskOrderManager.repay(dealcode, paychannel, remark, paidType, bd, delayDay);
+			orderService.repayWithPersistence(dealcode, paychannel, paidType, BigDecimal.valueOf(paidAmount),thirdCode);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);

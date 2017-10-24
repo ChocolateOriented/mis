@@ -69,7 +69,6 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 		}
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
 		params.put("DEALCODE", dealcode);
 		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 		
@@ -85,7 +84,9 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 		tMisDunnedConclusion.setDunningpeopleid(task.getDunningpeopleid());
 		tMisDunnedConclusion.setDunningcycle(task.getDunningcycle());
 		save(tMisDunnedConclusion);
-		tMisDunnedConclusionDao.updateTelAction(tMisDunnedConclusion);
+		if(tMisDunnedConclusion.getActions()!=null&&tMisDunnedConclusion.getActions().size()>0){
+			tMisDunnedConclusionDao.updateTelAction(tMisDunnedConclusion);
+		}
 		tMisDunningTaskDao.updatePromisePayDateAndNextFollowDate(dealcode,tMisDunnedConclusion.getPromisepaydate(),tMisDunnedConclusion.getNextfollowdate());
 		return true;
 	}

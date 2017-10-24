@@ -15,7 +15,6 @@
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
 				$('#btnDeduct').attr("disabled","disabled");
-				$('#btnTag').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
 			if("false"==window.parent.$("#daikouStatus").val()){
@@ -125,7 +124,7 @@
 	</table>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactstype="${overdueDays<=1 ? 'SELF' : ''}" method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>
+<!-- 	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/> -->
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />

@@ -47,6 +47,8 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	
 	private String extensionNumber;// 催收员分机号
 	
+	private	String sumcorpusamount; // 分案金额
+	
 	public TMisDunningPeople() {
 		super();
 	}
@@ -200,6 +202,14 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	public void setExtensionNumber(String extensionNumber) {
 		this.extensionNumber = extensionNumber;
+	}
+
+	public String getSumcorpusamount() {
+		return sumcorpusamount;
+	}
+
+	public void setSumcorpusamount(String sumcorpusamount) {
+		this.sumcorpusamount = sumcorpusamount;
 	}
 
 }

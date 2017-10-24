@@ -3,8 +3,12 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
+import com.mo9.risk.modules.dunning.dao.TMisRequestRecordDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisRequestRecord;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -14,11 +18,16 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -27,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 2017/7/6
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisDunningOrderService extends BaseService{
 
@@ -36,6 +46,8 @@ public class TMisDunningOrderService extends BaseService{
 	private RiskOrderManager orderManager;
 	@Autowired
 	private TMisDunningForRiskService orderForRiskService;
+	@Autowired
+	private TMisRequestRecordDao requestRecordDao;
 
 
 	/***
@@ -133,19 +145,15 @@ public class TMisDunningOrderService extends BaseService{
 	}
 
 	/**
-	 * @Description 尝试通过回调接口修复应还清的异常订单
-	 * @param dealcode
-	 * @param remittancechannel
-	 * @param remark
-	 * @param remittanceamount
+	 * @Description 重试回调江湖救急接口
 	 * @return boolean 是否成功
 	 */
-	public boolean tryRepairAbnormalOrder(String dealcode, String remittancechannel, String remark, BigDecimal remittanceamount) {
+	public boolean tryRepairAbnormalOrder(String dealcode, String paychannel, String paytype, BigDecimal payamount, String thirdCode) {
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
-				orderManager.repay(dealcode, remittancechannel, remark, DunningOrder.PAYTYPE_LOAN, remittanceamount, "7");
-			}catch (Exception e) {
-				logger.info("应还清的异常订单自动修复发生错误", e);
+				orderManager.repay(dealcode, paychannel, paytype, payamount, thirdCode);
+			} catch (Exception e) {
+				logger.info("重试回调江湖救急接口发生错误", e);
 				continue;
 			}
 			return true;
@@ -178,6 +186,83 @@ public class TMisDunningOrderService extends BaseService{
 			return orderForRiskService.findOrderByDealcodeWithNewTransactional(dealcode);
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+	}
+
+	/**
+	 * @Description 还款,
+	 * 响应状态不确定(IOException)的还款请求处理:
+	 * 		不抛出异常
+	 * 		请求持久化
+	 * 		等待定时重调, 再次确认请求是否被正确处理
+	 * @param dealcode
+	 * @param paychannel
+	 * @param paytype
+	 * @param payamount
+	 * @param thirdCode
+	 * @return void
+	 */
+	@Transactional(propagation = Propagation.MANDATORY)
+	public String repayWithPersistence(String dealcode, String paychannel, String paytype, BigDecimal payamount, String thirdCode) {
+		//记录请求, 若失败等待重试
+		DecimalFormat format = new DecimalFormat("0.00");
+		TMisRequestRecord requestRecord = new TMisRequestRecord();
+		requestRecord.setFrom(TMisDunningOrderService.class.getSimpleName());
+		requestRecord.setTarget("riskOrderRepay");
+		Map<String,String> param = new HashMap<String, String>();
+		param.put("dealcode",dealcode);
+		param.put("paychannel",paychannel);
+		param.put("paytype",paytype);
+		param.put("payamount",format.format(payamount));
+		param.put("thirdCode",thirdCode);
+		requestRecord.setParam(JSON.toJSONString(param));
+		requestRecord.preInsert();
+		requestRecordDao.insert(requestRecord);
+
+		String msg = "";
+		try {
+			msg = orderManager.repay(dealcode,paychannel,paytype,payamount,thirdCode);
+		}catch (IOException e) {
+			logger.info("订单"+dealcode+"调用江湖救急接口发生网络异常,等待重试",e);
+			return msg;
+		}catch (RuntimeException e){//发生业务异常也删除
+			requestRecordDao.delete(requestRecord);
+			throw e;
+		}
+		//成功则删除
+		requestRecordDao.delete(requestRecord);
+		return msg;
+	}
+
+	/**
+	 * @Description 查询状态不缺定的订单请求并执行重调
+	 * @param
+	 * @return void
+	 */
+	@Scheduled(cron = "0 50 * * * ?")
+	@Transactional
+	public void autoRepairAbnormalRepayRequest() {
+		//查询发生异常的请求记录
+		TMisRequestRecord queryRecord = new TMisRequestRecord();
+		queryRecord.setTarget("riskOrderRepay");
+		queryRecord.setFrom(TMisDunningOrderService.class.getSimpleName());
+		List<TMisRequestRecord> requestRecords = requestRecordDao.findList(queryRecord);
+
+		//重调
+		for (TMisRequestRecord record : requestRecords) {
+			JSONObject param = JSON.parseObject(record.getParam());
+			String dealcode = param.getString("dealcode");
+			String paychannel = param.getString("paychannel");
+			String paytype = param.getString("paytype");
+			BigDecimal payamount = new BigDecimal(param.getString("payamount"));
+			String thirdCode = param.getString("thirdCode");
+
+			boolean success = this.tryRepairAbnormalOrder(dealcode, paychannel, paytype,payamount, thirdCode);
+			if (success){//成功则删除
+				requestRecordDao.delete(record);
+			}else {//失败发送邮件
+				this.sendAbnormalOrderEmail("定时重试",paychannel,dealcode,payamount,"请求状态不确定订单,重调失败");
+			}
 		}
 	}
 }

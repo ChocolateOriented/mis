@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
+import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
@@ -25,6 +26,8 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
+import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -35,6 +38,7 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -93,7 +97,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Lazy(false)
 public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMisDunningTask> {
-
+	private static final Map<String, Integer> telconclusion=new HashMap<String, Integer>();
+	static{
+		telconclusion.put("ALPA", 1);
+		telconclusion.put("FEE", 1);
+		telconclusion.put("PTP", 1);
+		telconclusion.put("PTPX", 1);
+		telconclusion.put("KNOW", 2);
+		telconclusion.put("MESS", 2);
+		telconclusion.put("INSY", 3);
+		telconclusion.put("BUSY", 4);
+		telconclusion.put("CUT", 4);
+		telconclusion.put("NOAS", 4);
+		telconclusion.put("OFF", 4);
+		telconclusion.put("NOTK", 4);
+		telconclusion.put("LOOO", 5);
+		telconclusion.put("MESF", 5);
+		telconclusion.put("NOSE", 5);
+		telconclusion.put("STOP", 5);
+	}
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
 	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
 	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
@@ -151,7 +173,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	
 	@Autowired
 	private TMisDunningTaskSupportService tMisDunningTaskSupportService;
-	
+	@Autowired
+	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	public TMisDunningTask get(String id) {
 		return super.get(id);
 	}
@@ -1531,6 +1554,52 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //		}
 	}
 	
+	public TmpMoveCycle getTmpMoveCycle(String cycle){
+		TmpMoveCycle tmpMoveCycle = new TmpMoveCycle();
+		try {
+//			String Q0 =  DictUtils.getDictValue("Q0", "dunningCycle1", "-1_0");
+			if("Q0".equals(cycle)){
+				tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+				tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+				return tmpMoveCycle;
+			}else{
+				switch (getDaysOfMonth(new Date())) {
+				case 30:
+					if(getDays() < 16){
+						tmpMoveCycle.setDatetimestart(DateUtils.getMonthFirstDayDate());
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}else{
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(16));
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}
+				case 31:
+					if(getDays() < 17){
+						tmpMoveCycle.setDatetimestart(DateUtils.getMonthFirstDayDate());
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}else{
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(17));
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}
+				case 28:
+					return tmpMoveCycle;
+				default:
+					tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+					tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+					return tmpMoveCycle;
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("tmpMoveCycle返回失败默认赋值昨天日期"+ new Date());
+			logger.error("错误信息"+e.getMessage());
+			tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
+			tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
+			return tmpMoveCycle;
+		}
+	}
 	
 	/**
 	 * 过期自动分案
@@ -1602,15 +1671,33 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 根据队列找出催收人员集合
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+					
+					/**
+					 * 根据周期查询催收人员按金额排序
+					 */
+					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
 					
 					/**
 					 *  平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+						/**  平均分配法    */
+//						int j = i % dunningPeoples.size();                            			 // 平均分配法
+						
+						/**  蛇形分配法    */
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
+						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
+						
+						
 						/**  任务催收人员添加    */
 						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
@@ -1758,15 +1845,31 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					/**
 					 * 根据队列找出催收人员集合
 					 */
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
+//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
+					/**
+					 * 根据周期查询催收人员按金额排序
+					 */
+					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
+					
 					/**
 					 * 平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
 					logger.info("共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
+					
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+//						int j = i % dunningPeoples.size();  
+						/**  蛇形分配法    */
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
+						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
+						
 						/**  任务催收人员添加    */
 						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
@@ -2071,7 +2174,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     }  
     
     /**
-     * 手动分配
+     * 手动分案
      * @param dealcode
      * @param peopleId
      */
@@ -2146,7 +2249,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     }
     
     /**
-     * 委外手动分配
+     * 委外手动分案
      * @param dealcode
      * @param peopleId
      */
@@ -2898,7 +3001,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			return appLoginLog;
 		} catch (Exception e) {
 			logger.info("查询最新登录记录异常：" + e.getMessage());
-			return null;
+			throw new ServiceException(e);
 		}
 	}
 
@@ -3140,6 +3243,185 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
 	}
-	
+	/**
+	 * 自动做电催结论
+	 */
+	@Scheduled(cron = "0 10 20 * * ?")
+	@Transactional(readOnly = false)
+	public void autoTelConclusion1() {
+		//获取昨天晚上20:10到今天晚上20:10的Q0和Q1队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
+		logger.info("Q0和Q1开始电催结论");
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String yesterday =sd.format(DateUtils.getBeforeDay())+" 20:10:00";
+		String today =sd.format(new Date())+" 20:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime1",yesterday,today);
+		logger.info("Q0和Q1共查到"+recordList.size());
+		autoSaveTelConclusion(recordList);
+		
+	}
+	/**
+	 * 自动做电催结论
+	 */
+	@Scheduled(cron = "0 10 12 * * ?")
+	@Transactional(readOnly = false)
+	public void autoTelConclusion2() {
+		logger.info("Q2和Q3和Q4开始中午电催结论");
+		//获取昨天晚上20:10到今天12:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String yesterday =sd.format(DateUtils.getBeforeDay())+" 20:10:00";
+		String today =sd.format(new Date())+" 12:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime2",yesterday,today);
+		logger.info("Q2和Q3和Q4中午共查到"+recordList.size());
+		autoSaveTelConclusion(recordList);
+		
+	}
+	/**
+	 * 自动做电催结论
+	 */
+	@Scheduled(cron = "0 10 20 * * ?")
+	@Transactional(readOnly = false)
+	public void autoTelConclusion3() {
+		//获取今天12:10到今天晚上20:10的Q2和Q3和Q4队列的电催action(根据订单排序了,且只为该周期内的所对应的催收员的action)
+		logger.info("Q2和Q3和Q4开始晚上电催结论");
+		SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd");
+		String todayMonning =sd.format(new Date())+" 12:10:00";
+		String today =sd.format(new Date())+" 20:10:00";
+		List<TMisContantRecord> recordList=tcontDao.findautoTelConclusion("cycleAndTime3",todayMonning,today);
+		logger.info("Q2和Q3和Q4晚上共查到"+recordList.size());
+		autoSaveTelConclusion(recordList);
+		
+	}
+	private void autoSaveTelConclusion(List<TMisContantRecord> recordList) {
+		if(recordList==null||recordList.size()<=0){
+			logger.info(new Date()+",今天无电催action");
+			return;
+		}
+		Map<String, Object> recordTemp=new HashMap<String, Object>();
+		List<String> actions=new ArrayList<String>();
+		String decalode=recordList.get(0).getDealcode();
+		String taskId=recordList.get(0).getTaskid();
+		String dunningCycle=recordList.get(0).getDunningCycle();
+		String dunningPeopleId=recordList.get(0).getDunningpeoplename();
+		StringBuilder remark=new StringBuilder();
+		int cycle=0;
+		for (int i=0;i<recordList.size();i++) {
+			//判断是否是同一个用户
+			if(decalode.equals(recordList.get(i).getDealcode())){
+				logger.info("订单号:"+decalode+",案件队列为:"+dunningCycle+"数据整理");
+				//同一个用户所有做过电催结论的action的id
+				actions.add(recordList.get(i).getId());
+				//承诺还款时间
+				if(recordTemp.get("promisDate")==null){
+					if(recordList.get(i).getPromisepaydate()!=null){
+						recordTemp.put("promisDate", recordList.get(i).getPromisepaydate());
+					}
+				}
+				//电催结论备注
+				if(++cycle<20){
+					remark.append(recordList.get(i).getContactstype().getDesc()+"-"+recordList.get(i).getContactsname()+"-"+recordList.get(i).getContanttarget()+"-"+
+							recordList.get(i).getTelstatus().toString());
+					if(StringUtils.isEmpty(recordList.get(i).getRemark())){
+						remark.append(";");
+					}else{
+						remark.append("-"+recordList.get(i).getRemark()+";");
+					}
+				}
+				//如果没取到表示是该订单的第一个结果码
+				if(recordTemp.get("telStatus")==null){
+					recordTemp.put("telStatus", recordList.get(i).getTelstatus());
+				}else{
+					//如果存的结果码是则按到优先顺序判断
+					if(telconclusion.get(recordTemp.get("telStatus").toString())!=null){
+						Integer priority = telconclusion.get(recordList.get(i).getTelstatus().toString());
+						if(priority!=null&&telconclusion.get(recordTemp.get("telStatus").toString())>priority){
+							recordTemp.put("telStatus", recordList.get(i).getTelstatus());
+						}
+							
+					}
+				}
+				//遍历最后一个时保存电催结论
+				if(i==recordList.size()-1){
+					logger.info("最后一个订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
+					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
+					if (!result) {
+						logger.info(decalode+"该订单电催结论失败.");
+					}else{
+						
+						logger.info(decalode+"该订单电催结论成功.");
+					}
+					return;
+				}
+			}else{
+				logger.info("订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
+					//保存电催结论
+					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
+					if (!result) {
+						logger.info(decalode+"该订单电催结论失败.");
+					}else{
+						
+						logger.info(decalode+"该订单电催结论成功.");
+					}
+					if(actions!=null)
+						actions.clear();
+					if(recordTemp!=null)
+						recordTemp.clear();
+					decalode=recordList.get(i).getDealcode();
+					taskId=recordList.get(i).getTaskid();
+					dunningCycle=recordList.get(i).getDunningCycle();
+					dunningPeopleId=recordList.get(i).getDunningpeoplename();
+					remark.delete(0, remark.length());
+					cycle=0;
+					--i;
+			}
+			
+		}
+	}
+	private boolean saveConclusion(Map<String, Object> recordTemp, List<String> actions, String decalode, String taskId,
+			StringBuilder remark,String dunningCycle,String dunningPeopleId) {
+		// 就要给前一个用户做电催结论
+		TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
+		//承诺还款时间
+		tMisDunnedConclusion.setPromisepaydate((Date) recordTemp.get("promisDate"));
+		//是否有效联系
+		String  statusConclusion=recordTemp.get("telStatus").toString();
+		if(telconclusion.get(statusConclusion)==null){
+			logger.info(new Date()+"没有这个结果码"+statusConclusion);
+			return false;
+		}
+		if (telconclusion.get(statusConclusion) <= 3) {
+			tMisDunnedConclusion.setIseffective(true);
+		}else if(telconclusion.get(statusConclusion)==4){
+			tMisDunnedConclusion.setIseffective(false);
+			Date findDirCreate = tcontDao.findDirCreate(dunningPeopleId,decalode,dunningCycle);
+			if(findDirCreate!=null){
+				Date findIsEffective = tcontDao.findIsEffective(dunningPeopleId,decalode,dunningCycle,findDirCreate);
+				if(findIsEffective==null){
+					recordTemp.put("telStatus", TelStatus.valueOf("LOOO"));
+				}
+			}
+		}else{
+			tMisDunnedConclusion.setIseffective(false);
+		}
+		//下次跟进时间
+		String nextTelDate=DictUtils.getDictValue(recordTemp.get("telStatus").toString(), "dunning_result_code", "");
+		if(StringUtils.isEmpty(nextTelDate)){
+			logger.info(new Date()+"该结果码数据字典未配置");
+			return false;
+		}
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DATE, Integer.parseInt(nextTelDate));
+		Date nextfollowDate = calendar.getTime();
+		tMisDunnedConclusion.setNextfollowdate(nextfollowDate);
+		//结果码
+		tMisDunnedConclusion.setResultcode((TelStatus) recordTemp.get("telStatus"));
+		tMisDunnedConclusion.setActions(actions);
+		//备注
+		tMisDunnedConclusion.setRemark(remark.toString());
+		tMisDunnedConclusion.setDealcode(decalode);
+		tMisDunnedConclusion.setTaskid(taskId);
+		tMisDunnedConclusion.setConclusionType("auto");
+		boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, decalode, taskId);
+		return result;
+	}
 	
 }

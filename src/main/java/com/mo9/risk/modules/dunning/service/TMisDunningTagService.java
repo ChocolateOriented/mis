@@ -25,9 +25,9 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 @Service
 @Transactional(readOnly = true)
 public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDunningTag> {
-	
+
 	public static final ConcurrentHashMap<String, Long> dealcodeTagType = new ConcurrentHashMap<String, Long>();
-	
+
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 	
@@ -94,12 +94,12 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 	
 	/**
 	 * 校验是否所有标签类型已添加
-	 * @param tMisDunningTag
+	 * @param buyerid
 	 * @return
 	 */
 	@Transactional
-	public boolean preCheckExist(String dealcode) {
-		List<String> existTags = dao.getExistTagByDealcode(dealcode);
+	public boolean preCheckExist(String buyerid) {
+		List<String> existTags = dao.getExistTagByBuyerid(buyerid);
 		
 		if (existTags == null) {
 			return true;

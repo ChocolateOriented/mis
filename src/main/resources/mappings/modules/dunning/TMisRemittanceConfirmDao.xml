@@ -376,24 +376,30 @@
 
 	<select id="findAbnormalRemittanceConfirm" resultType="TMisRemittanceConfirm">
 		SELECT
-		m.Id AS "id",
-		m.RemittanceChannel AS "remittancechannel",
-		m.Remark AS "remark",
-		m.PayType AS "paytype",
-		m.RemittanceAmount AS "remittanceamount",
-		m.dealcode AS "dealcode",
-		m.mobile AS "mobile"
+		<include refid="tMisRemittanceConfirmColumns"/>
 		FROM
-		t_mis_remittance_confirm m
-		LEFT JOIN t_risk_order AS o ON m.dealcode = o.dealcode
+		t_mis_remittance_confirm a
+		LEFT JOIN t_risk_order AS o ON a.dealcode = o.dealcode
 		WHERE
 		o.merchant_id = 7
 		AND o.`status`= 'payment'
 		AND o.type = 'loan'
-		AND m.ConfirmFlow="AUDIT"
-		AND m.ConfirmStatus = "finish"
-		AND m.PayType = "loan"
-		AND m.invalid="t"
+		AND a.ConfirmFlow="AUDIT"
+		AND a.ConfirmStatus = "finish"
+		AND a.PayType = "loan"
+		AND a.invalid="t"
 	</select>
 
+	<select id="findCompleteAuditBySerialNumber" resultType="TMisRemittanceConfirm">
+		SELECT
+		<include refid="tMisRemittanceConfirmColumns"/>
+		FROM
+		t_mis_remittance_confirm a
+		WHERE
+		a.ConfirmFlow="AUDIT"
+		AND a.ConfirmStatus = "complete_audit"
+		AND a.financialserialnumber = #{remittanceSerialNumber}
+		AND a.RemittanceChannel = #{remittanceChannel}
+		AND a.invalid="t"
+	</select>
 </mapper>

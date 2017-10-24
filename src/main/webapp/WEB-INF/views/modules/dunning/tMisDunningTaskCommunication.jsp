@@ -107,7 +107,7 @@
 				<td>
 					${(vs.index+1)}
 				</td>
-				<td>${cp.contactName}</td>
+				<td style="${cp.relativeMatch ? 'background-color:#fffe93;color:#a4a912;' : ''}">${cp.contactName}</td>
 				<td>
 					<c:choose>
 						<c:when test = "${not empty cp.rcname && cp.rcname != '未知'}">
@@ -120,6 +120,7 @@
 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
 								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
+								<c:when test = "${cp.familyrelation=='worktel'}">(单位)</c:when>
 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
 								<c:otherwise></c:otherwise>
 							</c:choose>
@@ -154,7 +155,7 @@
 	<%-- <div class="pagination">${contactPage}</div> --%>
 	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
 	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactMobile="${personMobile}" contactstype="${overdueDays<=1 ? 'SELF' : ''}"   method="Sms" type="button" value="催收短信" />
-	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/>
+<!-- 	<input id="btnTel" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Tel"  type="button" value="电催结论" disabled/> -->
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />
@@ -164,7 +165,7 @@
 	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-	<input id="btnTag" name="btnCollection" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
+	<input id="btnTag"  onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
 	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />

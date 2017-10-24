@@ -6,7 +6,16 @@
 	<title>入账对公明细</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
-		$(document).ready(function() {
+      function showDetail(obj) {
+        $(".suspense").css("display", "none");
+        $(obj).children(".suspense").css("display", "block");
+      }
+
+      function hideDetail() {
+        $(".suspense").css("display", "none");
+      }
+
+	  $(document).ready(function() {
 			
 		var a=/^[0-9]*(\.[0-9]{1,2})?$/;
 		$("#searchForm").validate({
@@ -55,7 +64,26 @@
         	return false;
         }
 	</script>
-	
+	<style type="text/css">
+		.suspense {
+			z-index: 10000;
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			width: 250px;
+			background-color: white;
+			opacity: 0.9;
+			border: solid red 1px;
+			border-radius: 5px;
+			outline: none;
+			padding-left: 20px;
+			padding-top: 20px;
+		}
+
+		.beautif {
+			padding-bottom: 10px;
+		}
+	</style>
 </head>
 <body>
 	<ul class="nav nav-tabs">
@@ -100,6 +128,12 @@
 				 <form:option value="finish" label="已完成"/>
 			</form:select>
 			</li>
+			<li><label>退款状态</label>
+				<form:select  id="refundStatus" path="refundStatus" class="input-medium">
+					<form:option selected="selected" value="" label="全部"/>
+					<form:options items="${RefundStatusList}" itemLabel="desc" />
+				</form:select>
+			</li>
 			</br>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
@@ -120,6 +154,7 @@
 				<th>汇款人账户</th>
 				<th>备注</th>
 				<th>入账状态</th>
+				<th>退款状态</th>
 				<th>上传时间</th>
 				<th>上传人</th>
 				
@@ -159,6 +194,28 @@
 				</td>
 				<td>
 						${tmessage.accountStatusText }
+				</td>
+				<td>
+					<c:choose>
+						<c:when test="${fn:length(tmessage.refunds) > 0}">
+							<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+								<font color="red">${tmessage.refunds[0].refundStatusText}</font>
+								<div class="suspense" style="display:none; " tabindex="0">
+									<c:forEach items="${tmessage.refunds}" var="refund">
+										<div class="beautif">退款审核时间:<fmt:formatDate value="${refund.auditTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+										<div class="beautif">退款完成时间:<fmt:formatDate value="${refund.refundTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+										<div class="beautif">审核人:${refund.auditor }</div>
+										<div class="beautif">退款金额:${refund.amount }</div>
+										<div class="beautif">退款状态:${refund.refundStatusText}</div>
+										<br/>
+									</c:forEach>
+								</div>
+							</div>
+						</c:when>
+						<c:otherwise>
+                            正常
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td>
 					<fmt:formatDate value="${tmessage.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/> 

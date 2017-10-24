@@ -54,6 +54,7 @@ import com.mo9.risk.modules.dunning.entity.DerateReason;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
 import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
@@ -256,27 +257,12 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("tmiscycle", tmiscycle);
 		return "modules/dunning/tMisDunningTaskList";
 	}
-	
-	/**
-	 * 加载群发催收短信页面
-	 * @param tMisDunningTask
-	 * @param model
-	 * @return
-	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:view")
-//	@RequestMapping(value = "collectionGroupSms")
-//	public String collectionGroupSms( Model model) {
-////		System.out.println("");
-//		model.addAttribute("smsTemplates", DunningSmsTemplate.values());
-//		return "modules/dunning/dialog/dialogCollectionGroupSms";
-//	}
-	
-	
+
 	/**
 	 * 群发短信获取模板
-	 * @param tMisDunningTask
-	 * @param model
-	 * @param redirectAttributes
+	 * @param
+	 * @param ordersStr
+	 * @param smsTemplate
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
@@ -287,13 +273,6 @@ public class TMisDunningTaskController extends BaseController {
 			if(StringUtils.isNotBlank(ordersStr)){
 				String[] strTemplate = ordersStr.split(",")[0].split("#");
 			}
-			
-//			String message =  tMisContantRecordService.getDunningSmsTemplate
-//					(new DunningOrder(
-//							strTemplate[0],
-//								"".equals(strTemplate[1]) ?  Double.parseDouble(strTemplate[1]) : 0 , 
-//									"".equals(strTemplate[2]) ?  Integer.parseInt(strTemplate[2]) : 0 )
-//					,DunningSmsTemplate.valueOf(smsTemplate));
 			String message =  tMisContantRecordService.getDunningSmsTemplate("【XXX】" ,new DunningOrder("xxx", 0D, 0), DunningSmsTemplate.valueOf(smsTemplate));
 			return message;
 		} catch (Exception e) {
@@ -301,74 +280,7 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return null;
 	}
-	
-	
-	/**
-	 * 群发短信
-	 * @param tMisDunningTask
-	 * @param model
-	 * @param redirectAttributes
-	 * @return
-	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:view")
-//	@RequestMapping(value = "groupSmsSend")
-//	@ResponseBody
-//	public String groupSmsSend(String ordersStr,String smsTemplate ,Model model,String taskidStr) {
-//		String[] strOrders = ordersStr.split(",");
-//		Set<String> set = new HashSet<String>(Arrays.asList(strOrders));
-//		Iterator<String> it = set.iterator();  
-//		while (it.hasNext()) {
-//			String[] strTemplate = it.next().split("#");
-//			if(!"".equals(strTemplate[0]) && !"".equals(strTemplate[1]) && !"".equals(strTemplate[2])){
-////				strTemplate[3];   获取手机号码
-//				
-//				/**
-//				 *  发送短信
-//				 *//*
-//				Map<String,String> params = new HashMap<String,String>();
-//				params.put("mobile", strTemplate[3]);
-//				params.put("message",message);
-//				MsfClient.instance().requestFromServer(ServiceAddress.SNC_SMS, params, BaseResponse.class);*/
-//				
-//				
-//				
-//				String dealcode = strTemplate[0];
-//				TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-//				if (order == null) {
-//					logger.warn("订单不存在，订单号：" + dealcode);
-//					continue;
-//				}
-//				
-//				String platformExt = order.getPlatformExt();
-//				String route = "【mo9】";
-//				if (platformExt != null && platformExt.contains("feishudai")) {
-//					route = "[飞鼠贷]";
-//				}
-//				String message =  tMisContantRecordService.getDunningSmsTemplate
-//						(route, new DunningOrder(strTemplate[0],Double.parseDouble(strTemplate[1]) * 100, Integer.parseInt(strTemplate[2])),DunningSmsTemplate.valueOf(smsTemplate));
-//				
-//				Map<String,Object> parameter = new HashMap<String,Object>();
-//				parameter.put("STATUS_DUNNING", "dunning");
-//				parameter.put("DEALCODE", dealcode);
-//				TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(parameter);
-//				
-//				if (task == null) {
-//					logger.warn("任务不存在，订单号：" + dealcode);
-//					continue;
-//				}
-//				TMisContantRecord t =new TMisContantRecord();
-//				t.setSmstemp(TMisContantRecord.SmsTemp.valueOf(smsTemplate));
-//				t.setContactstype(TMisContantRecord.ContactsType.SELF);
-//				t.setContanttarget(strTemplate[3]);
-//				t.setContanttype(TMisContantRecord.ContantType.sms);
-//				t.setContent(message);
-//				tMisContantRecordService.saveRecord(task,order, t,null);
-//			}
-//		}
-//		String[] taskids = taskidStr.split(",");
-//		tMisDunningTaskDao.updatedunningtimeList(Arrays.asList(taskids));
-//		return "OK";
-//	}
+
 	
 	/*催收留案功能-委外任务截止时间设置 Patch 0002 by GQWU at 2016-11-25 start*/
 	@RequiresPermissions("dunning:tMisDunningTask:directorview")
@@ -631,105 +543,62 @@ public class TMisDunningTaskController extends BaseController {
 			return "OK";
 		}
 	}
-	/*催收留案功能-留案保存 Patch 0001 by GQWU at 2016-11-9 end*/
-	
-//	/**
-//	 * 加载手动分配页面
-//	 * @param tMisDunningTask
-//	 * @param model
-//	 * @return
-//	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:directorview")
-//	@RequestMapping(value = "dialogDistribution")
-//	public String dialogDistribution( Model model,String orders,String[] overduedays) {
-//		try {
-//			if(null==overduedays || overduedays.length == 0){
-//				model.addAttribute("mes", "订单逾期天数异常");
-//				return "modules/dunning/dialog/dialogDistribution";
-//			}
-//			List<TMisDunningPeople> peopleGroupby = tMisDunningPeopleService.findDunningPeopleGroupby();
-//			Map<String, TMisDunningPeople> map = new HashMap<String,TMisDunningPeople>();
-//			Set<String> set = new HashSet<String>(Arrays.asList(overduedays));
-//			for(String string : set){
-//				Integer overdueday = Integer.parseInt(string);
-//				for(TMisDunningPeople dunningPeople : peopleGroupby){
-//					if(dunningPeople.getBegin() <= overdueday && dunningPeople.getEnd() >= overdueday){
-//						map.put(String.valueOf(dunningPeople.getBegin())+String.valueOf(dunningPeople.getEnd()), new TMisDunningPeople(dunningPeople.getBegin(), dunningPeople.getEnd()));
-//					}
-//				}
-//			}
-//			if(map.isEmpty()){
-//				model.addAttribute("mes", "催收人员周期不存在");
-//				return "modules/dunning/dialog/dialogDistribution";
-//			}
-//			if(map.size() > 1){
-//				model.addAttribute("mes", "请选择是同一周期的订单");
-//				return "modules/dunning/dialog/dialogDistribution";
-//			}
-//			List<String> mapKeyList = new ArrayList<String>(map.keySet());    
-//			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleBybeginEnd(map.get(mapKeyList.get(0)));
-//			model.addAttribute("dunningPeoples", dunningPeoples);
-//			model.addAttribute("orders", orders);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return "views/error/500";
-//		}
-//		return "modules/dunning/dialog/dialogDistribution";
-//	}
 	
 	/**
-	 * 加载手动分配页面
-	 * @param tMisDunningTask
+	 * 加载手动分案页面
+	 * @param dunningcycle
 	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:directorview")
 	@RequestMapping(value = "dialogDistribution")
-	public String dialogDistribution( Model model,String orders,String dunningcycle) {
+	public String dialogDistribution( Model model,String dunningcycle) {
 		try {
+			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
-//			model.addAttribute("orders", orders);
 			model.addAttribute("dunningcycle", dunningcycle);
+			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
+			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
-			logger.info("",e);
+			logger.info("加载手动分案页面失败",e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogDistribution";
 	}
-	
-	public static void main(String[] args) {
 
-//		try {
-//		String[] arr = {"123","456","789","123","12"}; 
-//		List<String> list = Arrays.asList(arr); 
-////			for(String string : list){
-////				Thread.sleep(1000);
-////				System.out.println(string);
-////			}
-//			for(String string : list){
-//				Thread.sleep(1000);
-//				System.out.println(string+"==="+  new Date());
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		Thread1 mTh1=new Thread1("A");  
-////    	Thread1 mTh2=new Thread1("B");  
-//    	mTh1.start();  
-//    	mTh2.start();  
-//		String[] arr = {"123","456","789","123","12"}; 
-//		List<String> list = Arrays.asList(arr); 
-//		Map<String, String> map = MapUtils.putAll(new HashMap<String, String>(), arr); 
-//		for(String map2 : map.keySet()){
-//			System.out.println("key= "+ map2 + " and value= " + map.get(map2));
-//		}
-	}
-	
 	/**
-	 * 手动分配
-	 * @param tMisDunningTask
+	 * 获取手动分案催收人员
+	 * @param request
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequestMapping(value = "dialogDistributionPeople")
+	@ResponseBody
+	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
+		List<TMisDunningPeople> dunningpeople = null;
+		String[] dunningcycle = request.getParameterValues("dunningcycle[]");
+		String[] type = request.getParameterValues("type[]");
+		String[] auto = request.getParameterValues("auto[]");
+		String name = request.getParameter("name");
+
+		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name)) {
+			return new ArrayList<TMisDunningPeople>();
+		}
+
+		String dunningpeoplename=request.getParameter("dunningpeoplename");
+		try{
+			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
+		}catch (Exception e){
+			logger.info("",e);
+			return null;
+		}
+		return dunningpeople;
+	}
+
+	/**
+	 * 手动分案
+	 * @param dunningcycle
 	 * @param model
 	 * @param redirectAttributes
 	 * @return
@@ -743,14 +612,12 @@ public class TMisDunningTaskController extends BaseController {
 			if(null == orders || null == dunningcycle ||"".equals(orders) || "".equals(dunningcycle)  ){
 				return "订单或队列不能为空";
 			}
-//			String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
 			List<String> dealcodes = new ArrayList<String>();
 			for(String string :Arrays.asList(orders.split(","))){
 				if(!"".equals(string.split("#")[0])){
 					dealcodes.add(string.split("#")[0]);
 				}
 			}
-//			List<String> dealcodes =  Arrays.asList(orders.split(","));
 			List<String> newdunningpeopleids = Arrays.asList(request.getParameterValues("newdunningpeopleids"));
 			String assignmes = tMisDunningTaskService.assign(dealcodes, dunningcycle,newdunningpeopleids);
 			mes = "OK,手动勾选"+dealcodes.size()+"条订单," + assignmes;
@@ -761,41 +628,10 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return  mes;
 	}
-	
-//	/**
-//	 * 手动分配
-//	 * @param tMisDunningTask
-//	 * @param model
-//	 * @param redirectAttributes
-//	 * @return
-//	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:directorview")
-//	@RequestMapping(value = "distributionSave")
-//	@ResponseBody
-//	public String distributionSave(String orders, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-//		boolean f = false;
-//		String mes = "";
-//		String[] newdunningpeopleids = request.getParameterValues("newdunningpeopleids");
-//		String[] str = orders.split(",");
-//		Set<String> set = new HashSet<String>(Arrays.asList(str));
-//		Iterator<String> it = set.iterator(); 
-//		int i = 0;
-//		while (it.hasNext()) {  
-//			String dealcode = it.next();  
-//			f = tMisDunningTaskService.assign(dealcode, newdunningpeopleids[i]);
-//			mes += "订单:" + dealcode + ",";
-//			i++;
-//			if (i >= newdunningpeopleids.length) i = 0;
-//		}
-//		mes += "未分配?请核实";
-//		return f ? "OK" : mes;
-//	}
-	
-	
-	
+
 	/**
 	 * 自动分配
-	 * @param tMisDunningTask
+	 * @param
 	 * @param model
 	 * @param redirectAttributes
 	 * @return
@@ -878,28 +714,7 @@ public class TMisDunningTaskController extends BaseController {
 		addMessage(redirectAttributes, "异常订单同步");
 		return "OK";
 	}
-	
-	/**
-	 * 导出催收任务数据
-	 * @param user
-	 * @param request
-	 * @param response
-	 * @param redirectAttributes
-	 * @return
-	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:exportFile")
-//    @RequestMapping(value = "exportFile", method=RequestMethod.POST)
-//    public String exportFile(DunningOrder order, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
-//		try {
-//            String fileName = "OutSourcing" + DateUtils.getDate("yyyy-MM-dd HHmmss")+".xlsx";
-//            List<DunningOrder> page = tMisDunningTaskService.findOrderList(order);
-//    		new ExportExcel("贷后还款情况报表", DunningOrder.class).setDataList(page).write(response, fileName).dispose();
-//    		return null;
-//		} catch (Exception e) {
-//			addMessage(redirectAttributes, "导出失败！失败信息："+e.getMessage());
-//		}
-//		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findOrderPageList?repage";
-//    }
+
 	
 	/**
 	 * 导出委外数据
@@ -954,19 +769,17 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载用户信息页面1
-	 * @param tMisDunningTask
+	 * @param status buyerId dealcode dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "pageFather")
 	public String pageFather(String status,String buyerId, String dealcode,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,Model model) {
+
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
-		
-		
-		//boolean isDelayable = order.getPayCode() == null || !order.getPayCode().startsWith(TMisDunningOrder.CHANNEL_KAOLA);
 		
 		TRiskBuyerPersonalInfo personalInfo = null;
 		TBuyerContact tBuyerContact = new TBuyerContact();
@@ -996,7 +809,7 @@ public class TMisDunningTaskController extends BaseController {
 			
 			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 			model.addAttribute("personalInfo", personalInfo);
-			model.addAttribute("overdueDays",personalInfo.getOverdueDays());
+			model.addAttribute("overdueDays",Integer.parseInt(personalInfo.getOverdueDays()));
 			model.addAttribute("mobileSelf",personalInfo.getMobile());
 		} catch (Exception e) {
 			logger.info("切换只读库查询失败：" + e.getMessage());
@@ -1029,7 +842,7 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		//根据逾期天数控制子页面显示;
 		String controlDay=DictUtils.getDictValue("overdueDay", "controlPage", "1");
-		model.addAttribute("controlDay", controlDay);
+		model.addAttribute("controlDay", Integer.parseInt(controlDay));
 		boolean deductable = tMisDunningDeductService.preCheckChannel(tMisChangeCardRecord.getBankname());
 		//根据资方和逾期天数判断是否开启代扣
 		boolean daikouStatus = tMisDunningTaskService.findOrderByPayCode(order);
@@ -1038,7 +851,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("daikouStatus", daikouStatus);
 		
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
-		tMisDunningTag.setDealcode(dealcode);
+		tMisDunningTag.setBuyerid(buyerId);
 		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 		model.addAttribute("tags", tags);
 		
@@ -1052,7 +865,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 展示用户影像资料
-	 * @param buyerId
+	 * @param
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
@@ -1060,13 +873,14 @@ public class TMisDunningTaskController extends BaseController {
 	public void showBuyerIdCardImg(HttpServletRequest request, HttpServletResponse response) {
 		String buyerId = request.getParameter("buyerId");
 		String fileId = tMisDunningTaskService.findBuyerImg(buyerId);
-		String riskadminUrl = DictUtils.getDictValue("riskadmin", "orderUrl", "");
+		String riskadminUrl = DictUtils.getDictValue("riskportal", "orderUrl", "");
 		String url = riskadminUrl + "file/showPic.a?fileId=" + fileId;
 		InputStream input = null;
 		OutputStream output = null;
+		HttpURLConnection connection = null;
 		try {
 			URL httpUrl = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) httpUrl.openConnection();
+			connection = (HttpURLConnection) httpUrl.openConnection();
 			connection.setRequestProperty("connection", "Keep-Alive");
 			connection.setRequestProperty("Content-Type", "image/jpg");
 			connection.setRequestProperty("accept", "*/*");
@@ -1092,6 +906,9 @@ public class TMisDunningTaskController extends BaseController {
 				if (output != null) {
 					output.close();
 				}
+				if (connection != null) {
+					connection.disconnect();
+				}
 			} catch (IOException e) {
 				//nothing to do
 			}
@@ -1100,7 +917,7 @@ public class TMisDunningTaskController extends BaseController {
 
 	/**
 	 * 加载用户信息页面
-	 * @param tMisDunningTask
+	 * @param buyerId
 	 * @param model
 	 * @return
 	 */
@@ -1154,7 +971,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载通讯录页面
-	 * @param tMisDunningTask
+	 * @param mobileSelf
 	 * @param model
 	 * @return
 	 */
@@ -1219,7 +1036,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载通话记录页面
-	 * @param tMisDunningTask
+	 * @param mobileSelf
 	 * @param model
 	 * @return
 	 */
@@ -1270,7 +1087,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载历史借款信息页面
-	 * @param tMisDunningTask
+	 * @param buyerId dealcode dunningCycle overdueDays dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
@@ -1313,7 +1130,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载登录日志页面
-	 * @param tMisDunningTask
+	 * @param buyerId dealcode dunningCycle overdueDays dunningtaskdbid
 	 * @param model
 	 * @return
 	 */
@@ -1393,41 +1210,7 @@ public class TMisDunningTaskController extends BaseController {
 			logger.warn("任务不存在，订单号：" + dealcode);
 			return null;
 		}
-		
-//		String selfMobile = "";
-//		List<TMisSendMsgInfo> list = tMisContantRecordService.getTelInfos(buyerId,"self");
-//		if(list != null && list.size() > 0){
-//			selfMobile = list.get(0).getTel();
-//		}
-//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-//		if(personalInfo == null){
-//			return "views/error/500";
-//		}
-//		Integer odds = Integer.valueOf(personalInfo.getOverdueDays());
-//		String smsT = "";
-//		boolean chooseSelf = true;
-//		if(odds == 0 || odds < 0){
-//			smsT = "ST_0";
-//		}
-//		else if(0 < odds && odds < 8){
-//			smsT = "ST__1_7";
-//		}else if(7 < odds && odds < 15){
-//			smsT = "ST_8_14";
-//		}else if(14 < odds && odds < 22){
-//			smsT = "ST_15_21";
-//		}else if(21 < odds && odds < 36){
-//			smsT = "ST_22_35";
-//		}else{
-//			chooseSelf = false;
-//			smsT = "ST_15_PLUS";
-//			selfMobile = "";
-//		}
-//		
-//		
-//		TMisContantRecord t = new TMisContantRecord();
-//		t.setSmstemp(SmsTemp.valueOf(smsT));
-//		String smsContext = "";
-//		smsContext = tMisContantRecordService.smsGetTemp(task,order, t);
+
 		String contatType="";
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
@@ -1469,7 +1252,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "collectionTel")
 	public String collectionTel(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
-//		model.addAttribute("tMisDunningTask", tMisDunningTask);
+
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -1479,7 +1262,9 @@ public class TMisDunningTaskController extends BaseController {
 		
 		String contactMobile = request.getParameter("contactMobile");
 		String contactstype = request.getParameter("contactstype");
-		
+		MobileResult[] values = MobileResult.values();
+		List<MobileResult> mobileResultList = Arrays.asList(values);
+		model.addAttribute("mobileResultList", mobileResultList);
 		model.addAttribute("contactMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
 		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() :"");
 		
@@ -1491,7 +1276,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载电催结论页面
-	 * @param tMisDunningConclusion
+	 * @param tMisDunningTask
 	 * @param model
 	 * @return
 	 */
@@ -1522,7 +1307,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 加载敏感标签页面
-	 * @param tMisDunningConclusion
+	 * @param tMisDunningTask
 	 * @param model
 	 * @return
 	 */
@@ -1540,7 +1325,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("tMisDunningTag", tMisDunningTag);
 		} else {
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
-			tMisDunningTag.setDealcode(dealcode);
+			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 			
 			if(tags != null && tags.size() > 0) {
@@ -1767,156 +1552,18 @@ public class TMisDunningTaskController extends BaseController {
 		
 		model.addAttribute("personalInfo", personalInfo);
 		model.addAttribute("payChannelList", payChannelList);
-		
-		/*BigDecimal delayAmount = new BigDecimal(0l);
-		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
-			if(Integer.valueOf(personalInfo.getOverdueDays()) < Integer.parseInt(DictUtils.getDictValue("overdueday", "overdueday", "14"))){
-				
 
-				int existDelayNumber = tMisRemittanceConfirmService.getExistDelayNumber(order.getRootorderid());
-				boolean amt1500 = order.getAmount().compareTo(new BigDecimal(1500)) >= 0 ? true : false;
-				int base = amt1500 ? 80 : 40;
-				BigDecimal defaultInterestAmount = new BigDecimal((existDelayNumber + 1) * base);
-				
-				delayAmount = order.getCostAmount().add(defaultInterestAmount).add(order.getOverdueAmount()).subtract(order.getReliefflag() == 1 ? order.getReliefamount() : new BigDecimal(0));
-			}
-		}
-		
-		model.addAttribute("delayAmount", delayAmount);*/
 		int result = tMisRemittanceConfirmService.getResult(dealcode);
 		model.addAttribute("result", result);
 		//model.addAttribute("isDelayable", isDelayable);
 		return "modules/dunning/dialog/dialogCollectionDeduct";
 	}
 	
-	/**
-	 * 加载催收还款页面
-	 * @param tMisDunningTask
-	 * @param model
-	 * @return
-	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:view")
-//	@RequestMapping(value = "collectionConfirmpay")
-//	public String collectionConfirmpay(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
-//		String buyerId = request.getParameter("buyerId");
-//		String dealcode = request.getParameter("dealcode");
-//		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
-//			return "views/error/500";
-//		}
-//		model.addAttribute("buyerId", buyerId);
-//		model.addAttribute("dealcode", dealcode);
-//		
-//		Map<String,Object> params = new HashMap<String,Object>();
-//		params.put("STATUS_DUNNING", "dunning");
-//		params.put("DEALCODE", dealcode);
-//		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
-//		if (task == null) {
-//			logger.warn("任务不存在，订单号：" + dealcode);
-//			return "views/error/500";
-//		}
-//		
-//		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-//		if (order == null) {
-//			logger.warn("订单不存在，订单号：" + dealcode);
-//			return "views/error/500";
-//		}
-//		
-//		Map<String,Object> maps = new HashMap<String,Object>();
-//		maps.put("buyerId",buyerId);
-//		
-//		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);
-//		model.addAttribute("personalInfo", personalInfo);
-//		
-//		model.addAttribute("task", task);
-//		
-//		BigDecimal delayAmount = new BigDecimal(0l);
-//		if(personalInfo != null && StringUtils.isNotBlank(personalInfo.getOverdueDays())){
-//			if(Integer.valueOf(personalInfo.getOverdueDays()) < 15){
-//				
-//				BigDecimal cpAmt = new BigDecimal(0L);
-//				if(order.getCreditAmount() != null && 
-//					(
-//						(order.getCouponId() != null && order.getCouponId() > 0)
-//						||(order.getSubCostAmount()!=null&&order.getSubCostAmount().compareTo(BigDecimal.ZERO)>0)
-//					)
-//				){
-//					cpAmt = order.getAmount().subtract(order.getCreditAmount());
-//				}
-//				
-//				BigDecimal defaultInterestAmount = getDefaultDelayAmount(order);
-//				
-//				//续期费用 = 7天或者14天续期费用 +续期手续费用（20元或者30元）+逾期费 + 订单手续费
-//				delayAmount = order.getCostAmount().add(defaultInterestAmount).subtract(cpAmt).add(order.getOverdueAmount());
-//			}
-//		}
-//		
-//		model.addAttribute("delayAmount", delayAmount);
-//		return "modules/dunning/dialog/dialogCollectionConfirmpay";
-//	}
-	
-	/**
-	 * 完成订单状态
-	 * @param tMisDunningTask
-	 * @param model
-	 * @return
-	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:view")
-//	@RequestMapping(value = "confrimPayStatus")
-//	@ResponseBody
-//	public String confrimPayStatus(TMisPaid paid) {
-//		String dealcode = paid.getDealcode();
-//		String paychannel = paid.getPaychannel();
-//		String remark = paid.getRemark();
-//		String paidType = paid.getPaidType();
-//		String paidAmount = paid.getPaidAmount();
-//		String delayDay = paid.getDelayDay();
-//		if(StringUtils.isBlank(delayDay)){
-//			delayDay = "0";
-//		}
-//		if( StringUtils.isBlank(paidAmount) || StringUtils.isBlank(dealcode)){
-//			return "错误，用户或者订单不存在";
-//		}
-//		if(StringUtils.isBlank(paidType) || StringUtils.isBlank(paychannel)){
-//			return "错误，代付类型或代付渠道不存在";
-//		}
-//		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-//		if (order == null) {
-//			return ("错误，用户或者订单不存在");
-//		}
-//		if(order.status.equals("payoff")){
-//			return "错误，订单已还清";
-//		}
-//		
-//		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-//		String url = riskUrl + "riskportal/limit/order/v1.0/payForStaffType/" +dealcode+ "/" +paychannel+ "/" +remark+ "/" +paidType+ "/" +paidAmount+ "/" +delayDay;
-//		logger.info("接口url：" + url);
-//		String str = "";
-//		try {
-//			String res =  java.net.URLEncoder.encode(GetRequest.getRequest(url, new HashMap<String,String>()), "utf-8");
-//			logger.info("接口url返回参数" + res.getBytes("UTF-8"));
-//			if(StringUtils.isNotBlank(res)){
-//				JSONObject repJson = new JSONObject(res);
-//				String resultCode =  repJson.has("resultCode") ? String.valueOf(repJson.get("resultCode")) : "";
-//				if(StringUtils.isNotBlank(resultCode) && "200".equals(resultCode)){
-//					str = repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
-//					logger.info("返回成功" + str);
-////					tMisRemittanceConfirmService.confirmationUpdate(entity)
-//					return "OK";
-//				}else{
-//					return repJson.has("datas") ? String.valueOf(repJson.get("datas")) : "";
-//				}
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return "";
-//	}
-	
 
 	/**
 	 * 完成代付
-	 * @param tMisDunningTask
-	 * @param model
+	 * @param delayDay
+	 * @param
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")

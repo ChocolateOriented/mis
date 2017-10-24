@@ -493,7 +493,7 @@ public class TMisMigrationRateReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			//开始时间必须小于结束时间
 			Date beginDate = dateFormat1.parse("2017-03-01");
-			Date endDate = dateFormat1.parse("2017-08-18");
+			Date endDate = dateFormat1.parse("2017-10-18");
 			Date date = beginDate;
 			while (!date.equals(endDate)) {
 				System.out.println(dateFormat1.format(date));

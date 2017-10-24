@@ -56,9 +56,6 @@
 			</if>
 			<if test="name != null and name != ''">
 				AND a.name LIKE concat('%',#{name},'%')
-<!-- 					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if> -->
-<!-- 					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if> -->
-<!-- 					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if> -->
 			</if>
 			<if test="dunningpeopletype != null and dunningpeopletype != ''">
 				AND a.dunningpeopletype = #{dunningpeopletype}
@@ -272,6 +269,22 @@
 <!-- 		AND a.DunningCycle LIKE concat('%',#{dunningcycle},'%') -->
 	</select>	
 	
+	<select id="findPeopleSumcorpusamountByDunningcycle" resultType="TMisDunningPeople" useCache="false">
+		SELECT 
+			<include refid="tMisDunningPeopleColumns"/>,
+			SUM(IFNULL(t.corpusamount,0)) AS "sumcorpusamount"
+		FROM t_mis_dunning_people a
+			LEFT JOIN t_mis_dunning_task_log t on t.dunningpeopleid = a.Id 
+<!-- 			AND date(t.createdate)= date(DATE_SUB(curdate(),INTERVAL 1 DAY))  -->
+			AND date(t.createdate) BETWEEN date(#{begindatetime}) AND date(#{enddatetime})
+			AND  t.behaviorstatus = 'in' 
+			AND  t.createby = 'auto_admin'
+			AND  t.DunningCycle = #{dunningcycle}
+		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  AND a.Invalid = 't' AND a.auto = 't'
+			GROUP BY a.Id
+			ORDER BY sumcorpusamount
+	</select>	
+	
 	<select id="findPeopleByDistributionDunningcycle" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
@@ -280,7 +293,38 @@
 		a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  
 		AND a.Invalid = 't' 
 	</select>	
-	
+	<select id="findPeopleByCycleTypeAutoName" resultType="TMisDunningPeople" useCache="false">
+		SELECT
+		    <include refid="tMisDunningPeopleColumns"/>
+		FROM t_mis_dunning_people a
+		     LEFT JOIN t_mis_dunning_group g ON a.GroupId=g.Id
+		WHERE
+		    a.Invalid = 't'
+		<if test="dunningcycle != null and dunningcycle.length > 0">
+			AND
+			<foreach item="item" collection="dunningcycle" open="(" separator=" OR " close=")">
+				dunningcycle LIKE CONCAT('%',#{item},'%')
+			</foreach>
+		</if>
+		<if test="type != null and type.length > 0">
+			AND g.type IN
+			<foreach item="item" collection="type" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="auto != null and auto.length > 0">
+			AND a.auto IN
+			<foreach item="item" collection="auto" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="name != null and name != ''">
+			AND a.groupId = #{name}
+		</if>
+		<if test="dunningpeoplename != null and dunningpeoplename != ''">
+			AND a.name LIKE concat('%',#{dunningpeoplename},'%')
+		</if>
+	</select>
 	 <update id="batchUpdateDunningcycle">
 		UPDATE t_mis_dunning_people SET 	
 			updatedate = now(),

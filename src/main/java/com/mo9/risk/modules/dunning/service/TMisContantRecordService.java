@@ -6,7 +6,6 @@ package com.mo9.risk.modules.dunning.service;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
-import com.mo9.risk.modules.dunning.dao.TBuyerContactDao;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
@@ -20,7 +19,9 @@ import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.DunningUserInfo;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
+import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -29,11 +30,14 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
-import com.mo9.risk.modules.dunning.manager.RiskContactRecordsManager;
+import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.MsfClient;
+//import com.sun.tools.corba.se.idl.StringGen;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,10 +45,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 import org.jboss.logging.Logger;
+import org.jfree.data.time.Hour;
+import org.omg.CORBA.INTERNAL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,10 +90,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 	@Autowired
 	private TmisDunningSmsTemplateDao tdstDao;
 	@Autowired
-	private RiskContactRecordsManager recordsManager;
+	private RiskBuyerContactManager recordsManager;
 	@Autowired
 	TMisAgentInfoService tMisAgentInfoService;
-
+	@Autowired
+	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	private static Logger logger = Logger.getLogger(TMisContantRecordService.class);
 
 	private DecimalFormat decimalFormat = new DecimalFormat("####.00"); // 数字格式化
@@ -145,7 +156,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 		if (StringUtils.isNotBlank(mobile)){
 			List<TRiskBuyerContactRecords> contactRecords;
 			try {
-				contactRecords = recordsManager.findByByMobile(mobile);
+				contactRecords = recordsManager.findContactRecordsByMobile(mobile);
 				if (null != contactRecords && contactRecords.size() > 0) {
 					return this.convertContactRecord2MsgInfo(contactRecords);
 				}
@@ -382,6 +393,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			dunning.setPromisepaydate(tMisContantRecord.getPromisepaydate());
 			// 联系人姓名
 			dunning.setContactsname(tMisContantRecord.getContactsname());
+			dunning.setDunningCycle(task.getDunningcycle());
 			save(dunning);
 			if (!"".equals(dunningtaskdbid) && null != dunningtaskdbid) {
 				dunningTaskDao.updatedunningtime(dunningtaskdbid);
@@ -390,6 +402,229 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 //			throw new ServiceException(e);
 			logger.warn("订单号为:"+order.getDealcode()+",保存到催收历史失败");
 		}
+		//----------------做自动电催结论-------------
+		if(tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.tel){
+			String contactsType = tMisContantRecord.getContactstype().toString();
+			if("SELF".equals(contactsType)||"MARRIED".equals(contactsType)||"PARENT".equals(contactsType)||"CHILDREN".equals(contactsType)||
+					"RELATIVES".equals(contactsType)||"FRIEND".equals(contactsType)||"WORKMATE".equals(contactsType)){
+				String status=tMisContantRecord.getTelstatus().toString();
+				if("BUSY".equals(status)||"CUT".equals(status)||"NOAS".equals(status)||"OFF".equals(status)||"NOTK".equals(status)){
+					dirTelConclusion(task, order, tMisContantRecord, dunningtaskdbid);
+				}
+			}
+		}
+	}
+
+	private void dirTelConclusion(TMisDunningTask task, TMisDunningOrder order, TMisContantRecord tMisContantRecord,
+			String dunningtaskdbid) {
+					//如果此次action为半失联,就要进行判断该用户是否符合n:3:2
+				
+					Date findDirCreate = tMisContantRecordDao.findDirCreate(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle());
+					Date findActionTime=null;
+					if(findDirCreate!=null){
+						 findActionTime = tMisContantRecordDao.findActionTime(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findDirCreate);
+						if(findActionTime==null){
+							return;
+						}
+							
+					}
+				 	//从这次下的以及之前的action
+					List<TMisContantRecord> dirTelConsuion=	tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findActionTime);
+					if(dirTelConsuion==null){
+						return;
+					}
+					SimpleDateFormat sd1=new SimpleDateFormat("yyyy-MM-dd");
+					//取得本人和所有联系人的电话号码
+					Set<String> contactMobile=tRiskBuyer2contactsDao.findContactMobile(tMisContantRecord.getBuyerId());
+					if(contactMobile==null){
+						logger.info(tMisContantRecord.getDealcode()+"该订单无联系人");
+						return;
+					}
+					//上午最终的结果
+					Map<String, Integer> monmobileMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						monmobileMap.put(mobile, 0);
+					}
+					//下午最终结果
+					Map<String, Integer> aftmobileMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						aftmobileMap.put(mobile, 0);
+					}
+					//用来记录如果上下午都是半失联的加一天
+					Map<String, Integer> sameDayMap=new HashMap<String, Integer>();
+					for (String mobile : contactMobile) {
+						sameDayMap.put(mobile, 0);
+					}
+					//上午的判断map如果为true就给最终monmobileMap的对应电话+1
+					Map<String, Boolean> monmobileJudge=new HashMap<String, Boolean>();
+					//下午的判断map如果为true就给最终aftmobileMap的对应电话+1
+					Map<String, Boolean> aftmobileJudge=new HashMap<String, Boolean>();
+					//记录不是半失联的电话码上午的的号码
+//					List<String> monfailMobile=new ArrayList<String>();
+					//记录不是半失联的电话码上午的的号码
+//					List<String> aftfailMobile=new ArrayList<String>();
+					int cycle=0;
+					StringBuilder remark=new StringBuilder();
+					String date=sd1.format(dirTelConsuion.get(0).getCreateDate());
+						for (int i = 0; i < dirTelConsuion.size(); i++) {
+							if(monmobileMap.get(dirTelConsuion.get(i).getContanttarget())==null){
+								continue;
+							}
+						
+							//表示同一天
+							if(date.equals(sd1.format(dirTelConsuion.get(i).getCreateDate()))){
+								String telStuts = dirTelConsuion.get(i).getTelstatus().toString();
+							
+								//分别对上下午进行处理
+								Calendar calendar = Calendar.getInstance(); 
+								calendar.setTime(dirTelConsuion.get(i).getCreateDate());
+								 int conhour= calendar.get(Calendar.HOUR_OF_DAY);
+								 int conminutes= calendar.get(Calendar.MINUTE);
+								 int consecond= calendar.get(Calendar.SECOND);
+								 int createTime=conhour*60*60+conminutes*60+consecond;
+								 int compareTime=12*60*60+10*60;
+								if(createTime<compareTime){
+									//上午
+									//如果上午存在有效联系的那么联系人,且之前的记录都清空.
+									if(dirTelConsuion.get(i).getIseffective()){
+											monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											sameDayMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+											monmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
+//											monfailMobile.add(dirTelConsuion.get(i).getContanttarget());
+											cycle=0;
+											remark.setLength(0);
+											continue;
+									}
+									//电催结论备注
+									if(++cycle<20){
+										remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
+												dirTelConsuion.get(i).getTelstatus().toString());
+										if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
+											remark.append(";");
+										}else{
+											remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
+										}
+									}
+									if("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts)){
+										monmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), true);
+									}
+								}else{
+										//下午
+										//如果下午存在不是半失联的那么联系人该上午不能做记录,且之前的记录都清空.
+										if(dirTelConsuion.get(i).getIseffective()){
+												monmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												aftmobileMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												sameDayMap.put(dirTelConsuion.get(i).getContanttarget(), 0);
+												aftmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), false);
+	//											aftfailMobile.add(dirTelConsuion.get(i).getContanttarget());
+												cycle=0;
+												remark.setLength(0);
+												continue;
+										}
+									//电催结论备注
+									if(++cycle<20){
+										remark.append(dirTelConsuion.get(i).getContactstype().getDesc()+"-"+dirTelConsuion.get(i).getContactsname()+"-"+dirTelConsuion.get(i).getContanttarget()+"-"+
+												dirTelConsuion.get(i).getTelstatus().toString());
+										if(StringUtils.isEmpty(dirTelConsuion.get(i).getRemark())){
+											remark.append(";");
+										}else{
+											remark.append("-"+dirTelConsuion.get(i).getRemark()+";");
+										}
+									}
+									if("BUSY".equals(telStuts)||"CUT".equals(telStuts)||"NOAS".equals(telStuts)||"OFF".equals(telStuts)||"NOTK".equals(telStuts)){
+										aftmobileJudge.put(dirTelConsuion.get(i).getContanttarget(), true);
+									}
+								}
+							}else{
+								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)&&
+											aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = sameDayMap.get(contMobile);
+										sameDayMap.put(contMobile, num+1);
+									}
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
+										Integer num = monmobileMap.get(contMobile);
+										monmobileMap.put(contMobile, num+1);
+										monmobileJudge.put(contMobile,false);
+									}
+									if(aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = aftmobileMap.get(contMobile);
+										aftmobileMap.put(contMobile, num+1);
+										aftmobileJudge.put(contMobile,false);
+									}
+									
+								}
+//								monfailMobile.clear();
+//								aftfailMobile.clear();
+								date=sd1.format(dirTelConsuion.get(i).getCreateDate());
+								--i;
+							}
+							if(i==dirTelConsuion.size()-1){
+								for (String contMobile : contactMobile) {
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)&&
+											aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = sameDayMap.get(contMobile);
+										sameDayMap.put(contMobile, num+1);
+									}
+									if(monmobileJudge.get(contMobile)!=null&&monmobileJudge.get(contMobile)){
+										Integer num = monmobileMap.get(contMobile);
+										monmobileMap.put(contMobile, num+1);
+										monmobileJudge.put(contMobile,false);
+									}
+									if(aftmobileJudge.get(contMobile)!=null&&aftmobileJudge.get(contMobile)){
+										Integer num = aftmobileMap.get(contMobile);
+										aftmobileMap.put(contMobile, num+1);
+										aftmobileJudge.put(contMobile,false);
+									}
+									
+								}
+							}
+						}
+						//如果存在n:3:2则下个完全失联
+						boolean doConcluSion=false;
+						for (String mobile : contactMobile) {
+							Integer monNum = monmobileMap.get(mobile);
+							Integer aftNum = aftmobileMap.get(mobile);
+							Integer same = sameDayMap.get(mobile);
+							int day=0;
+							if(same!=null){
+								day=monNum+aftNum-same;
+							}else{
+								day=monNum+aftNum;
+							}
+							if(monNum!=null&&aftNum!=null&&monNum!=0&&aftNum!=0&&day>=3){
+								doConcluSion=true;
+							}else{
+								doConcluSion=false;
+								return;
+							}
+						}
+						if(doConcluSion){
+							// 就要给前一个用户做电催结论
+							TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
+							//是否有效联系
+							tMisDunnedConclusion.setIseffective(false);
+							//下次跟进时间
+							String nextTelDate=DictUtils.getDictValue("LOOO", "dunning_result_code", "");
+							if(StringUtils.isEmpty(nextTelDate)){
+								logger.info(new Date()+"改结果码数据字典未配置");
+								return ;
+							}
+							Calendar calendar2 = Calendar.getInstance();
+							calendar2.add(Calendar.DATE, Integer.parseInt(nextTelDate));
+							Date nextfollowDate = calendar2.getTime();
+							tMisDunnedConclusion.setNextfollowdate(nextfollowDate);
+							//结果码
+							tMisDunnedConclusion.setResultcode(TelStatus.valueOf("LOOO"));
+							//备注
+							tMisDunnedConclusion.setRemark(remark.toString());
+							tMisDunnedConclusion.setDealcode(tMisContantRecord.getDealcode());
+							tMisDunnedConclusion.setTaskid(dunningtaskdbid);
+							tMisDunnedConclusion.setConclusionType("dir");
+							boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, tMisContantRecord.getDealcode(), dunningtaskdbid);
+							return;
+						}
 	}
 
 	/**

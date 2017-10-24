@@ -456,12 +456,8 @@ public class TMisRemittanceConfirmController extends BaseController {
 
 		String paidType = paid.getPaidType();
 		String paidAmount = paid.getPaidAmount();
-		String delayDay = paid.getDelayDay();
 		if(!"1".equals(isMergeRepayment) && Double.parseDouble(paidAmount) > (null != accountamount && !"".equals(accountamount) ? Double.parseDouble(accountamount) : Double.parseDouble("0"))){
 			return "还款金额不应该大于财务的到账金额";
-		}
-		if(StringUtils.isBlank(delayDay)){
-			paid.setDelayDay("0");
 		}
 		if( StringUtils.isBlank(paidAmount) || StringUtils.isBlank(dealcode)){
 			return "错误，用户或者订单不存在";
@@ -503,42 +499,14 @@ public class TMisRemittanceConfirmController extends BaseController {
 		if (StringUtils.isBlank(paytype)){
 			return "还款类型不能为空";
 		}
-		TMisRemittanceConfirm confirm = tMisRemittanceConfirmService.get(remittanceConfirmId);
-		if (confirm == null){
-			return "未查询到汇确认信息";
-		}
-		if (!ConfirmFlow.AUDIT.equals(confirm.getConfirmFlow()) || !TMisRemittanceConfirm.CONFIRMSTATUS_COMPLETE_AUDIT.equals(confirm.getConfirmstatus())){
-			return "错误，汇款确认信息未完成查账";
-		}
-		DunningOrder order = tMisDunningOrderService.findOrderByDealcode(confirm.getDealcode());
-		if (order == null) {
-			return ("错误，用户或者订单不存在");
-		}
-		if(order.getStatus().equals(DunningOrder.STATUS_PAYOFF)){
-			return "错误，订单已还清";
-		}
-		if (remittanceTag == null){
-			if (confirm.getRemittanceTag() == null){
-				return "还款标签不能为空";
-			}
-		}else {//若入账标记还款标签,则以入账时为准
-			confirm.setRemittanceTag(remittanceTag);
-		}
-		//若还款类型为还清则判断  还款金额<应催金额
-		if (DunningOrder.PAYTYPE_LOAN.equals(paytype)){
-			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
-				return "金额不匹配，入账失败";
-			}
-		}
-		confirm.setPaytype(paytype);
-		try {
-			tMisRemittanceConfirmService.auditConfrim(confirm);
-		} catch (ServiceException e){
-			logger.info(order.getDealcode()+"入账失败",e);
-			return "入账失败, "+e.getMessage();
 
+		try {
+			tMisRemittanceConfirmService.auditConfrim(remittanceConfirmId,paytype,remittanceTag);
+		} catch (ServiceException e){
+			logger.info(remittanceConfirmId+"入账失败",e);
+			return "入账失败, "+e.getMessage();
 		}catch (Exception e) {
-			logger.info(order.getDealcode()+"入账失败",e);
+			logger.info(remittanceConfirmId+"入账失败",e);
 			return "入账失败";
 		}
 		return "success";

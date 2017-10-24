@@ -30,7 +30,6 @@
 				position:absolute;
 				top:10px;
 				left:10px;
-				height:200px;
 				width:250px;
 				background-color:white;
 				opacity:0.9;
@@ -64,6 +63,7 @@
 				<th>订单状态</th>
 				<th>入账标签</th>
 				<th>入账类型</th>
+				<th>退款状态</th>
 				<th>更新时间</th>
 				<th>入账人</th>
 			</tr>
@@ -140,7 +140,28 @@
 					  	部分还款
 					  </c:if>  
 				</td>
-				
+				<td>
+					<c:choose>
+						<c:when test="${fn:length(tmessage.refunds) > 0}">
+							<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+								<font color="red">${tmessage.refunds[0].refundStatusText}</font>
+								<div class="suspense" style="display:none; " tabindex="0">
+									<c:forEach items="${tmessage.refunds}" var="refund">
+										<div class="beautif">退款审核时间:<fmt:formatDate value="${refund.auditTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+										<div class="beautif">退款完成时间:<fmt:formatDate value="${refund.refundTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+										<div class="beautif">审核人:${refund.auditor }</div>
+										<div class="beautif">退款金额:${refund.amount }</div>
+										<div class="beautif">退款状态:${refund.refundStatusText}</div>
+										<br/>
+									</c:forEach>
+								</div>
+							</div>
+						</c:when>
+						<c:otherwise>
+							正常
+						</c:otherwise>
+					</c:choose>
+				</td>
 				<td>
 					 <fmt:formatDate value="${tmessage.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>   
 				</td>

@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.manager.RiskScorecardManager;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCardDao, TMisDunningScoreCard> {
 
 	@Autowired
-	private RiskOrderManager riskOrderManager;
+	private RiskScorecardManager riskScorecardManager;
 	
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningScoreCardService.class);
 	
@@ -116,7 +117,7 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 			boolean oldOrder = order.getFirstOrder() == null ? false : !order.getFirstOrder();
 			
 			try {
-				String result = riskOrderManager.scApplicationCol(mobile, dealcode, buyerId, orderId, oldOrder);
+				String result = riskScorecardManager.scApplicationCol(mobile, dealcode, buyerId, orderId, oldOrder);
 				if (null == result || "".equals(result)) {
 					logger.info("获取评分数据无效，订单号" + dealcode);
 					continue;

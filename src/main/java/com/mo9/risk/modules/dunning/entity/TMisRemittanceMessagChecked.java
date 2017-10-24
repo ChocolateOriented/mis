@@ -63,6 +63,8 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 	private List<String> dunningGroupIds;
 	// 催收人id
 	private String dunningPeopleId;
+	//退款记录
+	private List<TMisDunningRefund> refunds;
 
 	public String getRealName() {
 		return realName;
@@ -213,5 +215,13 @@ public class TMisRemittanceMessagChecked extends DataEntity<TMisRemittanceMessag
 
 	public void setDunningPeopleId(String dunningPeopleId) {
 		this.dunningPeopleId = dunningPeopleId;
+	}
+
+	public List<TMisDunningRefund> getRefunds() {
+		return refunds;
+	}
+
+	public void setRefunds(List<TMisDunningRefund> refunds) {
+		this.refunds = refunds;
 	}
 }

@@ -4,6 +4,8 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -46,6 +48,8 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private Date promisepaydate;		//承诺还款日
 	private String contactsname;		//联系人姓名
 	private String conclusionid;		//电催结论id
+	private String dunningCycle;		//订单所属队列
+	private String buyerId;		//订单用户id
 	
 	private Integer buyerid;
 	
@@ -54,7 +58,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private String updateby;		// updateby
 	private Date updatedate;		// updatedate
 */	
-	
+
 	/**
      * 催收后电话的状态
      */
@@ -62,24 +66,24 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
     {
         TNIS("号码停机"),
         NOPK("手机拒接"),
-        BUSY("电话忙音"),
+//        BUSY("电话忙音"),
         NOBD("查无此人"),
         NOEX("号码不存在"),
         MEMO("一般纪要"),
         BDQJ("客户离职 "),
-        NOAS("无人应答 "),
+//        NOAS("无人应答 "),
         LMS("留口信"),
         //PTP("承诺还款"),
         OPTP("他人代偿"),
         CAIN("客户回电"),
-        STOP("暂缓催收"),
+//        STOP("暂缓催收"),
         FEAD("费用调整"),
-        OFF("电话关机"),
+//        OFF("电话关机"),
         LDTX("来电提醒"),
         OTHER("其他"),
         QT("其TA"),
         //逾期催收增加催收结论流程及相关优化  变更枚举项
-        PTP("承诺还款（PTP）"),
+//        PTP("承诺还款（PTP）"),
         RTP("拒绝还款（RTP）"),
         WTP("有还款意愿"),
         WTR("有代偿意愿"),
@@ -88,8 +92,24 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
         NSA("非本人接听"),
         NSN("非本人号码"),
         OOC("完全失联"),
-        HOOC("半失联")
-        ;
+        HOOC("半失联"),
+       //新增的枚举
+        ALPA("承诺还款"),
+	   	 BUSY("半失联"),
+	   	 CUT("半失联"),
+	   	 FEE("承诺还款"),
+	   	 INSY("无还款诚意"),
+	   	 KNOW("沟通中"),
+	   	 LOOO("完全失联"),
+	   	 MESF("完全失联"),
+	   	 NOAS("半失联"),
+	   	 MESS("沟通中"),
+	   	 NOSE("完全失联"),
+	   	 OFF("半失联"),
+	   	 NOTK("半失联"),
+	   	 PTP("承诺还款"),
+	   	 PTPX("承诺还款"),
+	   	 STOP("完全失联");
         
         private String desc;
         TelStatus(String desc)
@@ -427,6 +447,22 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 
 	public void setSmsTemplateId(String smsTemplateId) {
 		this.smsTemplateId = smsTemplateId;
+	}
+
+	public String getDunningCycle() {
+		return dunningCycle;
+	}
+
+	public void setDunningCycle(String dunningCycle) {
+		this.dunningCycle = dunningCycle;
+	}
+
+	public String getBuyerId() {
+		return buyerId;
+	}
+
+	public void setBuyerId(String buyerId) {
+		this.buyerId = buyerId;
 	}
 	
 	

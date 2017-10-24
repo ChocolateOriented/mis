@@ -96,7 +96,7 @@ $(document).ready(function() {
 	 	}
 	 });
 	 	 
-	// 手动分配
+	// 手动分案
 	$("#distribution").click(function(){
 		 var orders = new Array();
 		 var dunningcycle = new Array();
@@ -120,7 +120,7 @@ $(document).ready(function() {
 				return;
 			}
 			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid;
-			$.jBox.open("iframe:" + url, "手动分配" , 600, 350, {            
+			$.jBox.open("iframe:" + url, "手动分案" , 600, 500, {
 	               buttons: {},
 	               loaded: function (h) {
 	                   $(".jbox-content", document).css("overflow-y", "hidden");
@@ -138,6 +138,66 @@ $(document).ready(function() {
 				success:function(data){
 					if(data=="OK"){
 						top.$.jBox.tip("系统短信定时任务分配成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
+	//电催结论1
+	$("#diancui1").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui1",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
+	//电催结论2
+	$("#diancui2").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui2",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
+					}
+					
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+                       alert("查询失败:"+textStatus);
+                    }
+				
+			});
+			
+	 });
+	//电催结论3
+	$("#diancui3").click(function(){
+		
+			$.ajax({
+				url:"${ctx}/dunning/tMisDunningOuterTask/diancui3",
+				type:"GET",
+				data:{},
+				success:function(data){
+					if(data=="OK"){
+						top.$.jBox.tip("成功");
 					}
 					
 				},
@@ -264,9 +324,18 @@ function formatPeopleList( item ){
 			</li>
 		</ul>
 	</form:form>
-	<input id="distribution" class="btn btn-primary" type="button" value="手动分配" />
+	<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui1" class="btn btn-primary" type="button" value="电催结论(Q0,Q1)" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui2" class="btn btn-primary" type="button" value="电催结论(Q2,Q3,Q4)上午" />
+	</shiro:hasPermission>
+	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
+		<input id="diancui3" class="btn btn-primary" type="button" value="电催结论(Q2,Q3,Q4)下午" />
 	</shiro:hasPermission>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>

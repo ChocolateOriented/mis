@@ -1,4 +1,4 @@
-package com.mo9.risk.modules.dunning.web;
+package com.mo9.risk.modules.dunning.api;
 
 import java.util.Date;
 
@@ -41,5 +41,4 @@ public class TMisDunningNumberCleanCallbackController extends BaseController {
 			return;
 		}
 	}
-	
 }

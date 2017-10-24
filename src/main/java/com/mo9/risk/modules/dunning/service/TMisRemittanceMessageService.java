@@ -4,10 +4,12 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceMessageDao;
 import com.mo9.risk.modules.dunning.entity.AlipayRemittanceExcel;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningRefund;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.ConfirmFlow;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
@@ -17,6 +19,7 @@ import com.mo9.risk.util.RegexUtil;
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -52,6 +55,8 @@ public class TMisRemittanceMessageService extends
 	private TMisDunningOrderService dunningOrderService;
 	@Autowired
 	private TMisDunningGroupService groupService ;
+	@Autowired
+	private TMisDunningRefundDao refundDao;
 	@Autowired
 	protected Validator validator;
 
@@ -213,14 +218,19 @@ public class TMisRemittanceMessageService extends
 		if (StringUtils.isBlank(mobile)) {
 			return null;
 		}
-		//查找订单
+		//查找未还清订单
 		DunningOrder order = dunningOrderService.findPaymentOrderMsgByMobile(mobile);
 		if (order == null) {
 			return null;
 		}
-		logger.debug(
-				"订单:" + order.getDealcode() + "与汇款信息" + remittanceMessage.getRemittanceSerialNumber()
-						+ "匹配成功");
+		//检查是否有退款信息
+		String serialNumber =  remittanceMessage.getRemittanceSerialNumber();
+		List<TMisDunningRefund> refunds = refundDao.findValidBySerialNumber(serialNumber, remittanceMessage.getRemittanceChannel());
+		if (refunds!=null && refunds.size()>0){//该汇款存在退款记录
+			return null;
+		}
+
+		logger.debug("订单:" + order.getDealcode() + "与汇款信息" + serialNumber + "匹配成功");
 		TMisRemittanceConfirm remittanceConfirm = this.createRemittanceConfirm(remittanceMessage, order);
 		this.autoAddTemittanceTag(remittanceMessage, order, remittanceConfirm);
 		return remittanceConfirm;
@@ -332,7 +342,7 @@ public class TMisRemittanceMessageService extends
 	 */
 	public Page<TMisRemittanceMessage> findAcountPageList(Page<TMisRemittanceMessage> page, TMisRemittanceMessage entity) {
 		entity.setPage(page);
-		page.setList(dao.findAccountPageList(entity));
+		page.setList(dao.findAcountPageList(entity));
 		return page;
 	}
 
@@ -340,7 +350,7 @@ public class TMisRemittanceMessageService extends
 	 * 查询所有的对公明细
 	 */
 	public List<TMisRemittanceMessage> findAcountPageList(TMisRemittanceMessage tMisRemittanceMessage) {
-		return dao.findAccountPageList(tMisRemittanceMessage);
+		return dao.findAcountPageList(tMisRemittanceMessage);
 	}
 
 	/**
@@ -380,11 +390,11 @@ public class TMisRemittanceMessageService extends
 	 * @Description 手工查账
 	 */
 	@Transactional
-	public boolean handleAudit(TMisRemittanceConfirm remittanceConfirm) {
+	public void handleAudit(TMisRemittanceConfirm remittanceConfirm) {
 		//查询订单
 		DunningOrder order = dunningOrderService.findPaymentOrderMsgByDealcode(remittanceConfirm.getDealcode());
 		if (order == null) {
-			return false;
+			throw new ServiceException("无未还清订单");
 		}
 
 		//查询汇款信息
@@ -393,11 +403,18 @@ public class TMisRemittanceMessageService extends
 		q_remittanceMessage.setRemittanceChannel(remittanceConfirm.getRemittancechannel());
 		List<TMisRemittanceMessage> remittanceMessages = this.findList(q_remittanceMessage);
 		if (remittanceMessages == null || remittanceMessages.size() == 0) {
-			return false;
+			throw new ServiceException("未查询到汇款信息");
 		}
 		TMisRemittanceMessage remittanceMessage = remittanceMessages.get(0);
 		if (remittanceMessage == null) {
-			return false;
+			throw new ServiceException("未查询到汇款信息");
+		}
+
+		//检查是否有退款信息
+		String serialNumber =  remittanceMessage.getRemittanceSerialNumber();
+		List<TMisDunningRefund> refunds = refundDao.findValidBySerialNumber(serialNumber, remittanceMessage.getRemittanceChannel());
+		if (refunds!=null && refunds.size()>0){//该汇款存在退款记录
+			throw new ServiceException("该汇款存在退款记录");
 		}
 
 		//生成TMisRemittanceConfirm
@@ -408,7 +425,6 @@ public class TMisRemittanceMessageService extends
 		}
 		new_tMisRemittanceConfirm.setRemittanceTag(remittanceConfirm.getRemittanceTag());
 		remittanceConfirmService.save(new_tMisRemittanceConfirm);
-		return true;
 	}
 
 	/**

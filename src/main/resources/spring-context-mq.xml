@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+	default-lazy-init="true">
+	<!--消息队列配置-->
+	<description>Mq Configuration</description>
+	
+    <!-- 加载配置属性文件 -->
+	<context:property-placeholder ignore-unresolvable="true" location="classpath:jeesite.properties" />
+
+	<bean id="aliyunMqConsumer" class="com.mo9.risk.util.Mo9MqConsumer"
+		init-method="start"  destroy-method="shutdown" lazy-init="false">
+		<property name="consumerId" value="${consumerId}"/>
+		<property name="accessKey" value="${accessKey}"/>
+		<property name="secretKey" value="${secretKey}"/>
+		<property name="onsAddr" value="${onsAddr}"/>
+		<property name="messageModelString" value="${messageModelString}"/>
+		<property name="consumeThreadNums" value="${consumeThreadNums}"/>
+		<property name="subscriptionMap">
+			<map>
+				<entry value-ref="riskOrderListener">
+					<key>
+						<bean class="com.mo9.mqclient.MqSubscription">
+							<property name="topic" value="${MQ_TOPIC}"/>
+              <!--订阅全部tag-->
+							<property name="expression" value="*"/>
+						</bean>
+					</key>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id = "riskOrderListener" class="com.mo9.risk.modules.dunning.listener.RiskOrderListener"></bean>
+
+</beans>
