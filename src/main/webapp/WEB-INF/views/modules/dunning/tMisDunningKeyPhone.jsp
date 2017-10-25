@@ -412,10 +412,14 @@
 		currentPageUrl = "/mis/f/numberPhone/" + (obj ? ($(obj).attr("typecall") || "callout") : "callout") + "?";
 		if((!obj)||$(obj).attr("typecall")=="callout"){
 			$("#calloutPage").addClass("active");
+			$("#agent").attr("disabled",false);
+			$("#queue").attr("disabled",true);
 			$("#callinPage").removeClass("active");
 		}else{
 			$("#callinPage").addClass("active");
 			$("#calloutPage").removeClass("active");
+			$("#agent").attr("disabled",true);
+			$("#queue").attr("disabled",false);
 		}
 		$("#page").val("");
 		$("#pageSize").val("");
@@ -450,7 +454,8 @@
  <div style="width:270px; height:620px;position:absolute; border:1px solid gold;border-radius: 25px;background-color:#F8F8F8; left:2%;" >
  	<div style="height:60px;width:280px;position:absolute;">
  		<div style="top:20px;left:130px;position:absolute;margin:0 auto;">
-			<i class="icon-legal" style="font-size:15px;color:gray;"></i>
+<!-- 			<i class="icon-legal" style="font-size:15px;color:gray;"></i> -->
+			<font size="4" color="orange">mo</font><font color="blue">9</font>
  		</div>
  	</div>
 	<div style="width:250px; height:500px;margin:0px;top:60px;left:10px; position:absolute; border:1px solid gold;background-color:white;">
@@ -599,6 +604,7 @@
     <input id="page" name="page" type="hidden" value=""/>
     <input id="pageSize" name="pagesize" type="hidden" value=""/>
     <input id="queue" name="queue" type="hidden" value="${queue}"/>
+    <input id="agent" name="agent" type="hidden" value="${agent}"/>
 </form>
  
  </div>
