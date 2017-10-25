@@ -88,6 +88,9 @@
 	<sql id="pageListCondotion">
 		<where>
 			a.FinishTime IS NOT NULL
+			<if test="targetNumber != null and targetNumber != ''">
+				AND a.TargetNumber = #{targetNumber}
+			</if>
 			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
 				AND p.groupId = #{dunningPeople.group.id}
 			</if>

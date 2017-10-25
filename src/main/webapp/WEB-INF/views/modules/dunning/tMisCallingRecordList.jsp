@@ -103,6 +103,10 @@
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<div class="container-fluid">
 			<div class="row-fluid form-row">
+				<div class="span2">
+					<span>客户电话：</span>
+					<input name="targetNumber" type="text" maxlength="20" class="input-medium" value="${tMisCallingRecord.targetNumber}"/>
+				</div>
 				<div class="span4">
 					<span>呼叫时间：</span>
 					<input name="beginCallTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
@@ -188,7 +192,7 @@
 						${tMisCallingRecord.dealcode}
 					</a>
 				</td>
-				<td>
+				<td style="padding:2px;">
 					<c:if test="${not empty tMisCallingRecord.audioUrl}">
 						<audio src="${ctiUrl}${tMisCallingRecord.audioUrl}" preload="none" controls="controls" controlsList="nodownload"></audio>
 					</c:if>

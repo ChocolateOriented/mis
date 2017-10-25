@@ -237,7 +237,12 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			saveCalloutResults(page.getResults());
 			
 			int total = page.getTotal();
-			for (int i = 2; i <= total; i++) {
+			int totalPage = total / 10;
+			if (totalPage % 10 > 0) {
+				totalPage++;
+			}
+			
+			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
 				CallCenterPageResponse<CallCenterCalloutInfo> next = callCenterManager.calloutInfo(action);
 				if (result == null || !"0".equals(result.getErrorCode())) {
@@ -278,7 +283,12 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			saveCallinResults(page.getResults());
 			
 			int total = page.getTotal();
-			for (int i = 2; i <= total; i++) {
+			int totalPage = total / 10;
+			if (totalPage % 10 > 0) {
+				totalPage++;
+			}
+			
+			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
 				CallCenterPageResponse<CallCenterCallinInfo> next = callCenterManager.callinInfo(action);
 				if (result == null || !"0".equals(result.getErrorCode())) {
