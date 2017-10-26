@@ -449,10 +449,10 @@ public class TMisMigrationRateReportController extends BaseController {
 	/**
 	 * 关于迁徙率数据的获取
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "autoMigrationRateGetData")
-	@ResponseBody
-	public void autoMigrationRateGetData() {
+//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+//	@RequestMapping(value = "autoMigrationRateGetData")
+//	@ResponseBody
+//	public void autoMigrationRateGetData() {
 //		try {
 //			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
 //			tMisMigrationRateReportService.autoMigrationRateGetData();
@@ -461,7 +461,7 @@ public class TMisMigrationRateReportController extends BaseController {
 //		} finally {
 //			DynamicDataSource.setCurrentLookupKey("dataSource");
 //		}
-	}
+//	}
 	
 	/**
 	 * 获取计算后的迁徙率数据
