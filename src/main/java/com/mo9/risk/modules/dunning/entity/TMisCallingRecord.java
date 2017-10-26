@@ -101,7 +101,7 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.startTime = start == null || start == 0 ? null : new Date(start * 1000);
 		this.endTime = end == null || end == 0 ? null : new Date(end * 1000);
 		this.finishTime = finish == null || finish == 0 ? null : new Date(finish * 1000);
-		this.durationTime = start == null || end == null ? 0 : (int) (end - start);
+		this.durationTime = this.startTime == null || this.endTime == null ? 0 : (int) (end - start);
 		this.audioId = callinInfo.getSessionid();
 	}
 
@@ -119,9 +119,9 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.callTime = create == null || create == 0 ? null : new Date(create * 1000);
 		this.ringTime = ring == null || ring == 0 ? null : new Date(ring * 1000);
 		this.startTime = start == null || start == 0 ? null : new Date(start * 1000);
-		this.endTime = end == null || end == 0 ? null : new Date(end * 1000);
+		this.endTime = this.startTime == null || end == null || end == 0 ? null : new Date(end * 1000);
 		this.finishTime = finish == null || finish == 0 ? null : new Date(finish * 1000);
-		this.durationTime = start == null || end == null ? 0 : (int) (end - start);
+		this.durationTime = this.startTime == null || this.endTime == null ? 0 : (int) (end - start);
 		this.audioId = calloutInfo.getEuuid();
 	}
 
@@ -202,7 +202,7 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 			return "";
 		}
 		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		if (c.getTime().compareTo(this.callTime) <= 0) {
