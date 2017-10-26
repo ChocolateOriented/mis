@@ -18,6 +18,7 @@
 			<tr>
 				<th>时间</th>
 				<th>催收人</th>
+				<th>操作人</th>
 				<th>短信内容</th>
 			</tr>
 		</thead>
@@ -30,6 +31,7 @@
 				<td>
 					${tmiscontantrecord.peoplename}
 				</td>
+				<td>${tmiscontantrecord.createBy.name}</td>
 				<td>
 					${tmiscontantrecord.content}
 				</td>

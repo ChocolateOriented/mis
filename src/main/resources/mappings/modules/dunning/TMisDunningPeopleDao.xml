@@ -29,7 +29,7 @@
 		g.`type` AS "group.type",
 		g.`name` AS "group.name"
 	</sql>
-	
+
 	<sql id="tMisDunningPeopleJoins">
 		LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
 	</sql>
@@ -173,7 +173,7 @@
 	</select>	
 	
 	<select id="findDunningPeopleGroupby" resultType="TMisDunningPeople" useCache="false">
-		SELECT 
+		SELECT
 			a.begin AS "begin",
 			a.end AS "end"
 		FROM t_mis_dunning_people a
