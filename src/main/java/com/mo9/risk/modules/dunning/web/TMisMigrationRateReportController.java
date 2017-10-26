@@ -453,14 +453,14 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequestMapping(value = "autoMigrationRateGetData")
 	@ResponseBody
 	public void autoMigrationRateGetData() {
-		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-			tMisMigrationRateReportService.autoMigrationRateGetData();
-		} catch (Exception e) {
-			logger.info("",e);
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
+//		try {
+//			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+//			tMisMigrationRateReportService.autoMigrationRateGetData();
+//		} catch (Exception e) {
+//			logger.info("",e);
+//		} finally {
+//			DynamicDataSource.setCurrentLookupKey("dataSource");
+//		}
 	}
 	
 	/**
