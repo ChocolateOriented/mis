@@ -79,7 +79,7 @@ $(document).ready(function() {
 <body>
 	<input id="migration1" class="btn btn-primary" type="button" value="插入cycyle" />
 	<div>----------------------------------</div>
-	<input id="migration2" class="btn btn-primary" type="button" value="更新迁徙基础表" />
+	<%--<input id="migration2" class="btn btn-primary" type="button" value="更新迁徙基础表" />--%>
 	<li>
 		<label>获取数据的时间</label>
 		<input id="margTime" name="margTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
