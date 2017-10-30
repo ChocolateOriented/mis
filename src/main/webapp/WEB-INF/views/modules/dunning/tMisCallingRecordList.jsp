@@ -65,8 +65,7 @@
 	                });
 		        },
 			    formatResult:formatPeopleList, //选择显示字段
-			    formatSelection:formatPeopleList, //选择选中后填写字段
-		        width:300
+			    formatSelection:formatPeopleList //选择选中后填写字段
 			});
 			
 			// 清空查询功能
@@ -104,15 +103,15 @@
 		<div class="container-fluid">
 			<div class="row-fluid form-row">
 				<div class="span2">
-					<span>客户电话：</span>
-					<input name="targetNumber" type="text" maxlength="20" class="input-medium" value="${tMisCallingRecord.targetNumber}"/>
+					<span class="span4" style="line-height:30px;">客户电话：</span>
+					<input name="targetNumber" type="text" maxlength="20" class="span8" value="${tMisCallingRecord.targetNumber}"/>
 				</div>
 				<div class="span4">
-					<span>呼叫时间：</span>
-					<input name="beginCallTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					<span class="span2" style="line-height:30px;">呼叫时间：</span>
+					<input name="beginCallTime" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
 						value="<fmt:formatDate value="${tMisCallingRecord.beginCallTime}" pattern="yyyy-MM-dd"/>"
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-					<input name="endCallTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					<input name="endCallTime" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
 						value="<fmt:formatDate value="${tMisCallingRecord.endCallTime}" pattern="yyyy-MM-dd"/>"
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 				</div>
@@ -121,8 +120,8 @@
 			</shiro:hasPermission>
 			<div class="row-fluid form-row">
 				<div class="span2">
-					<span>催收小组：</span>
-					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
+					<span class="span4" style="line-height:30px;">催收小组：</span>
+					<form:select id="groupList" path="dunningPeople.group.id" class="span8">
 						<form:option value="">全部</form:option>
 						<!-- 添加组类型为optgroup -->
 						<c:forEach items="${groupTypes}" var="type">
@@ -138,8 +137,8 @@
 					</form:select>
 				</div>
 				<div class="span4">
-					<span>催款人：</span>
-					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
+					<span class="span2" style="line-height:30px;">催款人：</span>
+					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</div>
 			</div>
 			<div class="row-fluid form-row">

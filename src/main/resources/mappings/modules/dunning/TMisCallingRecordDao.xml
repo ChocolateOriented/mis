@@ -52,8 +52,6 @@
 				SELECT o.dealcode FROM t_risk_buyer b, t_risk_order o
 				WHERE b.id = o.buyer_id
 				AND b.mobile = a.TargetNumber
-				AND o.merchant_id = 7
-				AND o.type = 'loan'
 				ORDER BY o.id DESC
 				LIMIT 1
 			) as "dealcode",
