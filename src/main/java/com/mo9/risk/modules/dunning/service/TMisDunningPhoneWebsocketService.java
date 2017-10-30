@@ -40,6 +40,12 @@ public class TMisDunningPhoneWebsocketService {
 	public void onOpen(@PathParam("userId") String userId, @PathParam("agent") String agent, @PathParam("status") String status, Session session) {
 		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByPeopleId(userId);
 		if (agentInfo == null || StringUtils.isBlank(agent) || !agent.equals(agentInfo.getAgent())) {
+			 Session nowSession = WebSocketSessionUtil.get(userId);
+			 try {
+				 nowSession.close();
+				} catch (IOException e) {
+					log.warn("关闭失败");
+				}
 			return;
 		}
 		
@@ -52,7 +58,7 @@ public class TMisDunningPhoneWebsocketService {
 			try {
 				sessionOld.close();
 			} catch (IOException e) {
-				log.info("关闭失败");
+				log.warn("关闭失败");
 			}
 		}
 		phoneService.changeAgentStatus(msg);

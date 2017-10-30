@@ -156,9 +156,13 @@
 				</td>
 				<td  >${c.name}</td>
 				<td >
-					<a href="javascript:void(0)" <shiro:hasPermission name="dunning:phone:view"> onclick="phonePage(this)"</shiro:hasPermission> showName="${c.name}">
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${c.name}">
+					</shiro:hasPermission>
 						${c.tel}
+					<shiro:hasPermission name="dunning:phone:view"> 
 					</a>
+					</shiro:hasPermission>
 				</td>
 				<td>					
 					短信
