@@ -7,6 +7,7 @@ import com.mo9.mqclient.MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.Mo9MqMessage;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class RiskOrderListener implements IMqMsgListener {
 
 		String dealcode = order.getDealcode();
 		if (orderDao.findOrderByDealcode(dealcode) != null ){
+			order.setUpdateTime(new Date());
 			orderDao.orderSynUpdate(order);
 			return MqAction.CommitMessage;
 		}
