@@ -19,6 +19,8 @@ public interface TMisAgentInfoDao extends CrudDao<TMisAgentInfo> {
 	public TMisAgentInfo getInfoByAgent(String agent);
 	
 	public TMisAgentInfo getInfoByExtension(String extension);
+	
+	public TMisAgentInfo getInfoByQueue(String queue);
 
 	public TMisAgentInfo validateAgent(TMisAgentInfo tmisAgentInfo);
 

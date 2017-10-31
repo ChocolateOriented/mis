@@ -15,9 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mo9.risk.modules.dunning.bean.CallCenterAgentInfo;
+import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
-import com.mo9.risk.modules.dunning.bean.CallCenterCalling;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
@@ -25,6 +24,7 @@ import com.mo9.risk.modules.dunning.dao.TMisCallingRecordDao;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord.CallType;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -73,121 +73,12 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			allowedGroupIds.addAll(groupIds);
 			entity.setGroupIds(allowedGroupIds);
 		}
-		
+		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
 		page.setCount(dao.listCount(entity));
 		List<TMisCallingRecord> records = dao.findList(entity);
 		page.setList(records);
 		return page;
-	}
-
-	/**
-	 * 保存新通话记录
-	 * @param action
-	 * @param peopleId
-	 * @return
-	 */
-	@Transactional(readOnly = false)
-	public void saveNewRecord(CallCenterCalling action, String peopleId) {
-		TMisCallingRecord tMisCallingRecord = new TMisCallingRecord();
-		tMisCallingRecord.setAgent(action.getAgent());
-		tMisCallingRecord.setPeopleId(peopleId);
-		tMisCallingRecord.setCallType(TMisCallingRecord.CallType.out);
-		tMisCallingRecord.setExtensionNumber(action.getExtension());
-		tMisCallingRecord.setTargetNumber(action.getTarget());
-		tMisCallingRecord.setSessionId(action.getCustomerno());
-		save(tMisCallingRecord);
-	}
-	
-	/**
-	 * 保存新通话记录
-	 * @param agentInfo
-	 * @param peopleId
-	 * @return
-	 */
-	@Transactional(readOnly = false)
-	public void saveNewRecord(CallCenterAgentInfo agentInfo, String peopleId) {
-		TMisCallingRecord tMisCallingRecord = new TMisCallingRecord();
-		tMisCallingRecord.setAgent(agentInfo.getName());
-		tMisCallingRecord.setPeopleId(peopleId);
-		tMisCallingRecord.setCallType(TMisCallingRecord.CallType.in);
-		tMisCallingRecord.setExtensionNumber(agentInfo.getExtension());
-		tMisCallingRecord.setTargetNumber(agentInfo.getCallInNum());
-		tMisCallingRecord.setSessionId(agentInfo.getCallInSessionid());
-		save(tMisCallingRecord);
-	}
-	
-	/**
-	 * 根据坐席更新通话记录信息
-	 * @param agent
-	 * @return
-	 */
-	@Transactional(readOnly = false)
-	public void updateCallingInfoByAgent(String agent) {
-		List<TMisCallingRecord> records = dao.getUnfinishedCallingByAgent(agent);
-		
-		if (records == null || records.isEmpty()) {
-			return;
-		}
-		
-		for (TMisCallingRecord record : records) {
-			TMisCallingRecord newRecord = queryCallingInfoBySessionId(record);
-			if (newRecord != null) {
-				newRecord.setId(record.getId());
-				dao.update(newRecord);
-			}
-		}
-	}
-
-	/**
-	 * 根据sessionId查询CTI通话记录
-	 * @param callingRecord
-	 * @return
-	 */
-	public TMisCallingRecord queryCallingInfoBySessionId(TMisCallingRecord callingRecord) {
-		if (callingRecord.getCallType() == null) {
-			return null;
-		}
-		
-		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
-		action.setAgent(callingRecord.getAgent());
-		
-		try {
-			if (TMisCallingRecord.CallType.in == callingRecord.getCallType()) {
-				action.setSessionid(callingRecord.getSessionId());
-				CallCenterPageResponse<CallCenterCallinInfo> result = callCenterManager.callinInfo(action);
-				if (result == null || !"0".equals(result.getErrorCode())) {
-					throw new ServiceException(result.getErrorMsg());
-				}
-				
-				CallCenterPageResponse.CallCenterPageData<CallCenterCallinInfo> page = result.getData();
-				if (page == null || page.isEmpty()) {
-					return null;
-				}
-				
-				CallCenterCallinInfo callInfo = page.getResults().get(0);
-				TMisCallingRecord record = new TMisCallingRecord(callInfo);
-				return record;
-			} else {
-				action.setCustomerno(callingRecord.getSessionId());
-				CallCenterPageResponse<CallCenterCalloutInfo> result = callCenterManager.calloutInfo(action);
-				if (result == null || !"0".equals(result.getErrorCode())) {
-					throw new ServiceException(result.getErrorMsg());
-				}
-				
-				CallCenterPageResponse.CallCenterPageData<CallCenterCalloutInfo> page = result.getData();
-				if (page == null || page.isEmpty()) {
-					return null;
-				}
-				
-				CallCenterCalloutInfo callInfo = page.getResults().get(0);
-				TMisCallingRecord record = new TMisCallingRecord(callInfo);
-				return record;
-			}
-		} catch (Exception e) {
-			logger.info("查询通话信息失败,坐席:" + callingRecord.getAgent() + ",失败信息:" + e);
-			throw new ServiceException(e);
-		}
 	}
 	
 	/**
@@ -267,9 +158,10 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			
 			int total = page.getTotal();
 			int totalPage = total / 10;
-			if (totalPage % 10 > 0) {
+			if (total % 10 > 0) {
 				totalPage++;
 			}
+			logger.info("同步呼出通话信息页数" + totalPage);
 			
 			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
@@ -313,9 +205,10 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			
 			int total = page.getTotal();
 			int totalPage = total / 10;
-			if (totalPage % 10 > 0) {
+			if (total % 10 > 0) {
 				totalPage++;
 			}
+			logger.info("同步呼入通话信息页数" + totalPage);
 			
 			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
@@ -343,18 +236,21 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 */
 	private void saveCalloutResults(List<CallCenterCalloutInfo> calloutInfos) {
 		for (CallCenterCalloutInfo callInfo : calloutInfos) {
-			TMisCallingRecord current = dao.getRecordBySessionId(callInfo.getCustomerno());
+			TMisCallingRecord entity = new TMisCallingRecord();
+			entity.setCallType(CallType.out);
+			entity.setUuid(callInfo.getEuuid());
+			TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
 			if (current != null) {
 				continue;
 			}
 			
-			TMisCallingRecord record = new TMisCallingRecord(callInfo);
 			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByExtension(callInfo.getExtension());
 			
 			if (agentInfo == null) {
 				continue;
 			}
 			
+			TMisCallingRecord record = new TMisCallingRecord(callInfo);
 			record.setPeopleId(agentInfo.getPeopleId());
 			save(record);
 		}
@@ -367,18 +263,27 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 */
 	private void saveCallinResults(List<CallCenterCallinInfo> callinInfos) {
 		for (CallCenterCallinInfo callInfo : callinInfos) {
-			TMisCallingRecord current = dao.getRecordBySessionId(callInfo.getSessionid());
+			TMisCallingRecord entity = new TMisCallingRecord();
+			entity.setCallType(CallType.in);
+			entity.setUuid(callInfo.getSessionid());
+			TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
 			if (current != null) {
 				continue;
 			}
-			TMisCallingRecord record = new TMisCallingRecord(callInfo);
-			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByAgent(callInfo.getAgent());
+			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByQueue(callInfo.getQueue());
 			
 			if (agentInfo == null) {
 				continue;
 			}
 			
+			TMisCallingRecord record = new TMisCallingRecord(callInfo);
 			record.setPeopleId(agentInfo.getPeopleId());
+			if (StringUtils.isEmpty(record.getAgent())) {
+				record.setAgent(agentInfo.getAgent());
+			}
+			if (StringUtils.isEmpty(record.getExtensionNumber())) {
+				record.setExtensionNumber(agentInfo.getExtension());
+			}
 			save(record);
 		}
 	}

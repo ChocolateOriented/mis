@@ -26,11 +26,13 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	private CallType callType;		//呼叫类型
 
+	private String callState;		//通话状态
+
 	private String extensionNumber;		//分机号码
 
 	private String targetNumber;		//通话号码
 
-	private String sessionId;		//呼叫sessionId
+	private String customerNo;		//呼叫自定义编号
 
 	private Date callTime;	//呼叫创建时间
 
@@ -44,13 +46,13 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	private Integer durationTime;		//通话时长  单位：s
 
-	private String audioId;		//音频文件id
+	private String uuid;		//uuid
 
 	private String dealcode;		//订单号
 
-	private Date beginCallTime;
+	private Date callTimeFrom;
 
-	private Date endCallTime;
+	private Date callTimeTo;
 
 	private TMisDunningPeople dunningPeople;
 
@@ -89,7 +91,6 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.agent = callinInfo.getAgent();
 		this.callType = CallType.in;
 		this.extensionNumber = callinInfo.getExtension();
-		this.sessionId = callinInfo.getSessionid();
 		this.targetNumber = callinInfo.getCaller();
 		Long create = callinInfo.getInQueueTime();
 		Long ring = callinInfo.getAgentOfferTime();
@@ -102,14 +103,14 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.endTime = end == null || end == 0 ? null : new Date(end * 1000);
 		this.finishTime = finish == null || finish == 0 ? null : new Date(finish * 1000);
 		this.durationTime = this.startTime == null || this.endTime == null ? 0 : (int) (end - start);
-		this.audioId = callinInfo.getSessionid();
+		this.uuid = callinInfo.getSessionid();
 	}
 
 	public TMisCallingRecord(CallCenterCalloutInfo calloutInfo){
 		this.agent = calloutInfo.getAgent();
 		this.callType = CallType.out;
 		this.extensionNumber = calloutInfo.getExtension();
-		this.sessionId = calloutInfo.getCustomerno();
+		this.customerNo = calloutInfo.getCustomerno();
 		this.targetNumber = calloutInfo.getTarget();
 		Long create = calloutInfo.getChannelCreateTime();
 		Long ring = create;
@@ -122,7 +123,7 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.endTime = this.startTime == null || end == null || end == 0 ? null : new Date(end * 1000);
 		this.finishTime = finish == null || finish == 0 ? null : new Date(finish * 1000);
 		this.durationTime = this.startTime == null || this.endTime == null ? 0 : (int) (end - start);
-		this.audioId = calloutInfo.getEuuid();
+		this.uuid = calloutInfo.getEuuid();
 	}
 
 	public String getDbid() {
@@ -165,6 +166,30 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.callType = callType;
 	}
 
+	public String getCallState() {
+		return callState;
+	}
+
+	public void setCallState(String callState) {
+		this.callState = callState;
+	}
+
+	public String getCallStateText() {
+		if (this.callType == null) {
+			return "";
+		}
+		if (this.startTime != null) {
+			return "接通";
+		}
+		if (this.callType == CallType.out) {
+			return "未接";
+		}
+		if (this.callType == CallType.in) {
+			return this.ringTime == null ? "队列中放弃" : "坐席未接";
+		}
+		return "";
+	}
+
 	public String getExtensionNumber() {
 		return extensionNumber;
 	}
@@ -181,12 +206,12 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.targetNumber = targetNumber;
 	}
 
-	public String getSessionId() {
-		return sessionId;
+	public String getCustomerNo() {
+		return customerNo;
 	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void setCustomerNo(String customerNo) {
+		this.customerNo = customerNo;
 	}
 
 	public Date getCallTime() {
@@ -281,28 +306,12 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		return timeText;
 	}
 
-	public String getCallingState() {
-		if (this.callType == null) {
-			return "";
-		}
-		if (this.startTime != null) {
-			return "接通";
-		}
-		if (this.callType == CallType.out) {
-			return "未接";
-		}
-		if (this.callType == CallType.in) {
-			return this.ringTime == null ? "队列中放弃" : "坐席未接";
-		}
-		return "";
+	public String getUuid() {
+		return uuid;
 	}
 
-	public String getAudioId() {
-		return audioId;
-	}
-
-	public void setAudioId(String audioId) {
-		this.audioId = audioId;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getDealcode() {
@@ -314,27 +323,27 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 	}
 
 	public String getAudioUrl() {
-		if (this.audioId == null || this.startTime == null || this.callType == null) {
+		if (this.uuid == null || this.startTime == null || this.callType == null) {
 			return "";
 		}
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-		return this.callType.toString() + "/" + dateFormat.format(this.startTime) + "/" + this.audioId + ".wav";
+		return this.callType.toString() + "/" + dateFormat.format(this.startTime) + "/" + this.uuid + ".wav";
 	}
 
-	public Date getBeginCallTime() {
-		return beginCallTime;
+	public Date getCallTimeFrom() {
+		return callTimeFrom;
 	}
 
-	public void setBeginCallTime(Date beginCallTime) {
-		this.beginCallTime = beginCallTime;
+	public void setCallTimeFrom(Date callTimeFrom) {
+		this.callTimeFrom = callTimeFrom;
 	}
 
-	public Date getEndCallTime() {
-		return endCallTime;
+	public Date getCallTimeTo() {
+		return callTimeTo;
 	}
 
-	public void setEndCallTime(Date endCallTime) {
-		this.endCallTime = endCallTime;
+	public void setCallTimeTo(Date callTimeTo) {
+		this.callTimeTo = callTimeTo;
 	}
 
 	public TMisDunningPeople getDunningPeople() {

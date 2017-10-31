@@ -90,34 +90,20 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 		return dao.getInfoByExtension(extension);
 	}
 	
+	/**
+	 * 根据队列获取坐席信息
+	 * @param queue
+	 * @return
+	 */
+	public TMisAgentInfo getInfoByQueue(String queue) {
+		return dao.getInfoByQueue(queue);
+	}
+	
 	public Page<TMisAgentInfo> findPageList(Page<TMisAgentInfo> page, TMisAgentInfo entity) {
 		entity.setPage(page);
 		page.setList(dao.findList(entity));
 		return page;
 	}
-	
-//	@Transactional(readOnly = false)
-//	public void saveAgent(TMisAgentInfo tmisAgentInfo) {
-//		if(StringUtils.isNotEmpty(tmisAgentInfo.getId())){
-//			TMisAgentInfo info = dao.getInfoByPeopleId(tmisAgentInfo.getId());
-//			TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(info.getPeopleId());
-//			tMisDunningPeople.setAgent(tmisAgentInfo.getAgent());
-//			tMisDunningPeople.setExtensionNumber(tmisAgentInfo.getAgent());
-//			tMisDunningPeopleService.save(tMisDunningPeople);
-//		}
-//		super.save(tmisAgentInfo);
-//	}
-//	
-//	@Transactional(readOnly = false)
-//	public void deleteAgent(TMisAgentInfo tmisAgentInfo) {
-//		TMisDunningPeople tdp=tMisDunningPeopleService.getByAgent(tmisAgentInfo.getAgent());
-//		if(tdp!=null){
-//			tdp.setAgent(null);
-//			tdp.setExtensionNumber(null);;
-//			tMisDunningPeopleService.save(tdp);
-//		}
-//		super.delete(tmisAgentInfo);
-//	}
 
 	public Boolean validateAgent(TMisAgentInfo tmisAgentInfo) {
 		return dao.validateAgent(tmisAgentInfo)==null;

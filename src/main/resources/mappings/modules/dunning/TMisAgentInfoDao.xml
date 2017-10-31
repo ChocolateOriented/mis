@@ -48,6 +48,14 @@
 		limit 1
 	</select>
 	
+	<select id="getInfoByQueue" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.queue = #{queue}
+		limit 1
+	</select>
+	
 	<select id="findList" resultType="TMisAgentInfo">
 		SELECT 
 			a.dbid as "dbid",

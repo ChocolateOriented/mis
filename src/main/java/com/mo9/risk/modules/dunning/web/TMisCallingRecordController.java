@@ -68,6 +68,7 @@ public class TMisCallingRecordController extends BaseController {
 		model.addAttribute("page", page);
 		String url = DictUtils.getDictValue("ctiUrl", "callcenter", "") + "audio/";
 		model.addAttribute("ctiUrl", url);
+		model.addAttribute("userId", UserUtils.getUser().getId());
 		return "modules/dunning/tMisCallingRecordList";
 	}
 	

@@ -10,14 +10,14 @@
 		a.CallType as "callType",
 		a.ExtensionNumber as "extensionNumber",
 		a.TargetNumber as "targetNumber",
-		a.SessionId as "sessionId",
+		a.CustomerNo as "customerNo",
 		a.CallTime as "callTime",
 		a.RingTime as "ringTime",
 		a.StartTime as "startTime",
 		a.EndTime as "endTime",
 		a.FinishTime as "finishTime",
 		a.DurationTime as "durationTime",
-		a.AudioId as "audioId",
+		a.Uuid as "uuid",
 		a.createby as "createBy.name",
 		a.createdate as "createDate",
 		a.updateby as "updateBy.name",
@@ -41,7 +41,7 @@
 			a.CallType as "callType",
 			a.ExtensionNumber as "extensionNumber",
 			a.TargetNumber as "targetNumber",
-			a.SessionId as "sessionId",
+			a.CustomerNo as "customerNo",
 			a.CallTime as "callTime",
 			a.RingTime as "ringTime",
 			a.StartTime as "startTime",
@@ -55,7 +55,7 @@
 				ORDER BY o.id DESC
 				LIMIT 1
 			) as "dealcode",
-			a.AudioId as "audioId",
+			a.Uuid as "uuid",
 			a.createby as "createBy.name",
 			a.createdate as "createDate",
 			a.updateby as "updateBy.name",
@@ -71,6 +71,9 @@
 			    ORDER BY a.CallTime DESC
 			</otherwise>
 		</choose>
+		<if test="page != null">
+			LIMIT ${page.firstResult}, ${page.pageSize}
+		</if>
 	</select>
 	
 	<select id="listCount" resultType="int">
@@ -79,8 +82,6 @@
 		FROM t_mis_calling_record a
 		LEFT JOIN t_mis_dunning_people p on a.peopleid = p.id
 		<include refid="pageListCondotion"></include>
-		<where>
-		</where>
 	</select>
 	
 	<sql id="pageListCondotion">
@@ -112,11 +113,41 @@
 			<if test="peopleId != null and peopleId != ''">
 				AND a.peopleId = #{peopleId}
 			</if>
-			<if test="beginCallTime != null">
-				<![CDATA[ AND a.CallTime >= #{beginCallTime} ]]>
+			<if test="callTimeFrom != null">
+				<![CDATA[ AND a.CallTime >= #{callTimeFrom} ]]>
 			</if>
-			<if test="endCallTime != null">
-				<![CDATA[ AND a.CallTime < #{endCallTime} ]]>
+			<if test="callTimeTo != null">
+				<![CDATA[ AND a.CallTime < #{callTimeTo} ]]>
+			</if>
+			<if test="callType != null">
+				AND a.callType = #{callType}
+			</if>
+			<if test="callState != null">
+				<choose>
+					<!-- 接通 -->
+					<when test="callState == '0'.toString()">
+						AND a.StartTime IS NOT NULL
+					</when>
+					<!-- 未接 -->
+					<when test="callState == '1'.toString()">
+						AND a.callType = 'out'
+						AND a.StartTime IS NULL
+					</when>
+					<!-- 坐席未接 -->
+					<when test="callState == '2'.toString()">
+						AND a.callType = 'in'
+						AND a.StartTime IS NULL
+						AND a.RingTime IS NOT NULL
+					</when>
+					<!-- 队列中放弃 -->
+					<when test="callState == '3'.toString()">
+						AND a.callType = 'in'
+						AND a.StartTime IS NULL
+						AND a.RingTime IS NULL
+					</when>
+					<otherwise>
+					</otherwise>
+				</choose>
 			</if>
 		</where>
 	</sql>
@@ -142,14 +173,14 @@
 			CallType,
 			ExtensionNumber,
 			TargetNumber,
-			SessionId,
+			CustomerNo,
 			CallTime,
 			RingTime,
 			StartTime,
 			EndTime,
 			FinishTime,
 			DurationTime,
-			audioId,
+			Uuid,
 			createby,
 			createdate,
 			updateby,
@@ -161,14 +192,14 @@
 			#{callType},
 			#{extensionNumber},
 			#{targetNumber},
-			#{sessionId},
+			#{customerNo},
 			#{callTime},
 			#{ringTime},
 			#{startTime},
 			#{endTime},
 			#{finishTime},
 			#{durationTime},
-			#{audioId},
+			#{uuid},
 			#{createBy.name},
 			#{createDate},
 			#{updateBy.name},
@@ -193,8 +224,8 @@
 			<if test="extensionNumber != null">
 				targetNumber = #{targetNumber},
 			</if>
-			<if test="sessionId != null">
-				sessionId = #{sessionId},
+			<if test="customerNo != null">
+				customerNo = #{customerNo},
 			</if>
 			<if test="callTime != null">
 				callTime = #{callTime},
@@ -214,41 +245,12 @@
 			<if test="durationTime != null">
 				durationTime = #{durationTime},
 			</if>
-			<if test="audioId != null">
-				audioId = #{audioId},
+			<if test="uuid != null">
+				uuid = #{uuid},
 			</if>
 			updateby = #{updateBy.name},
 			updatedate = #{updateDate}
 		WHERE id = #{id}
-	</update>
-	
-	<update id="updateRecordBySessionId">
-		UPDATE t_mis_calling_record SET
-			<if test="callTime != null">
-				callTime = #{callTime},
-			</if>
-			<if test="ringTime != null">
-				ringTime = #{ringTime},
-			</if>
-			<if test="startTime != null">
-				startTime = #{startTime},
-			</if>
-			<if test="endTime != null">
-				endTime = #{endTime},
-			</if>
-			<if test="finishTime != null">
-				finishTime = #{finishTime},
-			</if>
-			<if test="durationTime != null">
-				durationTime = #{durationTime},
-			</if>
-			<if test="audioId != null">
-				audioId = #{audioId},
-			</if>
-			updateby = #{updateBy.name},
-			updatedate = #{updateDate}
-		WHERE sessionId = #{sessionId}
-		AND finishTime IS NULL
 	</update>
 	
 	<update id="delete">
@@ -256,20 +258,12 @@
 		WHERE id = #{id}
 	</update>
 	
-	<select id="getUnfinishedCallingByAgent" resultType="TMisCallingRecord">
+	<select id="getRecordByInOutUuid" resultType="TMisCallingRecord">
 		SELECT
 			<include refid="TMisCallingRecordColumns"/>
 		FROM t_mis_calling_record a
-		WHERE
-			a.DurationTime is null
-		AND a.Agent = #{agent}
-	</select>
-	
-	<select id="getRecordBySessionId" resultType="TMisCallingRecord">
-		SELECT
-			<include refid="TMisCallingRecordColumns"/>
-		FROM t_mis_calling_record a
-		WHERE a.sessionid = #{sessionId}
+		WHERE a.uuid = #{uuid}
+		AND a.callType = #{callType}
 		limit 1
 	</select>
 

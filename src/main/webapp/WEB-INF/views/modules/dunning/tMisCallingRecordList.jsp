@@ -90,6 +90,17 @@
 			$("#searchForm").submit();
         	return false;
         }
+		
+		function dail(obj){
+			if (confirm("确定拨打该电话吗")) {
+				$.post("${ctx}/dunning/tMisDunningPhone/fatherPageTOPhonePage", {target: $(obj).text(), peopleId: "${userId}"}, function(data) {
+					if (!data) {
+						alert("当前坐席状态无法外呼");
+						return;
+					}
+				});
+			}
+		}
 	</script>
 </head>
 <body>
@@ -108,12 +119,30 @@
 				</div>
 				<div class="span4">
 					<span class="span2" style="line-height:30px;">呼叫时间：</span>
-					<input name="beginCallTime" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
-						value="<fmt:formatDate value="${tMisCallingRecord.beginCallTime}" pattern="yyyy-MM-dd"/>"
+					<input name="callTimeFrom" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
+						value="<fmt:formatDate value="${tMisCallingRecord.callTimeFrom}" pattern="yyyy-MM-dd"/>"
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
-					<input name="endCallTime" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
-						value="<fmt:formatDate value="${tMisCallingRecord.endCallTime}" pattern="yyyy-MM-dd"/>"
+					<input name="callTimeTo" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
+						value="<fmt:formatDate value="${tMisCallingRecord.callTimeTo}" pattern="yyyy-MM-dd"/>"
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+				</div>
+				<div class="span2">
+					<span class="span4" style="line-height:30px;">呼叫类型：</span>
+					<select name="callType" class="span8">
+						<option value="">全部</option>
+						<option value="in" <c:if test="${'in' eq tMisCallingRecord.callType}">selected</c:if>>呼入</option>
+						<option value="out" <c:if test="${'out' eq tMisCallingRecord.callType}">selected</c:if>>呼出</option>
+					</select>
+				</div>
+				<div class="span2">
+					<span class="span4" style="line-height:30px;">通话状态：</span>
+					<select name="callState" class="span8" value="${tMisCallingRecord.callState}">
+						<option value="">全部</option>
+						<option value="0" <c:if test="${'0' eq tMisCallingRecord.callState}">selected</c:if>>接通</option>
+						<option value="1" <c:if test="${'1' eq tMisCallingRecord.callState}">selected</c:if>>未接</option>
+						<option value="3" <c:if test="${'2' eq tMisCallingRecord.callState}">selected</c:if>>坐席未接</option>
+						<option value="2" <c:if test="${'3' eq tMisCallingRecord.callState}">selected</c:if>>队列中放弃</option>
+					</select>
 				</div>
 			</div>
 			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
@@ -172,7 +201,14 @@
 					${tMisCallingRecord.callTimeText}
 				</td>
 				<td>
-					${tMisCallingRecord.targetNumber}
+					<c:choose>
+						<c:when test="${fns:contains(tMisCallingRecord.targetNumber, '*')}">
+							${tMisCallingRecord.targetNumber}
+						</c:when>
+						<c:otherwise>
+							<a href="javascript: void 0;" onclick="dail(this)">${tMisCallingRecord.targetNumber}</a>
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td>
 					${tMisCallingRecord.callType.desc}
@@ -181,7 +217,7 @@
 					${tMisCallingRecord.peopleName}
 				</td>
 				<td>
-					${tMisCallingRecord.callingState}
+					${tMisCallingRecord.callStateText}
 				</td>
 				<td>
 					${tMisCallingRecord.durationTimeText}
@@ -191,7 +227,7 @@
 						${tMisCallingRecord.dealcode}
 					</a>
 				</td>
-				<td style="padding:2px;">
+				<td style="padding:0px;">
 					<c:if test="${not empty tMisCallingRecord.audioUrl}">
 						<audio src="${ctiUrl}${tMisCallingRecord.audioUrl}" preload="none" controls="controls" controlsList="nodownload"></audio>
 					</c:if>
