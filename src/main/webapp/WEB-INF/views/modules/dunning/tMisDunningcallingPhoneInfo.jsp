@@ -66,11 +66,17 @@
 							${calling.startTime}
 						</td>
 						<td>
-							${calling.caller }
+							
+							<c:if test="${calling.agentStartTime eq 0 }">
+							 <font color="red">${calling.caller }</font>
+							</c:if>
+							<c:if test="${calling.agentStartTime ne 0 }">
+							 ${calling.caller }
+							</c:if>
 						</td>
 						<td>
 							<c:if test="${calling.agentStartTime eq 0 }">
-							 未接
+							 <font color="red">未接</font>
 							</c:if>
 							<c:if test="${calling.agentStartTime ne 0}">
 							${calling.callTotalTime }
