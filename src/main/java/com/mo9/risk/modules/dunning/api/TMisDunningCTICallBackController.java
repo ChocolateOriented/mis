@@ -67,7 +67,8 @@ public class TMisDunningCTICallBackController extends BaseController {
 		if (CallCenterBaseNotice.EXTENSION_STATE_NOTICE.equals(type)) {
 			CallCenterAgentInfo noticeInfo = JSON.parseObject(data, CallCenterAgentInfo.class);
 			if (noticeInfo != null && (CallCenterAgentState.ONCALL.equals(noticeInfo.getState())
-					|| CallCenterAgentState.AVAILABLE.equals(noticeInfo.getState()))) {
+					|| CallCenterAgentState.AVAILABLE.equals(noticeInfo.getState())|| CallCenterAgentState.RINGING.equals(noticeInfo.getState()))) {
+
 				TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByExtension(noticeInfo.getExtension());
 				if (agentInfo != null) {
 					noticeInfo.setName(agentInfo.getAgent());

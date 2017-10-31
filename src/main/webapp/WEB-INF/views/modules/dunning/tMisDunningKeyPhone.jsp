@@ -237,7 +237,25 @@
 		}
 		
 		//判断是来电
-		if (data.operation == "Receiving") {
+// 		if (data.operation == "Receiving") {
+// 			changePhone();
+// 			$("#statusPhones").attr("readonly", true);
+			
+// 			$(".showName").html(data.name || '未知');
+// 			$(".phoneStatus").css("display", "none");
+// 			$("#backCall").css("display", "block");
+// 			$(".numberSave").css("display", "block");
+// 			$("#numberValue").val(data.target);
+// 			$("#continues").removeClass("icon-play");
+// 			$("#continues").addClass("icon-pause");
+// 			var icon = "${ctxStatic}/images/userinfo.jpg";
+// 			showNotice('来电提醒', '点击去接听电话', icon);  
+// 			return;
+// 		}
+		if (data.operation == "ringing") {
+			if($("#calling").css("display")=="block"){
+				return;
+			}
 			changePhone();
 			$("#statusPhones").attr("readonly", true);
 			
