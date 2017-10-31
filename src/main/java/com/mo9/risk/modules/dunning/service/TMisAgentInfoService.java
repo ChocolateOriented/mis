@@ -23,6 +23,7 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 	 */
 	@Transactional(readOnly = false)
 	public void updateStatus(TMisAgentInfo agentInfo) {
+		agentInfo.preUpdate();
 		dao.updateInfo(agentInfo);
 		saveLonginLog(agentInfo);
 	}

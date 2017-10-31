@@ -61,12 +61,12 @@ public class TMisDunningPhoneService {
 			tMisAgentInfoService.updateStatus(msg);
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("变更坐席状态失败：" + e.getMessage());
+			logger.info("变更坐席状态失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送变更坐席状态结果消息失败：" + e.getMessage());
+			logger.info("WebSocket发送变更坐席状态结果消息失败：" + e);
 		}
 		return msg;
 	}
@@ -88,12 +88,12 @@ public class TMisDunningPhoneService {
 			msg.setResult("success");
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("发起呼叫失败：" + e.getMessage());
+			logger.info("发起呼叫失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送呼叫结果消息失败：" + e.getMessage());
+			logger.info("WebSocket发送呼叫结果消息失败：" + e);
 		}
 		return msg;
 	}
@@ -110,12 +110,12 @@ public class TMisDunningPhoneService {
 			msg.setResult("success");
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("呼叫中断失败：" + e.getMessage());
+			logger.info("呼叫中断失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送呼叫中断结果消息失败：" + e.getMessage());
+			logger.info("WebSocket发送呼叫中断结果消息失败：" + e);
 		}
 		return msg;
 	}
@@ -131,12 +131,12 @@ public class TMisDunningPhoneService {
 			msg.setResult("success");
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("呼叫保持失败：" + e.getMessage());
+			logger.info("呼叫保持失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送呼叫保持结果消息失败：" + e.getMessage());
+			logger.info("WebSocket发送呼叫保持结果消息失败：" + e);
 		}
 		return msg;
 	}
@@ -152,15 +152,16 @@ public class TMisDunningPhoneService {
 			msg.setResult("success");
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("取消保持失败：" + e.getMessage());
+			logger.info("取消保持失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送取消保持结果消息失败：" + e.getMessage());
+			logger.info("WebSocket发送取消保持结果消息失败：" + e);
 		}
 		return msg;
 	}
+	
 	/**
 	 * 接听应答
 	 */
@@ -172,12 +173,12 @@ public class TMisDunningPhoneService {
 			msg.setResult("success");
 		} catch (Exception e) {
 			msg.setResult("error");
-			logger.info("接听应答失败：" + e.getMessage());
+			logger.info("接听应答失败：" + e);
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
 		} catch (IOException e) {
-			logger.info("WebSocket发送接听应答消息失败：" + e.getMessage());
+			logger.info("WebSocket发送接听应答消息失败：" + e);
 		}
 		return msg;
 	}
@@ -210,7 +211,7 @@ public class TMisDunningPhoneService {
 		try {
 			session.getBasicRemote().sendText(JSON.toJSONString(msg));
 		} catch (IOException e) {
-			logger.info("WebSocket发送变更接听状态消息失败：" + e.getMessage());
+			logger.info("WebSocket发送变更接听状态消息失败：" + e);
 		}
 	}
 	
@@ -222,7 +223,7 @@ public class TMisDunningPhoneService {
 		try {
 			cbr = callCenterManager.calloutInfo(action);
 		} catch (Exception e) {
-			logger.info("获取呼出信息失败,"+ e.getMessage());
+			logger.info("获取呼出信息失败," + e);
 		}
 		return cbr;
 	}
@@ -235,7 +236,7 @@ public class TMisDunningPhoneService {
 		try {
 			cbr = callCenterManager.callinInfo(action);
 		} catch (Exception e) {
-			logger.info("获取呼入信息失败,"+ e.getMessage());
+			logger.info("获取呼入信息失败," + e);
 		}
 		return cbr;
 	}

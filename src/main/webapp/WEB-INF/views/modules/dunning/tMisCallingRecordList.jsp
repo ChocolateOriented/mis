@@ -140,8 +140,8 @@
 						<option value="">全部</option>
 						<option value="0" <c:if test="${'0' eq tMisCallingRecord.callState}">selected</c:if>>接通</option>
 						<option value="1" <c:if test="${'1' eq tMisCallingRecord.callState}">selected</c:if>>未接</option>
-						<option value="3" <c:if test="${'2' eq tMisCallingRecord.callState}">selected</c:if>>坐席未接</option>
-						<option value="2" <c:if test="${'3' eq tMisCallingRecord.callState}">selected</c:if>>队列中放弃</option>
+						<option value="2" <c:if test="${'2' eq tMisCallingRecord.callState}">selected</c:if>>坐席未接</option>
+						<option value="3" <c:if test="${'3' eq tMisCallingRecord.callState}">selected</c:if>>队列中放弃</option>
 					</select>
 				</div>
 			</div>
