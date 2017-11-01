@@ -176,39 +176,43 @@
             $("#search").click(getPeople);
 
             $('#distributionSave').click(function() {
+                confirmx('是否确认分案?', saveConfirm);
+			}); 
+			
+			$('#esc').click(function() {
+				window.parent.window.jBox.close();    
+			});
+
+			function saveConfirm(){
                 if($("#inputForm").valid()){
                     if (!$("#rightContainer div").length) {
                         $.jBox.tip("请选择需要分案的催收人员", "warning");
                         return;
                     }
 
-				$("#distributionSave").attr('disabled',"true");
- 	                $.ajax({
- 	                    type: 'POST',
- 	                    url : "${ctx}/dunning/tMisDunningOuterTask/outDistributionSave",
- 	                    data: $('#inputForm').serialize(),             //获取表单数据
- 	                    success : function(data) {
- 	                        if (data == "OK") {
- 	                            alert("保存成功");
- 	                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
- 	                            window.parent.window.jBox.close();            //关闭子窗体
- 	                        } else {
- 	                            alert(data);
- 	                            window.parent.page();
- 	                            window.parent.window.jBox.close();
- 	                        }
- 	                    },
- 	                    error : function(XMLHttpRequest, textStatus, errorThrown){
- 	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
- 	                       alert("保存失败:"+textStatus);
- 	                    }
- 	                });
- 		          }
-			}); 
-			
-			$('#esc').click(function() {
-				window.parent.window.jBox.close();    
-			}); 
+                    $("#distributionSave").attr('disabled',"true");
+                    $.ajax({
+                        type: 'POST',
+                        url : "${ctx}/dunning/tMisDunningOuterTask/outDistributionSave",
+                        data: $('#inputForm').serialize(),             //获取表单数据
+                        success : function(data) {
+                            if (data == "OK") {
+                                alert("保存成功");
+                                window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+                                window.parent.window.jBox.close();            //关闭子窗体
+                            } else {
+                                alert(data);
+                                window.parent.page();
+                                window.parent.window.jBox.close();
+                            }
+                        },
+                        error : function(XMLHttpRequest, textStatus, errorThrown){
+                            //通常情况下textStatus和errorThrown只有其中一个包含信息
+                            alert("保存失败:"+textStatus);
+                        }
+                    });
+                }
+			}
 		});
 	</script>
 
@@ -246,10 +250,11 @@
 				<div style="width:20%;display:inline-block;">
 					<input id="cyclesCheckable" type="checkbox"/><label for="cyclesCheckable">队列</label>
 				</div>
-				<div style="width:40%;display:inline-block;">
-					<input id="cycle1" type="checkbox" name="cycles" value="Q1" disabled/><label for="cycle1">Q1<label/>&nbsp;
-					<input id="cycle2" type="checkbox" name="cycles" value="Q2" disabled/><label for="cycle2">Q2</label>&nbsp;
-					<input id="cycle3" type="checkbox" name="cycles" value="Q3" disabled/><label for="cycle3">Q3<label/>&nbsp;
+				<div style="width:50%;display:inline-block;">
+					<input id="cycle0" type="checkbox" name="cycles" value="Q0" disabled/><label for="cycle0">Q0<label/>&nbsp;
+					<input id="cycle1" type="checkbox" name="cycles" value="Q1" disabled/><label for="cycle1">Q1</label>&nbsp;
+					<input id="cycle2" type="checkbox" name="cycles" value="Q2" disabled/><label for="cycle2">Q2<label/>&nbsp;
+					<input id="cycle3" type="checkbox" name="cycles" value="Q3" disabled/><label for="cycle3">Q3</label>&nbsp;
 					<input id="cycle4" type="checkbox" name="cycles" value="Q4" disabled/><label for="cycle4">Q4</label>&nbsp;
 					<input id="cycle5" type="checkbox" name="cycles" value="Q5" disabled/><label for="cycle5">Q5</label>
 				</div>

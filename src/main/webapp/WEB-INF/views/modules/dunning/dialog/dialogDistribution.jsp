@@ -176,40 +176,44 @@
             $("#search").click(getPeople);
 
 			$('#distributionSave').click(function() {
- 			   if($("#inputForm").valid()){
- 			     if (!$("#rightContainer div").length) {
-                     $.jBox.tip("请选择需要分案的催收人员", "warning");
-                     return;
-				 }
-
- 				 $("#distributionSave").attr('disabled',"true");
- 	                $.ajax({
- 	                    type: 'POST',
- 	                    url : "${ctx}/dunning/tMisDunningTask/distributionSave",
- 	                    data: $('#inputForm').serialize(),             //获取表单数据
- 	                    success : function(data) {
- 	                        if (data == "OK") {
- 	                            alert("保存成功");
- 	                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
- 	                            window.parent.window.jBox.close();            //关闭子窗体
- 	                        } else {
- 	                            alert(data);
- 	                            window.parent.page();
- 	                            window.parent.window.jBox.close();
- 	                        }
- 	                    },
- 	                    error : function(XMLHttpRequest, textStatus, errorThrown){
- 	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
- 	                       alert("保存失败:"+textStatus);
- 	                    }
- 	                });
- 		          }
+                confirmx('是否确认分案?', saveConfirm);
 			});
 
 			
 			$('#esc').click(function() {
 				window.parent.window.jBox.close();    
 			});
+
+			function saveConfirm() {
+                if($("#inputForm").valid()){
+                    if (!$("#rightContainer div").length) {
+                        $.jBox.tip("请选择需要分案的催收人员", "warning");
+                        return;
+                    }
+
+                    $("#distributionSave").attr('disabled',"true");
+                    $.ajax({
+                        type: 'POST',
+                        url : "${ctx}/dunning/tMisDunningTask/distributionSave",
+                        data: $('#inputForm').serialize(),             //获取表单数据
+                        success : function(data) {
+                            if (data == "OK") {
+                                alert("保存成功");
+                                window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+                                window.parent.window.jBox.close();            //关闭子窗体
+                            } else {
+                                alert(data);
+                                window.parent.page();
+                                window.parent.window.jBox.close();
+                            }
+                        },
+                        error : function(XMLHttpRequest, textStatus, errorThrown){
+                            //通常情况下textStatus和errorThrown只有其中一个包含信息
+                            alert("保存失败:"+textStatus);
+                        }
+                    });
+                }
+			}
 
         });
 	</script>
@@ -340,8 +344,7 @@
 
 		<div class="form-actions">
  			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-				<%--<input id="distributionSave" class="btn btn-primary" type="button" value="确认分案"/>&nbsp;--%>
-				<input    name="btnCollection" onclick="return confirmx('是否确认分案？', '${ctx}/dunning/tMisDunningTask/distributionSave?id=${tMisDunningTask.id}')" class="btn btn-primary"  type="button" value="分案" />&nbsp;
+				<input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;
  				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
  			</shiro:hasPermission>
 		</div>
