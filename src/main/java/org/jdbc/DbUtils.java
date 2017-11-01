@@ -306,8 +306,9 @@ public class DbUtils {
 	 */
 	public List<TRiskBuyerContactRecords> findBuyerContactRecordsListByBuyerId(String buyerId) throws Exception {
 		String sql = "SELECT  " +
-				" CASE WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(通讯录)')" +
-				" WHEN w.company_tel IS NOT NULL THEN ' 单位电话'" +
+				" CASE WHEN w.company_tel IS NOT NULL THEN concat(w.company_name,'(单位&联系人)')" +
+				" WHEN b.type IS NOT NULL THEN concat(c.name,'(单位&联系人)')" +
+				" WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(通讯录)')" +
 				" WHEN d.contact_name IS NULL AND c.name IS NOT NULL THEN c.name" +
 				" ELSE '未知'" +
 				" END as 'name'," +
@@ -339,7 +340,7 @@ public class DbUtils {
 				" LEFT JOIN t_buyer_contact AS d ON d.buyer_id = a.buyer_id AND d.contact_mobile = c.tel" +
 				" INNER JOIN t_risk_buyer2contacts  b  ON c.id = b.buyer_contact_id  AND a.buyer_id = b.buyer_id" +
 				" LEFT JOIN t_risk_buyer_workinfo AS w  ON w.buyer_id = a.buyer_id AND REPLACE(w.company_tel, '-', '') = c.tel" +
-				" WHERE a.buyer_id = '" + buyerId + "'  GROUP BY c.tel ORDER BY SUM(a.times) DESC  LIMIT 30 " ;
+				" WHERE a.buyer_id = '" + buyerId + "'  GROUP BY c.tel ORDER BY SUM(a.times) DESC  LIMIT 50 " ;
 		if(sql == null || sql.trim().equals("")) {
 			//logger.info("parameter is valid!");
 			return null;

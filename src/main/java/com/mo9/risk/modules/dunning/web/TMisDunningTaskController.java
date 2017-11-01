@@ -1052,7 +1052,7 @@ public class TMisDunningTaskController extends BaseController {
 		TRiskBuyerContactRecords  tRiskBuyerContactRecords = new TRiskBuyerContactRecords();
 		tRiskBuyerContactRecords.setBuyerId(buyerId);
 		tRiskBuyerContactRecords.setDealcode(dealcode);
-		Page<TRiskBuyerContactRecords> communicationsPage = new Page<TRiskBuyerContactRecords>(request, response);		
+		Page<TRiskBuyerContactRecords> communicationsPage = new Page<TRiskBuyerContactRecords>(request, response, 50);		
 //		communicationsPage = tRiskBuyerContactRecordsService.findPage(communicationsPage, tRiskBuyerContactRecords);
 		communicationsPage = tRiskBuyerContactRecordsService.findPageByRediscache(communicationsPage, tRiskBuyerContactRecords,buyerId,mobileSelf);
 //		TRiskBuyerPersonalInfo personalInfo = personalInfoDao.getBuyerInfoByDealcode(dealcode);

@@ -163,17 +163,22 @@ public class TBuyerContactService {
 			return;
 		}
 		
+		Map<String, TBuyerContact> relationMap = new HashMap<String, TBuyerContact>(128);
+		for (TBuyerContact relation : contactRelations) {
+			if (relation.getContactMobile() != null) {
+				relationMap.put(relation.getContactMobile(), relation);
+			}
+		}
+		
 		for (TBuyerContact contact : tBuyerContacts) {
 			if (contact.getContactMobile() == null) {
 				continue;
 			}
 			
-			for (TBuyerContact relation : contactRelations) {
-				if (contact.getContactMobile().equals(relation.getContactMobile())) {
-					contact.setRcname(relation.getRcname());
-					contact.setFamilyrelation(relation.getFamilyrelation());
-					break;
-				}
+			TBuyerContact relation = relationMap.get(contact.getContactMobile());
+			if (relation != null) {
+				contact.setRcname(relation.getRcname());
+				contact.setFamilyrelation(relation.getFamilyrelation());
 			}
 		}
 	}

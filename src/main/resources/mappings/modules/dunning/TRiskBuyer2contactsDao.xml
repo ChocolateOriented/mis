@@ -39,6 +39,22 @@
 			and a.type is not NULL
 	</select>
 	
+	<select id="getBuyerContacts" resultType="TRiskBuyer2contacts">
+		SELECT 
+			a.id AS "id",
+			a.buyer_id AS "buyerId",
+			a.buyer_contact_id AS "buyerContactId",
+			a.create_time AS "createTime",
+			a.family_relation AS "familyRelation",
+			a.type AS "type",
+			b.tel as "tel",
+			b.name as "name"
+		FROM t_risk_buyer2contacts a
+		LEFT JOIN t_risk_contact b ON a.buyer_contact_id = b.id
+		WHERE a.buyer_id = #{buyerId} 
+		AND a.type is not NULL
+	</select>
+	
 	<select id = "getSendMsgByBuyerIdAndType" resultType = "TMisSendMsgInfo">	    
 		SELECT 
 			a.buyer_id AS "buyerId",
