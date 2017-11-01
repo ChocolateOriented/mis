@@ -2,6 +2,7 @@ package com.mo9.risk.modules.dunning.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
@@ -14,17 +15,20 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     private static final long serialVersionUID = 1L;
 
+    public static final String PROBLEM_STATUS_SOLVED = "solved"; //已解决
+    public static final String PROBLEM_STATUS_UNSOLVED = "unsolved";  //未解决
+
     private String dealcode; // 订单编号
     private String ordertype; // 订单类型
-    private Boolean orderstatus; // 当前催收时的订单状态
-    private Boolean problemstatus;//客服反馈的问题状态
+    private String orderstatus; // 当前催收时的订单状态
+    private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
     private String problemdescriotion;//问题描述
-    private Date dunningtime;//操作时间
     private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
-    private String roodealcode;//主订单编号
+    private String rootorderid;//主订单编号
+    private TRiskOrder tRiskOrder;
 
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
@@ -43,19 +47,25 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.ordertype = ordertype;
     }
 
-    public Boolean getOrderstatus() {
+    public String getOrderstatus() {
         return orderstatus;
     }
 
-    public void setOrderstatus(Boolean orderstatus) {
+    public void setOrderstatus(String orderstatus) {
         this.orderstatus = orderstatus;
     }
 
-    public Boolean getProblemstatus() {
+    public String getProblemstatus() {
         return problemstatus;
     }
 
-    public void setProblemstatus(Boolean problemstatus) {
+    @ExcelField(title="订单状态", type=1, align=2, sort=9)
+    public String getStatusText() {
+        return PROBLEM_STATUS_SOLVED.equals(this.problemstatus) ?  "已解决" :
+                PROBLEM_STATUS_UNSOLVED.equals(this.problemstatus) ?  "未解决" : "";
+    }
+
+    public void setProblemstatus(String problemstatus) {
         this.problemstatus = problemstatus;
     }
 
@@ -75,15 +85,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     public void setProblemdescriotion(String problemdescriotion) {
         this.problemdescriotion = problemdescriotion;
-    }
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    public Date getDunningtime() {
-        return dunningtime;
-    }
-
-    public void setDunningtime(Date dunningtime) {
-        this.dunningtime = dunningtime;
     }
 
     @Length(min=1, max=128, message="催收订单号长度必须介于 1 和 128 之间")
@@ -114,11 +115,19 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     }
 
     @Length(min=1, max=128, message="催收订单号长度必须介于 1 和 128 之间")
-    public String getRoodealcode() {
-        return roodealcode;
+    public String getRootorderid() {
+        return rootorderid;
     }
 
-    public void setRoodealcode(String roodealcode) {
-        this.roodealcode = roodealcode;
+    public void setRootorderid(String rootorderid) {
+        this.rootorderid = rootorderid;
+    }
+
+    public TRiskOrder gettRiskOrder() {
+        return tRiskOrder;
+    }
+
+    public void settRiskOrder(TRiskOrder tRiskOrder) {
+        this.tRiskOrder = tRiskOrder;
     }
 }

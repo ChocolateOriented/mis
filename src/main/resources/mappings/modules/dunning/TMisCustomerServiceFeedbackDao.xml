@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao">
+    <sql id="tMisCustomerServiceFeedbackColumns">
+        a.id AS "id",
+        a.dealcode AS "dealcode",
+        a.ordertype AS "ordertype",
+        a.orderstatus AS "orderstatus",
+        a.problemstatus AS "problemstatus",
+        a.hashtag AS "hashtag",
+        a.problemdescription AS "problemdescription",
+        a.createTime AS "createTime",
+        a.createby AS "createBy.name",
+        a.pushpeople AS "pushpeople",
+        a.operate AS "operate",
+        a.handlingresult AS "handlingresult",
+        a.rootOrderId AS "rootOrderId",
+        a.tRiskOrderId AS "tRiskOrder.id"
+    </sql>
+
+    <sql id="tMisCustomerServiceFeedbackJoinsColumns">
+          ,
+        r.`dealcode` AS "tRiskOrder.dealcode",
+        r.`type` AS "tRiskOrder.type",
+        r.`status` AS "tRiskOrder.status",
+        r.`createTime` AS "tRiskOrder.createTime",
+        r.`rootOrderId` AS "tRiskOrder.rootOrderId"
+    </sql>
+
+    <sql id="tMisCustomerServiceFeedbackJoins">
+        LEFT JOIN t_risk_order r ON r.id=a.tRiskOrderId
+    </sql>
+
+    <select id="get" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+              <include refid="tMisCustomerServiceFeedbackColumns"/>
+              <include refid="tMisCustomerServiceFeedbackJoinsColumns"/>
+        FROM t_mis_customer_service_feedback a
+              <include refid="tMisCustomerServiceFeedbackJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+              <include refid="tMisCustomerServiceFeedbackColumns"/>
+              <include refid="tMisCustomerServiceFeedbackJoinsColumns"/>
+        FROM t_mis_customer_service_feedback a
+              <include refid="tMisCustomerServiceFeedbackJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="insert">
+        INSERT INTO t_mis_customer_service_feedback(
+            id,
+            dealcode,
+            ordertype,
+            orderstatus,
+            problemstatus,
+            hashtag,
+            problemdescription,
+            createTime,
+            createby,
+            pushpeople,
+            operate,
+            handlingresult,
+            rootOrderId
+        )VALUES (
+            #{id},
+            #{dealcode},
+            #{ordertype},
+            #{orderstatus},
+            #{problemstatus},
+            #{hashtag},
+            #{problemdescription},
+            #{createTime},
+            #{createBy.name},
+            #{pushpeople},
+            #{operate},
+            #{handlingresult},
+            #{rootOrderId}
+        )
+    </select>
+
+    <select id="findFeedbackByCodeTypeStatus" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+            <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM t_mis_customer_service_feedback a
+            LEFT JOIN  t_risk_order r ON a.tRiskOrderId=r.id
+        WHERE
+             a.Invalid = 't'
+        <if test="dealcode !=null and dealcode.length > 0">
+            AND r.dealcode IN
+            <foreach item="item" collection="dealcode" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="ordertype !=null and ordertype.length >0">
+            AND r.type IN
+            <foreach item="item" collection="ordertype" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderstatus !=null and orderstatus.length > 0">
+            AND r.status IN
+            <foreach item="item" collection="orderstatus" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findFeedbackByStatusTagProblemPeople" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+            <include refid="tMisCustomerServiceFeedbackColumns"/>
+            <include refid="tMisCustomerServiceFeedbackJoinsColumns"/>
+        FROM t_mis_customer_service_feedback a
+            <include refid="tMisCustomerServiceFeedbackJoins"/>
+        WHERE
+            a.Invalid = 't'
+        <if test="problemstatus !=null and problemstatus.length > 0">
+            AND a.problemstatus IN
+            <foreach item="item" collection="problemstatus" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="hashtag !=null and hashtag.length > 0">
+            <foreach item="item" collection="hashtag" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="problemdescription !=null and problemdescription.length > 0">
+            <foreach item="item" collection="problemdescription" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="pushpeople !=null and pushpeople.length > 0">
+            <foreach item="item" collection="pushpeople" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findFeedbackByStatus" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+             <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM t_mis_customer_service_feedback a
+             LEFT JOIN t_risk_order r on a.tRiskOrderId=r.id
+        WHERE
+             a.Invalid = 't'
+        <if test="problemstatus !=null and problemstatus !=''">
+            AND a.problemstatus=#{problemstatus}
+        </if>
+    </select>
+</mapper>

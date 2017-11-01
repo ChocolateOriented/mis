@@ -29,10 +29,20 @@
 						</bean>
 					</key>
 				</entry>
+				<entry value-ref="customerServiceFeedbackListener">
+				<key>
+					<bean class="com.mo9.mqclient.MqSubscription">
+						<property name="topic" value="${MQ_MO9_TOPIC}"/>
+						<!--订阅全部tag-->
+						<property name="expression" value="*"/>
+					</bean>
+				</key>
+			</entry>
 			</map>
 		</property>
 	</bean>
 
 	<bean id = "riskOrderListener" class="com.mo9.risk.modules.dunning.listener.RiskOrderListener"></bean>
+	<bean id="customerServiceFeedbackListener" class="com.mo9.risk.modules.dunning.listener.CustomerServiceFeedbackListener"></bean>
 
 </beans>
