@@ -3230,12 +3230,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 20 6 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB_job() {
+		logger.info("开始今天迁徙计算");
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			Date Yesterday = TMisMigrationRateReportService.getDate(-1);
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(Yesterday);
+			logger.info("迁徙计算结束");
 		} catch (Exception e) {
 			logger.info(e);
+			logger.warn("迁徙计算失败");
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");  
 		}
