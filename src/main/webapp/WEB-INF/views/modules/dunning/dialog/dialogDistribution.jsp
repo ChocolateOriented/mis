@@ -340,8 +340,8 @@
 
 		<div class="form-actions">
  			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-				<input id="distributionSave" class="btn btn-primary" type="button" value="确认分案"/>&nbsp;
-				<input    name="btnCollection" onclick="return confirmx('是否确认分案？', '${ctx}/dunning/tMisDunningTask/distributionSave?id=${tMisRemittanceConfirm.id}')" class="btn btn-primary"  type="button" value="是" />
+				<%--<input id="distributionSave" class="btn btn-primary" type="button" value="确认分案"/>&nbsp;--%>
+				<input    name="btnCollection" onclick="return confirmx('是否确认分案？', '${ctx}/dunning/tMisDunningTask/distributionSave?id=${tMisDunningTask.id}')" class="btn btn-primary"  type="button" value="分案" />&nbsp;
  				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
  			</shiro:hasPermission>
 		</div>
