@@ -243,4 +243,19 @@
 		</where>
 		limit 1
 	</select>
+	
+	<select id="validateDirect" resultType="TMisAgentInfo">
+		SELECT
+			a.direct
+		FROM t_mis_agent_info a
+		<where>
+			<if test="extension !=null and extension != '' ">
+				AND a.direct=#{direct}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id != #{id}
+			</if>
+		</where>
+		limit 1
+	</select>
 </mapper>

@@ -53,6 +53,21 @@ $(document).ready(function() {
 				        }
 				    }
 				}
+			},
+			direct:{
+				remote: {
+				    url: "${ctx}/dunning/tMisAgentInfo/validateDirect",    
+				    type: "post",               
+				    dataType: "json",            
+				    data: {                    
+				    	extension: function() {
+				            return $("#direct").val();
+				        },
+				    	id:function() {
+				            return $("#agentId").val();
+				        }
+				    }
+				}
 			}
 			
 		},
@@ -65,6 +80,9 @@ $(document).ready(function() {
 			},
 			extension:{
 				remote:"该分机号已存在"
+			},
+			direct:{
+				remote:"该对外分机号已存在"
 			}
 		},
 		submitHandler: function(form){
@@ -125,8 +143,8 @@ $(document).ready(function() {
 		<div class="control-group">
 			<label class="control-label">对外分机号：</label>
 			<div class="controls">
-				<form:input path="direct" htmlEscape="false" maxlength="64" class="input-medium " />
-<!-- 				<span class="help-inline"><font color="red">*</font></span> -->
+				<form:input path="direct" htmlEscape="false" maxlength="64" class="input-medium required" />
+				<span class="help-inline"><font color="red">*</font></span>
 			</div>
 		</div>
 		

@@ -71,6 +71,7 @@ public class TMisDunningCTICallBackController extends BaseController {
 					|| CallCenterAgentState.RINGING.equals(noticeInfo.getState()))) {
 				TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByExtension(noticeInfo.getExtension());
 				if (agentInfo != null) {
+					TMisAgentInfoService.callStatus.put(agentInfo.getAgent(),noticeInfo.getState());
 					noticeInfo.setName(agentInfo.getAgent());
 					tMisDunningPhoneService.changeState(noticeInfo);
 				}

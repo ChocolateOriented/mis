@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
 
 import com.alibaba.fastjson.JSON;
+import com.mo9.risk.modules.dunning.bean.CallCenterAgentState;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentStatus;
 import com.mo9.risk.modules.dunning.bean.CallCenterBaseAction;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
@@ -151,7 +152,11 @@ public class TMisDunningPhoneWebsocketService {
 		if (!"success".equals(result.getResult())) {
 			log.info("关闭连接时坐席离线失败:" + result.getMsg());
 		}
-		
+		String statusNotice = tMisAgentInfoService.callStatus.remove(agent);
+		if(statusNotice!=null&&!CallCenterAgentState.AVAILABLE.equals(statusNotice)){
+			msgObj.setOperation(CallCenterBaseAction.HANGUP);
+			phoneService.hangup(msgObj);
+		}
 		WebSocketSessionUtil.remove(userId);
 	}
 

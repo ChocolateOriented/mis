@@ -166,4 +166,9 @@ public class TMisAgentInfoController extends BaseController{
 	public Boolean  validateExtension(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
 		return tMisAgentInfoService.validateExtension(tmisAgentInfo);
 	}
+	@RequestMapping(value={"validateDirect"})
+	@ResponseBody
+	public Boolean  validateDirect(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
+		return tMisAgentInfoService.validateDirect(tmisAgentInfo);
+	}
 }

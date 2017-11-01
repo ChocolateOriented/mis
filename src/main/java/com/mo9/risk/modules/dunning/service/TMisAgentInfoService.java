@@ -3,6 +3,11 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.websocket.Session;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +20,7 @@ import com.thinkgem.jeesite.common.service.CrudService;
 @Service
 @Transactional(readOnly = true)
 public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgentInfo> {
-	
+	public static final Map<String, String> callStatus = new ConcurrentHashMap<String, String>();
 	/**
 	 * 更新坐席状态
 	 * @param agentInfo
@@ -116,5 +121,9 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 
 	public Boolean validateExtension(TMisAgentInfo tmisAgentInfo) {
 		return dao.validateExtension(tmisAgentInfo)==null;
+	}
+
+	public Boolean validateDirect(TMisAgentInfo tmisAgentInfo) {
+		return dao.validateDirect(tmisAgentInfo)==null;
 	}
 }

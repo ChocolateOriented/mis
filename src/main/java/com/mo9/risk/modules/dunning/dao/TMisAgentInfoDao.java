@@ -27,4 +27,6 @@ public interface TMisAgentInfoDao extends CrudDao<TMisAgentInfo> {
 	public TMisAgentInfo validateQueue(TMisAgentInfo tmisAgentInfo);
 	
 	public TMisAgentInfo validateExtension(TMisAgentInfo tmisAgentInfo);
+
+	public TMisAgentInfo validateDirect(TMisAgentInfo tmisAgentInfo);
 }
