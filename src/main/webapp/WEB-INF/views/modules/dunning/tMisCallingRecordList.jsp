@@ -12,6 +12,16 @@
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function() {
+			var groups = [];
+			if ("${supervisorLimit}" == "true") {
+				var groupOptions = $("#groupList")[0].options;
+				for (var i = 0; i < groupOptions.length; i++) {
+					if (groupOptions[i].value) {
+						groups.push(groupOptions[i].value);
+					}
+				}
+			}
+			
 			//组与花名联动查询
 			$("#groupList").on("change",function(){
 				$("#peopleList").select2("val", null);
@@ -26,6 +36,7 @@
 			        	var param = {};
 			        	if ("${supervisorLimit}" == "true") {
 			        		param = {'group.id': groupId, 
+			        				'group.groupIds': groups.toString(),
 				            		nickname: term};
 			        	} else {
 			        		param = {'group.id': groupId, 
