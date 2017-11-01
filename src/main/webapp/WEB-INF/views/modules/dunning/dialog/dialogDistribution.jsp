@@ -249,10 +249,11 @@
 				<div style="width:20%;display:inline-block;">
 					<input id="cyclesCheckable" type="checkbox"/><label for="cyclesCheckable">队列</label>
 				</div>
-				<div style="width:40%;display:inline-block;">
-					<input id="cycle1" type="checkbox" name="cycles" value="Q1" disabled/><label for="cycle1">Q1<label/>&nbsp;
-					<input id="cycle2" type="checkbox" name="cycles" value="Q2" disabled/><label for="cycle2">Q2</label>&nbsp;
-					<input id="cycle3" type="checkbox" name="cycles" value="Q3" disabled/><label for="cycle3">Q3<label/>&nbsp;
+				<div style="width:50%;display:inline-block;">
+					<input id="cycle0" type="checkbox" name="cycles" value="Q0" disabled/><label for="cycle0">Q0<label/>&nbsp;
+					<input id="cycle1" type="checkbox" name="cycles" value="Q1" disabled/><label for="cycle1">Q1</label>&nbsp;
+					<input id="cycle2" type="checkbox" name="cycles" value="Q2" disabled/><label for="cycle2">Q2<label/>&nbsp;
+					<input id="cycle3" type="checkbox" name="cycles" value="Q3" disabled/><label for="cycle3">Q3</label>&nbsp;
 					<input id="cycle4" type="checkbox" name="cycles" value="Q4" disabled/><label for="cycle4">Q4</label>&nbsp;
 					<input id="cycle5" type="checkbox" name="cycles" value="Q5" disabled/><label for="cycle5">Q5</label>
 				</div>
@@ -340,6 +341,7 @@
 		<div class="form-actions">
  			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
 				<input id="distributionSave" class="btn btn-primary" type="button" value="确认分案"/>&nbsp;
+				<input    name="btnCollection" onclick="return confirmx('是否确认分案？', '${ctx}/dunning/tMisDunningTask/distributionSave?id=${tMisRemittanceConfirm.id}')" class="btn btn-primary"  type="button" value="是" />
  				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
  			</shiro:hasPermission>
 		</div>
