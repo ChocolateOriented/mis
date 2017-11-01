@@ -52,9 +52,9 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     public String findList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
 
         //默认条件展示未解决问题消息案件
-        if (tMisCustomerServiceFeedback.getProblemstatus() == null){
+       /* if (tMisCustomerServiceFeedback.getProblemstatus() == null){
             tMisCustomerServiceFeedback.setProblemstatus(tMisCustomerServiceFeedback.PROBLEM_STATUS_SOLVED);
-        }
+        }*/
         Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.findPage(new Page<TMisCustomerServiceFeedback>(request, response), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
         return "modules/dunning/tMisCustomerServiceFeedbackList";

@@ -4,6 +4,7 @@ import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -57,6 +58,12 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
             return null;
         }
         return tMisCustomerServiceFeedbackDao.findFeedbackByStatus(problemstatus);
+    }
+
+    public Page<TMisCustomerServiceFeedback> findPage(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback) {
+        // 设置排序参数
+        page.setOrderBy("ProblemStatus DESC");
+        return super.findPage(page, this.get(tMisCustomerServiceFeedback));
     }
 
 }
