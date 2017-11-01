@@ -139,4 +139,16 @@
 		GROUP by ContantTarget
 	</select>
 	
+	<select id="findContactRecordsPhoneInfo" resultType="com.mo9.risk.modules.dunning.entity.PhoneInfo">
+		SELECT 
+			phone AS "preNumber",
+			province AS "province",
+			city AS "city"
+		FROM phone a
+		WHERE a.phone IN
+		<foreach collection="list" item="record" open="(" close=")" separator=",">
+			substr(#{record.tel}, 1, 7)
+		</foreach>
+	</select>
+	
 </mapper>

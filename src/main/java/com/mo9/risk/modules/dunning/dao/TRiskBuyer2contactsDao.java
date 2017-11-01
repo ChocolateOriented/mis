@@ -21,6 +21,8 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 public interface TRiskBuyer2contactsDao {
 	public List<TRiskBuyer2contacts> getContactsByBuyerId(@Param("buyerId")String buyerId,@Param("dealcode")String dealcode);
 	
+	public List<TRiskBuyer2contacts> getBuyerContacts(String buyerId);
+	
 	public List<TMisSendMsgInfo> getSendMsgByBuyerIdAndType(String buyerId,String type);
 	/**
 	 * 查询该用户联系人的所有电话

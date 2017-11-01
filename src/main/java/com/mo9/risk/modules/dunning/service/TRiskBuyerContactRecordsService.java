@@ -6,6 +6,9 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.bean.ThreadBuyerid;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerContactRecordsDao;
+import com.mo9.risk.modules.dunning.entity.PhoneInfo;
+import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.manager.RiskBuyerContactManager;
 import com.mo9.risk.util.InsertRedisThread;
@@ -20,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdbc.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +50,12 @@ public class TRiskBuyerContactRecordsService {
 	private TMisDunningTaskDao tMisDunningTaskDao;
 	@Autowired
 	private TRiskBuyerContactRecordsDao tRiskBuyerContactRecordsDao;
-	
+	@Autowired
+	private TBuyerContactService tBuyerContactService;
+	@Autowired
+	private TRiskBuyerWorkinfoService tRiskBuyerWorkinfoService;
+	@Autowired
+	private TRiskBuyer2contactsService tRiskBuyer2contactsService;
 	
 	public Page<TRiskBuyerContactRecords> findPage(Page<TRiskBuyerContactRecords> page, TRiskBuyerContactRecords tRiskBuyerContactRecords) {
 		tRiskBuyerContactRecords.setPage(page);
@@ -89,6 +99,8 @@ public class TRiskBuyerContactRecordsService {
 				} catch (Exception e) {
 					logger.warn("切源查询通讯失败：buyerid-"+tRiskBuyerContactRecords.getBuyerId(),e);
 				}
+			} else {
+				matchContactRecordRelation(contactRecordsList, buyerId);
 			}
 			if(!contactRecordsList.isEmpty()){
 				for(TRiskBuyerContactRecords records : contactRecordsList){
@@ -281,7 +293,83 @@ public class TRiskBuyerContactRecordsService {
 		
 	}
 
-	
+	/**
+	 * 匹配单位/联系人/通讯录/归属地
+	 * @param tRiskBuyerContactRecords
+	 * @param buyerId
+	 * @return
+	 */
+	private void matchContactRecordRelation(List<TRiskBuyerContactRecords> list, String buyerId) {
+		TMisSendMsgInfo workinfo = tRiskBuyerWorkinfoService.getWorkTelInfoByBuyerId(buyerId);
+		List<TRiskBuyer2contacts> buyer2Contacts = tRiskBuyer2contactsService.getBuyerContacts(buyerId);
+		List<TMisSendMsgInfo> buyerContactsInfo = tBuyerContactService.getContactsByBuyerId(buyerId);
+		List<PhoneInfo> phoneInfos = tRiskBuyerContactRecordsDao.findContactRecordsPhoneInfo(list);
+		
+		Map<String, TRiskBuyer2contacts> buyer2ContactMap = new HashMap<String, TRiskBuyer2contacts>(64);
+		Map<String, TMisSendMsgInfo> buyerContactsMap = new HashMap<String, TMisSendMsgInfo>(128);
+		Map<String, PhoneInfo> PhoneInfoMap = new HashMap<String, PhoneInfo>(128);
+		
+		if (buyer2Contacts != null && !buyer2Contacts.isEmpty()) {
+			for (TRiskBuyer2contacts buyerContact : buyer2Contacts) {
+				buyer2ContactMap.put(buyerContact.getTel(), buyerContact);
+			}
+		}
+		
+		if (buyerContactsInfo != null && !buyerContactsInfo.isEmpty()) {
+			for (TMisSendMsgInfo contactInfo : buyerContactsInfo) {
+				buyerContactsMap.put(contactInfo.getTel(), contactInfo);
+			}
+		}
+		
+		if (phoneInfos != null && !phoneInfos.isEmpty()) {
+			for (PhoneInfo phone : phoneInfos) {
+				PhoneInfoMap.put(phone.getPreNumber(), phone);
+			}
+		}
+		
+		for (TRiskBuyerContactRecords contactRecord : list) {
+			String recordTel = contactRecord.getTel();
+			if (StringUtils.isEmpty(recordTel)) {
+				continue;
+			}
+			
+			//匹配归属地
+			if (recordTel.length() >= 7) {
+				PhoneInfo phone = PhoneInfoMap.get(recordTel.substring(0, 7));
+				if (phone != null) {
+					String province = phone.getProvince() == null ? "" : phone.getProvince();
+					String city = phone.getCity() == null ? "" : phone.getCity();
+					String location = province.equals(city) ? city : province + city;
+					contactRecord.setLocation(location);
+				}
+			}
+			
+			//匹配单位
+			if (workinfo != null && recordTel.equals(workinfo.getTel())) {
+				String name = workinfo.getName() + "(单位&联系人)";
+				contactRecord.setName(name);
+				continue;
+			}
+			
+			//匹配联系人
+			TRiskBuyer2contacts buyer2Contact = buyer2ContactMap.get(recordTel);
+			if (buyer2Contact != null) {
+				String name = buyer2Contact.getName() + "(单位&联系人)";
+				contactRecord.setName(name);
+				continue;
+			}
+			
+			//匹配通讯录
+			TMisSendMsgInfo contactInfo = buyerContactsMap.get(recordTel);
+			if (contactInfo != null) {
+				String name = contactInfo.getName() + "(通讯录)";
+				contactRecord.setName(name);
+				continue;
+			}
+			
+		}
+		
+	}
 	
 	/**
 	 * 预缓存通话记录

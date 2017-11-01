@@ -180,6 +180,34 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 		this.inDuration = inDuration;
 	}
 
+	public Integer getOutCnt() {
+		if (this.number == null || this.inCnt == null) {
+			return null;
+		}
+		return this.number - this.inCnt;
+	}
+
+	public String getInTimes() {
+		if (this.inDuration == null) {
+			return null;
+		}
+		int hour = this.inDuration / 3600;
+		int minute = this.inDuration % 3600 / 60;
+		int second = this.inDuration % 60;
+		return hour + "小时" + minute + "分" + second + "秒";
+	}
+
+	public String getOutTimes() {
+		if (this.sumtime == null || this.inDuration == null) {
+			return null;
+		}
+		int outDuration = this.sumtime - this.inDuration;
+		int hour = outDuration / 3600;
+		int minute = outDuration % 3600 / 60;
+		int second = outDuration % 60;
+		return hour + "小时" + minute + "分" + second + "秒";
+	}
+
 	@Override
 	public String toString() {
 		return "TRiskBuyerContactRecords{" +
