@@ -20,8 +20,7 @@
 		a.Invalid AS "Invalid",
 		a.dunningcycle AS "dunningcycle",
 		a.nickname AS "nickname",
-		a.groupId AS "group.id",
-		a.extensionNumber AS "extensionNumber"
+		a.groupId AS "group.id"
 	</sql>
 	
 	<sql id="peopleJoinsColumns">
@@ -234,7 +233,6 @@
 			nickname = #{nickname},
 			groupId = #{group.id},
 			extensionNumber = #{extensionNumber}
-			
 		WHERE dbid = #{dbid}
 	</update>
 	
@@ -369,4 +367,17 @@
 			name = #{name}
 		WHERE id = #{id}
 	</update>
+	
+	
+	<select id="findAgentPeopleList" resultType="TMisDunningPeople" useCache="false">
+		SELECT 
+			a.id,
+			a.nickname
+		FROM t_mis_dunning_people a
+		left join t_mis_agent_info t on  a.id=t.peopleId
+		WHERE
+		 t.peopleId is null
+		 and 
+		 a.nickname is not null
+	</select>
 </mapper>

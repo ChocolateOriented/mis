@@ -30,4 +30,6 @@ public interface TRiskBuyerPersonalInfoDao {
 	public TRiskBuyerPersonalInfo getbuyerIfo(String dealcode);
 
 	String findMobileByBuyerId(String buyerId);
+	
+	public TRiskBuyerPersonalInfo getBuyerInfoByMobile(String mobile);
 }

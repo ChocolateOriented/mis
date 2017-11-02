@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -23,6 +24,7 @@ import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 
 
 
@@ -44,6 +46,8 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 	TMisDunningPeopleDao tmisPeopleDao;
 	@Autowired
 	TRiskBuyerPersonalInfoDao tbuyerDao;
+	@Autowired
+	TMisAgentInfoService tMisAgentInfoService;
 
 //	@Autowired
 //	private TMisContantRecordService tcrService;
@@ -99,9 +103,8 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 			  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
 			  
 			  String smsCotent = tSmsTemplate.getSmsCotent();
-			  TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(task.getDunningpeopleid());
 			  TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(order.getDealcode());
-			  String cousmscotent = this.cousmscotent(smsCotent,buyerInfeo,order.getPlatformExt(),task.getDunningpeopleid(),tMisDunningPeople.getExtensionNumber());
+			  String cousmscotent = this.cousmscotent(smsCotent,buyerInfeo,order.getPlatformExt(),task.getDunningpeopleid());
 			  tSmsTemplate.setSmsCotent(cousmscotent); 
 			 } 
 			 return findList;
@@ -119,7 +122,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   * @param smsCotent
 		   * @return
 		   */
-        public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid,String extensionNumber) {
+        public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid) {
         	
 //        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
         	
@@ -178,9 +181,12 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 	        		smsCotent=smsCotent.replace("${creditamount}",creditAmount);
 	        	}
         	}
-        	if(null!=extensionNumber&&""!=extensionNumber){
+        	if(null!=dunningpeopleid&&""!=dunningpeopleid){
 	        	if(smsCotent.contains("${extensionNumber}")){
-	        		smsCotent=smsCotent.replace("${extensionNumber}",extensionNumber);
+	        		TMisAgentInfo info=tMisAgentInfoService.getInfoByPeopleId(dunningpeopleid);
+		        	if(info != null &&StringUtils.isNotEmpty(info.getDirect())){
+		        		smsCotent=smsCotent.replace("${extensionNumber}",info.getDirect());
+		        	}
 	        	}
         	}
         	if(null!=buyerInfeo.getCreateTime()){

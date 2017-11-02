@@ -233,6 +233,20 @@
 			$("#ifm").attr("src", currentPageUrl);
 	    }
 		
+		//从父页面跳转到软电话页面
+		function phoneFatherPage(phone,name){
+			if(confirm("确定拨打该电话吗")){
+				var reg = new RegExp("_");
+				var phone=phone.replace(reg,"");
+				$.post("${ctx}/dunning/tMisDunningPhone/fatherPageTOPhonePage", {target:phone, peopleId: "${userId}",name:name}, function(data) {
+					if (!data) {
+						alert("当前坐席状态无法外呼");
+						return;
+					}
+				});
+			}
+		}
+		
 		function messageHide(){
 			return  parseInt("${overdueDays}")>parseInt("${controlDay}");
 			  
@@ -281,7 +295,14 @@
 		<input id="mobile" name="mobile" type="hidden" value="${personalInfo.mobile}" />
 		<tbody>
 		<tr>
-			<td>手机号：${personalInfo.mobile}(${personalInfo.mobileCity})&nbsp;&nbsp;
+			<td>手机号：<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phoneFatherPage('${personalInfo.mobile}','${personalInfo.realName}')" showName="${personalInfo.realName}">
+					</shiro:hasPermission>
+					${personalInfo.mobile}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					</a>
+					</shiro:hasPermission>
+					(${personalInfo.mobileCity})&nbsp;&nbsp;
 				<input id="btnTelTaskFather" class="btn btn-primary" type="button" value="电话" style="padding:0px 8px 0px 8px;font-size:13px;"
 					contactMobile="${personalInfo.mobile}" contactstype="SELF" onclick="collectionfunction(this, 650)" method="Tel"/>
 				

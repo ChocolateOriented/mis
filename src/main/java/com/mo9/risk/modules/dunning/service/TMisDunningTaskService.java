@@ -228,6 +228,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return tMisDunningTaskDao.findOrderByDealcode(dealcode);
 	}
 	
+	public TMisDunningTask findDunningTaskByDealcode(Map<String,Object> params) {
+		return tMisDunningTaskDao.findDunningTaskByDealcode(params);
+	}
+	
 	/**
 	 * 操作order表(切换数据源提取出update方法)
 	 */
@@ -2716,8 +2720,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								throw new RuntimeException("发送短信失败");
 							}
 							smsCotent = tdstService.cousmscotent(smsTemplate.getSmsCotent(), buyerInfeo,
-									dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid(),
-									dunningOrder.getExtensionNumber());
+									dunningOrder.getPlatformExt(), dunningOrder.getDunningpeopleid());
 							if (smsCotent.contains("$")) {
 								throw new RuntimeException();
 							}
@@ -2750,7 +2753,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								// 模板填充的map
 								Map<String, Object> map = tMisContantRecordService.getCotentValue(
 										smsTemplate.getSmsCotent(), buyerInfeo, dunningOrder.getPlatformExt(),
-										dunningOrder.getDunningpeopleid(), dunningOrder.getExtensionNumber());
+										dunningOrder.getDunningpeopleid());
 								params.put("template_data", new JacksonConvertor().serialize(map));
 								String englishTemplateName = smsTemplate.getEnglishTemplateName();
 								params.put("template_name", englishTemplateName);// 模板名称
@@ -2766,7 +2769,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 								// 模板填充的map
 								Map<String, Object> map = tMisContantRecordService.getCotentValue(
 										smsTemplate.getSmsCotent(), buyerInfeo, dunningOrder.getPlatformExt(),
-										dunningOrder.getDunningpeopleid(), dunningOrder.getExtensionNumber());
+										dunningOrder.getDunningpeopleid());
 								params.put("template_data", new JacksonConvertor().serialize(map));
 								String englishTemplateName = smsTemplate.getEnglishTemplateName();
 								params.put("template_name", englishTemplateName);// 模板名称
