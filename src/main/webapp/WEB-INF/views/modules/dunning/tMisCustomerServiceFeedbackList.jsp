@@ -71,7 +71,7 @@
                     ${tMisCustomerServiceFeedback.problemdescription}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.createTime}
+                    ${fn:substring(tMisCustomerServiceFeedback.createTime, 0, 16)}
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.createBy.name}

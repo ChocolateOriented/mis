@@ -24,6 +24,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
     private String problemdescriotion;//问题描述
+    private Date   createTime;//操作时间
     private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
@@ -129,5 +130,15 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     public void settRiskOrder(TRiskOrder tRiskOrder) {
         this.tRiskOrder = tRiskOrder;
+    }
+
+    @Override
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    @Override
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }
