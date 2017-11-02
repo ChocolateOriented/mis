@@ -474,13 +474,15 @@
         r.link_name2 AS linkname2,
         r.link_relation2 AS linkrelation2,
         r.link_tel2 AS linktel2,
-				t.DunningPeopleName AS `name`
+				t.DunningPeopleName AS `name`,
+				p.Nickname AS `nickname`
         FROM
         t_risk_order AS o
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
         LEFT JOIN t_risk_buyer_idcard AS i ON o.buyer_id = i.buyer_id
         LEFT JOIN s_user_relationship as r ON r.buyer_id = o.buyer_id
 				LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
+				LEFT JOIN t_mis_dunning_people AS p ON p.id = t.DunningPeopleId
         WHERE o.dealcode in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
@@ -507,17 +509,8 @@
 			) THEN
 				'普通订单'
 			WHEN o.type = 'loan'
-			AND NOT EXISTS (
-				SELECT
-					*
-				FROM
-					t_risk_buyer_credit AS c
-				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
-				WHERE
-					o.buyer_id = c.buyer_id
-				AND h.order_id = o.id
-				AND h. STATUS = 'pass'
-			) THEN
+			AND o.is_delay = 1
+			THEN
 				'续期订单'
 			WHEN o.type = 'partial' THEN
 				'部分还款'
