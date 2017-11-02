@@ -78,7 +78,7 @@
 			a.agent=#{agent}
 		</if>
 		<if test="nickName != null and nickName != '' ">
-			p.nickName=#{nickName}
+		and	p.nickName=#{nickName}
 		</if>
 		</where>
 		<choose>
