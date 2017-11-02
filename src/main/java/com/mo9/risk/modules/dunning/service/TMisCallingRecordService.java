@@ -90,9 +90,11 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	public void syncCallRecord() {
 		logger.info("定时同步电话通话信记录开始");
 		Calendar c = Calendar.getInstance();
+		c.set(Calendar.SECOND, 0);
 		c.add(Calendar.MINUTE, -1);
 		Date end = c.getTime();
 		c.add(Calendar.MINUTE, -5);
+		c.add(Calendar.SECOND, -1);
 		Date start = c.getTime();
 		
 		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
@@ -121,6 +123,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		c.set(Calendar.SECOND, 0);
 		Date end = c.getTime();
 		c.add(Calendar.DATE, -1);
+		c.add(Calendar.SECOND, -1);
 		Date start = c.getTime();
 		
 		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();

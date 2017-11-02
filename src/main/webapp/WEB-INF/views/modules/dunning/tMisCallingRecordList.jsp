@@ -6,8 +6,12 @@
 	<meta name="decorator" content="default"/>
 	<style type="text/css">
 		.form-row {
-			margin-top : 7px;
-			margin-bottom : 7px;
+			margin-top: 7px;
+			margin-bottom: 7px;
+		}
+		.span-text {
+			line-height: 30px;
+			word-break: keep-all;
 		}
 	</style>
 	<script type="text/javascript">
@@ -125,11 +129,11 @@
 		<div class="container-fluid">
 			<div class="row-fluid form-row">
 				<div class="span2">
-					<span class="span4" style="line-height:30px;">客户电话：</span>
-					<input name="targetNumber" type="text" maxlength="20" class="span8" value="${tMisCallingRecord.targetNumber}"/>
+					<span class="span4 span-text">客户电话：</span>
+					<input name="targetNumber" type="text" maxlength="20" class="span8" style="margin-left:2%;" value="${tMisCallingRecord.targetNumber}"/>
 				</div>
 				<div class="span4">
-					<span class="span2" style="line-height:30px;">呼叫时间：</span>
+					<span class="span2 span-text">呼叫时间：</span>
 					<input name="callTimeFrom" type="text" readonly="readonly" maxlength="20" class="span4 Wdate"
 						value="<fmt:formatDate value="${tMisCallingRecord.callTimeFrom}" pattern="yyyy-MM-dd"/>"
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
@@ -138,7 +142,7 @@
 						onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 				</div>
 				<div class="span2">
-					<span class="span4" style="line-height:30px;">呼叫类型：</span>
+					<span class="span4 span-text">呼叫类型：</span>
 					<select name="callType" class="span8">
 						<option value="">全部</option>
 						<option value="in" <c:if test="${'in' eq tMisCallingRecord.callType}">selected</c:if>>呼入</option>
@@ -146,7 +150,7 @@
 					</select>
 				</div>
 				<div class="span2">
-					<span class="span4" style="line-height:30px;">通话状态：</span>
+					<span class="span4 span-text">通话状态：</span>
 					<select name="callState" class="span8" value="${tMisCallingRecord.callState}">
 						<option value="">全部</option>
 						<option value="0" <c:if test="${'0' eq tMisCallingRecord.callState}">selected</c:if>>接通</option>
@@ -160,7 +164,7 @@
 			</shiro:hasPermission>
 			<div class="row-fluid form-row">
 				<div class="span2">
-					<span class="span4" style="line-height:30px;">催收小组：</span>
+					<span class="span4 span-text">催收小组：</span>
 					<form:select id="groupList" path="dunningPeople.group.id" class="span8">
 						<form:option value="">全部</form:option>
 						<!-- 添加组类型为optgroup -->
@@ -177,7 +181,7 @@
 					</form:select>
 				</div>
 				<div class="span4">
-					<span class="span2" style="line-height:30px;">催款人：</span>
+					<span class="span2 span-text">催款人：</span>
 					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</div>
 			</div>
