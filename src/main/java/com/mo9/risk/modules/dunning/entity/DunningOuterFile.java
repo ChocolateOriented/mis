@@ -47,6 +47,7 @@ public class DunningOuterFile {
 	private String linkrelation2; // 联系人2关系
 	private String linktel2; // 联系人2电话
 	private String name; // 催收员
+	private String nickname; //催收员花名
 //	private Data createDate;
 	private List<String> orders; // 订单号（参数）
 	
@@ -283,10 +284,19 @@ public class DunningOuterFile {
 		return name;
 	}
 
+	@ExcelField(title = "催收人花名", type = 1, align = 2, sort = 25)
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	@ExcelField(title = "导出日期", type = 1, align = 2, sort = 25)
+	@ExcelField(title = "导出日期", type = 1, align = 2, sort = 26)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getCreateDate() {
 		return new Date();

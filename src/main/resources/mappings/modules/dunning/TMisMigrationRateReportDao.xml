@@ -125,24 +125,24 @@
 	<!--  迁徙率 begin	 -->
 	
 	<!--  # 更新已经采集的逾期订单	 -->
-	<update id="householdsUpdateHaveBeenCollectDealcode">
-		<![CDATA[
-			UPDATE t_risk_order as o 
-			INNER JOIN tmp_move_rate AS r on r.dealcode = o.dealcode
-			SET r.PayoffTime = DATE(o.payoff_time),
-				r.OperatorStatus = 
-				CASE 
-					WHEN o.`status` = 'payoff'
-						AND IFNULL(o.delay_days, 0) = 0 
-					THEN 'payoff'
-					WHEN o.`status` = 'payoff'
-						AND IFNULL(o.delay_days, 0) > 0 
-					THEN 'delay'
-					ELSE NULL
-				END;
-		]]>
-	</update>
-	
+	<!--<update id="householdsUpdateHaveBeenCollectDealcode">-->
+		<!--<![CDATA[-->
+			<!--UPDATE t_risk_order as o -->
+			<!--INNER JOIN tmp_move_rate AS r on r.dealcode = o.dealcode-->
+			<!--SET r.PayoffTime = DATE(o.payoff_time),-->
+				<!--r.OperatorStatus = -->
+				<!--CASE -->
+					<!--WHEN o.`status` = 'payoff'-->
+						<!--AND IFNULL(o.delay_days, 0) = 0 -->
+					<!--THEN 'payoff'-->
+					<!--WHEN o.`status` = 'payoff'-->
+						<!--AND IFNULL(o.delay_days, 0) > 0 -->
+					<!--THEN 'delay'-->
+					<!--ELSE NULL-->
+				<!--END;-->
+		<!--]]>-->
+	<!--</update>-->
+	<!---->
 	<!--  # 采集今天逾期一天的数据	 -->
 	<insert id="householdsInsertOverOneDay">
 		<![CDATA[

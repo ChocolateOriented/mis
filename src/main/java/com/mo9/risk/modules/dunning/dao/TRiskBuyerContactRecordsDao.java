@@ -5,6 +5,7 @@ package com.mo9.risk.modules.dunning.dao;
 
 import java.util.List;
 
+import com.mo9.risk.modules.dunning.entity.PhoneInfo;
 import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
@@ -34,5 +35,12 @@ public interface TRiskBuyerContactRecordsDao {
 	 * @return
 	 */
 	public List<TRiskBuyerContactRecords> findContantNumberListBydealcode(TRiskBuyerContactRecords tRiskBuyerContactRecords);	
+	
+	/**
+	 * 查询通话记录号码信息
+	 * @param tRiskBuyerContactRecords
+	 * @return
+	 */
+	public List<PhoneInfo> findContactRecordsPhoneInfo(List<TRiskBuyerContactRecords> tRiskBuyerContactRecords);	
 
 }

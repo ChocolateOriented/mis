@@ -657,11 +657,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency> -->
-		<!--dependency>
+		<!--<dependency>
 			<groupId>com.mis</groupId>
 			<artifactId>commonutil</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-        </dependency-->
+        </dependency>-->
 
 		<dependency>
 			<groupId>com.mis</groupId>

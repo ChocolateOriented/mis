@@ -28,4 +28,8 @@ public class TRiskBuyer2contactsService {
 	public List<TRiskBuyer2contacts> getContactsByBuyerId(@Param("buyerId")String buyerId,@Param("dealcode")String dealcode){
 		return tRiskBuyer2contactsDao.getContactsByBuyerId(buyerId,dealcode);
 	}
+	
+	public List<TRiskBuyer2contacts> getBuyerContacts(String buyerId) {
+		return tRiskBuyer2contactsDao.getBuyerContacts(buyerId);
+	}
 }

@@ -31,6 +31,7 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
@@ -449,19 +450,19 @@ public class TMisMigrationRateReportController extends BaseController {
 	/**
 	 * 关于迁徙率数据的获取
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "autoMigrationRateGetData")
-	@ResponseBody
-	public void autoMigrationRateGetData() {
-		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-			tMisMigrationRateReportService.autoMigrationRateGetData();
-		} catch (Exception e) {
-			logger.info("",e);
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-	}
+//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+//	@RequestMapping(value = "autoMigrationRateGetData")
+//	@ResponseBody
+//	public void autoMigrationRateGetData() {
+//		try {
+//			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+//			tMisMigrationRateReportService.autoMigrationRateGetData();
+//		} catch (Exception e) {
+//			logger.info("",e);
+//		} finally {
+//			DynamicDataSource.setCurrentLookupKey("dataSource");
+//		}
+//	}
 	
 	/**
 	 * 获取计算后的迁徙率数据
@@ -492,8 +493,15 @@ public class TMisMigrationRateReportController extends BaseController {
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			//开始时间必须小于结束时间
-			Date beginDate = dateFormat1.parse("2017-03-01");
-			Date endDate = dateFormat1.parse("2017-10-18");
+			String start = DictUtils.getDictValue("migrateStart", "migrate", "");
+			String end = DictUtils.getDictValue("migrateEnd", "migrate", "");
+			if(StringUtils.isEmpty(start)||StringUtils.isEmpty(end)){
+				logger.warn("字典未配置");
+			}
+			logger.info("开始时间:"+start);
+			logger.info("结束时间:"+end);
+			Date beginDate = dateFormat1.parse(start);
+			Date endDate = dateFormat1.parse(end);
 			Date date = beginDate;
 			while (!date.equals(endDate)) {
 				System.out.println(dateFormat1.format(date));

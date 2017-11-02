@@ -103,9 +103,13 @@
 				<th>姓名</th>
 <!-- 				<th>匹配</th> -->
 				<th>号码</th>
-<!-- 				<th>所属地</th> -->
+				<th>归属地</th>
 				<th>累计通话时长</th>
 				<th>通话次数</th>
+				<th>主叫次数</th>
+				<th>被叫次数</th>
+				<th>累计主叫时长</th>
+				<th>累计被叫时长</th>
 				<th>历史记录</th>
 				<th>操作</th>
 			</tr>
@@ -159,12 +163,24 @@
 					</a>
 					</shiro:hasPermission>
 				</td>
-<%-- 				<td>${p.location}</td> --%>
+				<td>${p.location}</td>
 				<td>
 					${p.times}
 				</td>
 				<td>
 					${p.number}
+				</td>
+				<td>
+					${p.outCnt}
+				</td>
+				<td>
+					${p.inCnt}
+				</td>
+				<td>
+					${p.inTimes}
+				</td>
+				<td>
+					${p.outTimes}
 				</td>
 				<td>					
 					短信

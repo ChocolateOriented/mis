@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
@@ -60,7 +61,7 @@ public class TMisDunningPayCallbackController extends BaseController {
 		}
 		logger.info("代扣回调报文:" + decodeData);
 		
-		JSONObject jsonObj = JSON.parseObject(decodeData);
+		JSONObject jsonObj = JSON.parseObject(decodeData, Feature.OrderedField);
 		if (jsonObj == null || jsonObj.isEmpty()) {
 			logger.info("代扣回调报文解析错误：" + decodeData);
 			return "OK";

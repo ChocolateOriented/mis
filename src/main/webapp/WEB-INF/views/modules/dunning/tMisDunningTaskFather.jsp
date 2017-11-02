@@ -42,9 +42,9 @@
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			/*if("${ispayoff}" == "true"){
+			if("${ispayoff}" == "true"){
 				disableBtn();
-			}*/
+			}
 			var obj=null;
 			if(parseInt("${overdueDays}")>parseInt("${controlDay}")){
 				obj=document.getElementById("customerDetails");
@@ -133,18 +133,14 @@
 			btnStatistics(doc, btn);
 		}
 		
-		/*function disableBtn() {
+		function disableBtn() {
 			$("#btnTelTaskFather").prop("disabled", true);
 			$("#changeIdcard").prop("disabled", true);
 			$("#changeMobile").prop("disabled", true);
 			$("#changeBankcard").prop("disabled", true);
 			$("#butnSms").prop("disabled", true);
 			$("#butnIdCardImg").prop("disabled", true);
-			
-			var tags = $("#tags").children("div");
-			tags.children("#editTag").remove();
-			tags.children("#closeTag").remove();
-		}*/
+		}
 
 		function getBuyerIdCardImg() {
 			$.jBox.open("<img src='${ctx}/dunning/tMisDunningTask/showBuyerIdCardImg?buyerId=${buyerId}'/>", "手持身份证", 800, 700, {
@@ -164,24 +160,20 @@
 		}
 		
 		function showTagDetail(obj) {
-            var tags = $("#tags").children("div");
 			$(".suspense").css("display", "none");
 			$(obj).children(".suspense").css("display", "block");
 		}
 		
 		function hideTagDetail() {
-            var tags = $("#tags").children("div");
 			$(".suspense").css("display", "none");
 		}
 		
 		function editTag(obj) {
 			var tagId = $(obj).parent().attr("tagId");
-            var tags = $("#tags").children("div");
 			collectionfunction($(obj).parent(), 540, 340, {tagId : tagId});
 		}
 		
 		function closeTag(obj) {
-            var tags = $("#tags").children("div");
 			var tagId = $(obj).parent().attr("tagId");
 			confirmx('确认要删除该标签吗？', function() {
 				$.post("${ctx}/dunning/tMisDunningTag/closeTag", {id : tagId}, function(data) {
@@ -198,7 +190,6 @@
 		//添加标签后添加元素
 		function addTag(tagId) {
 			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
-                var tags = $("#tags").children("div");
 				var templ = $("#tagTemplate");
 				var elem = templ.clone(true);
 				elem.children("#title").text(data.tagtypeDesc);
@@ -220,7 +211,6 @@
 		
 		//编辑后刷新标签明细
 		function refreshTag(tagId) {
-            var tags = $("#tags").children("div");
 			$.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
 				var elem = $(".tag[tagId='" + tagId + "']");
 				elem.find("#tagtype span").text(data.tagtypeDesc);
