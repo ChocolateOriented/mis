@@ -49,9 +49,10 @@
 			a.FinishTime as "finishTime",
 			a.DurationTime as "durationTime",
 			(
-				SELECT o.dealcode FROM t_risk_buyer b, t_risk_order o
-				WHERE b.id = o.buyer_id
-				AND b.mobile = a.TargetNumber
+				SELECT o.dealcode FROM t_risk_buyer b
+                INNER JOIN t_risk_order o ON b.id = o.buyer_id
+                INNER JOIN t_mis_dunning_task t ON o.dealcode = t.dealcode
+				WHERE b.mobile = a.TargetNumber
 				ORDER BY o.id DESC
 				LIMIT 1
 			) as "dealcode",
