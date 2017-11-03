@@ -427,7 +427,7 @@
 	var currentPageUrl = null;
 	//呼出呼入
 	function calloutin(obj) {
-		currentPageUrl = "/mis/f/numberPhone/" + (obj ? ($(obj).attr("typecall") || "callout") : "callout") + "?";
+		currentPageUrl = "${pageContext.request.contextPath}/f/numberPhone/" + (obj ? ($(obj).attr("typecall") || "callout") : "callout") + "?";
 		if((!obj)||$(obj).attr("typecall")=="callout"){
 			$("#calloutPage").addClass("active");
 			$("#agent").attr("disabled",false);
