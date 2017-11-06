@@ -862,7 +862,11 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
     	}
     	
     	return map;
-    }	
+    }
+
+	public int findCountSmsSend(TMisContantRecord tContantRecord) {
+		return tMisContantRecordDao.findCountSmsSend(tContantRecord);
+	}	
     
 
 }

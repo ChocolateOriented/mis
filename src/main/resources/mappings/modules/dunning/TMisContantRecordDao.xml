@@ -436,4 +436,27 @@
 		LIMIT 1;
 	</select>
 	<!-- 自动电催结论结束-->
+	<select id="findCountSmsSend" resultType="int">
+	SELECT
+	count(*)
+	FROM
+	`t_mis_contant_record`
+	WHERE
+	Dealcode = #{dealcode}
+	AND
+	SmsTemp=#{templateName}
+	<if test="contanttarget !=null and contanttarget != '' ">
+	AND
+	contanttarget=#{contanttarget}		
+	</if>	
+	AND
+	ContantType='sms'
+	AND
+	IFNULL(Remark,'') !='短信发送失败'
+	AND
+	CreateDate BETWEEN DATE_FORMAT(CURDATE(),'%Y-%m-%d 00:00:00') AND now()
+	;
+	
+	</select>
+	
 </mapper>
