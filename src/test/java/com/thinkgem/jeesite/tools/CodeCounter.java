@@ -22,7 +22,7 @@ public class CodeCounter {
 	 */
 	public static void main(String[] args) {
 		String file = CodeCounter.class.getResource("/").getFile();
-		String path = file.replace("target/test-classes", "src");
+		String path = file.replace("target/test.json-classes", "src");
 
 		ArrayList<File> al = getFile(new File(path));
 		for (File f : al) {
