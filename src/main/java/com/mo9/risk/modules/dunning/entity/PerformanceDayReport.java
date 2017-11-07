@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import java.util.Date;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -34,7 +35,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 //	public void setDatetime(Date datetime) {
 //		this.datetime = datetime;
 //	}
-	
+
 	
 	@ExcelField(title="起始日", type=1, align=2, sort=1)
 	public Date getDatetimestart() {
@@ -49,7 +50,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 		return datetimeend;
 	}
 	public void setDatetimeend(Date datetimeend) {
-		this.datetimeend = datetimeend;
+		this.datetimeend =  null != datetimeend ? DateUtils.endDate(datetimeend) : datetimeend;
 	}
 	
 	@ExcelField(title="催收员", type=1, align=2, sort=3)
