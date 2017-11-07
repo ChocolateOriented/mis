@@ -492,103 +492,40 @@
     <!-- 历史借款信息 list -->
     <select id="findOrderHistoryList" resultType="com.mo9.risk.modules.dunning.entity.OrderHistory">
 			SELECT
-				o.id AS orderid,
-				o.dealcode AS dealcode,
-				CASE
-			WHEN o.type = 'loan'
-			AND EXISTS (
-				SELECT
-					*
-				FROM
-					t_risk_buyer_credit AS c
-				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
-				WHERE
-					o.buyer_id = c.buyer_id
-				AND h.order_id = o.id
-				AND h. STATUS = 'pass'
-			) THEN
-				'普通订单'
-			WHEN o.type = 'loan'
-			AND o.is_delay = 1
-			THEN
-				'续期订单'
-			WHEN o.type = 'partial' THEN
-				'部分还款'
-			END AS ordertype,
-			 o.credit_amount AS creditamount,
-			 o.days AS days,
-			 CASE
-			WHEN EXISTS (
-				SELECT
-					*
-				FROM
-					t_risk_buyer_credit AS c
-				LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
-				WHERE
-					o.buyer_id = c.buyer_id
-				AND h.order_id = o.id
-				AND h. STATUS = 'pass'
-			) THEN
-				(
-					SELECT
-						DATE_FORMAT(
-							Max(h.create_time),
-							'%Y-%m-%d %H:%i'
-						)
-					FROM
-						t_risk_buyer_credit AS c
-					LEFT JOIN t_risk_buyer_credit_history AS h ON c.id = h.buyer_credit_id
-					WHERE
-						c.buyer_id = o.buyer_id
-					AND h.order_id = o.id
-					AND h.`status` = 'pendingExamine'
-				)
-			ELSE
-				o.create_time
-			END AS createtime,
-			 DATE_FORMAT(
-				o.remit_time,
-				'%Y-%m-%d %H:%i'
-			) AS remittime,
-			 o.repayment_time AS repaymenttime,
-			 CASE
-			WHEN o. STATUS = 'payment' THEN
-				datediff(CURDATE(), o.repayment_time)
-			WHEN o. STATUS = 'payoff' THEN
-				datediff(
-					o.payoff_time,
-					o.repayment_time
-				)
-			END AS delaydays,
+        o.id AS orderid,
+        o.dealcode AS dealcode,
+        '普通订单' AS ordertype,
+        o.credit_amount AS creditamount,
+        o.days AS days,
+        o.create_time AS createtime,
+        DATE_FORMAT(
+          o.remit_time,
+          '%Y-%m-%d %H:%i'
+        ) AS remittime,
+        o.repayment_time AS repaymenttime,
+			  CASE
+          WHEN o. STATUS = 'payment' THEN
+          datediff(CURDATE(), o.repayment_time)
+          WHEN o. STATUS = 'payoff' THEN
+          datediff(
+          o.payoff_time,
+          o.repayment_time
+          )
+      	END AS delaydays,
 			 IFNULL(o.overdue_amount, 0) AS overdueamount,
-			 IFNULL(
-				o.default_interest_amount,
-				0
-			) AS defaultinterestamount,
-			 CASE
-			WHEN o.type = 'loan'
-			AND o.`status` = 'payment' THEN
-				'未还清'
-			WHEN o.`status` = 'payoff' THEN
-				'已还清'
-			WHEN o.type = 'partial'
-			AND o.`status` = 'partial' THEN
-				'未还清(部分还款)'
+			CASE
+        WHEN o.`status` = 'payment'
+        THEN
+          '未还清'
+        WHEN o.`status` = 'payoff' THEN
+          '已还清'
 			END AS STATUS,
 			 o.payoff_time AS payofftime,
-			 CASE 
-<!-- 			WHEN o.type = 'loan' THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) - IFNULL(o.balance, 0)  -->
-			 	WHEN o.type = 'loan' THEN <include refid="countRemainAmmount"/>
-<!-- 			WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - IFNULL(o.modify_amount, 0) -->
-				WHEN o.type = 'partial'  THEN IFNULL(o.credit_amount, 0) + IFNULL(o.overdue_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END
-			 END AS amount,
-			 o.root_order_id AS rootorderid,
-			 o1.dealcode AS roodealcode
+			 <include refid="countBalance"/> AS amount
 			FROM
 				t_risk_order AS o
-			LEFT JOIN t_risk_order AS o1 ON o.root_order_id = o1.id
 			WHERE
-				o.type IN ('loan', 'partial')
+				o.type ='loan'
 			AND o.merchant_id = 7
 			AND o.`status` IN (
 				'payment',
@@ -600,6 +537,7 @@
 				o.buyer_id,
 				o.remit_time;
 	</select>
+
 <!-- 催收留案功能-留案提交 Patch 0001 by GQWU at 2016-11-10 start -->
 	<update id="updateDunningTimeByDealcodes">
 		UPDATE t_mis_dunning_task SET 	

@@ -57,11 +57,9 @@
 				<th>到期还款日期</th>
 				<th>逾期天数</th>
 				<th>逾期费</th>
-				<th>续期费</th>
 				<th>订单状态</th>
 				<th>还清日期</th>
 				<th>还款金额</th>
-				<th>主订单编号</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -103,20 +101,13 @@
 					${orderHistory.overdueamountText}
 				</td>
 				<td>
-					${orderHistory.defaultinterestamountText}
-				</td>
-				<td>
 					${orderHistory.status}
 				</td>
 				<td>
 					<fmt:formatDate value="${orderHistory.payofftime}" pattern="yyyy-MM-dd HH:mm"/>
-<%-- 					${orderHistory.payofftime} --%>
 				</td>
 				<td>
 					${orderHistory.amountText}
-				</td>
-				<td>
-					${orderHistory.roodealcode}
 				</td>
 			</tr>
 		</c:forEach> 
