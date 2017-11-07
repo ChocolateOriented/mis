@@ -90,6 +90,8 @@ public class DunningReportService extends BaseService {
 	 */
 	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport entity) {
 		entity.setPage(page);
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dunningReportDao.findPerformanceDayReportCount(entity));
 		page.setList(dunningReportDao.findPerformanceDayReport(entity));
 		return page;
 	}

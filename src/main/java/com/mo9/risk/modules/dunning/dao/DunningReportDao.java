@@ -32,4 +32,11 @@ public interface DunningReportDao extends BaseDao {
 	 * @return: List<PerformanceDayReport>
 	 */
 	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceDayReport);
+
+	/**
+	 * @Description  工作日报分页count
+	 * @param entity
+	 * @return java.lang.Long
+	 */
+	Long findPerformanceDayReportCount(PerformanceDayReport entity);
 }
