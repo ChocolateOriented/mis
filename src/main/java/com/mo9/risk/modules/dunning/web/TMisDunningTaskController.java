@@ -3,7 +3,9 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
+import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.service.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +18,6 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,7 +109,6 @@ import com.thinkgem.jeesite.modules.sys.entity.Role;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
-import com.thinkgem.jeesite.util.NumberUtil;
 
 /**
  * 催收任务Controller
@@ -177,6 +177,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisDunningScoreCardService tMisDunningScoreCardService;
+
+	@Autowired
+	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -652,7 +655,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 新订单任务
-	 * @param tMisDunningTask
 	 * @param model
 	 * @param redirectAttributes
 	 * @return
@@ -673,7 +675,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 自动扫描还款
-	 * @param tMisDunningTask
 	 * @param model
 	 * @param redirectAttributes
 	 * @return
@@ -718,8 +719,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 导出委外数据
-	 * @param user
-	 * @param request
 	 * @param response
 	 * @param redirectAttributes
 	 * @return
@@ -1373,7 +1372,188 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		return "modules/dunning/dialog/dialogCollectionAmount";
 	}
-	
+
+
+	/**
+	 * 加载信息修复新增页面
+	 * @param tMisDunningTask
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionInformationAdd")
+	public String collectionInformationAdd(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "views/error/500";
+		}
+		model.addAttribute("buyerid", buyerId);
+		model.addAttribute("dealCode",dealcode);
+		model.addAttribute("method","add");
+
+		return "modules/dunning/dialog/dialogInformationRecoveryAdd";
+	}
+
+	/**
+	 * 保存信息修复信息
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@ResponseBody
+	@RequestMapping(value = "informationSave")
+	public String InformationSave(DunningInformationRecovery dunningInformationRecovery, Model model,HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerid");
+		if(buyerId==null||"".equals(buyerId)){
+			return "借贷人信息不完全，无法执行此操作";
+		}
+		dunningInformationRecovery.setBuyerId(Integer.valueOf(buyerId));
+		if (dunningInformationRecovery.getContactRelationship() ==null || "".equals(dunningInformationRecovery.getContactRelationship())
+				||dunningInformationRecovery.getContactName() == null || "".equals(dunningInformationRecovery.getContactName())){
+			dunningInformationRecovery.setContactName("");
+			dunningInformationRecovery.setContactRelationship("");
+		}
+		tMisDunningInformationRecoveryService.saveInformationRecovery(dunningInformationRecovery);
+
+		return "OK";
+	}
+
+
+
+	/**
+	 * 加载信息修复修改页面
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionInformationChange")
+	public String collectionInformationChange	(Model model,HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		String id = request.getParameter("id");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "views/error/500";
+		}
+		DunningInformationRecovery dunningInformationRecovery = new DunningInformationRecovery();
+		dunningInformationRecovery.setBuyerId(Integer.valueOf(buyerId));
+		dunningInformationRecovery.setDealCode(dealcode);
+		dunningInformationRecovery.setId(id);
+		DunningInformationRecovery historyRecord = tMisDunningInformationRecoveryService.findInformationRecoveryList(dunningInformationRecovery).get(0);
+		model.addAttribute("DunningInformationRecovery", historyRecord);
+		model.addAttribute("method","update");
+		model.addAttribute("buyerid",buyerId);
+		model.addAttribute("dealCode",dealcode);
+		model.addAttribute("id",id);
+		return "modules/dunning/dialog/dialogInformationRecoveryAdd";
+	}
+
+	/**
+	 * 信息修复保存修改页面数据
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@ResponseBody
+	@RequestMapping(value = "informationUpdate")
+	public String InformationUpdate(DunningInformationRecovery dunningInformationRecovery, Model model,HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerid");
+		String dealcode = request.getParameter("dealCode");
+		String id = request.getParameter("id");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "借贷人信息不完全，无法执行此操作";
+		}
+		dunningInformationRecovery.setBuyerId(Integer.valueOf(buyerId));
+		dunningInformationRecovery.setId(id);
+		if (dunningInformationRecovery.getContactRelationship() ==null || "".equals(dunningInformationRecovery.getContactRelationship())
+			||dunningInformationRecovery.getContactName() == null || "".equals(dunningInformationRecovery.getContactName())){
+			dunningInformationRecovery.setContactName("");
+			dunningInformationRecovery.setContactRelationship("");
+		}
+		tMisDunningInformationRecoveryService.updateInformationRecovery(dunningInformationRecovery);
+		return "OK";
+	}
+
+
+	/**
+	 * 加载信息修复-历史记录列表页面
+	 * @param tMisDunningTask
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionHistoryRecordList")
+	public String collectionHistoryRecordList(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		String id = request.getParameter("id");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "views/error/500";
+		}
+		DunningInformationRecoveryHistoryRecord dunningInformationRecoveryHistoryRecord = new DunningInformationRecoveryHistoryRecord();
+		dunningInformationRecoveryHistoryRecord.setBuyerId(Integer.valueOf(buyerId));
+		dunningInformationRecoveryHistoryRecord.setDealCode(dealcode);
+		dunningInformationRecoveryHistoryRecord.setId(id);
+		List<DunningInformationRecoveryHistoryRecord> historyRecordList = tMisDunningInformationRecoveryService.findInformationRecoveryHistoryRecordList(dunningInformationRecoveryHistoryRecord);
+		model.addAttribute("historyRecordList", historyRecordList);
+		return "modules/dunning/dialog/dialogInformationRecoveryRecordList";
+	}
+
+
+	/**
+	 * 加载信息修复-历史记录新增页面
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "collectionHistoryRecordAdd")
+	public String collectionHistoryRecordAdd(DunningInformationRecoveryHistoryRecord dunningInformationRecoveryHistoryRecord, Model model, HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealCode = request.getParameter("dealcode");
+		String id =request.getParameter("id");
+		if(buyerId==null||dealCode==null||"".equals(buyerId)||"".equals(dealCode)){
+			return "views/error/500";
+		}
+		model.addAttribute("buyerid", buyerId);
+		model.addAttribute("dealCode",dealCode);
+		model.addAttribute("id",id);
+		return "modules/dunning/dialog/dialogInformationRecoveryRecordAdd";
+	}
+
+
+
+	/**
+	 * 信息修复-保存历史记录新增
+
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@ResponseBody
+	@RequestMapping(value = "saveHistoryRemark")
+	public String saveHistoryRemark(Model model , HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerid");
+		String dealCode = request.getParameter("dealCode");
+		String id = request.getParameter("id");
+		String historyRemarks = request.getParameter("historyRemarks");
+		if(buyerId==null||dealCode==null||"".equals(buyerId)||"".equals(dealCode)){
+			return "借贷人信息不完全，无法执行此操作";
+		}
+		DunningInformationRecoveryHistoryRecord dunningInformationRecoveryHistoryRecord = new DunningInformationRecoveryHistoryRecord();
+		dunningInformationRecoveryHistoryRecord.setBuyerId(Integer.valueOf(buyerId));
+		dunningInformationRecoveryHistoryRecord.setDealCode(dealCode);
+		dunningInformationRecoveryHistoryRecord.setHistoryRemark(historyRemarks);
+		dunningInformationRecoveryHistoryRecord.setId(id);
+		tMisDunningInformationRecoveryService.saveInformationRecoveryHistoryRecord(dunningInformationRecoveryHistoryRecord);
+		return "OK";
+	}
+
+
+
+
+
+
 	/**
 	 * 保存减免金额
 	 * @param task
@@ -1562,7 +1742,6 @@ public class TMisDunningTaskController extends BaseController {
 
 	/**
 	 * 完成代付
-	 * @param delayDay
 	 * @param
 	 * @return
 	 */
@@ -1638,8 +1817,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 完成代付
-	 * @param tMisDunningTask
-	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
@@ -1781,7 +1958,6 @@ public class TMisDunningTaskController extends BaseController {
 	
 	/**
 	 * 导出催收绩效月表
-	 * @param user
 	 * @param request
 	 * @param response
 	 * @param redirectAttributes
@@ -1806,4 +1982,33 @@ public class TMisDunningTaskController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceMonthReport?repage";
     }
+
+
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "informationRecovery")
+	public String informationRecoveryDetails(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
+		String buyerId = request.getParameter("buyerId");
+		String dealcode = request.getParameter("dealcode");
+		if(buyerId==null||dealcode==null||"".equals(buyerId)||"".equals(dealcode)){
+			return "views/error/500";
+		}
+		DunningInformationRecovery dunningInformationRecovery = new DunningInformationRecovery();
+		dunningInformationRecovery.setBuyerId(Integer.valueOf(buyerId));
+		dunningInformationRecovery.setDealCode(dealcode);
+		List<DunningInformationRecovery> entityList = tMisDunningInformationRecoveryService.findInformationRecoveryList(dunningInformationRecovery);
+		for (DunningInformationRecovery informationRecovery: entityList) {
+			if (informationRecovery.getContactType() ==null || "".equals(informationRecovery.getContactType())){
+				continue;
+			}
+			informationRecovery.setContactType(DunningInformationRecovery.ContactTypeENUM.
+					valueOf(informationRecovery.getContactType()).getContactTypeName());
+			if(informationRecovery.getContactRelationship() == null ||"".equals(informationRecovery.getContactRelationship())){
+				continue;
+			}
+			informationRecovery.setContactRelationship(DunningInformationRecovery.ContactRelationshipENUM.
+					valueOf(informationRecovery.getContactRelationship()).getContactRelationshipName());
+		}
+		model.addAttribute("entityList", entityList);
+		return "modules/dunning/tMisDunningInformationRecovery";
+	}
 }
