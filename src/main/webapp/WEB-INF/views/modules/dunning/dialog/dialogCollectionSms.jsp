@@ -60,7 +60,10 @@
  	                            alert("保存成功");
 //  	                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
  	                            window.parent.window.jBox.close();            //关闭子窗体
- 	                        } else {
+ 	                        } else if(data == "sendOut"){
+ 	                            alert("已超过当日发送上限");
+                            	window.parent.window.jBox.close(); 
+ 	                        }else {
  	                            alert("保存失败:"+data.message);
  	                            //window.parent.page();
  	                            window.parent.window.jBox.close();

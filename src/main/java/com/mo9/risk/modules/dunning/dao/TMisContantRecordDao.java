@@ -76,4 +76,11 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 	 * 获取最新一次的n:3:2后的action为有效的时间
 	 */
 	public Date findActionTime(@Param("dunningpeopleId")String dunningpeopleId, @Param("dealcode")String dealcode, @Param("dunningCycle")String dunningCycle,@Param("dirDate")Date dirDate);
+
+	/**
+	 * 获取短信模板发送的次数
+	 * @param tContantRecord
+	 * @return
+	 */
+	public int findCountSmsSend(TMisContantRecord tContantRecord);
 }
