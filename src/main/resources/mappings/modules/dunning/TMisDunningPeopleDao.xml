@@ -54,6 +54,9 @@
 		    <if test="id != null and id != ''">
 				AND a.id = #{id}
 			</if>
+		    <if test="auto != null and auto != ''">
+				AND a.auto = #{auto}
+			</if>
 			<if test="name != null and name != ''">
 				AND a.name LIKE concat('%',#{name},'%')
 			</if>
@@ -332,6 +335,21 @@
 			dunningcycle = #{dunningcycle}
 		WHERE id in 
 		<foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
+	 <update id="operationUpdate">
+		UPDATE t_mis_dunning_people SET 	
+			updatedate = now(),
+			updateby = #{userId},
+			<if test="tMisDunningPeople.group != null and tMisDunningPeople.group.id != null and tMisDunningPeople.group.id != '' ">
+			 groupId= #{tMisDunningPeople.group.id }
+			</if>
+			<if test="tMisDunningPeople.auto != null and tMisDunningPeople.auto != '' ">
+			auto = #{tMisDunningPeople.auto}
+			</if>
+		WHERE id in 
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
             #{item}
         </foreach>
 	</update>

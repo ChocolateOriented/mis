@@ -104,4 +104,13 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @param name
 	 */
 	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(@Param("dunningcycle")String[] dunningcycle, @Param("type")String[] type, @Param("auto")String[] auto, @Param("name")String name,@Param("dunningpeoplename")String dunningpeoplename);
+	
+	/**
+	 * 批量更新小组分配,自动分配
+	 * @param ids
+	 * @param userId
+	 * @param tMisDunningPeople
+	 * @return
+	 */
+	public int operationUpdate(@Param("ids")List<String> ids,@Param("userId") String userId, @Param("tMisDunningPeople")TMisDunningPeople tMisDunningPeople);
 }

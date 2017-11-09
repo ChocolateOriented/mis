@@ -231,4 +231,15 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 
 		return tMisDunningPeopleDao.findPeopleByCycleTypeAutoName(dunningcycle, type,auto,name,dunningpeoplename);
 	}
+	/**
+	 * 批量更新小组分配,自动分配
+	 * @param ids
+	 * @param userId
+	 * @param tMisDunningPeople
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public int operationUpdate(List<String> ids, String userId, TMisDunningPeople tMisDunningPeople) {
+		return tMisDunningPeopleDao.operationUpdate(ids,userId,tMisDunningPeople);
+	}
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -25,9 +26,11 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
+import com.mo9.risk.util.CsvUtil;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -250,5 +253,76 @@ public class TMisDunningPeopleController extends BaseController {
 		return true;
 
 	}
+	
+	/**
+	 * 加载分配小组和自动分配等页面
+	 * @param peopleids
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "dialogOperationPeoPle")
+	public String dialogOperationPeoPle( Model model,String peopleids,String operateId) {
+		try {
+			model.addAttribute("peopleids", peopleids);
+			model.addAttribute("operateId", operateId);
+		} catch (Exception e) {
+			logger.info("加载分配小组和自动分配等页面失败",e);
+			return "views/error/500";
+		}
+		return "modules/dunning/dialog/dialogOperationPeoPle";
+	}
 
+	/**
+	 * 批量分配小组和自动分配等
+	 * @param peopleids
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "operationSave")
+	@ResponseBody
+	public String operationSave(TMisDunningPeople tMisDunningPeople,String[] peopleids, HttpServletRequest request) {
+		
+		try {
+			List<String> ids = Arrays.asList(peopleids); 
+			if(ids.isEmpty()){
+				String mes = "请选择催收员";
+				return mes;
+			}
+			tMisDunningPeopleService.operationUpdate(ids, UserUtils.getUser().getId(),tMisDunningPeople);
+		} catch (Exception e) {
+			logger.info("手动批量分配发生错误",e);
+		}
+		return "OK";
+	}
+	/**
+	 * 批量添加催收员
+	 * @param peopleids
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "fileUpload")
+	public String fileUpload( Model model,MultipartFile file, RedirectAttributes redirectAttributes) {
+		//解析上传Excel或csv
+		List<TMisDunningPeople> list ;
+		String filename = file.getOriginalFilename();
+		logger.info("正在接析文件:" +filename) ;
+		try {
+			if (StringUtils.endsWith(filename,".csv")){
+				list = CsvUtil.importCsv(file,TMisDunningPeople.class,3);
+			}else {
+				ImportExcel ei = new ImportExcel(file, 1, 0);
+				list = ei.getDataList(TMisDunningPeople.class);
+			}
+			logger.info("完成接析文件:" + file.getOriginalFilename());
+		} catch (Exception e) {
+			logger.info("解析式发生错误",e);
+			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误");
+			return "redirect:analysis";
+		}
+
+		return "OK";
+	}
 }
