@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
+import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
@@ -125,4 +126,11 @@ public interface TMisRemittanceConfirmDao extends CrudDao<TMisRemittanceConfirm>
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm>
 	 */
 	List<TMisRemittanceConfirm> findCompleteAuditBySerialNumber(@Param("remittanceSerialNumber")String remittanceSerialNumber, @Param("remittanceChannel")String remittanceChannel);
+
+	/**
+	 * @Description 查询对公还款流水 
+	 * @param dealcode
+	 * @return java.util.List<com.mo9.risk.modules.dunning.bean.SerialRepay>
+	 */
+	List<SerialRepay> findRemittanceSerialRepay(String dealcode);
 }

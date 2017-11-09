@@ -35,6 +35,16 @@
                }
          });
 	}
+
+        function openSerialRepayWindow(dealcode) {
+          var url = "${ctx}/dunning/tMisDunningTask/orderSerialRepayList?dealcode=" + dealcode;
+          $.jBox.open("iframe:" + url, "还款流水", 900, 400, {
+            buttons: {},
+            loaded: function (h) {
+              $(".jbox-content", document).css("overflow-y", "hidden");
+            }
+          });
+        }
 	</script>
 </head>
 <body>
@@ -69,9 +79,9 @@
 					${vs.index +1}
 				</td>
 				<td>
-<%-- 				<a href="${ctx}/dunning/tMisDunningTask/form?id=${tMisDunningTask.id}"> --%>
-					${orderHistory.dealcode}
-<!-- 				</a> -->
+                    <a onclick="openSerialRepayWindow('${orderHistory.dealcode}')">
+                        ${orderHistory.dealcode}
+                    </a>
 				</td>
 				<td>
 					${orderHistory.ordertype}
