@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
@@ -400,5 +401,14 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	public List<TMisRemittanceConfirm> findCompleteAuditBySerialNumber(String remittanceSerialNumber, String remittanceChannel) {
 		return dao.findCompleteAuditBySerialNumber(remittanceSerialNumber,remittanceChannel);
+	}
+
+	/**
+	 * @Description 查询对公还款流水
+	 * @param dealcode
+	 * @return java.util.List<com.mo9.risk.modules.dunning.bean.SerialRepay>
+	 */
+	public List<SerialRepay> findRemittanceSerialRepay(String dealcode) {
+		return dao.findRemittanceSerialRepay(dealcode);
 	}
 }

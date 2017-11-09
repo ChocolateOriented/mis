@@ -9,10 +9,12 @@ import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisRequestRecordDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRequestRecord;
+import com.mo9.risk.modules.dunning.manager.ApiFailException;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MailSender;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.service.BaseService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
@@ -152,6 +154,9 @@ public class TMisDunningOrderService extends BaseService{
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
 				orderManager.repay(dealcode, paychannel, paytype, payamount, thirdCode);
+			} catch (ServiceException e){
+				logger.info("重试回调江湖救急接口发生错误", e);
+				return false;
 			} catch (Exception e) {
 				logger.info("重试回调江湖救急接口发生错误", e);
 				continue;
@@ -224,6 +229,9 @@ public class TMisDunningOrderService extends BaseService{
 			msg = orderManager.repay(dealcode,paychannel,paytype,payamount,thirdCode);
 		}catch (IOException e) {
 			logger.info("订单"+dealcode+"调用江湖救急接口发生网络异常,等待重试",e);
+			return msg;
+		} catch (ApiFailException e) {
+			logger.info(dealcode+e.getMessage()+",等待重试",e);
 			return msg;
 		}catch (RuntimeException e){//发生业务异常也删除
 			requestRecordDao.delete(requestRecord);

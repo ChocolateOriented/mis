@@ -402,4 +402,30 @@
 		AND a.RemittanceChannel = #{remittanceChannel}
 		AND a.invalid="t"
 	</select>
+
+	<select id="findRemittanceSerialRepay" resultType="com.mo9.risk.modules.dunning.bean.SerialRepay">
+		SELECT
+			"SELF_OFFLINE" AS repayWay,
+			CASE
+				WHEN
+					a.RemittanceChannel = "alipay" THEN "支付宝"
+				ELSE
+					a.RemittanceChannel
+			END AS repayChannel,
+			"succeeded" AS repayStatus,
+			a.RemittanceAmount AS repayAmount,
+			a.PayType AS payType,
+			a.RemittanceTime AS repayTime,
+			a.updateDate AS statusTime
+		FROM
+		t_mis_remittance_confirm a
+		WHERE
+		(
+			a.ConfirmStatus = "finish"
+			OR
+			a.ConfirmStatus = "ch_confirm"
+		)
+		AND a.invalid="t"
+		AND a.Dealcode = #{dealcode}
+	</select>
 </mapper>
