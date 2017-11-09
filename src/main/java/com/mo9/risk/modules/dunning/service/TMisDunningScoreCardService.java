@@ -106,6 +106,7 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 		List<DunningOrder> orders = dao.getNewRiskOrder(dunningOrder);
 		
 		if (orders == null || orders.size() == 0) {
+			logger.info("没有需要获取评分的订单");
 			return;
 		}
 		
@@ -139,7 +140,7 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 				tMisDunningScoreCard.setUpdateBy(user);
 				save(tMisDunningScoreCard);
 			} catch (Exception e) {
-				logger.info("获取评分数据失败" + e.getMessage());
+				logger.info("订单" + dealcode + "获取评分数据失败" + e.getMessage());
 			}
 		}
 	}
