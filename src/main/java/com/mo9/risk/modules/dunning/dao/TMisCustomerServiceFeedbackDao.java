@@ -14,21 +14,18 @@ import java.util.List;
 @MyBatisDao
 public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServiceFeedback>{
 
-    /**
-     * 通过订单编号,类型,状态查询反馈案件
-     * @param
-     */
-    public List<TMisCustomerServiceFeedback> findFeedbackByCodeTypeStatus(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 
     /**
-     * 通过问题状态,推送标签,推送人查询反馈案件
-     * @param
+     * @Description 客服推送消息的订单号,标签,时间的通知列表分页展示
+     * @param tMisCustomerServiceFeedback
      */
-    public List<TMisCustomerServiceFeedback> findFeedbackByStatusTagProblemPeople(@Param("problemstatus")String problemstatus,@Param("hashtag")String hashtag,@Param("problemdescription")String problemdescription,@Param("pushpeople")String pushpeople);
+    public List<TMisCustomerServiceFeedback> NotifyList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 
     /**
-     * 通过推送标签查询一个反馈案件
-     * @param
+     * 更新问题状态,待解决操作
+     * @param customerServiceFeedback
      */
-    public TMisCustomerServiceFeedback findFeedbackByStatus(@Param("problemstatus")String problemstatus);
+    public int updateFeedback(TMisCustomerServiceFeedback customerServiceFeedback);
+
+    TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback);
 }

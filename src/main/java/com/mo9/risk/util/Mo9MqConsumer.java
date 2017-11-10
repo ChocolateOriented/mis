@@ -6,10 +6,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import com.aliyun.openservices.ons.api.Consumer;
-import com.aliyun.openservices.ons.api.ONSFactory;
-import com.aliyun.openservices.ons.api.PropertyKeyConst;
-import com.aliyun.openservices.ons.api.PropertyValueConst;
+import com.aliyun.openservices.ons.api.*;
 import com.mo9.mqclient.IMqMsgListener;
 import com.mo9.mqclient.MqSubscription;
 import com.mo9.mqclient.impl.aliyun.AliyunMessageModel;
@@ -75,6 +72,7 @@ public class Mo9MqConsumer extends AliyunMqConsumer {
 		}
 
 		this.consumer = ONSFactory.createConsumer(producerProperties);
+
 		Set<Entry<MqSubscription, IMqMsgListener>> entrySet = this.subscriptionIMqMsgListenerMap
 				.entrySet();
 		for (Entry<MqSubscription, IMqMsgListener> entry : entrySet) {

@@ -4,7 +4,6 @@ import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,45 +24,51 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
     @Autowired
     private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 
+
     /**
-     *@Description 通过订单编号,类型,状态查询反馈案件
+     * 客服推送的消息分页展示
+     * @param page
+     * @param tMisCustomerServiceFeedback
+     * @return
+     */
+    public Page<TMisCustomerServiceFeedback> feedbackList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback) {
+        // 设置排序参数
+
+        tMisCustomerServiceFeedback.setPage(page);
+        page.setOrderBy("problemStatus DESC");
+        page.setList(dao.findList(tMisCustomerServiceFeedback));
+
+        return page;
+    }
+
+    /**
+     * @Description 客服推送消息的订单号,标签,时间的通知列表分页展示
+     * @param page
+     */
+    public Page<TMisCustomerServiceFeedback> NotifyList(Page<TMisCustomerServiceFeedback> page,TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+
+        tMisCustomerServiceFeedback.setPage(page);
+        page.setOrderBy("createTime DESC");
+        page.setList(dao.NotifyList(tMisCustomerServiceFeedback));
+        return page;
+    }
+
+    /**
+     * 更新问题状态,待解决操作
      * @param tMisCustomerServiceFeedback
      */
-    public List<TMisCustomerServiceFeedback> findFeedbackByCodeTypeStatus(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+    @Transactional(readOnly = false)
+    public int updateFeedback(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
-        return tMisCustomerServiceFeedbackDao.findFeedbackByCodeTypeStatus(tMisCustomerServiceFeedback);
+        return tMisCustomerServiceFeedbackDao.updateFeedback(tMisCustomerServiceFeedback);
     }
 
     /**
-     * @Description 通过问题状态,推送标签,推送人查询反馈案件
-     * @param problemstatus
-     * @param hashtag
-     * @param pushpeople
+     * 根据问题ID获取订单号,问题状态,标签,问题描述,推送人
+     * @param
      */
-    public List<TMisCustomerServiceFeedback> findFeedbackByStatusTagPushPeople(@Param("problemstatus")String problemstatus, @Param("hashtag")String hashtag, @Param("problemdescription")String problemdescription,@Param("pushpeople")String pushpeople) {
+    public TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback){
 
-        if (problemstatus == null && hashtag == null&& problemdescription==null && pushpeople == null) {
-            return null;
-        }
-        return tMisCustomerServiceFeedbackDao.findFeedbackByStatusTagProblemPeople(problemstatus,hashtag,problemdescription,pushpeople);
+        return tMisCustomerServiceFeedbackDao.findCodeStatusTagDesPeople(customerServiceFeedback);
     }
-
-    /**
-     * @Description 通过推送标签查询一个反馈案件
-     * @param problemstatus
-     */
-    public TMisCustomerServiceFeedback findFeedbackByTag(@Param("problemstatus")String problemstatus){
-
-        if ( problemstatus == null) {
-            return null;
-        }
-        return tMisCustomerServiceFeedbackDao.findFeedbackByStatus(problemstatus);
-    }
-
-    public Page<TMisCustomerServiceFeedback> findPage(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback) {
-        // 设置排序参数
-        page.setOrderBy("ProblemStatus DESC");
-        return super.findPage(page, this.get(tMisCustomerServiceFeedback));
-    }
-
 }

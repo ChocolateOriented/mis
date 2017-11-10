@@ -19,14 +19,29 @@
     function page(n,s){
         $("#pageNo").val(n);
         $("#pageSize").val(s);
+        $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList");
         $("#searchForm").submit();
         return false;
+    }
+
+    function changeResult(obj){
+        var id = $(obj).attr("feedbackId");
+        $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/jboxResult?id=" + id, "处理结果" , 220, 260, {
+            buttons: {
+            },
+            submit: function (v, h, f) {
+            },
+            loaded: function (h) {
+                $(".jbox-content", document).css("overflow-y", "hidden");
+            }
+        });
+
     }
 
 </script>
 </head>
 <body>
-    <form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/" method="post" class="breadcrumb form-search">
+    <form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList" method="post" class="breadcrumb form-search">
         <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
         <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
     </form:form>
@@ -51,27 +66,29 @@
         <tbody>
         <c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
             <tr>
-                <shiro:hasPermission name="dunning:TMisCustomerServiceFeedback:edit">
+                <shiro:hasPermission name="dunning:TMisCustomerServiceFeedback:view">
                 <td>
                     ${tMisCustomerServiceFeedback.dealcode}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.ordertype}
+                    ${tMisCustomerServiceFeedback.orderTypeText}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.orderstatus}
+                    ${tMisCustomerServiceFeedback.orderStatusText}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.problemstatus}
+                    ${tMisCustomerServiceFeedback.statusText}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.hashtag}
+                    ${tMisCustomerServiceFeedback.tagText}
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.problemdescription}
                 </td>
                 <td>
-                    ${fn:substring(tMisCustomerServiceFeedback.createTime, 0, 16)}
+                    <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
+                      <fmt:formatDate value="${tMisCustomerServiceFeedback.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </c:if>
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.createBy.name}
@@ -80,13 +97,16 @@
                     ${tMisCustomerServiceFeedback.pushpeople}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.operate}
+                    <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
+                        <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                               value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
+                    </c:if>
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.handlingresult}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.rootOrderId}
+                    ${tMisCustomerServiceFeedback.rootorderid}
                 </td>
                 </shiro:hasPermission>
             </tr>

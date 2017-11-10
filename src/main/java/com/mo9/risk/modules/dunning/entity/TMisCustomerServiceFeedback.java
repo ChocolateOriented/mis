@@ -1,11 +1,14 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 客服问题Entity
@@ -15,21 +18,37 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     private static final long serialVersionUID = 1L;
 
-    public static final String PROBLEM_STATUS_SOLVED = "solved"; //已解决
-    public static final String PROBLEM_STATUS_UNSOLVED = "unsolved";  //未解决
+    public static final String RESOLVED = "RESOLVED"; //已解决
+    public static final String UNRESOLVED = "UNRESOLVED";  //未解决
+    public static final String ORDER_DEDUCT="ORDER_DEDUCT";//订单代扣
+    public static final String WRITE_OFF="WRITE_OFF";//催销账
+    public static final String COMPLAIN_SHAKE="COMPLAIN_SHAKE"; //投诉催收
+    public static final String CONSULT_REPAY="CONSULT_REPAY";//协商还款
+    public static final String CONTACT_REMARK="CONTACT_REMARK" ;//备注联系方式
+    public static final String pending="pending";//待完成
+    public static final String lending="lending";//待放款
+    public static final String payment="payment";//待还款(未还清)
+    public static final String overdue="overdue";//逾期
+    public static final String payoff="payoff";//已还清 完成
+    public static final String cancel="cancel";//订单取消 完成
+    public static final String reject="reject";//拒绝 完成
+    public static final String loan="loan";//普通订单
+    public static final String loan_partial="loan_partial";//普通订单（部分
+    public static final String partial="partial";//部分还款订单
 
     private String dealcode; // 订单编号
-    private String ordertype; // 订单类型
-    private String orderstatus; // 当前催收时的订单状态
+    private String type; // 订单类型
+    private String status; // 当前催收时的订单状态
     private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
-    private String problemdescriotion;//问题描述
+    private String problemdescription;//问题描述
     private Date   createTime;//操作时间
     private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
     private String rootorderid;//主订单编号
-    private TRiskOrder tRiskOrder;
+    private String uname;//用户名
+    private Date pushTime;//消息推送时间
 
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
@@ -40,30 +59,50 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.dealcode = dealcode;
     }
 
-    public String getOrdertype() {
-        return ordertype;
+    public String getType() {
+        return type;
     }
 
-    public void setOrdertype(String ordertype) {
-        this.ordertype = ordertype;
+    @ExcelField(title="订单类型", type=1, align=2, sort=9)
+    public String getOrderTypeText() {
+        return loan.equals(this.type) ?  "普通订单" :
+                loan_partial.equals(this.type) ?  "部分还款订单" :
+                partial.equals(this.type) ?  "部分还款订单" :
+                        "";
     }
 
-    public String getOrderstatus() {
-        return orderstatus;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setOrderstatus(String orderstatus) {
-        this.orderstatus = orderstatus;
+    public String getStatus() {
+        return status;
+    }
+
+    public String getOrderStatusText() {
+        return payoff.equals(this.status) ?  "已还清" :
+                payment.equals(this.status) ?  "未还清" :
+                overdue.equals(this.status) ?  "未还清" :
+                partial.equals(this.status) ?  "未还清" :
+                pending.equals(this.status) ?  "" :
+                lending.equals(this.status) ?  "" :
+                cancel.equals(this.status) ?  "" :
+                reject.equals(this.status) ?  "" :
+                        "";
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getProblemstatus() {
         return problemstatus;
     }
 
-    @ExcelField(title="订单状态", type=1, align=2, sort=9)
+    @ExcelField(title="问题状态", type=1, align=2, sort=9)
     public String getStatusText() {
-        return PROBLEM_STATUS_SOLVED.equals(this.problemstatus) ?  "已解决" :
-                PROBLEM_STATUS_UNSOLVED.equals(this.problemstatus) ?  "未解决" : "";
+        return RESOLVED.equals(this.problemstatus) ?  "已解决" :
+                UNRESOLVED.equals(this.problemstatus) ?  "未解决" : "";
     }
 
     public void setProblemstatus(String problemstatus) {
@@ -71,21 +110,40 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     }
 
     @Length(min=1, max=128, message="催收订单号长度必须介于 1 和 128 之间")
-    public String getHashTag() {
+    public String getHashtag() {
         return hashtag;
     }
 
-    public void setHashTag(String hashtag) {
+    @ExcelField(title="标签类型", type=1, align=2, sort=9)
+    public String getTagText() {
+        List<String> tagList = JSON.parseObject(this.hashtag, new TypeReference<List<String>>() {});
+        if (tagList == null || tagList.isEmpty()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (String tag : tagList) {
+            String tagText = ORDER_DEDUCT.equals(tag) ? "订单代扣" :
+                    WRITE_OFF.equals(tag) ?  "催销账" :
+                            COMPLAIN_SHAKE.equals(tag) ? "投诉催收" :
+                                    CONSULT_REPAY.equals(tag) ? "协商还款" :
+                                            CONTACT_REMARK.equals(tag) ? "备注联系方式" : "";
+            builder.append(tagText).append(",");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        return builder.toString();
+    }
+
+    public void setHashtag(String hashtag) {
         this.hashtag = hashtag;
     }
 
     @Length(min=1, max=256, message="催收订单号长度必须介于 1 和 256 之间")
-    public String getProblemdescriotion() {
-        return problemdescriotion;
+    public String getProblemdescription() {
+        return problemdescription;
     }
 
-    public void setProblemdescriotion(String problemdescriotion) {
-        this.problemdescriotion = problemdescriotion;
+    public void setProblemdescription(String problemdescription) {
+        this.problemdescription = problemdescription;
     }
 
     @Length(min=1, max=128, message="催收订单号长度必须介于 1 和 128 之间")
@@ -124,14 +182,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.rootorderid = rootorderid;
     }
 
-    public TRiskOrder gettRiskOrder() {
-        return tRiskOrder;
-    }
-
-    public void settRiskOrder(TRiskOrder tRiskOrder) {
-        this.tRiskOrder = tRiskOrder;
-    }
-
     @Override
     public Date getCreateTime() {
         return createTime;
@@ -140,5 +190,22 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @Length(min=1, max=128, message="用户长度必须介于 1 和 128 之间")
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname;
+    }
+
+    public Date getPushTime() {
+        return pushTime;
+    }
+
+    public void setPushTime(Date pushTime) {
+        this.pushTime = pushTime;
     }
 }

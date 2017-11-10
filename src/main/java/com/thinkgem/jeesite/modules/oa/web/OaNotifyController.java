@@ -51,7 +51,7 @@ public class OaNotifyController extends BaseController {
 	public String list(OaNotify oaNotify, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<OaNotify> page = oaNotifyService.find(new Page<OaNotify>(request, response), oaNotify);
 		model.addAttribute("page", page);
-		return "modules/oa/oaNotifyList";
+		return "modules/oa/notifyList";
 	}
 
 	@RequiresPermissions("oa:oaNotify:view")
@@ -99,7 +99,7 @@ public class OaNotifyController extends BaseController {
 		oaNotify.setSelf(true);
 		Page<OaNotify> page = oaNotifyService.find(new Page<OaNotify>(request, response), oaNotify); 
 		model.addAttribute("page", page);
-		return "modules/oa/oaNotifyList";
+		return "modules/oa/notifyList";
 	}
 
 	/**

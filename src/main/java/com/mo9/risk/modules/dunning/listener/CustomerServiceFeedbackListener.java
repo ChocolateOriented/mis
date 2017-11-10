@@ -1,10 +1,12 @@
 package com.mo9.risk.modules.dunning.listener;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.mo9.mqclient.IMqMsgListener;
 import com.mo9.mqclient.MqAction;
 import com.mo9.mqclient.MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.Mo9MqMessage;
+import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,19 +26,21 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
     private static final Logger logger = LoggerFactory.getLogger(CustomerServiceFeedbackListener.class);
 
     @Autowired
-    TMisCustomerServiceFeedbackDao customerDao;
+    TMisCustomerServiceFeedbackDao feedbackDao;
 
     @Override
     public MqAction consume(MqMessage msg, Object consumeContext) {
 
-        String tag1 = msg.getTag();
-        if ("customerServiceFeedback_problemstatus".equals(tag1)){
-            return this.customerServiceFeedback_problemstatus(msg);
-        }
-        String tag2=msg.getTag();
-        if ("customerServiceFeedback_problem".equals(tag2)){
+        String tag1=msg.getTag();
+        if ("customerServiceFeedback_problem".equals(tag1)){
             return this.customerServiceFeedback_problem(msg);
         }
+
+        /*String tag2 = msg.getTag();
+        if ("customerServiceFeedback_problemstatus".equals(tag2)){
+            return this.customerServiceFeedback_problemstatus(msg);
+        }*/
+
         return MqAction.ReconsumeLater;
     }
 
@@ -47,41 +52,54 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
     private MqAction customerServiceFeedback_problem(MqMessage msg) {
 
         String json = msg.getBody();
-        Mo9MqMessage message = JSON.parseObject(json, Mo9MqMessage.class);
-        String remark=message.getRemark();
-        TMisCustomerServiceFeedback customer = JSON.parseObject(remark, TMisCustomerServiceFeedback.class);
-
-        String problemstatus=customer.getProblemstatus();
-        String hashtag=customer.getHashTag();
-        String problemdescription=customer.getProblemdescriotion();
-        String pushpeople=customer.getPushpeople();
-        if(customerDao.findFeedbackByStatusTagProblemPeople(problemstatus,hashtag,problemdescription,pushpeople)!=null){
-            customerDao.findList(customer);
-            return MqAction.CommitMessage;
+        TMisCustomerServicefeedbackDto feedback = JSON.parseObject(json, TMisCustomerServicefeedbackDto.class );
+        TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+        tMisCustomerServiceFeedback.setDealcode(feedback.getLoanDealCode());
+        tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
+        tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
+        tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
+        tMisCustomerServiceFeedback.setCreateBy(tMisCustomerServiceFeedback.getCreateBy());
+        tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
+        tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
+        tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
+        tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
+        tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
+        tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
+        tMisCustomerServiceFeedback.setUname(feedback.getUserName());
+        tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
+        logger.debug(tMisCustomerServiceFeedback.getId());
+        if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
+            logger.debug(tMisCustomerServiceFeedback.getId()+"find");
+            feedbackDao.insert(tMisCustomerServiceFeedback);
+        } else{
+            feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
+            feedbackDao.findList(tMisCustomerServiceFeedback);
+            feedbackDao.NotifyList(tMisCustomerServiceFeedback);
+            feedbackDao.findCodeStatusTagDesPeople(tMisCustomerServiceFeedback);
         }
-        return MqAction.ReconsumeLater;
+        return MqAction.CommitMessage;
     }
 
 
     /**
-     * @Description 未解决问题推送过来时
+     * @Description
      * @param msg
      * @return com.mo9.mqclient.MqAction
      */
-    private MqAction customerServiceFeedback_problemstatus(MqMessage msg){
+    /*private MqAction customerServiceFeedback_problemstatus(MqMessage msg){
 
         String json = msg.getBody();
         Mo9MqMessage message = JSON.parseObject(json, Mo9MqMessage.class);
         String remark=message.getRemark();
-        TMisCustomerServiceFeedback customer = JSON.parseObject(remark, TMisCustomerServiceFeedback.class);
+        TMisCustomerServiceFeedback feedback = JSON.parseObject(remark, TMisCustomerServiceFeedback.class);
 
-        String problemstatus=customer.getProblemstatus();
-        if(customerDao.findFeedbackByStatus(problemstatus) !=null){
-            customerDao.findList(customer);
+        *//*String problemstatus=feedback.getProblemstatus();
+        if(feedbackDao.get() !=null){
+            feedbackDao.findList(feedback);
             return MqAction.CommitMessage;
-        }
+        }*//*
 
         return MqAction.ReconsumeLater;
-    }
+    }*/
 
 }
