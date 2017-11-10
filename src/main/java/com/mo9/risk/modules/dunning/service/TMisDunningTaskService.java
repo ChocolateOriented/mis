@@ -1462,7 +1462,19 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			 *  二月分案规则
 			 */
 			case 28:
-				return;
+				switch (getDays()) {
+				case 1:
+					/**  Q0,Q2-Q4分案 */
+					this.autoAssign_Q1_Q4();
+					return;
+				case 14:
+					/**  Q0,Q1-Q4分案 */
+					this.autoAssign_Q1_Q4();
+					return;
+				default:
+					this.autoAssignCycle(TMisDunningTask.STATUS_DUNNING,C0,this.getCycleDict_Q0().get("begin"),this.getCycleDict_Q0().get("end"));
+					return;
+				}
 			default:
 				return;
 		}
@@ -1585,7 +1597,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						return tmpMoveCycle;
 					}
 				case 28:
-					return tmpMoveCycle;
+					if(getDays() < 14){
+						tmpMoveCycle.setDatetimestart(DateUtils.getMonthFirstDayDate());
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}else{
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(17));
+						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
+						return tmpMoveCycle;
+					}
 				default:
 					tmpMoveCycle.setDatetimestart(DateUtils.getDate(-1));
 					tmpMoveCycle.setDatetimeend(DateUtils.getDate(-1));
@@ -2044,8 +2064,14 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				return "dunningCycle1";
 			}
 		case 28:
-			return "";
-			
+			switch (getDays()) {
+			case 1:
+				return "dunningCycle3";
+			case 14:
+				return "dunningCycle1";
+			default:
+				return "dunningCycle1";
+			}
 		default:
 			return "";
 			
@@ -2081,6 +2107,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
 					break;
 				case 28:
+					day = (getDays()+2) % 15 == 0 ? 15 - 1 : (getDays()+2) % 15 - 1;
 					break;
 				default:
 					break;
@@ -2101,7 +2128,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		/**  逾期天数大于全部周期段时放入Q5    */
 		if(null == cycleDict && current > cyclemax){
-			String val = DictUtils.getDictValue("Q5", type, "47_61");
+			String val = DictUtils.getDictValue("Q5", type, "48_62");
 			cycleDict = new Dict();
 			cycleDict.setType(type);
 			cycleDict.setValue(val);
@@ -2415,24 +2442,41 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		
 		
 		Calendar calendar = Calendar.getInstance();  
-        int year = 2017;  
-        int month = Calendar.MAY;  
+        int year = 2018;  
+        int month = 1;  
         int date = 1;  
         calendar.set(year, month, date);  
         int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-				logger.debug("Max Day: " + maxDay);
+        System.out.println("Max Day: " + maxDay);
         int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-				logger.debug("Min Day: " + minDay);
-  
-        for (int i = minDay +1; i <= maxDay; i++) {  
-            calendar.set(year, month, i);
-						logger.debug("Day: " + calendar.getTime().toLocaleString());
-//        	int datenum = calendar.get(Calendar.DATE);
-//        	System.out.println(datenum);
-            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
+        System.out.println("Min Day: " + minDay);
+//        // 大月
+//        for (int i = minDay +1; i <= maxDay; i++) {  
+//            calendar.set(year, month, i);
+//            System.out.println("Day: " + calendar.getTime().toLocaleString());
+////        	int datenum = calendar.get(Calendar.DATE);
+////        	System.out.println(datenum);
+//            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
+////        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+//            System.out.println(s);
+//        }  
+//        // 小月
+//        for (int i = minDay ; i <= maxDay; i++) {  
+//            calendar.set(year, month, i);
+//            System.out.println("Day: " + calendar.getTime().toLocaleString());
+////        	int datenum = calendar.get(Calendar.DATE);
+////        	System.out.println(datenum);
+////            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
 //        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-						logger.debug(s);
-        }  
+//            System.out.println(s);
+//        }  
+        // 2月 
+        for (int i = minDay ; i <= maxDay; i++) {  
+            calendar.set(year, month, i);
+            System.out.println("Day: " + calendar.getTime().toLocaleString());
+            int s =(i+2) % 15 == 0 ? 15 - 1 : (i+2) % 15 - 1;
+            System.out.println(s);
+        } 
 //      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
 		
 //		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
