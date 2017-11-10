@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.sendMessage.event;
 
 import com.mo9.risk.modules.dunning.sendMessage.dao.EventType;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -19,12 +20,6 @@ public class FeedbackEvent {
     private String eventId;
 
     /**
-     * 事件发送时间
-     */
-    @NotNull(message = "事件发生时间不能为空")
-    private Date eventTime;
-
-    /**
      * 反馈记录id
      */
     @NotNull(message = "问题id不能为空")
@@ -37,13 +32,13 @@ public class FeedbackEvent {
      * 反馈记录人
      */
     @NotNull(message = "操作人不能为空")
-    private String createBy;
+    private User updateBy;
 
     /**
      * 反馈记录更新时间
      */
     @NotNull(message = "问题解决时间不能为空")
-    private Date createTime;
+    private Date updateDate;
 
     public String getEventId() {
         return eventId;
@@ -53,13 +48,6 @@ public class FeedbackEvent {
         this.eventId = eventId;
     }
 
-    public Date getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(Date eventTime) {
-        this.eventTime = eventTime;
-    }
 
     public String getFeedbackId() {
         return feedbackId;
@@ -69,21 +57,6 @@ public class FeedbackEvent {
         this.feedbackId = feedbackId;
     }
 
-    public String getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(String createBy) {
-        this.createBy= createBy;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 
     public int getEventType() {
         return EventType.EVENT_TYPE_FEEDBACK;
@@ -97,4 +70,19 @@ public class FeedbackEvent {
         this.handlingresult = handlingresult;
     }
 
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public User getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(User updateBy) {
+        this.updateBy = updateBy;
+    }
 }

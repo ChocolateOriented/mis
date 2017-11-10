@@ -59,7 +59,7 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
      */
     @Transactional(readOnly = false)
     public int updateFeedback(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
-
+              tMisCustomerServiceFeedback.preUpdate();
         return tMisCustomerServiceFeedbackDao.updateFeedback(tMisCustomerServiceFeedback);
     }
 

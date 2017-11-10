@@ -51,7 +51,7 @@ public class FeedBackMessageResendTask {
                 /**
                  * 下次发送时间更新
                  */
-                Date nextSendTime = messageService.generateNextSendTime(now, message.getTimes());
+                Date nextSendTime = messageService.generateNextSendTime(message.getTimes());
                 updateMessage.setNextSendTime(nextSendTime);
                 /**
                  * messageId 部位空表示消息发送成功

@@ -36,11 +36,6 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
             return this.customerServiceFeedback_problem(msg);
         }
 
-        /*String tag2 = msg.getTag();
-        if ("customerServiceFeedback_problemstatus".equals(tag2)){
-            return this.customerServiceFeedback_problemstatus(msg);
-        }*/
-
         return MqAction.ReconsumeLater;
     }
 
@@ -79,27 +74,5 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         }
         return MqAction.CommitMessage;
     }
-
-
-    /**
-     * @Description
-     * @param msg
-     * @return com.mo9.mqclient.MqAction
-     */
-    /*private MqAction customerServiceFeedback_problemstatus(MqMessage msg){
-
-        String json = msg.getBody();
-        Mo9MqMessage message = JSON.parseObject(json, Mo9MqMessage.class);
-        String remark=message.getRemark();
-        TMisCustomerServiceFeedback feedback = JSON.parseObject(remark, TMisCustomerServiceFeedback.class);
-
-        *//*String problemstatus=feedback.getProblemstatus();
-        if(feedbackDao.get() !=null){
-            feedbackDao.findList(feedback);
-            return MqAction.CommitMessage;
-        }*//*
-
-        return MqAction.ReconsumeLater;
-    }*/
 
 }

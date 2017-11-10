@@ -8,13 +8,13 @@ import com.mo9.risk.modules.dunning.sendMessage.MessageStatusEnum;
 import com.mo9.risk.modules.dunning.sendMessage.event.FeedbackEvent;
 import com.mo9.risk.modules.dunning.sendMessage.pojo.MessageEntity;
 import com.mo9.risk.modules.dunning.sendMessage.service.MessageService;
-import com.thinkgem.jeesite.common.service.ServiceException;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,29 +25,20 @@ import java.util.Date;
  * Created by qtzhou on 2017/11/9.
  * 问题处理结果消息回传
  */
-@Controller
-@RequestMapping(value="/feedback")
-public class FeedbackSendController {
+public class FeedbackSendService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FeedbackSendController.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeedbackSendService.class);
 
-    @Autowired
     private FeedbackMessageProducer feedbackMessageProducer;
 
-    @Autowired
     private MessageService messageService;
 
-    @Value("${aliyun.mq.feedback.topic}")
+
     private String feedbackTopic;
 
-    @Value("${aliyun.mq.feedback.tag}")
     private String feedbackTag;
 
-    private TMisCustomerServiceFeedback feedback;
-
-    @ResponseBody
-    @RequestMapping(value = "/create_feedback", method = RequestMethod.POST)
-    public BaseResponse createFeedBackRecord() {
+    public BaseResponse createFeedBackRecord(TMisCustomerServiceFeedback feedback) {
         BaseResponse response = new BaseResponse();
 
             /**
@@ -68,7 +59,7 @@ public class FeedbackSendController {
                 message.setCreateTime(now);
                 message.setUpdateTime(now);
                 message.setTimes(1);
-                Date nextSendTime = messageService.generateNextSendTime(now, message.getTimes());
+                Date nextSendTime = messageService.generateNextSendTime(message.getTimes());
                 message.setNextSendTime(nextSendTime);
 
                 /**
@@ -98,10 +89,42 @@ public class FeedbackSendController {
         FeedbackEvent event = new FeedbackEvent();
         Date now = new Date();
         event.setEventId(DateFormatUtils.format(now,"yyyy-MM-dd HH:mm:ss"));
-        event.setEventTime(feedback.getUpdateTime());
         event.setFeedbackId(feedback.getId());
         event.setHandlingresult(feedback.getHandlingresult());
-        event.setCreateTime(feedback.getCreateTime());
+        event.setUpdateBy(feedback.getUpdateBy());
+        event.setUpdateDate(feedback.getUpdateDate());
         return event;
+    }
+
+    public FeedbackMessageProducer getFeedbackMessageProducer() {
+        return feedbackMessageProducer;
+    }
+
+    public void setFeedbackMessageProducer(FeedbackMessageProducer feedbackMessageProducer) {
+        this.feedbackMessageProducer = feedbackMessageProducer;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+
+    public String getFeedbackTopic() {
+        return feedbackTopic;
+    }
+
+    public void setFeedbackTopic(String feedbackTopic) {
+        this.feedbackTopic = feedbackTopic;
+    }
+
+    public String getFeedbackTag() {
+        return feedbackTag;
+    }
+
+    public void setFeedbackTag(String feedbackTag) {
+        this.feedbackTag = feedbackTag;
     }
 }

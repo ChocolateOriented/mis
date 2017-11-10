@@ -1,15 +1,18 @@
 package com.mo9.risk.modules.dunning.sendMessage.pojo;
 
+import java.io.Serializable;
 import java.util.Date;
 
+import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.sendMessage.MessageStatusEnum;
+import com.mo9.risk.modules.dunning.sendMessage.dao.IEntity;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * Created by qtzhou on 2017/11/9.
  * 消息实体
  */
-public class MessageEntity  extends DataEntity<MessageEntity>{
+public class MessageEntity  extends DataEntity<MessageEntity> implements IEntity, Serializable {
 
 
     private String messageId;
@@ -92,5 +95,10 @@ public class MessageEntity  extends DataEntity<MessageEntity>{
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
+    }
+
+    @Override
+    public String toJsonString() {
+        return JSON.toJSONString(this);
     }
 }

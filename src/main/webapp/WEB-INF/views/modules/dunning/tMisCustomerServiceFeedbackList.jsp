@@ -87,11 +87,11 @@
                 </td>
                 <td>
                     <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
-                      <fmt:formatDate value="${tMisCustomerServiceFeedback.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                      <fmt:formatDate value="${tMisCustomerServiceFeedback.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </c:if>
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.createBy.name}
+                    ${tMisCustomerServiceFeedback.updateBy.name}
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.pushpeople}

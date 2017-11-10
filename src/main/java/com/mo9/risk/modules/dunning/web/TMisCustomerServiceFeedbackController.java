@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
+import com.mo9.risk.modules.dunning.sendMessage.controller.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -28,6 +29,9 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
     @Autowired
     private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
+
+    @Autowired
+    private FeedbackSendService feedbackSendService;
 
     @ModelAttribute
     public TMisCustomerServiceFeedback get(@RequestParam(required=false) String id) {
@@ -87,6 +91,11 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         TMisCustomerServiceFeedback feedback=null;
         try{
             tMisCustomerServiceFeedbackService.updateFeedback(tMisCustomerServiceFeedback);
+            /**
+             * 消息发送，数据库更新失败时不会发送
+             */
+            feedback = tMisCustomerServiceFeedback;
+            feedbackSendService.createFeedBackRecord(feedback);
         }catch (Exception e){
             logger.info("",e);
             return null;

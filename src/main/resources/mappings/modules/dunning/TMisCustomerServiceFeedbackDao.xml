@@ -8,8 +8,8 @@
         a.problemstatus AS "problemstatus",
         a.hashtag AS "hashtag",
         a.problemdescription AS "problemdescription",
-        a.createTime AS "createTime",
-        a.createby AS "createBy.name",
+        a.updateDate AS "updateDate",
+        a.updateBy AS "updateBy.name",
         a.pushpeople AS "pushpeople",
         a.operate AS "operate",
         a.handlingResult AS "handlingresult",
@@ -74,8 +74,8 @@
         <if test="problemstatus !=null and problemstatus!=''">
             AND a.problemStatus LIKE concat('%',#{problemstatus},'%')
         </if>
-        <if test="createTime !=null and createTime!=''">
-            AND a.createTime=#{createTime}
+        <if test="updateDate !=null and updateDate!=''">
+            AND a.updateDate=#{updateDate}
         </if>
         </where>
         <choose>
@@ -103,8 +103,8 @@
             problemstatus,
             hashtag,
             problemdescription,
-            createTime,
-            createby,
+            updateDate,
+            updateBy,
             pushpeople,
             operate,
             handlingResult,
@@ -119,8 +119,8 @@
             #{problemstatus},
             #{hashtag},
             #{problemdescription},
-            #{createTime},
-            #{createBy.name},
+            #{updateDate},
+            #{updateBy.name},
             #{pushpeople},
             #{operate},
             #{handlingresult},
@@ -133,7 +133,9 @@
     <update id="updateFeedback">
         UPDATE t_mis_customer_service_feedback SET
         problemstatus = #{problemstatus},
-        handlingResult=#{handlingresult}
+        handlingResult=#{handlingresult},
+        updateDate=#{updateDate},
+        updateBy=#{updateBy.name}
         WHERE id = #{id}
     </update>
 

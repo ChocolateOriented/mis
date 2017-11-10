@@ -23,9 +23,9 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
 
     /**
      * 更新问题状态,待解决操作
-     * @param customerServiceFeedback
+     * @param tMisCustomerServiceFeedback
      */
-    public int updateFeedback(TMisCustomerServiceFeedback customerServiceFeedback);
+    public int updateFeedback(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 
     TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback);
 }

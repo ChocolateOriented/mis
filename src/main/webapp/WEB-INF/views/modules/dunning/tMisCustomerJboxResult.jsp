@@ -44,7 +44,7 @@
 <form:form id="inputForm"  modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/resultSave" method="post" class="breadcrumb form-search">
     <textarea name="handlingresult" cols="30" rows="10" style="width: 175px;height: 100px" ></textarea>
     <input name="id" type="hidden" value="${id}"/>
-    <input name="problemstatus" type="hidden" value="已解决"/>
+    <input name="problemstatus" type="hidden" value="RESOLVED"/>
     <div style="margin-top: 20px">
         <input id="resultSave" class="btn btn-primary" type="button" value="已解决" />
         <input id="esc" class="btn btn-primary" type="button" value="取消" style="margin-left: 60px"/>

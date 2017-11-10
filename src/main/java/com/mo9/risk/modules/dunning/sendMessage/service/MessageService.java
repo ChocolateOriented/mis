@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,11 @@ public class MessageService extends CrudService<MessageEntityDao,MessageEntity> 
         return messageDao.updateMessage(message);
     }
 
-    public Date generateNextSendTime(Date nextSendTime, int times) {
-        return messageDao.generateNextSendTime(nextSendTime,times);
+    public Date generateNextSendTime(int times) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, (int)Math.pow(times, 2) * 10);
+
+        return calendar.getTime();
     }
 }

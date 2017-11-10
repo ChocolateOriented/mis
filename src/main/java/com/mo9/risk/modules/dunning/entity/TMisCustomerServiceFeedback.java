@@ -42,7 +42,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
     private String problemdescription;//问题描述
-    private Date   createTime;//操作时间
     private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
@@ -182,15 +181,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.rootorderid = rootorderid;
     }
 
-    @Override
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    @Override
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 
     @Length(min=1, max=128, message="用户长度必须介于 1 和 128 之间")
     public String getUname() {
@@ -208,4 +198,5 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public void setPushTime(Date pushTime) {
         this.pushTime = pushTime;
     }
+
 }
