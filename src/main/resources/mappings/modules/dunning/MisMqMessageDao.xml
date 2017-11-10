@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.MisMqMessageDao">
+
+	<sql id="messageColumns">
+		a.id AS "id",
+		a.msgId AS "msgId",
+		a.`key` AS "key",
+		a.topic AS "topic",
+		a.tag AS "tag",
+		a.body AS "body",
+		a.createdate AS "createdate",
+		a.updatedate AS "updatedate"
+	</sql>
+
+	<select id="findResendMessages" resultType="MisMqMessage">
+		SELECT
+			<include refid="messageColumns"/>
+		FROM t_mis_mq_message a
+		<where>
+			a.msgId IS NULL
+		</where>
+	</select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_mis_mq_message(
+			topic,
+			tag,
+			`key`,
+			body,
+			createdate,
+			updatedate
+		) VALUES (
+			#{topic},
+			#{tag},
+			#{key},
+			#{body},
+			now(),
+			now()
+		)
+	</insert>
+	
+    <update id="update">
+		UPDATE t_mis_mq_message SET
+			msgId = #{msgId},
+			updatedate = now()
+		WHERE id = #{id}
+	</update>	
+	
+</mapper>

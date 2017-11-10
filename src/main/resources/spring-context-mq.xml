@@ -48,7 +48,7 @@
 		<property name="accessKey" value="${accessKey}"/>
 		<property name="secretKey" value="${secretKey}"/>
 		<property name="onsAddr" value="${onsAddr}"/>
-		<property name="SendMsgTimeoutMillis" value="${SendMsgTimeoutMillis}"/>
+		<property name="SendMsgTimeoutMillis" value="${sendMsgTimeoutMillis}"/>
 	</bean>
 
 	<bean id = "riskOrderListener" class="com.mo9.risk.modules.dunning.listener.RiskOrderListener"></bean>
