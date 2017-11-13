@@ -20,12 +20,6 @@ public class FeedbackEvent {
     private String eventId;
 
     /**
-     * 事件类型
-     *
-     */
-    private String eventType;
-
-    /**
      * 反馈记录id
      */
     @NotNull(message = "问题id不能为空")
@@ -87,11 +81,4 @@ public class FeedbackEvent {
         this.updateBy = updateBy;
     }
 
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 }

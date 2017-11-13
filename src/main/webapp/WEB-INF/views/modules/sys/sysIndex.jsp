@@ -125,7 +125,7 @@
 					}
 				});
 			}
-			
+
 			// 获取通知数目  <c:set var="oaNotifyRemindInterval" value="${fns:getConfig('oa.notify.remind.interval')}"/>
 // 			function getNotifyNum3(){
 // 				$.get("${ctx}/oa/oaNotify/self/count?updateSession=0&t="+new Date().getTime(),function(data){
@@ -193,8 +193,8 @@
 						<ul class="dropdown-menu">
 							<li><a href="${ctx}/sys/user/info" target="mainFrame"><i class="icon-user"></i>&nbsp; 个人信息</a></li>
 							<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i class="icon-lock"></i>&nbsp;  修改密码</a></li>
-							<%--<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>--%>
-							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 </a></li>
+							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>
+							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  客服通知 </a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  催收任务 <span id="notifyNum3" class="label label-info hide"></span></a></li>
 						</ul>
 					</li>

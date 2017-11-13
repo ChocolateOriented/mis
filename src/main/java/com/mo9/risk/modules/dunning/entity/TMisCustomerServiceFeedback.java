@@ -48,7 +48,9 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String rootorderid;//主订单编号
     private String uname;//用户名
     private Date pushTime;//消息推送时间
-    private String keyword;
+    private String keyword;//页面关键字查询
+    private String readNum;		// 客服通知已读
+    private String unReadNum;	// 客服通知未读
 
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
@@ -206,5 +208,22 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+    }
+
+
+    public String getReadNum() {
+        return readNum;
+    }
+
+    public void setReadNum(String readNum) {
+        this.readNum = readNum;
+    }
+
+    public String getUnReadNum() {
+        return unReadNum;
+    }
+
+    public void setUnReadNum(String unReadNum) {
+        this.unReadNum = unReadNum;
     }
 }

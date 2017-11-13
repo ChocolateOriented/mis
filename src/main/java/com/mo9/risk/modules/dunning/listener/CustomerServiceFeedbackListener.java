@@ -64,13 +64,9 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
         logger.debug(tMisCustomerServiceFeedback.getId());
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
-            logger.debug(tMisCustomerServiceFeedback.getId()+"find");
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
             feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
-            feedbackDao.findList(tMisCustomerServiceFeedback);
-            feedbackDao.NotifyList(tMisCustomerServiceFeedback);
-            feedbackDao.findCodeStatusTagDesPeople(tMisCustomerServiceFeedback);
         }
         return MqAction.CommitMessage;
     }
