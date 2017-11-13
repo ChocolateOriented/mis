@@ -23,28 +23,28 @@ $(document).ready(function() {
 				        }
 				    }
 				}
-			},
-			extensionNumber:{
-				remote:{
-					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng",
-   					type:"post",
-   					dataType: "json", 
-    				data:{
-	    				extensionNumber:function() {
-				            return $("#extensionNumber").val();
-				        	}
-						}
-   					
-				}
 			}
+// 			extensionNumber:{
+// 				remote:{
+// 					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng",
+//    					type:"post",
+//    					dataType: "json", 
+//     				data:{
+// 	    				extensionNumber:function() {
+// 				            return $("#extensionNumber").val();
+// 				        	}
+// 						}
+   					
+// 				}
+// 			}
 		},
 		messages:{
 			nickname:{
 				remote:"该花名已被占用"
-			},
-			extensionNumber:{
-				remote:"请填写正确的格式"
 			}
+// 			extensionNumber:{
+// 				remote:"请填写正确的格式"
+// 			}
 		},
 		submitHandler: function(form){
 			loading('正在提交，请稍等...');
@@ -97,6 +97,7 @@ function changGroupType(){
 						<form:select id="dunningPeopleid" path="id" class="input-medium  required" disabled="true">
 							<form:option value="${TMisDunningPeople.id}">${TMisDunningPeople.name}</form:option>
 						</form:select>
+						<input type="hidden"  name="id" value="${tMisDunningPeople.id}" />
 					</c:when>
 					<c:otherwise>
 						<form:select id="dunningPeopleid" path="id" class="input-medium  required">
@@ -153,13 +154,20 @@ function changGroupType(){
 				</form:select>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label">催收员分机号：</label>
-			<div class="controls">
-				<input  value="${tMisDunningPeople.extensionNumber }" id="extensionNumber" name="extensionNumber" htmlEscape="false"  class="input-xlarge required "  />
-				<span class="help-inline"><font color="red">*</font></span>
-			</div>
-		</div>
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">催收员坐席号：</label> -->
+<!-- 			<div class="controls"> -->
+<%-- 				<input  value="${tMisDunningPeople.agent }" id=agent name="agent" htmlEscape="false"  class="input-xlarge required "  /> --%>
+<!-- 				<span class="help-inline"><font color="red">*</font></span> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 		<div class="control-group"> -->
+<!-- 			<label class="control-label">催收员分机号：</label> -->
+<!-- 			<div class="controls"> -->
+<%-- 				<input  value="${tMisDunningPeople.extensionNumber }" id="extensionNumber" name="extensionNumber" htmlEscape="false"  class="input-xlarge required "  /> --%>
+<!-- 				<span class="help-inline"><font color="red">*</font></span> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
 		<div class="control-group">
 			<label class="control-label">催收队列：</label>
 			<div class="controls">

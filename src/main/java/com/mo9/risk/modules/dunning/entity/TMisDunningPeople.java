@@ -49,8 +49,6 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	
 	private	String sumcorpusamount; // 分案金额
 	
-	
-
 	public TMisDunningPeople() {
 		super();
 	}
@@ -214,7 +212,4 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.sumcorpusamount = sumcorpusamount;
 	}
 
-	
-	
-	
 }

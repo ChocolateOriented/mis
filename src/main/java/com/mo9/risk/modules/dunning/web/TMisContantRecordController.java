@@ -30,6 +30,7 @@ import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.entity.TelNumberBean;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -272,7 +273,20 @@ public class TMisContantRecordController extends BaseController {
 			logger.warn("任务不存在，订单号：" + dealcode);
 			return null;
 		}
-		
+		 int overdayas =  TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
+		if (tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.sms) {
+			TMisContantRecord tContantRecord=new TMisContantRecord();
+			tContantRecord.setDealcode(dealcode);
+			tContantRecord.setTemplateName( tMisContantRecord.getTemplateName());
+			if(overdayas>1){
+				tContantRecord.setContanttarget(tMisContantRecord.getContanttarget());
+			}
+			int countSmsSend=tMisContantRecordService.findCountSmsSend(tContantRecord);
+			if(countSmsSend>=3){
+				return "sendOut";
+			}
+			
+		}
 		tMisContantRecordService.saveRecord(task,order, tMisContantRecord,dunningtaskdbid);
 		addMessage(redirectAttributes, "保存保存记录成功成功");
 		return "OK";

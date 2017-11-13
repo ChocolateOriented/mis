@@ -198,6 +198,13 @@
     <example>${fns:endsWith(str,suffix)}</example> 
   </function>
   <function>
+    <description>判断字符串是包含某某</description>
+    <name>contains</name>
+    <function-class>org.apache.commons.lang3.StringUtils</function-class>
+    <function-signature>boolean contains(java.lang.CharSequence, java.lang.CharSequence)</function-signature>
+    <example>${fns:contains(str,substr)}</example> 
+  </function>
+  <function>
     <description>缩写字符串，超过最大宽度用“...”表示</description>
     <name>abbr</name>
     <function-class>com.thinkgem.jeesite.common.utils.StringUtils</function-class>

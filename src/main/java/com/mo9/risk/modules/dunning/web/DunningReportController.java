@@ -125,8 +125,12 @@ public class DunningReportController extends BaseController {
 	public String findPerformanceDayReport(PerformanceDayReport performanceDayReport,TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			performanceDayReport.setDatetimestart(null == performanceDayReport.getDatetimestart()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
-			performanceDayReport.setDatetimeend(null == performanceDayReport.getDatetimeend()  ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
+			if(null == performanceDayReport.getDatetimestart()){
+				performanceDayReport.setDatetimestart(DateUtils.getDateToDay(new Date()));
+			}
+			if(null == performanceDayReport.getDatetimeend()){
+				performanceDayReport.setDatetimeend( DateUtils.getDateToDay(new Date()));
+			}
 			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
 			model.addAttribute("groupList", groupService.findList(new TMisDunningGroup()));

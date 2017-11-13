@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao">
+    
+	<sql id="TMisAgentInfoColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.agent as "agent",
+		a.extension as "extension",
+		a.direct as "direct",
+		a.queue as "queue",
+		a.peopleid as "peopleId",
+		a.status as "status",
+		a.createby as "createBy.name",
+		a.createdate as "createdate",
+		a.updateby as "updateBy.name",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<select id="get" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getInfoByPeopleId" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.peopleid = #{peopleId}
+		limit 1
+	</select>
+	
+	<select id="getInfoByAgent" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.agent = #{agent}
+		limit 1
+	</select>
+	
+	<select id="getInfoByExtension" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.extension = #{extension}
+		limit 1
+	</select>
+	
+	<select id="getInfoByQueue" resultType="TMisAgentInfo">
+		SELECT
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a
+		WHERE a.queue = #{queue}
+		limit 1
+	</select>
+	
+	<select id="findList" resultType="TMisAgentInfo">
+		SELECT 
+			a.dbid as "dbid",
+			a.id as "id",
+			a.agent as "agent",
+			a.extension as "extension",
+			a.direct as "direct",
+			a.queue as "queue",
+			a.peopleid as "peopleId",
+			a.status as "status",
+			a.createby as "createBy.name",
+			a.createdate as "createdate",
+			a.updateby as "updateBy.name",
+			a.updatedate as "updatedate",
+			p.nickname as "nickName"
+		FROM t_mis_agent_info a
+		left join t_mis_dunning_people  p on a.peopleId=p.id
+		<where>
+		<if test="agent != null and agent != '' ">
+			a.agent=#{agent}
+		</if>
+		<if test="nickName != null and nickName != '' ">
+		and	p.nickName=#{nickName}
+		</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			    ORDER BY a.dbid
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TMisAgentInfo">
+		SELECT 
+			<include refid="TMisAgentInfoColumns"/>
+		FROM t_mis_agent_info a		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_mis_agent_info(
+			id,
+			agent,
+			peopleid,
+			extension,
+			direct,
+			queue,
+			status,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{agent},
+			#{peopleId},
+			#{extension},
+			#{direct},
+			#{queue},
+			#{status},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_agent_info SET
+				agent = #{agent},
+				extension = #{extension},
+				direct = #{direct},
+				queue = #{queue},
+				peopleid = #{peopleId},
+				status = #{status},
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_mis_agent_info
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateInfo">
+		UPDATE t_mis_agent_info SET
+			<if test="extension != null">
+				extension = #{extension},
+			</if>
+			<if test="direct != null">
+				direct = #{direct},
+			</if>
+			<if test="queue != null">
+				queue = #{queue},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate}
+		WHERE
+		<choose>
+			<when test="peopleId !=null and peopleId != ''">
+				peopleid = #{peopleId}
+			</when>
+			<otherwise>
+				agent = #{agent}
+			</otherwise>
+		</choose>
+	</update>
+	
+	<insert id="saveLonginLog">
+		INSERT INTO t_mis_agent_login_log(
+			id,
+			agent,
+			peopleid,
+			status,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{agent},
+			#{peopleId},
+			#{status},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<select id="validateAgent" resultType="TMisAgentInfo">
+		SELECT
+			a.agent
+		FROM t_mis_agent_info a
+		<where>
+			<if test="agent !=null and agent != '' ">
+				AND a.agent=#{agent}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id != #{id}
+			</if>
+		</where>
+		limit 1
+	</select>
+	
+	<select id="validateQueue" resultType="TMisAgentInfo">
+		SELECT
+			a.agent
+		FROM t_mis_agent_info a
+		<where>
+			<if test="queue !=null and queue != '' ">
+				AND a.queue=#{queue}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id != #{id}
+			</if>
+		</where>
+		limit 1
+	</select>
+	
+	<select id="validateExtension" resultType="TMisAgentInfo">
+		SELECT
+			a.agent
+		FROM t_mis_agent_info a
+		<where>
+			<if test="extension !=null and extension != '' ">
+				AND a.extension=#{extension}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id != #{id}
+			</if>
+		</where>
+		limit 1
+	</select>
+	
+	<select id="validateDirect" resultType="TMisAgentInfo">
+		SELECT
+			a.direct
+		FROM t_mis_agent_info a
+		<where>
+			<if test="extension !=null and extension != '' ">
+				AND a.direct=#{direct}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id != #{id}
+			</if>
+		</where>
+		limit 1
+	</select>
+</mapper>

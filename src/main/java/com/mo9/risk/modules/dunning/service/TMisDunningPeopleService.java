@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.thinkgem.jeesite.common.supcan.treelist.cols.Group;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +68,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		}else{
 			tMisDunningPeople.preUpdate();
 			dao.update(tMisDunningPeople);
+			
 		}
 	}
 	
@@ -215,6 +214,10 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	@Transactional(readOnly = false)
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople) {
 		return dao.updatePeopleNameById(dunningPeople);
+	}
+	
+	public List<TMisDunningPeople> findAgentPeopleList() {
+		return tMisDunningPeopleDao.findAgentPeopleList();
 	}
 
 	/**

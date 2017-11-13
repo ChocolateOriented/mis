@@ -72,7 +72,10 @@
              });
 		}
 		
-		
+		//点击号码跳转软电话页面直接拨打
+		function phonePage(obj) {
+			window.parent.phoneFatherPage($(obj).html(),$(obj).attr("showName"));
+		}
 	</script>
 </head>
 <body>
@@ -151,7 +154,15 @@
 <%-- 						<c:otherwise></c:otherwise> --%>
 <%-- 					</c:choose> --%>
 <!-- 				</td> -->
-				<td>${p.tel}</td>
+				<td>
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${p.name}">
+					</shiro:hasPermission>
+					${p.tel}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					</a>
+					</shiro:hasPermission>
+				</td>
 				<td>${p.location}</td>
 				<td>
 					${p.times}

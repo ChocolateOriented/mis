@@ -59,6 +59,10 @@
              });
 		}
 		
+		//点击号码跳转软电话页面直接拨打
+		function phonePage(obj) {
+			window.parent.phoneFatherPage($(obj).html(),$(obj).attr("showName"));
+		}
 	</script>
 </head>
 <body>
@@ -87,7 +91,19 @@
 		<tbody>
 			<tr>
 				<td>1</td>
-				<td>${not empty workInfo.companyTel ? workInfo.companyTel : "无号码"}</td>
+				<td>
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<c:if test="${not empty workInfo.companyTel}">
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${workInfo.companyName}">
+					</c:if>
+					</shiro:hasPermission>
+					${not empty workInfo.companyTel ? workInfo.companyTel : "无号码"}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<c:if test="${not empty workInfo.companyTel}">
+					</a>
+					</c:if>
+					</shiro:hasPermission>
+				</td>
 				<td>
 				通话
 				<a href="javascript:void(0)" title="通话记录" onclick="onClickMonthDetails(this)" mobile="${workInfo.companyTel}" method="dialogTelDetail" type="tel">
@@ -104,7 +120,16 @@
 			<c:if test="${not empty workInfo.companyTel2}">
 			<tr>
 				<td>2</td>
-				<td>${workInfo.companyTel2}</td>
+				<td>
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${workInfo.companyName}">
+					</shiro:hasPermission>
+					${workInfo.companyTel2}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					</a>
+					</shiro:hasPermission>
+				
+				</td>
 				<td>
 				通话
 				<a href="javascript:void(0)" title="通话记录" onclick="onClickMonthDetails(this)" mobile="${workInfo.companyTel2}" method="dialogTelDetail" type="tel">
@@ -150,8 +175,16 @@
 						<c:otherwise>(其他)</c:otherwise>
 					</c:choose>
 				</td>
-				<td>${c.name}</td>
-				<td>${c.tel}</td>
+				<td  >${c.name}</td>
+				<td >
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${c.name}">
+					</shiro:hasPermission>
+						${c.tel}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					</a>
+					</shiro:hasPermission>
+				</td>
 				<td>					
 					短信
 					<a href="javascript:void(0)" title="短信记录" onclick="onClickMonthDetails(this)" mobile="${c.tel}" method="dialogSmsDetail" type="sms">

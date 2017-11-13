@@ -69,7 +69,10 @@
                    }
              });
 		}
-		
+		//点击号码跳转软电话页面直接拨打
+		function phonePage(obj) {
+			window.parent.phoneFatherPage($(obj).html(),$(obj).attr("showName"));
+		}
 	</script>
 </head>
 <body>
@@ -130,7 +133,15 @@
 						</c:otherwise>
 					</c:choose>
 				</td>
-				<td>${cp.contactMobile}</td>
+				<td>
+					<shiro:hasPermission name="dunning:phone:view"> 
+					<a href="javascript:void(0)" onclick="phonePage(this)" showName="${cp.contactName}">
+					</shiro:hasPermission>
+					${cp.contactMobile}
+					<shiro:hasPermission name="dunning:phone:view"> 
+					</a>
+					</shiro:hasPermission>
+				</td>
 				<td>
 					短信
 					<a href="javascript:void(0)" title="短信记录" onclick="onClickMonthDetails(this)" mobile="${cp.contactMobile}" method="dialogSmsDetail" type="sms">

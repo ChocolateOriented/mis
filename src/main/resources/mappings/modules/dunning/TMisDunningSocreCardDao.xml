@@ -122,6 +122,7 @@
 		LEFT JOIN t_risk_buyer_idcard i on i.buyer_id = b.id
 		WHERE o.merchant_id = '7'
 		AND DATEDIFF(CURDATE(), o.repayment_time)= #{overduedays}
+		AND o.status = 'payment'
 	</select>
 	
 	<select id="getScoreCardByDealcode" resultType="TMisDunningScoreCard">

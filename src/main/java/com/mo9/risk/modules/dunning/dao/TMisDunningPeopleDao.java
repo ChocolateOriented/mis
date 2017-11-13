@@ -94,6 +94,8 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 */
 	public int updatePeopleNameById(TMisDunningPeople dunningPeople);
 
+	public List<TMisDunningPeople> findAgentPeopleList();
+
 	/**
 	 * @Description:根据催收队列,催收员类型,分案状态,催收小组查询催收人员
 	 * @param dunningcycle

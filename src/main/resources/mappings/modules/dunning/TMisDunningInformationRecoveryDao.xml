@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningInformationRecoveryDao">
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+    
+    <sql id="DunningInformationRecoveryColumns">
+        a.Id AS "id",
+        a.buyer_id AS "buyerId",
+        a.Dealcode AS "dealCode",
+        a.contact_type AS "contactType",
+        a.contact_number AS "contactNumber",
+        a.contact_relationship AS "contactRelationship",
+        a.contact_name AS "contactName",
+        a.history_record_count AS "historyRecordCount",
+        a.CreateBy AS "createBy.name",
+        a.CreateDate AS "createDate",
+        a.UpdateBy AS "updateBy.name",
+        a.UpdateDate AS "updateDate"
+    </sql>
+    
+    <insert id="saveInformationRecovery">
+        INSERT INTO t_risk_buyer_informationrecovery(
+          Id,
+          buyer_id,
+          Dealcode,
+          contact_type,
+          contact_number,
+          contact_relationship,
+          contact_name,
+          history_record_count,
+          CreateBy,
+          CreateDate,
+          UpdateBy,
+          UpdateDate
+        )VALUES (
+          #{id},
+          #{buyerId},
+          #{dealCode},
+          #{contactType},
+          #{contactNumber},
+          #{contactRelationship},
+          #{contactName},
+          #{historyRecordCount},
+          #{createBy.name},
+          #{createDate},
+          #{updateBy.name},
+          #{updateDate}
+        )
+    </insert>
+
+
+    <insert id="saveInformationRecoveryLog">
+        INSERT INTO t_risk_buyer_informationrecovery_log(
+        Id,
+        buyer_id,
+        Dealcode,
+        contact_type,
+        contact_number,
+        contact_relationship,
+        contact_name,
+        history_record_count,
+        operation_type,
+        CreateBy,
+        CreateDate
+        )VALUES (
+        #{id},
+        #{buyerId},
+        #{dealCode},
+        #{contactType},
+        #{contactNumber},
+        #{contactRelationship},
+        #{contactName},
+        #{historyRecordCount},
+        #{operationType},
+        #{createBy.name},
+        #{createDate}
+        )
+    </insert>
+
+
+    <insert id="saveInformationRecoveryHistoryRecord">
+        INSERT INTO t_risk_buyer_informationrecovery_historycord(
+          Id,
+          Dealcode,
+          buyer_id,
+          histoty_remark,
+          CreateBy,
+          CreateDate
+        )VALUES (
+          #{id},
+          #{dealCode},
+          #{buyerId},
+          #{historyRemark},
+          #{createBy.name},
+          #{createDate}
+        )
+    </insert>
+
+
+    <select id="findInformationRecoveryList" resultType="DunningInformationRecovery" useCache="false">
+        SELECT
+          <include refid="DunningInformationRecoveryColumns"/>
+        FROM t_risk_buyer_informationrecovery AS a
+          <where>
+              <if test="buyerId != null and buyerId != ''">
+                  AND a.buyer_id =#{buyerId}
+              </if>
+              <if test="dealCode != null and dealCode !=''">
+                  AND a.Dealcode =#{dealCode}
+              </if>
+              <if test="id != null and id != ''">
+                  AND a.Id = #{id}
+              </if>
+          </where>
+          ORDER BY UpdateDate DESC ;
+    </select>
+
+
+    <select id="findInformationRecoveryHistoryRecordList" resultType="DunningInformationRecoveryHistoryRecord" useCache="false">
+        SELECT
+          Id AS id,
+          Dealcode  AS "dealCode",
+          buyer_id  AS "buyerId",
+          histoty_remark AS "historyRemark",
+          CreateBy AS "createBy.name",
+          CreateDate AS "createDate"
+        FROM t_risk_buyer_informationrecovery_historycord
+        <where>
+            <if test="buyerId != null and buyerId != ''">
+                AND buyer_id =#{buyerId}
+            </if>
+            <if test="dealCode != null and dealCode !=''">
+                AND Dealcode =#{dealCode}
+            </if>
+            <if test="id != null and id !=''">
+                AND Id =#{id}
+            </if>
+        </where>
+        ORDER BY CreateDate DESC ;
+    </select>
+
+
+    <update id="updateInformationRecovery">
+            UPDATE t_risk_buyer_informationrecovery
+          <set>
+              <if test="contactType != null and contactType !=''">
+                  contact_type = #{contactType},
+              </if>
+              <if test="contactNumber != null and contactNumber !=''">
+                  contact_number = #{contactNumber},
+              </if>
+              <if test="contactRelationship != null and contactRelationship !=''">
+                  contact_relationship = #{contactRelationship},
+              </if>
+              <if test="contactName != null and contactName !=''">
+                  contact_name = #{contactName},
+              </if>
+              <if test="updateDate != null and updateDate !=''">
+                  UpdateDate = #{updateDate},
+              </if>
+          </set>
+          <where>
+              <if test="buyerId != null and buyerId != ''">
+                  AND buyer_id =#{buyerId}
+              </if>
+              <if test="dealCode != null and dealCode !=''">
+                  AND Dealcode =#{dealCode}
+              </if>
+              <if test="id != null and id !=''">
+                  AND Id =#{id}
+              </if>
+          </where>
+    </update>
+
+    <update id="updateHistoryCount">
+        UPDATE t_risk_buyer_informationrecovery
+            SET history_record_count = (SELECT history_record_count FROM (SELECT max(history_record_count)+1 as history_record_count
+                  FROM t_risk_buyer_informationrecovery where buyer_id = #{buyerId} and Dealcode =#{dealCode}
+                  AND Id =#{id}) AS a) , UpdateDate = #{updateDate}
+        <where>
+            <if test="buyerId != null and buyerId != ''">
+                AND buyer_id =#{buyerId}
+            </if>
+            <if test="dealCode != null and dealCode !=''">
+                AND Dealcode =#{dealCode}
+            </if>
+            <if test="id != null and id !=''">
+                AND Id =#{id}
+            </if>
+        </where>
+    </update>
+</mapper>
