@@ -1,7 +1,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
-import com.mo9.risk.modules.dunning.sendMessage.controller.FeedbackSendService;
+import com.mo9.risk.modules.dunning.service.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;

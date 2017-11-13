@@ -48,13 +48,13 @@
 		<property name="accessKey" value="${accessKey}"/>
 		<property name="secretKey" value="${secretKey}"/>
 		<property name="onsAddr" value="${onsAddr}"/>
-		<!--<property name="SendMsgTimeoutMillis" value="${SendMsgTimeoutMillis}"/>-->
+		<property name="SendMsgTimeoutMillis" value="${sendMsgTimeoutMillis}"/>
 	</bean>
 
-	<bean id = "FeedbackSendService" class="com.mo9.risk.modules.dunning.sendMessage.controller.FeedbackSendService">
+	<bean id = "FeedbackSendService" class="com.mo9.risk.modules.dunning.service.FeedbackSendService">
 
-		<property name="feedbackMessageProducer" ref="feedbackMessageProducer"/>
-		<property name="messageService" ref="messageService"/>
+		<property name="IMqProducer" value="mqProducer"/>
+		<property name="MisMqMessageService" value="messageService"/>
 		<property name="feedbackTopic" value="${MQ_MO9_TOPIC}"/>
 		<property name="feedbackTag" value="${MQ_MO9_FEEDBACK_STATUS_TAG}"/>
 

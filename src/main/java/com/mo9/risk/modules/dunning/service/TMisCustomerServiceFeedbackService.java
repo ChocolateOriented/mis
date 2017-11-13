@@ -48,7 +48,7 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
     public Page<TMisCustomerServiceFeedback> NotifyList(Page<TMisCustomerServiceFeedback> page,TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
         tMisCustomerServiceFeedback.setPage(page);
-        page.setOrderBy("createTime DESC");
+        page.setOrderBy("updateDate DESC");
         page.setList(dao.NotifyList(tMisCustomerServiceFeedback));
         return page;
     }

@@ -1,6 +1,6 @@
-package com.mo9.risk.modules.dunning.sendMessage.event;
+package com.mo9.risk.modules.dunning.entity;
 
-import com.mo9.risk.modules.dunning.sendMessage.dao.EventType;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -20,6 +20,12 @@ public class FeedbackEvent {
     private String eventId;
 
     /**
+     * 事件类型
+     *
+     */
+    private String eventType;
+
+    /**
      * 反馈记录id
      */
     @NotNull(message = "问题id不能为空")
@@ -32,7 +38,7 @@ public class FeedbackEvent {
      * 反馈记录人
      */
     @NotNull(message = "操作人不能为空")
-    private User updateBy;
+    private String updateBy;
 
     /**
      * 反馈记录更新时间
@@ -57,11 +63,6 @@ public class FeedbackEvent {
         this.feedbackId = feedbackId;
     }
 
-
-    public int getEventType() {
-        return EventType.EVENT_TYPE_FEEDBACK;
-    }
-
     public String getHandlingresult() {
         return handlingresult;
     }
@@ -78,11 +79,19 @@ public class FeedbackEvent {
         this.updateDate = updateDate;
     }
 
-    public User getUpdateBy() {
+    public String getUpdateBy() {
         return updateBy;
     }
 
-    public void setUpdateBy(User updateBy) {
+    public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }

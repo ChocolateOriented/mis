@@ -48,6 +48,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String rootorderid;//主订单编号
     private String uname;//用户名
     private Date pushTime;//消息推送时间
+    private String keyword;
 
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
@@ -199,4 +200,11 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.pushTime = pushTime;
     }
 
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
 }

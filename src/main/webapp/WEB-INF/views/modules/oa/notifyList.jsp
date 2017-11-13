@@ -76,7 +76,7 @@
 				</form:select>
 			</li>
 			<li><label>关键词：</label>
-				<form:input path="dealcode" htmlEscape="false" maxlength="200" class="input-medium"/>
+				<form:input path="keyword"  htmlEscape="false" maxlength="200" class="input-medium"/>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="clearfix"></li>

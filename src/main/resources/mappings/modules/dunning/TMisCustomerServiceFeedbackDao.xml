@@ -5,7 +5,7 @@
         a.dealcode AS "dealcode",
         a.type AS "type",
         a.status AS "status",
-        a.problemstatus AS "problemstatus",
+        a.problemStatus AS "problemstatus",
         a.hashtag AS "hashtag",
         a.problemdescription AS "problemdescription",
         a.updateDate AS "updateDate",
@@ -15,6 +15,7 @@
         a.handlingResult AS "handlingresult",
         a.rootOrderId AS "rootorderid",
         a.uname AS "uname",
+        a.keyword AS keyword,
         a.pushTime AS "pushTime",
         a.id AS "id"
     </sql>
@@ -52,6 +53,7 @@
 
     <select id="NotifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
+             a.`keyword`,
              a.`dealcode`,
              a.`hashtag`,
              a.`problemStatus`,
@@ -60,14 +62,10 @@
         FROM t_mis_customer_service_feedback a
         <where>
 
-        <if test="dealcode !=null and dealcode!=''">
-        <![CDATA[
-            AND (a.dealcode LIKE concat('%',#{dealcode},'%')
-              OR a.hashtag LIKE concat('%',#{dealcode},'%')
-              OR (a.problemStatus LIKE concat('%',#{dealcode},'%')
-            AND a.problemStatus <> '未解决')
-        )]]>
+        <if test="keyword !=null and keyword!=''">
+            AND a.keyword LIKE concat('%',#{keyword},'%')
         </if>
+
         <if test="hashtag !=null and hashtag!=''">
             AND a.hashtag LIKE concat('%',#{hashtag},'%')
         </if>
@@ -100,7 +98,7 @@
             dealcode,
             type,
             status,
-            problemstatus,
+            problemStatus,
             hashtag,
             problemdescription,
             updateDate,
@@ -109,6 +107,7 @@
             operate,
             handlingResult,
             uname,
+            keyword,
             pushTime,
             rootOrderId
         )VALUES (
@@ -125,6 +124,7 @@
             #{operate},
             #{handlingresult},
             #{uname},
+            #{keyword},
             #{pushTime},
             #{rootorderid}
         )
@@ -132,7 +132,7 @@
 
     <update id="updateFeedback">
         UPDATE t_mis_customer_service_feedback SET
-        problemstatus = #{problemstatus},
+        problemStatus = #{problemstatus},
         handlingResult=#{handlingresult},
         updateDate=#{updateDate},
         updateBy=#{updateBy.name}
