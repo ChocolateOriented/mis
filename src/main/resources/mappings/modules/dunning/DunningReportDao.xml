@@ -5,10 +5,10 @@
 		<property name="timeToIdleSeconds" value="600"/>
 		<property name="timeToLiveSeconds" value="600"/>
 	</cache>
-    
+
 	<!-- 案件活动日报 -->
 	<select id="findProductivePowerDailyReport" resultType="SMisDunningProductivePowerDailyReport">
-		SELECT 
+		SELECT
 			a.id AS "id",
 			a.createtime AS "createTime",
 			a.dunningpeoplename AS "dunningPeopleName",
@@ -62,13 +62,13 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
     <!-- 工作日报 -->
 	<select id="findPerformanceDayReport" resultType="com.mo9.risk.modules.dunning.entity.PerformanceDayReport">
 
 		SELECT
 		#{datetimestart} AS datetimestart,
-		#{datetimeend}  AS datetimeend,
+		DATE_FORMAT(#{datetimeend} , "%Y-%m-%d") AS datetimeend,
 		<choose>
 			<when test="dunningCycle != null and dunningCycle != ''">
 				#{dunningCycle} AS DunningCycle,
@@ -163,34 +163,59 @@
 			</if>
 		</where>
 		ORDER BY DunningCycle
+
+		<if test="page!= null">
+			LIMIT ${page.firstResult},${page.pageSize}
+		</if>
+
 	</select>
 
-	<select id="findPerformanceDayReportCount" resultType="java.lang.Long">
-		SELECT
-		COUNT(*)
-		FROM t_mis_dunning_people
-		<where>
-			Field1 = 'active'
-			<if test="group != null and group.id != null and group.id !=''">
-				AND groupid = #{group.id}
-			</if>
-			<if test="group != null and group.groupIds != null">
-				AND groupid IN
-				<if test="group.groupIds.size == 0">
-					('')
-				</if>
-				<if test="group.groupIds.size > 0">
-					<foreach item="item" collection="group.groupIds" open="(" close=")" separator=",">
-						#{item}
-					</foreach>
-				</if>
-			</if>
-			<if test="personnel != null and personnel != ''">
-				AND Name LIKE concat('%',#{personnel},'%')
-			</if>
-			<if test="dunningCycle != null and dunningCycle != ''">
-				AND dunningCycle LIKE concat('%',#{dunningCycle},'%')
-			</if>
-		</where>
-	</select>
+  <select id="findPerformanceDayReportCount" resultType="java.lang.Long">
+    SELECT
+    COUNT(*)
+    FROM t_mis_dunning_people AS p
+    LEFT JOIN (
+      SELECT
+        t.DunningCycle,
+        t.DunningPeopleId
+			FROM t_mis_dunning_task AS t
+			LEFT JOIN t_risk_order AS o ON o.dealcode = t.Dealcode
+			WHERE t.DunningTaskStatus = 'finished'
+		    AND o.type = 'loan'
+		    AND o.merchant_id = 7
+		    AND o.status = 'payoff'
+		    <if test="dunningCycle != null and dunningCycle != ''">
+			    AND t.dunningCycle = #{dunningCycle}
+		    </if>
+        <![CDATA[
+			    AND t.CreateDate <= #{datetimeend}
+		      AND o.payoff_time >= #{datetimestart}
+			    AND o.payoff_time <= #{datetimeend}
+		    ]]>
+    GROUP BY t.DunningPeopleId ,t.DunningCycle
+    )AS t ON t.DunningPeopleId = p.Id
+    <where>
+      p.Field1 = 'active'
+      <if test="group != null and group.id != null and group.id !=''">
+        AND p.groupid = #{group.id}
+      </if>
+      <if test="group != null and group.groupIds != null">
+        AND p.groupid IN
+        <if test="group.groupIds.size == 0">
+          ('')
+        </if>
+        <if test="group.groupIds.size > 0">
+          <foreach item="item" collection="group.groupIds" open="(" close=")" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="personnel != null and personnel != ''">
+        AND p.Name LIKE concat('%',#{personnel},'%')
+      </if>
+      <if test="dunningCycle != null and dunningCycle != ''">
+        AND p.dunningCycle LIKE concat('%',#{dunningCycle},'%')
+      </if>
+    </where>
+  </select>
 </mapper>
