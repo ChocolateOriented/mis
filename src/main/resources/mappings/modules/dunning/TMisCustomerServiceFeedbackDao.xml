@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao">
+    <sql id="tMisCustomerServiceFeedbackColumns">
+        a.dealcode AS "dealcode",
+        a.type AS "type",
+        a.status AS "status",
+        a.problemStatus AS "problemstatus",
+        a.hashtag AS "hashtag",
+        a.problemdescription AS "problemdescription",
+        a.updateDate AS "updateDate",
+        a.updateBy AS "updateBy.name",
+        a.pushpeople AS "pushpeople",
+        a.operate AS "operate",
+        a.handlingResult AS "handlingresult",
+        a.rootOrderId AS "rootorderid",
+        a.uname AS "uname",
+        a.keyword AS keyword,
+        a.pushTime AS "pushTime",
+        a.id AS "id"
+    </sql>
+
+    <sql id="tMisCustomerServiceFeedbackJoinsColumns">
+
+    </sql>
+
+    <sql id="tMisCustomerServiceFeedbackJoins">
+        LEFT JOIN t_risk_order r ON r.id=a.tRiskOrderId
+    </sql>
+
+    <select id="get" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+              <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM t_mis_customer_service_feedback a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+              <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM t_mis_customer_service_feedback a
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="NotifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+             a.`keyword`,
+             a.`dealcode`,
+             a.`hashtag`,
+             a.`problemStatus`,
+             a.`pushTime`,
+             a.`id`
+        FROM t_mis_customer_service_feedback a
+        <where>
+
+        <if test="keyword !=null and keyword!=''">
+            AND a.keyword LIKE concat('%',#{keyword},'%')
+        </if>
+
+        <if test="hashtag !=null and hashtag!=''">
+            AND a.hashtag LIKE concat('%',#{hashtag},'%')
+        </if>
+        <if test="problemstatus !=null and problemstatus!=''">
+            AND a.problemStatus LIKE concat('%',#{problemstatus},'%')
+        </if>
+        <if test="updateDate !=null and updateDate!=''">
+            AND a.updateDate=#{updateDate}
+        </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findCodeStatusTagDesPeople" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+             <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM t_mis_customer_service_feedback a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="insert">
+        INSERT INTO t_mis_customer_service_feedback(
+            id,
+            dealcode,
+            type,
+            status,
+            problemStatus,
+            hashtag,
+            problemdescription,
+            updateDate,
+            updateBy,
+            pushpeople,
+            operate,
+            handlingResult,
+            uname,
+            keyword,
+            pushTime,
+            rootOrderId
+        )VALUES (
+            #{id},
+            #{dealcode},
+            #{type},
+            #{status},
+            #{problemstatus},
+            #{hashtag},
+            #{problemdescription},
+            #{updateDate},
+            #{updateBy.name},
+            #{pushpeople},
+            #{operate},
+            #{handlingresult},
+            #{uname},
+            #{keyword},
+            #{pushTime},
+            #{rootorderid}
+        )
+    </select>
+
+    <update id="updateFeedback">
+        UPDATE t_mis_customer_service_feedback SET
+        problemStatus = #{problemstatus},
+        handlingResult=#{handlingresult},
+        updateDate=#{updateDate},
+        updateBy=#{updateBy.name}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

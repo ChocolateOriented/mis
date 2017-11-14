@@ -29,10 +29,37 @@
 						</bean>
 					</key>
 				</entry>
+				<entry value-ref="customerServiceFeedbackListener">
+				<key>
+					<bean class="com.mo9.mqclient.MqSubscription">
+						<property name="topic" value="${MQ_MO9_TOPIC}"/>
+						<!--订阅全部tag-->
+						<property name="expression" value="*"/>
+					</bean>
+				</key>
+			</entry>
 			</map>
 		</property>
 	</bean>
 
+	<bean id="aliyunMqProducer" class="com.mo9.mqclient.impl.aliyun.AliyunMqProducer"
+		  init-method="init"  destroy-method="destory" lazy-init="false">
+		<property name="productId" value="${productId}"/>
+		<property name="accessKey" value="${accessKey}"/>
+		<property name="secretKey" value="${secretKey}"/>
+		<property name="onsAddr" value="${onsAddr}"/>
+		<property name="SendMsgTimeoutMillis" value="${sendMsgTimeoutMillis}"/>
+	</bean>
+
+	<bean id = "FeedbackSendService" class="com.mo9.risk.modules.dunning.service.FeedbackSendService">
+
+		<property name="IMqProducer" value="mqProducer"/>
+		<property name="MisMqMessageService" value="messageService"/>
+		<property name="feedbackTopic" value="${MQ_MO9_TOPIC}"/>
+		<property name="feedbackTag" value="${MQ_MO9_FEEDBACK_STATUS_TAG}"/>
+
+	</bean>
 	<bean id = "riskOrderListener" class="com.mo9.risk.modules.dunning.listener.RiskOrderListener"></bean>
+	<bean id="customerServiceFeedbackListener" class="com.mo9.risk.modules.dunning.listener.CustomerServiceFeedbackListener"></bean>
 
 </beans>

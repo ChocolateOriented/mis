@@ -123,9 +123,8 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 	public void setDelFlag(String delFlag) {
 		this.delFlag = delFlag;
 	}
-	
-	
-//	IEbtity
+
+
     public Date getCreateTime()
     {
         return this.createDate;

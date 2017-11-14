@@ -1602,7 +1602,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
 						return tmpMoveCycle;
 					}else{
-						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(17));
+						tmpMoveCycle.setDatetimestart(DateUtils.getDateOfMonth(14));
 						tmpMoveCycle.setDatetimeend(DateUtils.getDate(0));
 						return tmpMoveCycle;
 					}
