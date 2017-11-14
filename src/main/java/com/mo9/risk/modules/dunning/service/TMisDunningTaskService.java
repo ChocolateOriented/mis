@@ -1664,7 +1664,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					dunningTask.setDunningperiodbegin(Integer.parseInt(dict.getValue().split("_")[0]));
 					dunningTask.setDunningperiodend(Integer.parseInt(dict.getValue().split("_")[1]));
 					dunningTask.setUpdateBy(new User("auto_admin"));
-					
+					dunningTask.setCapitalamount(dunningTaskLog.getCorpusamount());
 					/**
 					 * 每个周期的任务集合
 					 */
