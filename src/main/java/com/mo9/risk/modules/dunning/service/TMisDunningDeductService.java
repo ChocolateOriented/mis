@@ -738,7 +738,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			String dealcode = deduct.getDealcode();
 			BigDecimal payamount = new BigDecimal(deduct.getPayamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel, DunningOrder.PAYTYPE_LOAN,payamount ,deduct.getThirdCode());
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel, payamount ,deduct.getThirdCode());
 			if (success) {
 				successCount++;
 				//更新代扣

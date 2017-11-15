@@ -10,7 +10,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningRefund;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -254,7 +253,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		return orderService.repayWithPersistence(dealcode, paychannel, paidType, remittanceamount, confirm.getThirdCode());
+		return orderService.repayWithPersistence(dealcode, paychannel, remittanceamount, confirm.getThirdCode());
 	}
 
 	/**
@@ -323,7 +322,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String paychannel = confirm.getRemittancechannel();
 		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
 		String thirdCode = confirm.getThirdCode();
-		orderService.repayWithPersistence(dealcode,paychannel,paytype,payamount,thirdCode);
+		orderService.repayWithPersistence(dealcode,paychannel,payamount,thirdCode);
 	}
 
 	/**
@@ -372,7 +371,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			String paychannel = remittanceConfirm.getRemittancechannel();
 			BigDecimal payamount = new BigDecimal(remittanceConfirm.getRemittanceamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,DunningOrder.PAYTYPE_LOAN ,payamount,remittanceConfirm.getThirdCode());
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel,payamount,remittanceConfirm.getThirdCode());
 			if (success) {
 				successCount++;
 				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");

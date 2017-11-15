@@ -43,7 +43,7 @@
 	</bean>
 
 	<bean id="aliyunMqProducer" class="com.mo9.mqclient.impl.aliyun.AliyunMqProducer"
-		  init-method="init"  destroy-method="destory" lazy-init="false">
+		  init-method="init"  destroy-method="destory" lazy-init="false" scope="singleton">
 		<property name="productId" value="${productId}"/>
 		<property name="accessKey" value="${accessKey}"/>
 		<property name="secretKey" value="${secretKey}"/>
