@@ -2,7 +2,6 @@ package com.mo9.risk.modules.dunning.entity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import org.hibernate.validator.constraints.Length;
@@ -49,8 +48,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String uname;//用户名
     private Date pushTime;//消息推送时间
     private String keyword;//页面关键字查询
-    private String readNum;		// 客服通知已读
-    private String unReadNum;	// 客服通知未读
+    private Integer buyerId;//订单用户ID
 
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
@@ -210,20 +208,11 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.keyword = keyword;
     }
 
-
-    public String getReadNum() {
-        return readNum;
+    public Integer getBuyerId() {
+        return buyerId;
     }
 
-    public void setReadNum(String readNum) {
-        this.readNum = readNum;
-    }
-
-    public String getUnReadNum() {
-        return unReadNum;
-    }
-
-    public void setUnReadNum(String unReadNum) {
-        this.unReadNum = unReadNum;
+    public void setBuyerId(Integer buyerId) {
+        this.buyerId = buyerId;
     }
 }

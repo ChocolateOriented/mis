@@ -77,10 +77,9 @@ public class FeedbackSendService extends MisMqMessageService {
         misMqMessage.setTag(feedbackTag);
         misMqMessage.setCreateTime(now);
         misMqMessage.setUpdateTime(now);
-        String key=misMqMessage.getKey();;
+        String key=misMqMessage.getKey();
         String body=misMqMessage.getBody();
         misMqMessageService.send(feedbackTopic,feedbackTag,key,body);
-        misMqMessageService.messageResendTask();
 
         return response;
     }
