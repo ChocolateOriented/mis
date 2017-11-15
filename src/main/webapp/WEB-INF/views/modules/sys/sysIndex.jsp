@@ -158,6 +158,16 @@
             }).loadData(refresh);
 			return false;
 		}// </c:if>
+		function openPhone() {
+			$.get("${ctx}/dunning/tMisDunningPhone/judgeAgent",function(data){
+				if(data){
+					var phonePage = window.open("${ctx}/dunning/tMisDunningPhone/phones");
+					window.callPage = phonePage;
+				}else{
+					alert("请先绑定坐席!");
+				}
+			});
+		}
 	</script>
 </head>
 <body>
@@ -166,6 +176,9 @@
 			<div class="navbar-inner">
 				<div class="brand"><span id="productName">${fns:getConfig('productName')}</span></div>
 				<ul id="userControl" class="nav pull-right">
+					<li>
+						<a title="软电话主页" href="javascript: void 0;" onclick="openPhone()"><i class="icon-phone"></i></a>
+					</li>
 					<li>
 <%-- 				<a href="${pageContext.request.contextPath}${fns:getFrontPath()}/index-${fnc:getCurrentSiteId()}.html" target="_blank" title="访问网站主页"> --%>
 					<a href="https://www.mo9.com" target="_blank" title="访问网站主页">
