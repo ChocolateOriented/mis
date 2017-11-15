@@ -21,9 +21,7 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -150,10 +148,10 @@ public class TMisDunningOrderService extends BaseService{
 	 * @Description 重试回调江湖救急接口
 	 * @return boolean 是否成功
 	 */
-	public boolean tryRepairAbnormalOrder(String dealcode, String paychannel, String paytype, BigDecimal payamount, String thirdCode) {
+	public boolean tryRepairAbnormalOrder(String dealcode, String paychannel,BigDecimal payamount, String thirdCode) {
 		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
-				orderManager.repay(dealcode, paychannel, paytype, payamount, thirdCode);
+				orderManager.repay(dealcode, paychannel, payamount, thirdCode);
 			} catch (ServiceException e){
 				logger.info("重试回调江湖救急接口发生错误", e);
 				return false;
@@ -202,31 +200,29 @@ public class TMisDunningOrderService extends BaseService{
 	 * 		等待定时重调, 再次确认请求是否被正确处理
 	 * @param dealcode
 	 * @param paychannel
-	 * @param paytype
 	 * @param payamount
 	 * @param thirdCode
 	 * @return void
 	 */
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String repayWithPersistence(String dealcode, String paychannel, String paytype, BigDecimal payamount, String thirdCode) {
+	public String repayWithPersistence(String dealcode, String paychannel, BigDecimal payamount, String thirdCode) {
 		//记录请求, 若失败等待重试
 		DecimalFormat format = new DecimalFormat("0.00");
 		TMisRequestRecord requestRecord = new TMisRequestRecord();
 		requestRecord.setFrom(TMisDunningOrderService.class.getSimpleName());
 		requestRecord.setTarget("riskOrderRepay");
-		Map<String,String> param = new HashMap<String, String>();
+		JSONObject param = new JSONObject();
 		param.put("dealcode",dealcode);
 		param.put("paychannel",paychannel);
-		param.put("paytype",paytype);
 		param.put("payamount",format.format(payamount));
 		param.put("thirdCode",thirdCode);
-		requestRecord.setParam(JSON.toJSONString(param));
+		requestRecord.setParam(param.toJSONString());
 		requestRecord.preInsert();
 		requestRecordDao.insert(requestRecord);
 
 		String msg = "";
 		try {
-			msg = orderManager.repay(dealcode,paychannel,paytype,payamount,thirdCode);
+			msg = orderManager.repay(dealcode,paychannel,payamount,thirdCode);
 		}catch (IOException e) {
 			logger.info("订单"+dealcode+"调用江湖救急接口发生网络异常,等待重试",e);
 			return msg;
@@ -247,7 +243,7 @@ public class TMisDunningOrderService extends BaseService{
 	 * @param
 	 * @return void
 	 */
-	@Scheduled(cron = "0 50 * * * ?")
+	@Scheduled(cron = "0 0/10 * * * ?")
 	@Transactional
 	public void autoRepairAbnormalRepayRequest() {
 		//查询发生异常的请求记录
@@ -261,11 +257,10 @@ public class TMisDunningOrderService extends BaseService{
 			JSONObject param = JSON.parseObject(record.getParam());
 			String dealcode = param.getString("dealcode");
 			String paychannel = param.getString("paychannel");
-			String paytype = param.getString("paytype");
 			BigDecimal payamount = new BigDecimal(param.getString("payamount"));
 			String thirdCode = param.getString("thirdCode");
 
-			boolean success = this.tryRepairAbnormalOrder(dealcode, paychannel, paytype,payamount, thirdCode);
+			boolean success = this.tryRepairAbnormalOrder(dealcode, paychannel, payamount, thirdCode);
 			if (success){//成功则删除
 				requestRecordDao.delete(record);
 			}else {//失败发送邮件

@@ -6,6 +6,7 @@ import com.mo9.mqclient.MqSendResult;
 import com.mo9.risk.modules.dunning.dao.MisMqMessageDao;
 import com.mo9.risk.modules.dunning.entity.MisMqMessage;
 import com.thinkgem.jeesite.common.service.BaseService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,6 +37,18 @@ public class MisMqMessageService extends BaseService {
 	 */
 	@Transactional
 	public void send (String topic, String tag, String key, String body) {
+		if (StringUtils.isBlank(topic)){
+			throw new IllegalArgumentException("消息主题不能为空");
+		}
+		if (StringUtils.isBlank(tag)){
+			throw new IllegalArgumentException("消息标签不能为空");
+		}
+		if (StringUtils.isBlank(key)){
+			throw new IllegalArgumentException("业务主键不能为空");
+		}
+		if (StringUtils.isBlank(body)){
+			throw new IllegalArgumentException("消息体不能为空");
+		}
 		MisMqMessage misMqMessage = new MisMqMessage(topic, tag, key, body);
 		dao.insert(misMqMessage);
 		this.sendMqMessage(misMqMessage);
