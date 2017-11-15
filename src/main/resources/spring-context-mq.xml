@@ -51,14 +51,14 @@
 		<property name="SendMsgTimeoutMillis" value="${sendMsgTimeoutMillis}"/>
 	</bean>
 
-	<bean id = "FeedbackSendService" class="com.mo9.risk.modules.dunning.service.FeedbackSendService">
+<!-- 	<bean id = "FeedbackSendService" class="com.mo9.risk.modules.dunning.service.FeedbackSendService"> -->
 
-		<property name="IMqProducer" value="mqProducer"/>
-		<property name="MisMqMessageService" value="messageService"/>
-		<property name="feedbackTopic" value="${MQ_MO9_TOPIC}"/>
-		<property name="feedbackTag" value="${MQ_MO9_FEEDBACK_STATUS_TAG}"/>
+<!-- 		<property name="IMqProducer" value="mqProducer"/> -->
+<!-- 		<property name="MisMqMessageService" value="messageService"/> -->
+<!-- 		<property name="feedbackTopic" value="${MQ_MO9_TOPIC}"/> -->
+<!-- 		<property name="feedbackTag" value="${MQ_MO9_FEEDBACK_STATUS_TAG}"/> -->
 
-	</bean>
+<!-- 	</bean> -->
 	<bean id = "riskOrderListener" class="com.mo9.risk.modules.dunning.listener.RiskOrderListener"></bean>
 	<bean id="customerServiceFeedbackListener" class="com.mo9.risk.modules.dunning.listener.CustomerServiceFeedbackListener"></bean>
 
