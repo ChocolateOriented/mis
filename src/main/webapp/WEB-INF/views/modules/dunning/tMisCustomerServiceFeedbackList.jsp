@@ -42,6 +42,7 @@
 </head>
 <body>
     <form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList" method="post" class="breadcrumb form-search">
+        <input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/>
         <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
         <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
     </form:form>

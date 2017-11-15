@@ -1,16 +1,21 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import org.apache.ibatis.annotations.Param;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.mo9.risk.modules.dunning.service.TMisDunningTaskService.*;
 
 /**
  * 客服问题service
@@ -24,6 +29,8 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
     @Autowired
     private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 
+    @Autowired
+    TMisDunningGroupService tMisDunningGroupService;
 
     /**
      * 客服推送的消息分页展示
@@ -32,8 +39,35 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
      * @return
      */
     public Page<TMisCustomerServiceFeedback> feedbackList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback) {
-        // 设置排序参数
 
+        int permissions = getPermissions();
+        List<String> allowedGroupIds = new ArrayList<String>();
+        DunningOrder dunningOrder=new DunningOrder();
+        if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
+            if(null == dunningOrder.getStatus()){
+                dunningOrder.setStatus("payment");
+            }
+            dunningOrder.setDunningpeopleid(UserUtils.getUser().getId());
+        }
+        if (DUNNING_INNER_PERMISSIONS == permissions) {
+            dunningOrder.setDunningpeopleid(null);
+            allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
+            dunningOrder.setGroupIds(allowedGroupIds);
+        }
+        if(DUNNING_OUTER_PERMISSIONS == permissions){
+            dunningOrder.setDunningpeopleid(null);
+        }
+        if (DUNNING_SUPERVISOR == permissions) {
+            TMisDunningGroup group = new TMisDunningGroup();
+            group.setSupervisor(UserUtils.getUser());
+            List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+            allowedGroupIds.addAll(groupIds);
+            dunningOrder.setGroupIds(allowedGroupIds);
+        }
+        if(DUNNING_ALL_PERMISSIONS == permissions){
+            dunningOrder.setDunningpeopleid(null);
+        }
+        // 设置排序参数
         tMisCustomerServiceFeedback.setPage(page);
         page.setOrderBy("problemStatus DESC");
         page.setList(dao.findList(tMisCustomerServiceFeedback));
@@ -45,8 +79,35 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
      * @Description 客服推送消息的订单号,标签,时间的通知列表分页展示
      * @param page
      */
-    public Page<TMisCustomerServiceFeedback> NotifyList(Page<TMisCustomerServiceFeedback> page,TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+    public Page<TMisCustomerServiceFeedback> NotifyList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
+        int permissions = getPermissions();
+        List<String> allowedGroupIds = new ArrayList<String>();
+        DunningOrder dunningOrder=new DunningOrder();
+        if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
+            if(null == dunningOrder.getStatus()){
+                dunningOrder.setStatus("payment");
+            }
+            dunningOrder.setDunningpeopleid(UserUtils.getUser().getId());
+        }
+        if (DUNNING_INNER_PERMISSIONS == permissions) {
+            dunningOrder.setDunningpeopleid(null);
+            allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
+            dunningOrder.setGroupIds(allowedGroupIds);
+        }
+        if(DUNNING_OUTER_PERMISSIONS == permissions){
+            dunningOrder.setDunningpeopleid(null);
+        }
+        if (DUNNING_SUPERVISOR == permissions) {
+            TMisDunningGroup group = new TMisDunningGroup();
+            group.setSupervisor(UserUtils.getUser());
+            List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
+            allowedGroupIds.addAll(groupIds);
+            dunningOrder.setGroupIds(allowedGroupIds);
+        }
+        if(DUNNING_ALL_PERMISSIONS == permissions){
+            dunningOrder.setDunningpeopleid(null);
+        }
         tMisCustomerServiceFeedback.setPage(page);
         page.setOrderBy("updateDate DESC");
         page.setList(dao.NotifyList(tMisCustomerServiceFeedback));
