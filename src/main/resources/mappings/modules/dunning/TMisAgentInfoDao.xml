@@ -198,6 +198,24 @@
 			#{updateDate}
 		)
 	</insert>
+
+	<select id="getLoginLogTodaybyId" resultType="TMisCallingRecord">
+		SELECT
+			status as agentState,
+			createdate
+		FROM
+			t_mis_agent_login_log a
+			<where>
+				<if test="peopleId != null and peopleId !='' ">
+					AND a.peopleid =#{peopleId}
+				</if>
+<!--				<if test="callTime != null">
+					AND to_days(CreateDate) = to_days(#{callTime})
+				</if>-->
+			</where>
+		ORDER BY CreateDate desc
+		limit 30
+	</select>
 	
 	<select id="validateAgent" resultType="TMisAgentInfo">
 		SELECT
