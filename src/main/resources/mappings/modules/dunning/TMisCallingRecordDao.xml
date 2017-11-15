@@ -118,7 +118,7 @@
 				<![CDATA[ AND a.CallTime >= #{callTimeFrom} ]]>
 			</if>
 			<if test="callTimeTo != null">
-				<![CDATA[ AND a.CallTime < #{callTimeTo} ]]>
+				<![CDATA[ AND a.CallTime < date_add(#{callTimeTo}, INTERVAL 1 DAY) ]]>
 			</if>
 			<if test="callType != null">
 				AND a.callType = #{callType}

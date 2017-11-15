@@ -245,6 +245,7 @@
 				<td style="padding:0px;">
 					<c:if test="${not empty tMisCallingRecord.audioUrl}">
 						<audio src="${ctiUrl}${tMisCallingRecord.audioUrl}" preload="none" controls="controls" controlsList="nodownload"></audio>
+						<a href="javascript: void 0;" onclick="window.location.href='${ctiUrl}${tMisCallingRecord.audioUrl}'">download</a>
 					</c:if>
 				</td>
 			</tr>

@@ -28,7 +28,8 @@
 	// 			var aid = $(obj).attr("aid");
 				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactstype=" + contactstype ;
 // 				alert(url);
-				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {            
+				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {
+				   top: '0%',
 	               buttons: {
 // 	            	   "确定": "ok", "取消": true
 	            	   },
@@ -154,7 +155,7 @@
 	<!-- <input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" /> -->
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
-	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 480), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
+	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 475), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisDunningTag:edit">
 	<input id="btnTag" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />

@@ -19,6 +19,8 @@ public class CallCenterAgentInfo implements Serializable{
 
 	private String extension;	//分机号
 
+	private String target;	//对方号码
+
 	private String callInNum;	//来电号码
 
 	private String callInSessionid;	//来电会话唯一id
@@ -59,6 +61,14 @@ public class CallCenterAgentInfo implements Serializable{
 
 	public void setExtension(String extension) {
 		this.extension = extension;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	public String getCallInNum() {

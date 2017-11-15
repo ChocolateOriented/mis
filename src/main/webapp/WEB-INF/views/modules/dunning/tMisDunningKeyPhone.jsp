@@ -237,23 +237,9 @@
 		}
 		
 		//判断是来电
-// 		if (data.operation == "Receiving") {
-// 			changePhone();
-// 			$("#statusPhones").attr("readonly", true);
-			
-// 			$(".showName").html(data.name || '未知');
-// 			$(".phoneStatus").css("display", "none");
-// 			$("#backCall").css("display", "block");
-// 			$(".numberSave").css("display", "block");
-// 			$("#numberValue").val(data.target);
-// 			$("#continues").removeClass("icon-play");
-// 			$("#continues").addClass("icon-pause");
-// 			var icon = "${ctxStatic}/images/userinfo.jpg";
-// 			showNotice('来电提醒', '点击去接听电话', icon);  
-// 			return;
-// 		}
 		if (data.operation == "ringing") {
-			if($("#calling").css("display")=="block"){
+			//呼叫中或通话中不处理ringing消息
+			if($("#calling").css("display") == "block" || $("#callingPhone").css("display") == "block"){
 				return;
 			}
 			changePhone();
@@ -407,7 +393,7 @@
 		if (operation == "Logged Out") {
 			hidePhoneDial();
 			//离线时通道关闭
-			closeWebSocket()
+			closeWebSocket();
 			return;
 		} 
 		
@@ -594,7 +580,7 @@
 			</div>
 			<div class="showName" style="text-align: center;margin-bottom:20px; "></div>
 			<div class="numbers-container" style="background-color:red; margin: 30px 0px 10px 30px;transform:rotate(140deg);">
-		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="refuseCalling()" operation="hangup"></i>
+		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="refuseCalling(this)" operation="hangup"></i>
 		 	</div>
 		 	<div class="numbers-container" style="background-color:green; margin: 30px 0px 10px 100px;">
 		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="callingPhone(this)" operation="answer"></i>

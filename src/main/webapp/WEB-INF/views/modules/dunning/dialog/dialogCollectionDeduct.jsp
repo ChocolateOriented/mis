@@ -16,17 +16,20 @@
 		
 		$('#save').click(function() {
 			if($("#inputForm").valid()){
-				if ($("input[name='paytype']:checked").val() == "partial" && parseFloat($("#payamount").val()) <= parseFloat("${personalInfo.corpusAmount}" || "0") / 100 * 0.5) {
-					$.jBox.tip("扣款金额需大于借款本金的50%", "warning");
-					return;
+				if ($("input[name='paytype']:checked").val() == "partial") {
+					var payamount = $("#payamount").val();
+					if (parseFloat(payamount) <= parseFloat("${personalInfo.corpusAmount}" || "0") / 100 * 0.5) {
+						$.jBox.tip("扣款金额需大于借款本金的50%", "warning");
+						return;
+					}
+					
+					if (parseFloat(payamount) >= parseFloat("${personalInfo.creditAmount}" || "0") / 100) {
+						$.jBox.tip("扣款金额应小于应催金额", "warning");
+						return;
+					}
 				}
 				
-				if ($("input[name='paytype']:checked").val() == "partial" && parseFloat($("#payamount").val()) > parseFloat("${personalInfo.creditAmount}" || "0") / 100) {
-					$.jBox.tip("扣款金额不能大于应催金额", "warning");
-					return;
-				}
-				
-				$("#save").attr('disabled',"true");
+				$("#save").attr('disabled', "true");
 				submitting();
 				
 				$.ajax({
@@ -113,10 +116,8 @@
 	function queryDeductStatus(deductcode) {
 		intervalCnt++;
 		$.get("${ctx}/dunning/tMisDunningDeduct/get", {deductcode: deductcode}, function(data) {
-			if (data.status == "succeeded" && data.repaymentstatus == "succeeded") {
+			if (data.status == "succeeded") {
 				alert("扣款成功");
-			} else if (data.status == "succeeded" && data.repaymentstatus == "failed") {
-				alert("还款失败:" + data.repaymentdetail || "");
 			} else if (data.status == "failed") {
 				var msg = data.statusdetail || "";
 				if (data.reason == "NO_BALANCE") {
@@ -198,7 +199,8 @@
 					<c:if test="${(vs.index % 4) eq 0}">
 						<div>
 					</c:if>
-					<input path="" type="radio" name="paychannel" htmlEscape="false" value="${payChannel.channelid}" ${payChannel.isusable ? '' : 'disabled'}/>${payChannel.channelname}
+					<input path="" type="radio" id="${payChannel.channelid}" name="paychannel" htmlEscape="false" value="${payChannel.channelid}"
+						${payChannel.isusable ? '' : 'disabled'}/><label for="${payChannel.channelid}">${payChannel.channelname}</label>
 					<c:if test="${vs.last || (vs.index eq 3)}">
 						<input id="paychannelValue" class="required" value="" style="visibility:hidden;width:0px;"/>
 					</c:if>
@@ -212,8 +214,8 @@
 		<div class="control-group">
 			<label class="control-label">扣款类型：</label>
 			<div class="controls" style="padding-top:3px;">
-				<input type="radio" name="paytype" value="loan" checked/>全款扣款
-				<input type="radio" name="paytype" value="partial" ${personalInfo.corpusAmount * 0.5 >= personalInfo.creditAmount ? 'disabled' : ''}/>部分扣款
+				<input id="loan" type="radio" name="paytype" value="loan" checked/><label for="loan">全款扣款</label>
+				<input id="partial" type="radio" name="paytype" value="partial" ${personalInfo.corpusAmount * 0.5 >= personalInfo.creditAmount ? 'disabled' : ''}/><label for="partial">部分扣款</label>
 				<!-- <span id="delay">
 					<input type="radio" name="paytype" value="delay"/>续期扣款
 				</span> -->
