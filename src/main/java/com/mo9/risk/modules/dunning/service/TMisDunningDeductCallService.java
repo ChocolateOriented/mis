@@ -181,15 +181,12 @@ public class TMisDunningDeductCallService {
 			}
 			
 			return true;
-		} catch (ServiceException e) {
-			logger.info("江湖救急接口返回失败：" + e.getMessage());
+		} catch (Exception e) {
+			logger.info("江湖救急接口返回失败：", e);
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.failed);
 			tMisDunningDeduct.setRepaymentdetail(e.getMessage());
 			update(tMisDunningDeduct);
 			saveDeductLog(tMisDunningDeduct);
-			return false;
-		} catch (Exception e) {
-			logger.info("江湖救急接口返回失败：" + e.getMessage());
 			return false;
 		}
 	}
