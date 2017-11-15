@@ -60,7 +60,8 @@
 			a.createby as "createBy.name",
 			a.createdate as "createDate",
 			a.updateby as "updateBy.name",
-			a.updatedate as "updateDate"
+			a.updatedate as "updateDate",
+			a.Status as "agentState"
 		FROM t_mis_calling_record a
 		LEFT JOIN t_mis_dunning_people p on a.peopleid = p.id
 		<include refid="pageListCondotion"></include>
@@ -118,10 +119,13 @@
 				<![CDATA[ AND a.CallTime >= #{callTimeFrom} ]]>
 			</if>
 			<if test="callTimeTo != null">
-				<![CDATA[ AND a.CallTime < date_add(#{callTimeTo}, INTERVAL 1 DAY) ]]>
+				<![CDATA[ AND a.CallTime < #{callTimeTo} ]]>
 			</if>
 			<if test="callType != null">
 				AND a.callType = #{callType}
+			</if>
+			<if test="agentState != null and agentState != '' ">
+				AND a.Status= #{agentState}
 			</if>
 			<if test="callState != null">
 				<choose>
@@ -185,7 +189,8 @@
 			createby,
 			createdate,
 			updateby,
-			updatedate
+			updatedate,
+		  	Status
 		) VALUES (
 			#{id},
 			#{agent},
@@ -204,7 +209,8 @@
 			#{createBy.name},
 			#{createDate},
 			#{updateBy.name},
-			#{updateDate}
+			#{updateDate},
+			#{agentState}
 		)
 	</insert>
 	

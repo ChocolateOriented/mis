@@ -33,6 +33,16 @@ public class CallCenterCalloutInfo implements Serializable{
 
 	private String customerno;	//自定义编号
 
+	private String agentState;
+
+	public String getAgentState() {
+		return agentState;
+	}
+
+	public void setAgentState(String agentState) {
+		this.agentState = agentState;
+	}
+
 	public String getId() {
 		return id;
 	}

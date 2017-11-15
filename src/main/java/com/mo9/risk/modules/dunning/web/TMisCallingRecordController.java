@@ -3,30 +3,28 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.io.*;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.service.TMisCallingRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * CTI回调Controller
@@ -46,10 +44,39 @@ public class TMisCallingRecordController extends BaseController {
 	
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
-	
+
 	@RequestMapping(value = {"list", ""})
 	public String list(@ModelAttribute("tMisCallingRecord") TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisCallingRecord> page = tMisCallingRecordService.findPage(new Page<TMisCallingRecord>(request, response), tMisCallingRecord);
+		for (TMisCallingRecord callingRecord : page.getList()){
+			if (callingRecord.getTargetNumber() != null && !"".equals(callingRecord.getTargetNumber())){
+				if (callingRecord.getTargetNumber().startsWith("0")){
+					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(1));
+				}
+				else if (callingRecord.getTargetNumber().startsWith("9")){
+					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(1));
+				}
+				else if (callingRecord.getTargetNumber().startsWith("179690")){
+					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(6));
+				}
+				else if (callingRecord.getTargetNumber().startsWith("17969")){
+					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(5));
+				}
+			}
+			if (callingRecord.getAgentState() != null && !"".equals(callingRecord.getAgentState())) {
+				if (callingRecord.getAgentState().equals("Logged Out")){
+					callingRecord.setAgentState("离线");
+				}
+				else if (callingRecord.getAgentState().equals("Available")){
+					callingRecord.setAgentState("在线");
+				}
+				else if (callingRecord.getAgentState().equals("On Break")){
+					callingRecord.setAgentState("小休");
+				}else {
+					callingRecord.setAgentState("");
+				}
+			}
+		}
 		//催收小组列表
 		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 		int permissions = TMisDunningTaskService.getPermissions();
@@ -92,4 +119,41 @@ public class TMisCallingRecordController extends BaseController {
 			+ order.getBuyerid() + "&dealcode=" + dealcode + "&dunningtaskdbid=" + task.getId() + "&status=" + order.getStatus();
 	}
 
+	/**
+	 * 下载通话记录
+	 * @param audioUrl
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "audioDownload")
+	public void audioDownload(@RequestParam(value = "audioUrl") String audioUrl, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String realPath = audioUrl;
+		String fileName = realPath.substring(realPath.lastIndexOf("/") + 1);
+		response.reset(); //清空response
+		response.setHeader("Content-Disposition", "attachment;filename="+fileName);
+		OutputStream out = response.getOutputStream();
+		URL url = new URL(realPath);
+		BufferedInputStream input = new BufferedInputStream(url.openStream());
+		try {
+			response.setContentType("audio/wav");
+			int n = 0;
+			byte b[] = new byte[1024];
+			while ((n = input.read(b)) != -1)
+			{
+				out.write(b, 0, n);
+			}
+			out.flush();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(input != null) {
+				input.close();
+			}
+			if(out != null) {
+				out.close();
+			}
+		}
+
+	}
 }
