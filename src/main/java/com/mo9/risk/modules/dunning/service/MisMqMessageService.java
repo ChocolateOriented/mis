@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Created by jxli on 2017/11/10.
  * 消息队列服务
  */
-@Service
+//@Service
 @Lazy(false)
 @Transactional(readOnly = true)
 public class MisMqMessageService extends BaseService {
