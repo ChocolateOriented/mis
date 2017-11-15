@@ -30,8 +30,8 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @Autowired
     private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
-    @Autowired
-    private FeedbackSendService feedbackSendService;
+//    @Autowired
+//    private FeedbackSendService feedbackSendService;
 
     @ModelAttribute
     public TMisCustomerServiceFeedback get(@RequestParam(required=false) String id) {
@@ -95,7 +95,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
              * 消息发送，数据库更新失败时不会发送
              */
             feedback = tMisCustomerServiceFeedback;
-            feedbackSendService.createFeedBackRecord(feedback);
+//            feedbackSendService.createFeedBackRecord(feedback);
         }catch (Exception e){
             logger.info("",e);
             return null;
