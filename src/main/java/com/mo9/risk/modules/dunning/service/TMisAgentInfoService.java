@@ -6,8 +6,6 @@ package com.mo9.risk.modules.dunning.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.Session;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,18 +110,18 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 	}
 
 	public Boolean validateAgent(TMisAgentInfo tmisAgentInfo) {
-		return dao.validateAgent(tmisAgentInfo)==null;
+		return dao.validateAgent(tmisAgentInfo) == null;
 	}
 
 	public Boolean validateQueue(TMisAgentInfo tmisAgentInfo) {
-		return dao.validateQueue(tmisAgentInfo)==null;
+		return dao.validateQueue(tmisAgentInfo) == null;
 	}
 
 	public Boolean validateExtension(TMisAgentInfo tmisAgentInfo) {
-		return dao.validateExtension(tmisAgentInfo)==null;
+		return dao.validateExtension(tmisAgentInfo) == null;
 	}
 
 	public Boolean validateDirect(TMisAgentInfo tmisAgentInfo) {
-		return dao.validateDirect(tmisAgentInfo)==null;
+		return dao.validateDirect(tmisAgentInfo) == null;
 	}
 }

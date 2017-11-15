@@ -303,6 +303,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
 				throw new ServiceException("金额不匹配，入账失败");
 			}
+		} else { //若还款类型为部分还款, 则还款金额应该小于应催金额
+			if(confirm.getRemittanceamount() >= order.getRemainAmmount() ){
+				throw new ServiceException("金额还款类型不匹配，入账失败");
+			}
 		}
 		confirm.setPaytype(paytype);
 

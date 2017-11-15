@@ -76,11 +76,6 @@ public class TMisDunningCTICallBackController extends BaseController {
 					tMisDunningPhoneService.changeState(noticeInfo);
 				}
 			}
-		} else if (CallCenterBaseNotice.STATE_NOTICE.equals(type)) {
-			CallCenterAgentInfo noticeInfo = JSON.parseObject(data, CallCenterAgentInfo.class);
-			if (noticeInfo != null && CallCenterAgentState.RECEIVING.equals(noticeInfo.getState())) {
-				tMisDunningPhoneService.changeState(noticeInfo);
-			}
 		} else {
 			//not care
 		}

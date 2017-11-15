@@ -110,6 +110,35 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	}
 	
 	/**
+	 * 每小时同步CTI通话记录
+	 * @return
+	 */
+	@Scheduled(cron = "0 0 0/1 * * ?")
+	@Transactional(readOnly = false)
+	public void syncCallRecordHourly() {
+		logger.info("定时同步电话通话信记录开始");
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.add(Calendar.MINUTE, -30);
+		Date end = c.getTime();
+		c.add(Calendar.HOUR_OF_DAY, -1);
+		c.add(Calendar.SECOND, -1);
+		Date start = c.getTime();
+		
+		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		String starttime = dateFormat.format(start);
+		String endtime = dateFormat.format(end);
+		action.setStarttime(starttime);
+		action.setEndtime(endtime);
+		
+		syncCalloutInfo(action);
+		syncCallinInfo(action);
+		logger.info("定时同步电话通话信记录结束");
+	}
+	
+	/**
 	 * 每日同步CTI通话记录
 	 * @return
 	 */

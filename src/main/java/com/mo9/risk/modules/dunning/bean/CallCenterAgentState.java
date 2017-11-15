@@ -24,7 +24,6 @@ public class CallCenterAgentState {
 
 	/**
 	 * 响铃中(主叫、来电响铃通知)
-	 * @see CallCenterAgentState#RECEIVING
 	 */
 	public static final String RINGING = "ringing";
 

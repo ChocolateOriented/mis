@@ -2,7 +2,11 @@ package com.mo9.risk.modules.dunning.service;
 
 import java.io.IOException;
 
-import javax.websocket.*;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
@@ -41,12 +45,12 @@ public class TMisDunningPhoneWebsocketService {
 	public void onOpen(@PathParam("userId") String userId, @PathParam("agent") String agent, @PathParam("status") String status, Session session) {
 		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByPeopleId(userId);
 		if (agentInfo == null || StringUtils.isBlank(agent) || !agent.equals(agentInfo.getAgent())) {
-			 Session nowSession = WebSocketSessionUtil.get(userId);
-			 try {
-				 nowSession.close();
-				} catch (IOException e) {
-					log.warn("关闭失败");
-				}
+			Session nowSession = WebSocketSessionUtil.get(userId);
+			try {
+				nowSession.close();
+			} catch (IOException e) {
+				log.warn("坐席" + agent + "关闭无效连接失败");
+			}
 			return;
 		}
 		
@@ -59,7 +63,7 @@ public class TMisDunningPhoneWebsocketService {
 			try {
 				sessionOld.close();
 			} catch (IOException e) {
-				log.warn("关闭失败");
+				log.warn("坐席" + agent + "关闭旧连接失败");
 			}
 		}
 		phoneService.changeAgentStatus(msg);
@@ -119,7 +123,7 @@ public class TMisDunningPhoneWebsocketService {
 			try {
 				WebSocketSessionUtil.sendMessage(JSON.toJSONString(msgObj), msgObj.getPeopleId());
 			} catch (IOException e1) {
-				log.info("WebSocket发送错误消息失败：" + e1.getMessage());
+				log.info("websocket发送错误消息失败：" + e1.getMessage());
 			}
 		}
 	}
@@ -133,7 +137,7 @@ public class TMisDunningPhoneWebsocketService {
 	 */
 	@OnError
 	public void onError(@PathParam("userId") String userId, @PathParam("agent") String agent, Throwable throwable, Session session) {
-		log.info("连接异常:" + throwable);
+		log.info("坐席" + agent + "连接异常:" + throwable);
 	}
 
 	/**
@@ -150,9 +154,9 @@ public class TMisDunningPhoneWebsocketService {
 		msgObj.setOperation(CallCenterAgentStatus.LOGGED_OUT);
 		CallCenterWebSocketMessage result = phoneService.changeAgentStatus(msgObj);
 		if (!"success".equals(result.getResult())) {
-			log.info("关闭连接时坐席离线失败:" + result.getMsg());
+			log.info("坐席" + agent + "关闭连接时离线失败:" + result.getMsg());
 		}
-		String statusNotice = tMisAgentInfoService.callStatus.remove(agent);
+		String statusNotice = TMisAgentInfoService.callStatus.remove(agent);
 		if(statusNotice!=null&&!CallCenterAgentState.AVAILABLE.equals(statusNotice)){
 			msgObj.setOperation(CallCenterBaseAction.HANGUP);
 			phoneService.hangup(msgObj);
