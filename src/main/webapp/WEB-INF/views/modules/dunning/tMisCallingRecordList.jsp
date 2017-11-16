@@ -160,9 +160,21 @@
 					</select>
 				</div>
 			</div>
-			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-			</shiro:hasPermission>
 			<div class="row-fluid form-row">
+				<div class="span2">
+					<span class="span4 span-text">坐席状态：</span>
+					<select name="agentState" path="agentState" class="span8">
+						<option value="">全部</option>
+						<option value="Logged Out">离线</option>
+						<option value="Available">在线</option>
+						<option value="On Break">小休</option>
+					</select>
+				</div>
+				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+				<div class="span4">
+					<span class="span2 span-text">催款人：</span>
+					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
+				</div>
 				<div class="span2">
 					<span class="span4 span-text">催收小组：</span>
 					<form:select id="groupList" path="dunningPeople.group.id" class="span8">
@@ -180,19 +192,7 @@
 						</c:forEach>
 					</form:select>
 				</div>
-				<div class="span4">
-					<span class="span2 span-text">催款人：</span>
-					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
-				</div>
-				<div class="span2">
-					<span class="span4 span-text">坐席状态：</span>
-					<select name="agentState" path="agentState" class="span8">
-						<option value="">全部</option>
-						<option value="Logged Out">离线</option>
-						<option value="Available">在线</option>
-						<option value="On Break">小休</option>
-					</select>
-				</div>
+				</shiro:hasPermission>
 			</div>
 			<div class="row-fluid form-row">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/>
