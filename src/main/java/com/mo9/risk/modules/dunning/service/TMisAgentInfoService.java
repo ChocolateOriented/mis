@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
 import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 
@@ -101,6 +102,10 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 	 */
 	public TMisAgentInfo getInfoByQueue(String queue) {
 		return dao.getInfoByQueue(queue);
+	}
+	
+	public TMisAgentInfo getLoginLogTodaybyId(TMisCallingRecord tMisCallingRecord) {
+		return dao.getLoginLogTodaybyId(tMisCallingRecord);
 	}
 	
 	public Page<TMisAgentInfo> findPageList(Page<TMisAgentInfo> page, TMisAgentInfo entity) {

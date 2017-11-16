@@ -199,22 +199,21 @@
 		)
 	</insert>
 
-	<select id="getLoginLogTodaybyId" resultType="TMisCallingRecord">
+	<select id="getLoginLogTodaybyId" resultType="TMisAgentInfo">
 		SELECT
-			status as agentState,
-			createdate
+			status
 		FROM
 			t_mis_agent_login_log a
 			<where>
 				<if test="peopleId != null and peopleId !='' ">
-					AND a.peopleid =#{peopleId}
+					AND a.peopleid = #{peopleId}
 				</if>
-<!--				<if test="callTime != null">
-					AND to_days(CreateDate) = to_days(#{callTime})
-				</if>-->
+				<if test="callTime != null">
+					<![CDATA[ AND a.CreateDate <= #{callTime} ]]>
+				</if>
 			</where>
-		ORDER BY CreateDate desc
-		limit 30
+		ORDER BY a.dbid desc
+		limit 1
 	</select>
 	
 	<select id="validateAgent" resultType="TMisAgentInfo">
