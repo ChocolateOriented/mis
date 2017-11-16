@@ -114,10 +114,6 @@
 		if(!$("#numberValue").val()){
 			return;
 		}
-        if(number.indexOf('9') === 0 && number.length ===12){
-            number = parseInt( '90'+number.substring(1));
-            number =parseInt(number);
-        }
 
 		var operation = $(obj).attr("operation");
 		var msg = {operation: operation, target: number};
