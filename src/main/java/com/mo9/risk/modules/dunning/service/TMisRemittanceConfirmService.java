@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningRefundDao;
 import com.mo9.risk.modules.dunning.dao.TMisRemittanceConfirmDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
@@ -10,7 +11,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningRefund;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm;
 import com.mo9.risk.modules.dunning.entity.TMisRemittanceConfirm.RemittanceTag;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -254,7 +254,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			tMisDunningTaskService.savePartialRepayLog(dealcode);
 		}
 		//回调江湖救急接口
-		return orderService.repayWithPersistence(dealcode, paychannel, paidType, remittanceamount, confirm.getThirdCode());
+		return orderService.repayWithPersistence(dealcode, paychannel, remittanceamount, confirm.getThirdCode());
 	}
 
 	/**
@@ -303,6 +303,10 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			if(confirm.getRemittanceamount() < order.getRemainAmmount() ){
 				throw new ServiceException("金额不匹配，入账失败");
 			}
+		} else { //若还款类型为部分还款, 则还款金额应该小于应催金额
+			if(confirm.getRemittanceamount() >= order.getRemainAmmount() ){
+				throw new ServiceException("金额还款类型不匹配，入账失败");
+			}
 		}
 		confirm.setPaytype(paytype);
 
@@ -323,7 +327,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 		String paychannel = confirm.getRemittancechannel();
 		BigDecimal payamount =  new BigDecimal(confirm.getRemittanceamount());
 		String thirdCode = confirm.getThirdCode();
-		orderService.repayWithPersistence(dealcode,paychannel,paytype,payamount,thirdCode);
+		orderService.repayWithPersistence(dealcode,paychannel,payamount,thirdCode);
 	}
 
 	/**
@@ -372,7 +376,7 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 			String paychannel = remittanceConfirm.getRemittancechannel();
 			BigDecimal payamount = new BigDecimal(remittanceConfirm.getRemittanceamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel ,DunningOrder.PAYTYPE_LOAN ,payamount,remittanceConfirm.getThirdCode());
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode ,paychannel,payamount,remittanceConfirm.getThirdCode());
 			if (success) {
 				successCount++;
 				logger.debug("汇款信息:" + remittanceConfirm.getId() + "订单" + remittanceConfirm.getDealcode() + "修复成功");
@@ -400,5 +404,14 @@ public class TMisRemittanceConfirmService extends CrudService<TMisRemittanceConf
 	 */
 	public List<TMisRemittanceConfirm> findCompleteAuditBySerialNumber(String remittanceSerialNumber, String remittanceChannel) {
 		return dao.findCompleteAuditBySerialNumber(remittanceSerialNumber,remittanceChannel);
+	}
+
+	/**
+	 * @Description 查询对公还款流水
+	 * @param dealcode
+	 * @return java.util.List<com.mo9.risk.modules.dunning.bean.SerialRepay>
+	 */
+	public List<SerialRepay> findRemittanceSerialRepay(String dealcode) {
+		return dao.findRemittanceSerialRepay(dealcode);
 	}
 }

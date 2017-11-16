@@ -160,9 +160,21 @@
 					</select>
 				</div>
 			</div>
-			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-			</shiro:hasPermission>
 			<div class="row-fluid form-row">
+				<div class="span2">
+					<span class="span4 span-text">坐席状态：</span>
+					<select name="agentState" path="agentState" class="span8">
+						<option value="">全部</option>
+						<option value="Logged Out">离线</option>
+						<option value="Available">在线</option>
+						<option value="On Break">小休</option>
+					</select>
+				</div>
+				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+				<div class="span4">
+					<span class="span2 span-text">催款人：</span>
+					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
+				</div>
 				<div class="span2">
 					<span class="span4 span-text">催收小组：</span>
 					<form:select id="groupList" path="dunningPeople.group.id" class="span8">
@@ -180,10 +192,7 @@
 						</c:forEach>
 					</form:select>
 				</div>
-				<div class="span4">
-					<span class="span2 span-text">催款人：</span>
-					<form:input id="peopleList" class="span8" style="margin:0px;" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
-				</div>
+				</shiro:hasPermission>
 			</div>
 			<div class="row-fluid form-row">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/>
@@ -201,6 +210,7 @@
 				<th>通话类型</th>
 				<th>通话人</th>
 				<th>通话状态</th>
+				<th>坐席状态</th>
 				<th>通话时长</th>
 				<th>订单编号</th>
 				<th>操作</th>
@@ -235,6 +245,9 @@
 					${tMisCallingRecord.callStateText}
 				</td>
 				<td>
+					${tMisCallingRecord.agentState}
+				</td>
+				<td>
 					${tMisCallingRecord.durationTimeText}
 				</td>
 				<td>
@@ -245,6 +258,10 @@
 				<td style="padding:0px;">
 					<c:if test="${not empty tMisCallingRecord.audioUrl}">
 						<audio src="${ctiUrl}${tMisCallingRecord.audioUrl}" preload="none" controls="controls" controlsList="nodownload"></audio>
+
+						<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+						<a href="${ctx}/dunning/tMisCallingRecord/audioDownload?audioUrl=${ctiUrl}${tMisCallingRecord.audioUrl}">下载</a>
+						</shiro:hasPermission>
 					</c:if>
 				</td>
 			</tr>

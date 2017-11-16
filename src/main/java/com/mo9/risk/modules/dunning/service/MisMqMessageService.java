@@ -6,25 +6,26 @@ import com.mo9.mqclient.MqSendResult;
 import com.mo9.risk.modules.dunning.dao.MisMqMessageDao;
 import com.mo9.risk.modules.dunning.entity.MisMqMessage;
 import com.thinkgem.jeesite.common.service.BaseService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by jxli on 2017/11/10.
  * 消息队列服务
  */
-//@Service
+@Service
 @Lazy(false)
 @Transactional(readOnly = true)
 public class MisMqMessageService extends BaseService {
 	@Autowired
 	IMqProducer mqProducer;
 	@Autowired
-	MisMqMessageDao dao;
+    MisMqMessageDao dao;
 
 	/**
 	 * @Description 发送消息到消息队列, 并持久化到数据库, 若是失败, 定时重发

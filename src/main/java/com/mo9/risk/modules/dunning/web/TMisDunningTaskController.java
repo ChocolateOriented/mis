@@ -3,68 +3,24 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.mo9.risk.modules.dunning.entity.*;
-import com.mo9.risk.modules.dunning.service.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.activiti.engine.impl.util.json.JSONObject;
-import org.apache.log4j.Logger;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.jdbc.DbUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
+import com.mo9.risk.modules.dunning.bean.SerialRepay;
+import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
-import com.mo9.risk.modules.dunning.entity.BankCardInfo;
 import com.mo9.risk.modules.dunning.entity.DerateReason;
+import com.mo9.risk.modules.dunning.entity.DunningInformationRecovery;
+import com.mo9.risk.modules.dunning.entity.DunningInformationRecoveryHistoryRecord;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
 import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
 import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
 import com.mo9.risk.modules.dunning.entity.OrderHistory;
-import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
 import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.SmsTemp;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
@@ -74,18 +30,21 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisPaid;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
-import com.mo9.risk.modules.dunning.entity.TMisSendMsgInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.enums.PayStatus;
+import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
+import com.mo9.risk.modules.dunning.service.TMisDunningInformationRecoveryService;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
@@ -109,6 +68,46 @@ import com.thinkgem.jeesite.modules.sys.entity.Role;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.activiti.engine.impl.util.json.JSONObject;
+import org.apache.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jdbc.DbUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * 催收任务Controller
@@ -180,7 +179,9 @@ public class TMisDunningTaskController extends BaseController {
 
 	@Autowired
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
-	
+	@Autowired
+	private RiskOrderManager orderManager;
+
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
 	@ModelAttribute
@@ -805,13 +806,15 @@ public class TMisDunningTaskController extends BaseController {
 				return "views/error/500";
 			}
 			model.addAttribute("dunningCycle", task.getDunningcycle());
-			
+
 			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
 			model.addAttribute("personalInfo", personalInfo);
-			model.addAttribute("overdueDays",Integer.parseInt(personalInfo.getOverdueDays()));
+			if (personalInfo.getOverdueDays() != null){
+				model.addAttribute("overdueDays",Integer.parseInt(personalInfo.getOverdueDays()));
+			}
 			model.addAttribute("mobileSelf",personalInfo.getMobile());
 		} catch (Exception e) {
-			logger.info("切换只读库查询失败：" + e.getMessage());
+			logger.info("切换只读库查询失败", e);
 			return "views/error/500";
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
@@ -1124,9 +1127,85 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("mobileSelf", mobileSelf);
 		return "modules/dunning/tMisDunningOrderHistoryList";
 	}
-	
 
-	
+/**
+ * @Description  还款流水信息
+ * @param dealcode
+ * @param model
+ * @return java.lang.String
+ */
+@RequiresPermissions("dunning:tMisDunningTask:view")
+@RequestMapping(value = "orderSerialRepayList")
+public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model model) {
+	if (StringUtils.isBlank(dealcode)){
+		return "views/error/404";
+	}
+
+	List<SerialRepay> repayList = new LinkedList<>();
+	RepayWay needRepayWay = serialRepay.getRepayWay();
+
+	//获取代收还款流水
+	if (needRepayWay == null || needRepayWay.equals(RepayWay.AGENCY_COLLECT)){
+		try {
+			repayList.addAll(orderManager.findSerialRepayMsg(dealcode));
+		} catch (IOException e) {
+			model.addAttribute("message","获取代收流水失败, 请稍后刷新重试");
+		}
+	}
+	//获取代扣还款流水
+	if (needRepayWay == null || needRepayWay.equals(RepayWay.AGENCY_DEDUCT)){
+		repayList.addAll(tMisDunningDeductService.findDeductSerialRepay(dealcode));
+	}
+	//获取线下还款流水(对公)
+	if (needRepayWay == null || needRepayWay.equals(RepayWay.SELF_OFFLINE)){
+		repayList.addAll(tMisRemittanceConfirmService.findRemittanceSerialRepay(dealcode));
+	}
+
+	//根据查询还款状态过滤流水
+	PayStatus needPayStatus = serialRepay.getRepayStatus();
+	if (needPayStatus != null){
+		Iterator<SerialRepay> iterator = repayList.iterator();
+		while (iterator.hasNext()) {
+			SerialRepay repay = iterator.next();
+			if (!needPayStatus.equals(repay.getRepayStatus())){
+				iterator.remove();
+			}
+		}
+	}
+
+	//按还款时间倒序
+	Collections.sort(repayList, new Comparator<SerialRepay>() {
+		@Override
+		public int compare(SerialRepay o1, SerialRepay o2) {
+			Date o1RepayTime = o1.getRepayTime();
+			long o1Timestamp ;
+			if (o1RepayTime == null){
+				o1Timestamp = 0l;
+			}else {
+				o1Timestamp = o1RepayTime.getTime();
+			}
+
+			Date o2RepayTime = o2.getRepayTime();
+			long o2Timestamp ;
+			if (o2RepayTime == null){
+				o2Timestamp = 0l;
+			}else {
+				o2Timestamp = o2RepayTime.getTime();
+			}
+
+			if (o1Timestamp < o2Timestamp){
+				return 1;
+			}
+			return -1;
+		}
+	});
+
+	model.addAttribute("repayList",repayList);
+	model.addAttribute("dealcode",dealcode);
+	model.addAttribute("repayWays",RepayWay.values());
+	return "modules/dunning/orderSerialRepayList";
+}
+
 	/**
 	 * 加载登录日志页面
 	 * @param buyerId dealcode dunningCycle overdueDays dunningtaskdbid

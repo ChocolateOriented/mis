@@ -57,7 +57,7 @@ public class PostRequest {
 	 * @throws IOException
 	 *             如果请求失败，抛出该异常
 	 */
-	public static String postRequest(String uri, String data, Integer timeout) throws IOException {
+	public static String postRequest(String uri, String data,Map<String,String> headers,Integer timeout) throws IOException {
 
 		log.info("POST:"+uri+", msg:"+data);
 		trustAllHosts();// 信任所有HTTPS主机.
@@ -68,6 +68,13 @@ public class PostRequest {
 			conn = (HttpURLConnection) url.openConnection();
 			if ( url.getProtocol().equalsIgnoreCase("HTTPS") ) {// 为HTTPS地址，添加域名验证策略
 				((HttpsURLConnection) conn).setHostnameVerifier(verifier);
+			}
+
+			//添加请求头
+			if (headers!=null && headers.size()>0){
+				for (Map.Entry<String,String> header: headers.entrySet()) {
+					conn.setRequestProperty(header.getKey(),header.getValue());
+				}
 			}
 
 			if(timeout == null || timeout == 0){
@@ -119,7 +126,7 @@ public class PostRequest {
 	 *             如果请求失败，抛出该异常
 	 */
 	public static String postRequest(String uri, Map<String, String> params) throws IOException {
-		return postRequest(uri, params, DEFAULT_CHARSET , DEFAULT_TIMEOUT);
+		return postRequest(uri, params,DEFAULT_CHARSET , DEFAULT_TIMEOUT);
 	}
 
 	public static String postRequest(String uri, Map<String, String> params, String charSet) throws IOException {
@@ -141,7 +148,8 @@ public class PostRequest {
 	 * @throws IOException
 	 *             如果请求失败，抛出该异常
 	 */
-	public static String postRequest(String uri, Map<String, String> params, String charSet, Integer timeout) throws IOException {
+	public static String postRequest(String uri, Map<String, String> params, String charSet, Integer timeout) throws
+			IOException {
 
 		StringBuffer param = new StringBuffer();
 		Set<String> keys = params.keySet();
@@ -150,7 +158,7 @@ public class PostRequest {
 			String value = URLEncoder.encode(params.get(key), charSet);
 			param.append("&" + key + "=" + value);
 		}
-		return postRequest(uri, param.toString(),timeout);
+		return postRequest(uri, param.toString(), null,timeout);
 	}
 
 	/**
@@ -213,4 +221,6 @@ public class PostRequest {
 		String str = PostRequest.postRequest("http://localhost/snc/sms/sendSms", params);
 		System.out.println(str);
 	}
+
+
 }

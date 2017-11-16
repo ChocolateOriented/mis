@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentInfo;
+import com.mo9.risk.modules.dunning.bean.CallCenterAgentState;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalling;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
@@ -111,6 +112,13 @@ public class TMisDunningPhoneService {
 		} catch (Exception e) {
 			msg.setResult("error");
 			logger.info("呼叫中断失败：" + e);
+			
+			//挂断失败时，若坐席接听状态为空闲，则发送空闲消息
+			String state = TMisAgentInfoService.callStatus.get(msg.getAgent());
+			if (state == null || CallCenterAgentState.AVAILABLE.equals(state)) {
+				msg.setOperation(CallCenterAgentState.AVAILABLE);
+				msg.setResult("success");
+			}
 		}
 		try {
 			WebSocketSessionUtil.sendMessage(JSON.toJSONString(msg), msg.getPeopleId());
@@ -202,12 +210,12 @@ public class TMisDunningPhoneService {
 		CallCenterWebSocketMessage msg = new CallCenterWebSocketMessage();
 		msg.setAgent(agent);
 		msg.setOperation(noticeInfo.getState());
-		String target = noticeInfo.getCallInNum() == null ? (
-				noticeInfo.getCallOutNum() == null ? null : noticeInfo.getCallOutNum()
-						) : noticeInfo.getCallInNum();
-		msg.setTarget(target);
-		TRiskBuyerPersonalInfo personInfo = personalInfoService.getBuyerInfoByMobile(msg.getTarget());
-		msg.setName(personInfo == null ? null : personInfo.getRealName());
+		if (CallCenterAgentState.RINGING.equals(noticeInfo.getState())) {
+			String target = noticeInfo.getTarget();
+			msg.setTarget(target);
+			TRiskBuyerPersonalInfo personInfo = personalInfoService.getBuyerInfoByMobile(msg.getTarget());
+			msg.setName(personInfo == null ? null : personInfo.getRealName());
+		}
 		try {
 			session.getBasicRemote().sendText(JSON.toJSONString(msg));
 		} catch (IOException e) {

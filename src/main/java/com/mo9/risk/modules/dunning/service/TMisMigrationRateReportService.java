@@ -747,10 +747,9 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		//初始化
-		ChartUtils chartUtils = new ChartUtils();
 		//最大设为30k
 		// 2：创建Chart[创建不同图形]
-		JFreeChart chart = ChartFactory.createLineChart(title, "", "单位 (%)",dataset );
+		JFreeChart chart = ChartUtils.createLineChart(title, "", "单位 (%)",dataset );
 		// 设置标注无边框
 		chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
 		// 3:设置抗锯齿，防止字体显示不清楚

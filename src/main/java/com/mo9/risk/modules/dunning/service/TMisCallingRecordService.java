@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
+import com.mo9.risk.modules.dunning.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,9 +23,6 @@ import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.dao.TMisCallingRecordDao;
-import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
-import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisCallingRecord.CallType;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
 import com.thinkgem.jeesite.common.persistence.Page;
@@ -44,6 +43,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
+
+	@Autowired
+	private TMisAgentInfoDao tMisAgentInfoDao;
 
 	@Override
 	public Page<TMisCallingRecord> findPage(Page<TMisCallingRecord> page, TMisCallingRecord entity) {
@@ -109,6 +111,35 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		logger.info("定时同步电话通话信记录结束");
 	}
 	
+	/**
+	 * 每小时同步CTI通话记录
+	 * @return
+	 */
+	@Scheduled(cron = "0 0 0/1 * * ?")
+	@Transactional(readOnly = false)
+	public void syncCallRecordHourly() {
+		logger.info("定时同步电话通话信记录开始");
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.add(Calendar.MINUTE, -30);
+		Date end = c.getTime();
+		c.add(Calendar.HOUR_OF_DAY, -1);
+		c.add(Calendar.SECOND, -1);
+		Date start = c.getTime();
+
+		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		String starttime = dateFormat.format(start);
+		String endtime = dateFormat.format(end);
+		action.setStarttime(starttime);
+		action.setEndtime(endtime);
+
+		syncCalloutInfo(action);
+		syncCallinInfo(action);
+		logger.info("定时同步电话通话信记录结束");
+	}
+
 	/**
 	 * 每日同步CTI通话记录
 	 * @return
@@ -248,13 +279,14 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			}
 			
 			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByExtension(callInfo.getExtension());
-			
+
 			if (agentInfo == null) {
 				continue;
 			}
 			
 			TMisCallingRecord record = new TMisCallingRecord(callInfo);
 			record.setPeopleId(agentInfo.getPeopleId());
+			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
 		}
 	}
@@ -287,8 +319,25 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			if (StringUtils.isEmpty(record.getExtensionNumber())) {
 				record.setExtensionNumber(agentInfo.getExtension());
 			}
+			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
 		}
 	}
 
+	/**
+	 * 获取呼入/呼出的坐席状态
+	 */
+	private String getAgentStateOnMoment(TMisCallingRecord record){
+		List<TMisCallingRecord> list = tMisAgentInfoDao.getLoginLogTodaybyId(record);
+		for (int i = 0; i < list.size(); i++) {
+			if (record.getCallTime().compareTo(list.get(i).getCreateDate()) >0){
+				return list.get(i).getAgentState();
+			}
+			if (record.getCallTime().compareTo(list.get(i).getCreateDate()) <0
+					&& record.getCallTime().compareTo(list.get(i+1).getCreateDate())>0){
+				return list.get(i+1).getAgentState();
+			}
+		}
+		return "";
+	}
 }

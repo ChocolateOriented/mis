@@ -24,7 +24,7 @@
                 })
 			}
 			$('#btnAll').click(function () {
-				/*$("#problemstatus").val("已解决");*/
+				$("#problemstatus").val("ALL");
                 $("#searchForm").submit();
 			})
         $('#btnToBeSolved').click(function () {
@@ -78,10 +78,10 @@
 			<li><label>关键词：</label>
 				<form:input path="keyword"  htmlEscape="false" maxlength="200" class="input-medium"/>
 			</li>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page()"/></li>
 			<li class="clearfix"></li>
 		</ul>
-		<input id="problemstatus" name="problemstatus" type="hidden"/>
+		<form:input id="problemstatus" type="hidden" path="problemstatus"/>
 	</form:form>
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed" style="width: 800px">

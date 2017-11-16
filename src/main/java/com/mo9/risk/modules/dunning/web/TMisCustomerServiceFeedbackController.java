@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,8 +29,8 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @Autowired
     private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
-//    @Autowired
-//    private FeedbackSendService feedbackSendService;
+    @Autowired
+    private FeedbackSendService feedbackSendService;
 
     @ModelAttribute
     public TMisCustomerServiceFeedback get(@RequestParam(required=false) String id) {
@@ -50,14 +49,19 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
      * @param
      */
     @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
-    @RequestMapping(value = {"feedbackList", ""})
+    @RequestMapping(value = {"feedbackList",""})
     public String feedbackList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
+
+        String buyerId = request.getParameter("buyerId");
+        if(buyerId==null||"".equals(buyerId)){
+            return "views/error/500";
+        }
 
         Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.feedbackList(new Page<TMisCustomerServiceFeedback>(request, response), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
+        model.addAttribute("buyerId", buyerId);
         return "modules/dunning/tMisCustomerServiceFeedbackList";
     }
-
 
 
     /**
@@ -86,7 +90,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
     @RequestMapping(value ="resultSave")
     @ResponseBody
-    public  TMisCustomerServiceFeedback resultSave(TMisCustomerServiceFeedback tMisCustomerServiceFeedback,HttpServletRequest request){
+    public TMisCustomerServiceFeedback resultSave(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request){
 
         TMisCustomerServiceFeedback feedback=null;
         try{
@@ -95,7 +99,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
              * 消息发送，数据库更新失败时不会发送
              */
             feedback = tMisCustomerServiceFeedback;
-//            feedbackSendService.createFeedBackRecord(feedback);
+            feedbackSendService.createFeedBackRecord(feedback);
         }catch (Exception e){
             logger.info("",e);
             return null;
@@ -111,11 +115,11 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
     @RequestMapping(value = {"notify", ""})
     public String NotifyList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
-        if (tMisCustomerServiceFeedback.getProblemstatus()==null){
+        if (StringUtils.isEmpty(tMisCustomerServiceFeedback.getProblemstatus())){
             tMisCustomerServiceFeedback.setProblemstatus("UNRESOLVED");
         }
 
-        Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.NotifyList(new Page<TMisCustomerServiceFeedback>(request, response), tMisCustomerServiceFeedback);
+        Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.NotifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
         return "modules/oa/notifyList";
     }
@@ -138,6 +142,5 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
         return "modules/dunning/tMisCustomerJboxNotify";
     }
-
 
 }

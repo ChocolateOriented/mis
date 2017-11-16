@@ -34,7 +34,7 @@ import com.mo9.risk.util.RequestParamSign;
 @Controller
 public class TMisDunningPayCallbackController extends BaseController {
 	
-	private static Logger logger = Logger.getLogger(TMisDunningDeductService.class);
+	private static Logger logger = Logger.getLogger(TMisDunningPayCallbackController.class);
 
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;

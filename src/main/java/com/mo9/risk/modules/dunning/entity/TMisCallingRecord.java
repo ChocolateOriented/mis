@@ -58,6 +58,8 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	private List<String> groupIds;
 
+	private String agentState; //坐席状态
+
 	public enum CallType {
 		
 		in("呼入"),
@@ -226,7 +228,7 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		if (this.callTime == null) {
 			return "";
 		}
-		Calendar c = Calendar.getInstance();
+/*		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
@@ -238,7 +240,7 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		if (c.getTime().compareTo(this.callTime) <= 0) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			return "昨天 " + dateFormat.format(this.callTime);
-		}
+		}*/
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return dateFormat.format(this.callTime);
@@ -362,4 +364,11 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 		this.groupIds = groupIds;
 	}
 
+	public String getAgentState() {
+		return agentState;
+	}
+
+	public void setAgentState(String agentState) {
+		this.agentState = agentState;
+	}
 }

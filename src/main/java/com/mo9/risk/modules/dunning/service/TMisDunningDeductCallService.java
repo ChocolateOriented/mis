@@ -165,7 +165,7 @@ public class TMisDunningDeductCallService {
 		Double paidAmount = tMisDunningDeduct.getPayamount();
 		String thirdCode = tMisDunningDeduct.getThirdCode();
 		try {
-			orderService.repayWithPersistence(dealcode, paychannel, paidType, BigDecimal.valueOf(paidAmount),thirdCode);
+			orderService.repayWithPersistence(dealcode, paychannel, BigDecimal.valueOf(paidAmount),thirdCode);
 			
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.succeeded);
 			update(tMisDunningDeduct);
@@ -181,15 +181,12 @@ public class TMisDunningDeductCallService {
 			}
 			
 			return true;
-		} catch (ServiceException e) {
-			logger.info("江湖救急接口返回失败：" + e.getMessage());
+		} catch (Exception e) {
+			logger.info("江湖救急接口返回失败：", e);
 			tMisDunningDeduct.setRepaymentstatus(PayStatus.failed);
 			tMisDunningDeduct.setRepaymentdetail(e.getMessage());
 			update(tMisDunningDeduct);
 			saveDeductLog(tMisDunningDeduct);
-			return false;
-		} catch (Exception e) {
-			logger.info("江湖救急接口返回失败：" + e.getMessage());
 			return false;
 		}
 	}

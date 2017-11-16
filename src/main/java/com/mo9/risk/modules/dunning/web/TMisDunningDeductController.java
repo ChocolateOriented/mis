@@ -59,10 +59,6 @@ public class TMisDunningDeductController extends BaseController {
 		}
 		
 		Page<TMisDunningDeduct> page = tMisDunningDeductService.findPage(new Page<TMisDunningDeduct>(request, response), tMisDunningDeduct);
-		/*Map<String,Object> params = new HashMap<String,Object>();
-		params.put("STATUS_DUNNING", "dunning");
-		params.put("DEALCODE", dealcode);
-		TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);*/
 		TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
 		if (order == null) {
 			logger.warn("订单不存在，订单号：" + dealcode);
@@ -122,6 +118,12 @@ public class TMisDunningDeductController extends BaseController {
 		if (order.getCreditAmount() == null || tMisDunningDeduct.getPayamount() > order.getCreditAmount().doubleValue()) {
 			result.put("result", "NO");
 			result.put("msg", "扣款金额不应大于应催金额");
+			return result;
+		}
+		
+		if ("partial".equals(tMisDunningDeduct.getPaytype()) && tMisDunningDeduct.getPayamount() >= order.getCreditAmount().doubleValue()) {
+			result.put("result", "NO");
+			result.put("msg", "扣款金额应小于应催金额");
 			return result;
 		}
 		

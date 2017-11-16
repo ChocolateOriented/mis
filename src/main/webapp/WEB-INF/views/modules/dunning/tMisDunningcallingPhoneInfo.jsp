@@ -12,10 +12,10 @@
           if (n) window.parent.$("#page").val(n);
           if (s) window.parent.$("#pageSize").val(s);
           if('${call}'=="callin"){
-	          window.location = "/mis/f/numberPhone/callin?" + window.parent.$("#searchForm").serialize();
+	          window.location = "${pageContext.request.contextPath}/f/numberPhone/callin?" + window.parent.$("#searchForm").serialize();
           }
           if('${call}'=="callout"){
-	          window.location = "/mis/f/numberPhone/callout?" + window.parent.$("#searchForm").serialize();
+	          window.location = "${pageContext.request.contextPath}/f/numberPhone/callout?" + window.parent.$("#searchForm").serialize();
           }
           return false;
    }

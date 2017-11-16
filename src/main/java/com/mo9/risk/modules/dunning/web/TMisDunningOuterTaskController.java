@@ -222,7 +222,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 			TMisDunningScoreCard tMisDunningScoreCard = tMisDunningScoreCardService.getScoreCardByDealcode(dealcode);
 			model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
 		} catch (Exception e) {
-			logger.info("切换只读库查询失败：" + e.getMessage());
+			logger.info("切换只读库查询失败" ,e);
 			return "views/error/500";
 		} finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");

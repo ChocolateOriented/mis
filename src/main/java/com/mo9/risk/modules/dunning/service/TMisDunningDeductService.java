@@ -5,6 +5,8 @@ package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
+import com.mo9.risk.modules.dunning.bean.SerialRepay;
+import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.entity.BankCardInfo;
@@ -21,6 +23,7 @@ import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.thinkgem.jeesite.util.NumberUtil;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
@@ -738,7 +741,7 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 			String dealcode = deduct.getDealcode();
 			BigDecimal payamount = new BigDecimal(deduct.getPayamount());
 
-			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel, DunningOrder.PAYTYPE_LOAN,payamount ,deduct.getThirdCode());
+			boolean success = orderService.tryRepairAbnormalOrder(dealcode,paychannel, payamount ,deduct.getThirdCode());
 			if (success) {
 				successCount++;
 				//更新代扣
@@ -758,5 +761,40 @@ public class TMisDunningDeductService extends CrudService<TMisDunningDeductDao, 
 	 */
 	public List<TMisDunningDeduct> findAbnormalDeduct() {
 		return dao.findAbnormalDeduct();
+	}
+
+	/**
+	 * @Description 查询代扣的还款流水
+	 * @param dealcode
+	 * @return java.util.List<com.mo9.risk.modules.dunning.bean.SerialRepay>
+	 */
+	public List<SerialRepay> findDeductSerialRepay(String dealcode) {
+		TMisDunningDeduct queryDeduct = new TMisDunningDeduct();
+		queryDeduct.setDealcode(dealcode);
+		List<TMisDunningDeduct> deducts = this.findList(queryDeduct);
+		List<SerialRepay> repays = new ArrayList<>();
+		if (deducts == null || deducts.size() ==0 ){
+			return repays;
+		}
+		for (TMisDunningDeduct deduct: deducts) {
+			//只获取成功与失败的
+			if (PayStatus.submitted.equals(deduct.getStatus())){
+				continue;
+			}
+			SerialRepay repay = new SerialRepay();
+			repay.setRepayWay(RepayWay.AGENCY_DEDUCT);
+			repay.setRepayChannel(deduct.getPaychannel());
+			repay.setRepayStatus(deduct.getStatus());
+			repay.setRepayAmount(NumberUtil.formatTosepara(deduct.getPayamount()));
+			repay.setPayType(deduct.getPaytype());
+			if (PayStatus.succeeded.equals(deduct.getStatus())){
+				repay.setRepayTime(deduct.getFinishtime());
+			}else{
+				repay.setRepayTime(deduct.getStarttime());
+			}
+			repay.setStatusTime(deduct.getUpdateTime());
+			repays.add(repay);
+		}
+		return repays;
 	}
 }
