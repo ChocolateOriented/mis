@@ -143,4 +143,12 @@
 		WHERE dealcode = #{dealcode}
 	</update>
 
+	<select id="getOrderStatusCode" parameterType="com.mo9.risk.modules.dunning.entity.TRiskOrder">
+		SELECT
+		o.dealcode AS "dealcode",
+		o.status AS "status"
+		FROM
+		t_risk_order AS o
+		WHERE o.id=#{id}
+	</select>
 </mapper>

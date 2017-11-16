@@ -8,7 +8,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisRequestRecordDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisRequestRecord;
+import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.manager.ApiFailException;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.util.MailSender;
@@ -267,5 +269,13 @@ public class TMisDunningOrderService extends BaseService{
 				this.sendAbnormalOrderEmail("定时重试",paychannel,dealcode,payamount,"请求状态不确定订单,重调失败");
 			}
 		}
+	}
+
+	/**
+	 * @Description 根据江湖救急订单ID获取该订单编号和状态
+	 * @param tRiskOrder
+	 */
+	public TRiskOrder getOrderStatusCode(TRiskOrder tRiskOrder){
+		return tMisDunningOrderDao.getOrderStatusCode(tRiskOrder);
 	}
 }
