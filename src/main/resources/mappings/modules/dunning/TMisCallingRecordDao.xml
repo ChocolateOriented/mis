@@ -273,5 +273,13 @@
 		AND a.callType = #{callType}
 		limit 1
 	</select>
+	
+	<select id="queryMobileLocation" resultType="String">
+		SELECT
+			a.province
+		FROM phone a
+		WHERE a.phone = #{preNumber}
+		limit 1
+	</select>
 
 </mapper>

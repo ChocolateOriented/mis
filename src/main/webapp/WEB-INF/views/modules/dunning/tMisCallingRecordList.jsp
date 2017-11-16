@@ -165,9 +165,9 @@
 					<span class="span4 span-text">坐席状态：</span>
 					<select name="agentState" path="agentState" class="span8">
 						<option value="">全部</option>
-						<option value="Logged Out">离线</option>
-						<option value="Available">在线</option>
-						<option value="On Break">小休</option>
+						<option value="Logged Out" <c:if test="${'Logged Out' eq tMisCallingRecord.agentState}">selected</c:if>>离线</option>
+						<option value="Available" <c:if test="${'Available' eq tMisCallingRecord.agentState}">selected</c:if>>在线</option>
+						<option value="On Break" <c:if test="${'On Break' eq tMisCallingRecord.agentState}">selected</c:if>>小休</option>
 					</select>
 				</div>
 				<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
