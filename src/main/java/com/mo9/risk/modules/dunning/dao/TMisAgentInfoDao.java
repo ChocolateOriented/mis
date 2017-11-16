@@ -17,7 +17,7 @@ public interface TMisAgentInfoDao extends CrudDao<TMisAgentInfo> {
 
 	public int saveLonginLog(TMisAgentInfo entity);
 
-	public List<TMisCallingRecord> getLoginLogTodaybyId(TMisCallingRecord tMisCallingRecord);
+	public TMisAgentInfo getLoginLogTodaybyId(TMisCallingRecord tMisCallingRecord);
 	
 	public TMisAgentInfo getInfoByPeopleId(String peopleId);
 	

@@ -9,8 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.mo9.risk.modules.dunning.dao.TMisAgentInfoDao;
-import com.mo9.risk.modules.dunning.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,12 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.druid.util.StringUtils;
+import com.mo9.risk.modules.dunning.bean.CallCenterAgentStatus;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.dao.TMisCallingRecordDao;
+import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
 import com.mo9.risk.modules.dunning.entity.TMisCallingRecord.CallType;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -43,9 +45,6 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
-
-	@Autowired
-	private TMisAgentInfoDao tMisAgentInfoDao;
 
 	@Override
 	public Page<TMisCallingRecord> findPage(Page<TMisCallingRecord> page, TMisCallingRecord entity) {
@@ -328,16 +327,10 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * 获取呼入/呼出的坐席状态
 	 */
 	private String getAgentStateOnMoment(TMisCallingRecord record){
-		List<TMisCallingRecord> list = tMisAgentInfoDao.getLoginLogTodaybyId(record);
-		for (int i = 0; i < list.size(); i++) {
-			if (record.getCallTime().compareTo(list.get(i).getCreateDate()) >0){
-				return list.get(i).getAgentState();
-			}
-			if (record.getCallTime().compareTo(list.get(i).getCreateDate()) <0
-					&& record.getCallTime().compareTo(list.get(i+1).getCreateDate())>0){
-				return list.get(i+1).getAgentState();
-			}
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getLoginLogTodaybyId(record);
+		if (agentInfo == null) {
+			return CallCenterAgentStatus.LOGGED_OUT;
 		}
-		return "";
+		return agentInfo.getStatus();
 	}
 }

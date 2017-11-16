@@ -114,10 +114,6 @@
 		if(!$("#numberValue").val()){
 			return;
 		}
-        if(number.indexOf('9') === 0 && number.length ===12){
-            number = parseInt( '90'+number.substring(1));
-            number =parseInt(number);
-        }
 
 		var operation = $(obj).attr("operation");
 		var msg = {operation: operation, target: number};
@@ -397,7 +393,7 @@
 		if (operation == "Logged Out") {
 			hidePhoneDial();
 			//离线时通道关闭
-			closeWebSocket()
+			closeWebSocket();
 			return;
 		} 
 		
@@ -584,7 +580,7 @@
 			</div>
 			<div class="showName" style="text-align: center;margin-bottom:20px; "></div>
 			<div class="numbers-container" style="background-color:red; margin: 30px 0px 10px 30px;transform:rotate(140deg);">
-		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="refuseCalling()" operation="hangup"></i>
+		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="refuseCalling(this)" operation="hangup"></i>
 		 	</div>
 		 	<div class="numbers-container" style="background-color:green; margin: 30px 0px 10px 100px;">
 		        <i class="number-content icon-phone" style="color:white;font-size:20px;" onclick="callingPhone(this)" operation="answer"></i>
