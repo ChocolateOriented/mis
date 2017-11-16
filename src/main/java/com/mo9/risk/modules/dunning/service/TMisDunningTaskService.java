@@ -3470,5 +3470,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, decalode, taskId);
 		return result;
 	}
+
+	@Transactional(readOnly = false)
+	public int asyncUpdate(String dealcode,String status){
+		return tMisDunningTaskDao.asyncUpdate(dealcode,status);
+	}
 	
 }
