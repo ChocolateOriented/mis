@@ -333,4 +333,16 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		}
 		return agentInfo.getStatus();
 	}
+	
+	/**
+	 * 查询手机号归属地
+	 * @param mobile
+	 * @return
+	 */
+	public String queryMobileLocation(String mobile) {
+		if (mobile == null || mobile.length() != 11) {
+			return "";
+		}
+		return dao.queryMobileLocation(mobile.substring(0, 7));
+	}
 }
