@@ -116,19 +116,19 @@ public class TMisDunningPhoneController extends BaseController {
 	 */
 	@RequestMapping(value = "${adminPath}/dunning/tMisDunningPhone/fatherPageTOPhonePage")
 	@ResponseBody
-	public boolean fatherPageTOPhonePage(String target,String peopleId,String name,HttpServletRequest request, HttpServletResponse response) {
+	public boolean fatherPageTOPhonePage(String target, String peopleId, String name, HttpServletRequest request, HttpServletResponse response) {
 		Session session = WebSocketSessionUtil.get(peopleId);
-		if(session==null){
+		if(session == null){
 			return false;
 		}
-		CallCenterWebSocketMessage message=new CallCenterWebSocketMessage();
+		CallCenterWebSocketMessage message = new CallCenterWebSocketMessage();
 		TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByPeopleId(peopleId);
 		if (agentInfo == null || StringUtils.isEmpty(agentInfo.getAgent())) {
 			return false;
 		}
 		String agent = agentInfo.getAgent();
 		message.setAgent(agent);
-		message.setTarget("9"+target);
+		message.setTarget("90" + target);
 		message.setPeopleId(peopleId);
 		message.setName(name);
 		message.setOperation("originate");
