@@ -119,6 +119,18 @@ public class TMisDunningPeopleController extends BaseController {
 		model.addAttribute("tMisDunningPeople", tMisDunningPeople);
 		return "modules/dunning/tMisDunningPeopleForm";
 	}
+	/**
+	 * 重定向
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:view")
+	@RequestMapping(value = "redirectForm")
+	public String redirectForm(Model model , HttpServletRequest request, HttpServletResponse response) {
+		List<User> users = tMisDunningPeopleService.findUserList();
+		model.addAttribute("users",users);
+		return "modules/dunning/tMisDunningPeopleForm";
+	}
 	
 	
 	/**
@@ -319,10 +331,21 @@ public class TMisDunningPeopleController extends BaseController {
 			logger.info("完成接析文件:" + file.getOriginalFilename());
 		} catch (Exception e) {
 			logger.info("解析式发生错误",e);
-			redirectAttributes.addAttribute("message", "解析文件:" + file.getOriginalFilename() + ",发生错误");
-			return "redirect:analysis";
+			addMessage(redirectAttributes, "解析文件:" + file.getOriginalFilename() + ",发生失败");
+			return "redirect:redirectForm";
 		}
-
-		return "OK";
+		if(list==null||list.size()<1){
+			addMessage(redirectAttributes, "解析文件:" + file.getOriginalFilename() + ",发生失败内容为空");
+			return "redirect:redirectForm";
+		}
+		StringBuilder message=new StringBuilder();
+		boolean validsInsert=tMisDunningPeopleService.batchInsert(list,message);
+		if(!validsInsert){
+			addMessage(redirectAttributes,  "解析文件:" + file.getOriginalFilename() + ",发生失败."+message.toString());
+			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/redirectForm?repage";
+		}
+		logger.info("导入成功,文件:" + file.getOriginalFilename());
+		addMessage(redirectAttributes,  "导入成功.");
+		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
 	}
 }

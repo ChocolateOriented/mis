@@ -52,6 +52,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	
 	
 	private	String groupName; // 所属组中文名.导入用
+	private	String validateId; // 校验是否已经是催收员.导入用
 	
 	
 	public TMisDunningPeople() {
@@ -135,7 +136,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setField1(String field1) {
 		this.field1 = field1;
 	}
-	@ExcelField(title="是否自动分配", align=2, sort=40)
+	@ExcelField(title="是否自动分配", align=2, sort=50)
 	public String getAuto() {
 		return auto;
 	}
@@ -151,7 +152,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setInvalid(String invalid) {
 		Invalid = invalid;
 	}
-	@ExcelField(title="催收队列", align=2, sort=50)
+	@ExcelField(title="催收队列", align=2, sort=40)
 	public String getDunningcycle() {
 		return dunningcycle;
 	}
@@ -226,6 +227,14 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	public void setSumcorpusamount(String sumcorpusamount) {
 		this.sumcorpusamount = sumcorpusamount;
+	}
+
+	public String getValidateId() {
+		return validateId;
+	}
+
+	public void setValidateId(String validateId) {
+		this.validateId = validateId;
 	}
 
 }

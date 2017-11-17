@@ -6,7 +6,6 @@
 <meta name="decorator" content="default" />
 <script type="text/javascript">
 $(document).ready(function() {
-	
 	//队列分配
 	$("#btnDunningcycle").click(function(){
 		 var peopleids = new Array();

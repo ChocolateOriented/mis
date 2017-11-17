@@ -93,6 +93,9 @@ function batchAddPage(){
     });
 	
 }
+function disableBUtton(){
+	$("#save").attr("disabled","disabled");
+}
 </script>
 </head>
 <body>
@@ -102,7 +105,7 @@ function batchAddPage(){
 	</ul>
 	<br />
 	<div id="importBox" class="hide">
-		<form  id="importExcel" action="${ctx}/dunning/tMisDunningPeople/fileUpload" method="post" enctype="multipart/form-data"  >
+		<form  id="importExcel" action="${ctx}/dunning/tMisDunningPeople/fileUpload" method="post" enctype="multipart/form-data"  onsubmit="loading('正在导入，请稍等...');" >
 			<div style="border:1px dashed ;width:300px;height:260px;margin:10px 0px 0px 100px;text-align:center;">
 			
 				<div  style="margin-top: 10px ;">
@@ -113,14 +116,14 @@ function batchAddPage(){
 				
 				</div>	
 				<div  style="margin-top: 180px ;text-align:left; "> 
-					<input type="submit" class="btn btn-primary" id="save"  value="确定上传" />
+					<input type="submit" class="btn btn-primary" id="save"  value="确定上传" onclick="disableBUtton()" />
 				</div>
 			</div>
 			
 		</form>
 	</div>
-	<form:form id="inputForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/save" method="post" class="form-horizontal">
-		<sys:message content="${message}" />
+	<sys:message content="${message}" />
+	<form:form id="inputForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/save" method="post" class="form-horizontal" >
 		<input type="hidden" id="dbid" name="dbid" value="${tMisDunningPeople.dbid}" />
 		<input type="hidden" id="dunningPeoplename" name="name" value="${tMisDunningPeople.name}" />
 		<div class="control-group">

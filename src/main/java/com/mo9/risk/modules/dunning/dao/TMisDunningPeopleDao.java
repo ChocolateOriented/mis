@@ -113,4 +113,18 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public int operationUpdate(@Param("ids")List<String> ids,@Param("userId") String userId, @Param("tMisDunningPeople")TMisDunningPeople tMisDunningPeople);
+	
+	/**
+	 * 校验数据库的账号和所属组和花名
+	 * @param tMisDunningPeople
+	 * @return
+	 */
+	public TMisDunningPeople validateBatchAccountAndGroup(TMisDunningPeople tMisDunningPeople);
+	/**
+	 * 批量插入
+	 * @param listPeople
+	 */
+	public void batchSave(@Param("list") List<TMisDunningPeople> listPeople);
+	
+	
 }
