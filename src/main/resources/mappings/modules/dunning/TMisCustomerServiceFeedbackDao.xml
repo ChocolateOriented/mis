@@ -67,7 +67,9 @@
         <if test="keyword !=null and keyword!=''">
             AND a.keyword LIKE concat('%',#{keyword},'%')
         </if>
-
+        <if test="dealcode !=null and dealcode!=''">
+            AND a.dealcode LIKE concat('%',#{dealcode},'%')
+        </if>
         <if test="hashtag !=null and hashtag!=''">
             AND a.hashtag LIKE concat('%',#{hashtag},'%')
         </if>

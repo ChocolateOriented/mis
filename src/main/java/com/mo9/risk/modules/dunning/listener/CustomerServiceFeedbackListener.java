@@ -53,7 +53,7 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
         tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
         tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        tMisCustomerServiceFeedback.setCreateBy(tMisCustomerServiceFeedback.getCreateBy());
+        tMisCustomerServiceFeedback.setUpdateBy(tMisCustomerServiceFeedback.getUpdateBy());
         tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
         tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());

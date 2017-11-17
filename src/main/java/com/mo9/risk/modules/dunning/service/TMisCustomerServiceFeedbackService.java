@@ -109,7 +109,7 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
             dunningOrder.setDunningpeopleid(null);
         }
         tMisCustomerServiceFeedback.setPage(page);
-        page.setOrderBy("updateDate DESC");
+        page.setOrderBy("pushTime DESC");
         page.setList(dao.NotifyList(tMisCustomerServiceFeedback));
         return page;
     }

@@ -99,8 +99,10 @@
                 </td>
                 <td>
                     <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
-                        <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
-                               value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
+                        <shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+                            <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                   value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
+                        </shiro:hasPermission>
                     </c:if>
                 </td>
                 <td>
