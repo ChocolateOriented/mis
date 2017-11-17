@@ -26,4 +26,6 @@ public interface TMisDunningOrderDao extends BaseDao {
 	List<String> findPaymentOreder(List<String> deselcodes);
 
 	void orderSynUpdate(TRiskOrder order);
+
+	public TRiskOrder getOrderStatusCode(TRiskOrder tRiskOrder);
 }

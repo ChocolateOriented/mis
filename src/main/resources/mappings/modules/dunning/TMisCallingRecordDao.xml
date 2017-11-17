@@ -119,7 +119,7 @@
 				<![CDATA[ AND a.CallTime >= #{callTimeFrom} ]]>
 			</if>
 			<if test="callTimeTo != null">
-				<![CDATA[ AND a.CallTime < #{callTimeTo} ]]>
+				<![CDATA[ AND a.CallTime < date_add(#{callTimeTo}, INTERVAL 1 DAY) ]]>
 			</if>
 			<if test="callType != null">
 				AND a.callType = #{callType}
@@ -271,6 +271,14 @@
 		FROM t_mis_calling_record a
 		WHERE a.uuid = #{uuid}
 		AND a.callType = #{callType}
+		limit 1
+	</select>
+	
+	<select id="queryMobileLocation" resultType="String">
+		SELECT
+			a.province
+		FROM phone a
+		WHERE a.phone = #{preNumber}
 		limit 1
 	</select>
 

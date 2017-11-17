@@ -3,62 +3,22 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.alibaba.fastjson.JSON;
+import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.gamaxpay.commonutil.web.GetRequest;
+import com.gamaxpay.commonutil.web.PostRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.entity.AppLoginLog;
-import com.mo9.risk.modules.dunning.entity.DerateReason;
-import com.mo9.risk.modules.dunning.entity.DunningInformationRecovery;
-import com.mo9.risk.modules.dunning.entity.DunningInformationRecoveryHistoryRecord;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
-import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
-import com.mo9.risk.modules.dunning.entity.MobileResult;
-import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
-import com.mo9.risk.modules.dunning.entity.OrderHistory;
-import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
-import com.mo9.risk.modules.dunning.entity.TBuyerContact;
-import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
-import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TMisPaid;
-import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
-import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
-import com.mo9.risk.modules.dunning.service.TBuyerContactService;
-import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
-import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
-import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
-import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningInformationRecoveryService;
-import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
-import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
-import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
-import com.mo9.risk.modules.dunning.service.TMisRemittanceConfirmService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyer2contactsService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerContactRecordsService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
-import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
+import com.mo9.risk.modules.dunning.service.*;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -96,6 +56,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.activiti.engine.impl.util.json.JSONObject;
+import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jdbc.DbUtils;
@@ -119,10 +80,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TMisDunningTaskController extends BaseController {
 
 	private static final Logger actionlog = Logger.getLogger("com.mo9.cuishou.liulan");
-	
+
+	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+
+	@Autowired
+	private TMisDunningConfigureService tMisDunningConfigureService;
+
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
-	
+
+	@Autowired
+	private TMisDunningOrderService tMisDunningOrderService;
 	@Autowired
 	private TMisDunnedHistoryService tMisDunnedHistoryService;
 	
@@ -260,6 +228,46 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("numberList", numberList);
 		model.addAttribute("tmiscycle", tmiscycle);
 		return "modules/dunning/tMisDunningTaskList";
+	}
+
+	/**
+	 * 获取江湖救急该笔订单状态
+	 *
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "orderStatus")
+	@ResponseBody
+	public String getOrderStatus(String dealcode) throws IOException {
+
+		String mes="";
+		try {
+			String privateKey = tMisDunningConfigureService.getConfigureValue("orderRepay.privateKey");
+			String url = riskUrl +"riskportal/limit/order/findByDealcode.do";
+			HashMap<String,String> tRiskOrder = new HashMap<String,String>();
+			tRiskOrder.put("dealcode",dealcode);
+			String sign = Md5Encrypt.sign(tRiskOrder, privateKey);
+			tRiskOrder.put("sign", sign);
+			String res= PostRequest.postRequest(url,tRiskOrder);
+			logger.info(dealcode+"江湖救急订单还款接口参数" + res);
+
+			if (StringUtils.isBlank(res)) {
+				throw new ServiceException("订单接口回调失败");
+			}
+
+			TRiskOrder tRiskOrder1=JSON.parseObject(res,TRiskOrder.class);
+			if(("payoff").equals(tRiskOrder1.getStatus())){
+				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
+				return "payoff";
+			}
+			if(("payment").equals(tRiskOrder1.getStatus())){
+				return "payment";
+			}
+		}catch (Exception e){
+			logger.warn(e.getMessage());
+			return "";
+		}
+
+		return mes;
 	}
 
 	/**

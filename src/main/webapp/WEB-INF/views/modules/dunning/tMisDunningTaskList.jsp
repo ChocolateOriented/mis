@@ -333,8 +333,32 @@
 				alert(data);
 			});
 		}
+
+        function changeStatus( dealcode) {
+
+                $.ajax({
+                    type: 'POST',
+                    url : "${ctx}/dunning/tMisDunningTask/orderStatus?dealcode="+dealcode,
+                    success : function(data) {
+                        if (data == "payoff") {
+                            alert("同步成功");
+                            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+                            window.parent.window.jBox.close();            //关闭子窗体
+                        } else  if (data == "payment") {
+                            alert("该订单未还清");
+                        }else{
+                            alert("请联系管理员");
+						}
+                    },
+                    error : function(XMLHttpRequest, textStatus, errorThrown){
+                        //通常情况下textStatus和errorThrown只有其中一个包含信息
+                        alert("保存失败:"+statusText);
+                    }
+                });
+
+        }
+
 	</script>
-	
 </head>
 <body>
 	<ul class="nav nav-tabs">
@@ -559,8 +583,15 @@
 					${dunningOrder.overduedays}
 				</td>
 				<td>
-					${dunningOrder.statusText}
+
+					<c:if test="${dunningOrder.statusText eq '未还清'}">
+						<a href="javascript:void 0;onclick=changeStatus('${dunningOrder.dealcode}');"> ${dunningOrder.statusText}</a>
+					</c:if>
+					<c:if test="${dunningOrder.statusText eq '已还清'}">
+						 ${dunningOrder.statusText}
+					</c:if>
 				</td>
+
 				<td title="${dunningOrder.telremark}">
 					<c:choose>  
 						<c:when test="${fn:length(dunningOrder.telremark) > 15}">  
