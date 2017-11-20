@@ -109,9 +109,7 @@
                     ${tMisCustomerServiceFeedback.handlingresult}
                 </td>
                 <td>
-                    <c:if test="${tMisCustomerServiceFeedback.orderTypeText} eq '部分还款订单'">
-                        ${tMisCustomerServiceFeedback.rootorderid}
-                    </c:if>
+                    ${tMisCustomerServiceFeedback.rootorderid}
                 </td>
                 </shiro:hasPermission>
             </tr>

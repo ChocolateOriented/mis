@@ -20,7 +20,6 @@
         a.id AS "id"
     </sql>
 
-
     <select id="get" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
               <include refid="tMisCustomerServiceFeedbackColumns"/>
@@ -33,7 +32,7 @@
         SELECT
               <include refid="tMisCustomerServiceFeedbackColumns"/>
         FROM t_mis_customer_service_feedback a
-        LEFT JOIN t_risk_order r ON r.dealcode = a.dealcode AND r.root_order_id=a.rootOrderId
+        LEFT JOIN t_risk_order r ON r.dealcode = a.dealcode
         <where>
             r.buyer_id = #{buyerId}
         </where>

@@ -11,6 +11,7 @@ import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,9 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
         tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
         tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
-        tMisCustomerServiceFeedback.setRootorderid(tRiskOrder.getRootOrderId());
+        if(("部分还款订单").equals(feedback.getLoanOrderType())){
+            tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
+        }
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
         logger.debug(tMisCustomerServiceFeedback.getId());
