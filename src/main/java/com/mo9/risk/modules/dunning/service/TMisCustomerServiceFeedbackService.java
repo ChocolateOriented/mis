@@ -40,33 +40,6 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
      */
     public Page<TMisCustomerServiceFeedback> feedbackList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback) {
 
-        int permissions = getPermissions();
-        List<String> allowedGroupIds = new ArrayList<String>();
-        DunningOrder dunningOrder=new DunningOrder();
-        if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
-            if(null == dunningOrder.getStatus()){
-                dunningOrder.setStatus("payment");
-            }
-            dunningOrder.setDunningpeopleid(UserUtils.getUser().getId());
-        }
-        if (DUNNING_INNER_PERMISSIONS == permissions) {
-            dunningOrder.setDunningpeopleid(null);
-            allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
-            dunningOrder.setGroupIds(allowedGroupIds);
-        }
-        if(DUNNING_OUTER_PERMISSIONS == permissions){
-            dunningOrder.setDunningpeopleid(null);
-        }
-        if (DUNNING_SUPERVISOR == permissions) {
-            TMisDunningGroup group = new TMisDunningGroup();
-            group.setSupervisor(UserUtils.getUser());
-            List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
-            allowedGroupIds.addAll(groupIds);
-            dunningOrder.setGroupIds(allowedGroupIds);
-        }
-        if(DUNNING_ALL_PERMISSIONS == permissions){
-            dunningOrder.setDunningpeopleid(null);
-        }
         // 设置排序参数
         tMisCustomerServiceFeedback.setPage(page);
         page.setOrderBy("problemStatus DESC");
@@ -83,30 +56,26 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
 
         int permissions = getPermissions();
         List<String> allowedGroupIds = new ArrayList<String>();
-        DunningOrder dunningOrder=new DunningOrder();
         if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
-            if(null == dunningOrder.getStatus()){
-                dunningOrder.setStatus("payment");
-            }
-            dunningOrder.setDunningpeopleid(UserUtils.getUser().getId());
+            tMisCustomerServiceFeedback.setDunningpeopleid(UserUtils.getUser().getId());
         }
         if (DUNNING_INNER_PERMISSIONS == permissions) {
-            dunningOrder.setDunningpeopleid(null);
+            tMisCustomerServiceFeedback.setDunningpeopleid(null);
             allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
-            dunningOrder.setGroupIds(allowedGroupIds);
+            tMisCustomerServiceFeedback.setGroupIds(allowedGroupIds);
         }
         if(DUNNING_OUTER_PERMISSIONS == permissions){
-            dunningOrder.setDunningpeopleid(null);
+            tMisCustomerServiceFeedback.setDunningpeopleid(null);
         }
         if (DUNNING_SUPERVISOR == permissions) {
             TMisDunningGroup group = new TMisDunningGroup();
             group.setSupervisor(UserUtils.getUser());
             List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
             allowedGroupIds.addAll(groupIds);
-            dunningOrder.setGroupIds(allowedGroupIds);
+            tMisCustomerServiceFeedback.setGroupIds(allowedGroupIds);
         }
         if(DUNNING_ALL_PERMISSIONS == permissions){
-            dunningOrder.setDunningpeopleid(null);
+            tMisCustomerServiceFeedback.setDunningpeopleid(null);
         }
         tMisCustomerServiceFeedback.setPage(page);
         page.setOrderBy("pushTime DESC");
