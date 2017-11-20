@@ -416,7 +416,7 @@
         <shiro:hasPermission name="dunning:tMisDunningDeduct:view">
         	<li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunningDeduct/list" onclick="childPage(this)">扣款信息</a></li>
         </shiro:hasPermission>
-		<shiro:hasPermission name="dunning:tMisDunningDeduct:view">
+		<shiro:hasPermission name="dunning:tMisDunningTask:informationRecovery">
 			<li><a id="informationRecovery" href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/informationRecovery" onclick="childPage(this)">信息修复</a></li>
 		</shiro:hasPermission>
 		<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:view">
