@@ -19,5 +19,12 @@ public interface TMisCallingRecordDao extends CrudDao<TMisCallingRecord> {
 	 * @return
 	 */
 	public TMisCallingRecord getRecordByInOutUuid(TMisCallingRecord entity);
+	
+	/**
+	 * 根据手机号开头查询归属地
+	 * @param preNumber
+	 * @return
+	 */
+	public String queryMobileLocation(String preNumber);
 
 }

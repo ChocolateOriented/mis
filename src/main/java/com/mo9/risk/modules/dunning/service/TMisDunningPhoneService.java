@@ -46,6 +46,9 @@ public class TMisDunningPhoneService {
 	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoService;
 	
+	@Autowired
+	private TMisCallingRecordService tMisCallingRecordService;
+	
 	private static final Logger logger = LoggerFactory.getLogger(TMisDunningPhoneService.class);
 	
 	/**
@@ -255,5 +258,13 @@ public class TMisDunningPhoneService {
 	 */
 	private String generateCustomno() {
 		return "mo9." + IdGen.uuid();
+	}
+	
+	/**
+	 * 判断是否为本地手机号
+	 */
+	public boolean isLocalMobile(String mobile) {
+		String location = tMisCallingRecordService.queryMobileLocation(mobile);
+		return "上海".equals(location);
 	}
 }

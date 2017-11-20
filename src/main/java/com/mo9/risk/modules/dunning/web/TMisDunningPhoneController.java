@@ -128,7 +128,14 @@ public class TMisDunningPhoneController extends BaseController {
 		}
 		String agent = agentInfo.getAgent();
 		message.setAgent(agent);
-		message.setTarget("90" + target);
+		
+		String dialTarget = target;
+		if (!phoneService.isLocalMobile(target)) {
+			dialTarget = "0" + dialTarget;
+		}
+		dialTarget = "9" + dialTarget;
+		
+		message.setTarget(dialTarget);
 		message.setPeopleId(peopleId);
 		message.setName(name);
 		message.setOperation("originate");
