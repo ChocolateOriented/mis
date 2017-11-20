@@ -262,6 +262,31 @@ function formatPeopleList( item ){
 	}
 	return nickname ;
 }
+
+function changeStatus( dealcode) {
+
+    $.ajax({
+        type: 'POST',
+        url : "${ctx}/dunning/tMisDunningOuterTask/orderStatus?dealcode="+dealcode,
+        success : function(data) {
+            if (data == "payoff") {
+                alert("同步成功");
+                window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+                window.parent.window.jBox.close();            //关闭子窗体
+            } else  if (data == "payment") {
+                alert("该订单未还清");
+            }else{
+                alert("请联系管理员");
+            }
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown){
+            //通常情况下textStatus和errorThrown只有其中一个包含信息
+            alert("保存失败:"+statusText);
+        }
+    });
+
+}
+
 </script>
 
 </head>
@@ -372,7 +397,16 @@ function formatPeopleList( item ){
 					<td>${dunningOrder.balance}</td>
 					<td><fmt:formatDate value="${dunningOrder.repaymenttime}" pattern="yyyy-MM-dd" /></td>
 					<td>${dunningOrder.overduedays}</td>
-					<td>${dunningOrder.statusText}</td>
+					<td>
+						<c:if test="${dunningOrder.statusText eq '未还清'}">
+							<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+								<a href="javascript:void 0;onclick=changeStatus('${dunningOrder.dealcode}');"> ${dunningOrder.statusText}</a>
+							</shiro:hasPermission>
+						</c:if>
+						<c:if test="${dunningOrder.statusText eq '已还清'}">
+							${dunningOrder.statusText}
+						</c:if>
+					</td>
 					<td>${dunningOrder.dunningPeople.nickname}</td>
 					<td><fmt:formatDate value="${dunningOrder.outsourcingBeginDate}" pattern="yyyy-MM-dd" /></td>
 					<td><fmt:formatDate value="${dunningOrder.outsourcingEndDate}" pattern="yyyy-MM-dd" /></td>

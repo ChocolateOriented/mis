@@ -3,10 +3,16 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
-import com.mo9.risk.modules.dunning.entity.MobileResult;
+import com.alibaba.fastjson.JSON;
+import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
+import com.gamaxpay.commonutil.web.PostRequest;
+import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.service.*;
 import com.mo9.risk.util.DateUtils;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,25 +36,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.TBuyerContact;
-import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
-import com.mo9.risk.modules.dunning.service.TBuyerContactService;
-import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
-import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
-import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -68,6 +55,11 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 @Controller
 @RequestMapping(value = "${adminPath}/dunning/tMisDunningOuterTask")
 public class TMisDunningOuterTaskController extends BaseController {
+
+	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+
+	@Autowired
+	private TMisDunningConfigureService tMisDunningConfigureService;
 
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
@@ -397,6 +389,44 @@ public class TMisDunningOuterTaskController extends BaseController {
 		logger.info(new Date()+"电催结论(Q2,Q3,Q4)下午");
 		return "OK";
 	}
-	
-	
+
+	/**
+	 * 获取江湖救急该笔订单状态
+	 *
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:view")
+	@RequestMapping(value = "orderStatus")
+	@ResponseBody
+	public String getOrderStatus(String dealcode) throws IOException {
+
+		String mes="";
+		try {
+			String privateKey = tMisDunningConfigureService.getConfigureValue("orderRepay.privateKey");
+			String url = riskUrl +"riskportal/limit/order/findByDealcode.do";
+			HashMap<String,String> tRiskOrder = new HashMap<String,String>();
+			tRiskOrder.put("dealcode",dealcode);
+			String sign = Md5Encrypt.sign(tRiskOrder, privateKey);
+			tRiskOrder.put("sign", sign);
+			String res= PostRequest.postRequest(url,tRiskOrder);
+			logger.info(dealcode+"江湖救急订单还款接口参数" + res);
+
+			if (StringUtils.isBlank(res)) {
+				throw new ServiceException("订单接口回调失败");
+			}
+
+			TRiskOrder tRiskOrder1= JSON.parseObject(res,TRiskOrder.class);
+			if(("payoff").equals(tRiskOrder1.getStatus())){
+				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
+				return "payoff";
+			}
+			if(("payment").equals(tRiskOrder1.getStatus())){
+				return "payment";
+			}
+		}catch (Exception e){
+			logger.warn(e.getMessage());
+			return "";
+		}
+
+		return mes;
+	}
 }
