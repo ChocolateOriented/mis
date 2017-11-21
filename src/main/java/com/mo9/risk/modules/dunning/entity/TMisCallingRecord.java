@@ -4,10 +4,10 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.mo9.risk.modules.dunning.bean.CallCenterAgentStatus;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -366,6 +366,12 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	public String getAgentState() {
 		return agentState;
+	}
+
+	public String getAgentStateText() {
+		return CallCenterAgentStatus.AVAILABLE.equals(agentState) ? "在线"
+					: CallCenterAgentStatus.ON_BREAK.equals(agentState) ? "小休"
+						: CallCenterAgentStatus.LOGGED_OUT.equals(agentState) ? "离线" : "";
 	}
 
 	public void setAgentState(String agentState) {
