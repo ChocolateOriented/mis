@@ -5,8 +5,8 @@ package com.mo9.risk.modules.dunning.web;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.service.*;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,7 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * CTI回调Controller
@@ -45,6 +48,7 @@ public class TMisCallingRecordController extends BaseController {
 	@Autowired
 	private TMisDunningGroupService tMisDunningGroupService;
 
+	@RequiresPermissions("dunning:tMisCallingRecord:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(@ModelAttribute("tMisCallingRecord") TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisCallingRecord> page = tMisCallingRecordService.findPage(new Page<TMisCallingRecord>(request, response), tMisCallingRecord);
@@ -61,19 +65,6 @@ public class TMisCallingRecordController extends BaseController {
 				}
 				else if (callingRecord.getTargetNumber().startsWith("17969")){
 					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(5));
-				}
-			}
-			if (callingRecord.getAgentState() != null && !"".equals(callingRecord.getAgentState())) {
-				if (callingRecord.getAgentState().equals("Logged Out")){
-					callingRecord.setAgentState("离线");
-				}
-				else if (callingRecord.getAgentState().equals("Available")){
-					callingRecord.setAgentState("在线");
-				}
-				else if (callingRecord.getAgentState().equals("On Break")){
-					callingRecord.setAgentState("小休");
-				}else {
-					callingRecord.setAgentState("");
 				}
 			}
 		}
@@ -99,6 +90,7 @@ public class TMisCallingRecordController extends BaseController {
 		return "modules/dunning/tMisCallingRecordList";
 	}
 	
+	@RequiresPermissions("dunning:tMisCallingRecord:view")
 	@RequestMapping(value = "gotoTask")
 	public String gotoTask(TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		String dealcode = tMisCallingRecord.getDealcode();
@@ -126,6 +118,7 @@ public class TMisCallingRecordController extends BaseController {
 	 * @param response
 	 * @throws IOException
 	 */
+	@RequiresPermissions("dunning:tMisCallingRecord:view")
 	@RequestMapping(value = "audioDownload")
 	public void audioDownload(@RequestParam(value = "audioUrl") String audioUrl, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String realPath = audioUrl;
@@ -155,5 +148,16 @@ public class TMisCallingRecordController extends BaseController {
 			}
 		}
 
+	}
+	
+	@RequiresPermissions("dunning:tMisCallingRecord:edit")
+	@RequestMapping(value = "sync")
+	@ResponseBody
+	public String sync(Date syncDate, HttpServletRequest request, HttpServletResponse response) {
+		if (syncDate == null) {
+			return "error";
+		}
+		tMisCallingRecordService.syncCallRecordManual(syncDate);
+		return "success";
 	}
 }

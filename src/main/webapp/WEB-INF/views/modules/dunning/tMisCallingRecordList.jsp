@@ -86,7 +86,31 @@
 			// 清空查询功能
 			$("#empty").click(function(){
 				window.location.href="${ctx}/dunning/tMisCallingRecord/list";
-			}); 
+			});
+			
+			//同步通话记录
+			$("#sync").click(function(){
+				$.jBox.open($("#syncBox").html(), "同步通话记录", 250, 150, {            
+					submit: function (v, h, f) {
+						$.ajax({
+							type: 'POST',
+							url : "${ctx}/dunning/tMisCallingRecord/sync",
+							data: f,
+							success : function(data) {
+								if (data == "success") {
+									$.jBox.tip("同步完成", "info");
+		                        } else {
+		                        	$.jBox.tip("同步失败", "info");
+		                        }
+							}
+						});
+						return true;
+					},
+					loaded: function (h) {
+						$(".jbox-content", document).css("overflow-y", "hidden");
+					}
+				});
+			});
 		});
 		
 		//格式化peopleList选项
@@ -122,6 +146,12 @@
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisCallingRecord/">通话记录</a></li>
 	</ul>
+	<div id="syncBox" style="display:none;">
+		<form id="syncForm" action="${ctx}/dunning/tMisCallingRecord/sync" style="padding:5px;">
+			<input name="syncDate" type="text" readonly="readonly" class="input-medium Wdate" pattern="yyyy-MM-dd"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd', isShowClear:false, maxDate:'%y-%M-{%d-1}'});" />
+		</form>
+	</div>
 	<form:form id="searchForm" modelAttribute="tMisCallingRecord" action="${ctx}/dunning/tMisCallingRecord/" method="post" class="breadcrumb form-search"
 		style="padding:2px;">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
@@ -197,6 +227,9 @@
 			<div class="row-fluid form-row">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/>
 				<input id="empty" class="btn btn-primary" type="button" value="清空"/>
+				<shiro:hasPermission name="dunning:tMisCallingRecord:edit">
+					<input id="sync" class="btn btn-primary" type="button" value="同步"/>
+				</shiro:hasPermission>
 			</div>
 		</div>
 	</form:form>
@@ -245,7 +278,7 @@
 					${tMisCallingRecord.callStateText}
 				</td>
 				<td>
-					${tMisCallingRecord.agentState}
+					${tMisCallingRecord.agentStateText}
 				</td>
 				<td>
 					${tMisCallingRecord.durationTimeText}
