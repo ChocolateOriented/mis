@@ -121,7 +121,7 @@
 						<span class="solveStatus">
 							客服消息:订单号{${fns:abbr(tMisCustomerServiceFeedback.dealcode,50)}}
 							<c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
-								${fns:abbr(tMisCustomerServiceFeedback.statusText,50)}
+								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}&nbsp;${fns:abbr(tMisCustomerServiceFeedback.statusText,50)}
 							</c:if>
 							<c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
 								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}

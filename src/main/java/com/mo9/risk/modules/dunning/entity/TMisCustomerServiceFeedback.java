@@ -206,8 +206,8 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         return keyword;
     }
 
-    public void setKeyword(String dealcode,String hashtag,String problemstatus) {
-        this.keyword = dealcode+":"+hashtag+":"+problemstatus;
+    public void setKeyword(String dealcode,String tagText,String statusText) {
+        this.keyword = dealcode+":"+tagText+":"+statusText;
     }
 
     public Integer getBuyerId() {

@@ -62,12 +62,13 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
         tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
         tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
+        tMisCustomerServiceFeedback.setUname(feedback.getUserName());
+        tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
-        tMisCustomerServiceFeedback.setUname(feedback.getUserName());
-        tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
-        logger.debug(tMisCustomerServiceFeedback.getId());
+        tMisCustomerServiceFeedback.setKeyword(tMisCustomerServiceFeedback.getDealcode(),tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText());
+        logger.info(tMisCustomerServiceFeedback.getId());
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
@@ -75,5 +76,4 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         }
         return MqAction.CommitMessage;
     }
-
 }
