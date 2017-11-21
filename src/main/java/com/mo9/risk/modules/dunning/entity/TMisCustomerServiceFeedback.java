@@ -44,12 +44,14 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
-    private String rootorderid;//主订单编号
+    private Integer rootorderid;//主订单编号
     private String uname;//用户名
     private Date pushTime;//消息推送时间
     private String keyword;//页面关键字查询
     private Integer buyerId;//订单用户ID
-
+    private String dunningpeopleid;//催收人员id
+    private TMisDunningPeople dunningPeople;
+    private List<String> groupIds;
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
         return dealcode;
@@ -174,11 +176,11 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     }
 
     @Length(min=1, max=128, message="催收订单号长度必须介于 1 和 128 之间")
-    public String getRootorderid() {
+    public Integer getRootorderid() {
         return rootorderid;
     }
 
-    public void setRootorderid(String rootorderid) {
+    public void setRootorderid(Integer rootorderid) {
         this.rootorderid = rootorderid;
     }
 
@@ -204,8 +206,8 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         return keyword;
     }
 
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
+    public void setKeyword(String dealcode,String hashtag,String problemstatus) {
+        this.keyword = dealcode+":"+hashtag+":"+problemstatus;
     }
 
     public Integer getBuyerId() {
@@ -214,5 +216,29 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
 
     public void setBuyerId(Integer buyerId) {
         this.buyerId = buyerId;
+    }
+
+    public TMisDunningPeople getDunningPeople() {
+        return dunningPeople;
+    }
+
+    public void setDunningPeople(TMisDunningPeople dunningPeople) {
+        this.dunningPeople = dunningPeople;
+    }
+
+    public List<String> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<String> groupIds) {
+        this.groupIds = groupIds;
+    }
+
+    public void setDunningpeopleid(String dunningpeopleid) {
+        this.dunningpeopleid = dunningpeopleid;
+    }
+
+    public String getDunningpeopleid() {
+        return dunningpeopleid;
     }
 }

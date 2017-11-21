@@ -20,13 +20,6 @@
         a.id AS "id"
     </sql>
 
-    <sql id="tMisCustomerServiceFeedbackJoinsColumns">
-
-    </sql>
-
-    <sql id="tMisCustomerServiceFeedbackJoins">
-        LEFT JOIN t_risk_order r ON r.id=a.tRiskOrderId
-    </sql>
 
     <select id="get" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
@@ -40,15 +33,17 @@
         SELECT
               <include refid="tMisCustomerServiceFeedbackColumns"/>
         FROM t_mis_customer_service_feedback a
-        LEFT JOIN t_risk_order r ON r.dealcode = a.dealcode
+        LEFT JOIN t_risk_order r ON r.dealcode = a.dealcode AND r.root_order_id=a.rootOrderId
         <where>
             r.buyer_id = #{buyerId}
         </where>
+
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
                 ORDER BY ${page.orderBy}
             </when>
             <otherwise>
+
             </otherwise>
         </choose>
     </select>
@@ -60,14 +55,20 @@
              a.`hashtag`,
              a.`problemStatus`,
              a.`pushTime`,
-             a.`id`
+             a.`id`,
+             t.DunningPeopleId,
+             p.groupId
         FROM t_mis_customer_service_feedback a
+        LEFT JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+        LEFT JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
         <where>
 
         <if test="keyword !=null and keyword!=''">
             AND a.keyword LIKE concat('%',#{keyword},'%')
         </if>
-
+        <if test="dealcode !=null and dealcode!=''">
+            AND a.dealcode LIKE concat('%',#{dealcode},'%')
+        </if>
         <if test="hashtag !=null and hashtag!=''">
             AND a.hashtag LIKE concat('%',#{hashtag},'%')
         </if>
@@ -76,6 +77,20 @@
         </if>
         <if test="updateDate !=null and updateDate!=''">
             AND a.updateDate=#{updateDate}
+        </if>
+        <if test="groupIds != null">
+            AND p.groupId in
+            <if test="groupIds.size == 0">
+                ('')
+            </if>
+            <if test="groupIds.size > 0">
+                <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+                    #{groupId}
+                </foreach>
+            </if>
+        </if>
+        <if test="dunningpeopleid != null and dunningpeopleid != ''">
+            AND t.DunningPeopleId = #{dunningpeopleid}
         </if>
         </where>
         <choose>
