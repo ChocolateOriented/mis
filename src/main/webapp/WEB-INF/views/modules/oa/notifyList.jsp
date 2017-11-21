@@ -6,6 +6,12 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+		    if("${color}"=='all'){
+                $('#btnAll').css("color","red");
+            }else{
+
+                $('#btnToBeSolved').css("color","red");
+            }
 		    function showRow(type){
                 $('.result .solveStatus').each(function (index,item) {
                     $(item).parents('.result').show()
@@ -24,12 +30,16 @@
                 })
 			}
 			$('#btnAll').click(function () {
+                $("#colorChoice").val("all");
 				$("#problemstatus").val("ALL");
                 $("#searchForm").submit();
+
 			})
         $('#btnToBeSolved').click(function () {
+            $("#colorChoice").val("solving");
             $("#problemstatus").val("UNRESOLVED");
             $("#searchForm").submit();
+
         })
 		});
 
@@ -50,6 +60,12 @@
 		function page(n,s){
 			$("#pageNo").val(n);
 			$("#pageSize").val(s);
+			if("${color}"=='all'){
+                $("#colorChoice").val("all");
+            }
+            if("${color}"=='solving'){
+                $("#colorChoice").val("solving");
+            }
             $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/notify");
 			$("#searchForm").submit();
         	return false;
@@ -64,6 +80,7 @@
 	<form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/notify" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<input id="colorChoice" name="colorChoice" type="hidden" value=""/>
 		<ul class="ul-form">
 			<li><label>类别：</label>
 				<form:select path="hashtag" htmlEscape="false" maxlength="200" class="input-medium">
@@ -89,7 +106,7 @@
 		    <tr>
 				<th style="background: #26d6ff" colspan="2">
 					<span type="button" id="btnAll" value="" style="cursor: pointer;">全部</span>&nbsp;|&nbsp;
-					<span type="button" id="btnToBeSolved" value="待解决" style="cursor: pointer;color: #1a1a1a">待解决</span>
+					<span type="button" id="btnToBeSolved" value="待解决" style="cursor: pointer;color: #1a1a1a;">待解决</span>
 				</th>
 			</tr>
 			<tr>

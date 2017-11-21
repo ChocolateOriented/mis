@@ -588,7 +588,11 @@
 						<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 							<a href="javascript:void 0;onclick=changeStatus('${dunningOrder.dealcode}');"> ${dunningOrder.statusText}</a>
 						</shiro:hasPermission>
+						<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
+							${dunningOrder.statusText}
+						</shiro:lacksPermission>
 					</c:if>
+
 					<c:if test="${dunningOrder.statusText eq '已还清'}">
 						 ${dunningOrder.statusText}
 					</c:if>

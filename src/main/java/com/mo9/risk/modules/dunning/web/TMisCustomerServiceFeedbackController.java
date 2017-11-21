@@ -114,13 +114,14 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
      */
     @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
     @RequestMapping(value = {"notify", ""})
-    public String NotifyList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
+    public String NotifyList(String colorChoice,TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
         if (StringUtils.isEmpty(tMisCustomerServiceFeedback.getProblemstatus())){
             tMisCustomerServiceFeedback.setProblemstatus("UNRESOLVED");
         }
 
         Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.NotifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
+        model.addAttribute("color", colorChoice);
         return "modules/oa/notifyList";
     }
 
