@@ -50,7 +50,6 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
 
         String json = msg.getBody();
         TMisCustomerServicefeedbackDto feedback = JSON.parseObject(json, TMisCustomerServicefeedbackDto.class );
-        TRiskOrder tRiskOrder=new TRiskOrder();
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
         tMisCustomerServiceFeedback.setDealcode(feedback.getLoanDealCode());
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
@@ -63,7 +62,7 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
         tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
         tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
-        if(("部分还款订单").equals(feedback.getLoanOrderType())){
+        if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
