@@ -17,7 +17,7 @@
 <body>
 
 <div style="margin-bottom: 10px; margin-left: 10px">
-<input id="btnAdd" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="InformationAdd" type="button" value="添加" />
+<input id="btnAdd" onclick="window.parent.collectionfunction(this)" class="btn btn-primary" method="InformationAdd" type="button" value="添加" />
 </div>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">
 <thead>

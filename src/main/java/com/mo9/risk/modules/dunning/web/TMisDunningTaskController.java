@@ -3,6 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.alibaba.fastjson.JSON;
+import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
@@ -34,6 +36,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
+import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
@@ -41,6 +44,7 @@ import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
 import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
+import com.mo9.risk.modules.dunning.service.TMisDunningConfigureService;
 import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningInformationRecoveryService;
@@ -56,9 +60,11 @@ import com.mo9.risk.modules.dunning.service.TRiskBuyerContactRecordsService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
 import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
+import com.mo9.risk.util.PostRequest;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -119,6 +125,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TMisDunningTaskController extends BaseController {
 
 	private static final Logger actionlog = Logger.getLogger("com.mo9.cuishou.liulan");
+	
+ 	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+ 
+ 	@Autowired
+ 	private TMisDunningConfigureService tMisDunningConfigureService;
 	
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
@@ -2097,4 +2108,46 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		model.addAttribute("entityList", entityList);
 		return "modules/dunning/tMisDunningInformationRecovery";
 	}
+	
+	
+ 	/**
+	
+ 	 * 获取江湖救急该笔订单状态
+ 	 *
+ 	 */
+ 	@RequiresPermissions("dunning:tMisDunningTask:view")
+ 	@RequestMapping(value = "orderStatus")
+ 	@ResponseBody
+ 	public String getOrderStatus(String dealcode) throws IOException {
+ 
+ 		String mes="";
+ 		try {
+ 			String privateKey = tMisDunningConfigureService.getConfigureValue("orderRepay.privateKey");
+ 			String url = riskUrl +"riskportal/limit/order/findByDealcode.do";
+ 			HashMap<String,String> tRiskOrder = new HashMap<String,String>();
+ 			tRiskOrder.put("dealcode",dealcode);
+ 			String sign = Md5Encrypt.sign(tRiskOrder, privateKey);
+ 			tRiskOrder.put("sign", sign);
+ 			String res= PostRequest.postRequest(url,tRiskOrder);
+ 			logger.info(dealcode+"江湖救急订单还款接口参数" + res);
+ 
+ 			if (StringUtils.isBlank(res)) {
+ 				throw new ServiceException("订单接口回调失败");
+ 			}
+ 
+ 			TRiskOrder tRiskOrder1= JSON.parseObject(res,TRiskOrder.class);
+ 			if(("payoff").equals(tRiskOrder1.getStatus())){
+ 				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
+ 				return "payoff";
+ 			}
+ 			if(("payment").equals(tRiskOrder1.getStatus())){
+ 				return "payment";
+ 			}
+ 		}catch (Exception e){
+ 			logger.warn(e.getMessage());
+ 			return "";
+ 		}
+ 
+ 		return mes;
+ 	}
 }

@@ -88,7 +88,7 @@ public class RiskOrderManager {
 		return resultMsg;
 	}
 
-	private static final String mo9Url = DictUtils.getDictValue("mo9Url","orderUrl","");
+	private static final String flashUrl = DictUtils.getDictValue("flashUrl","orderUrl","");
 	/**
 	 * @Description 查询代收还款流水
 	 * @param dealcode
@@ -104,7 +104,7 @@ public class RiskOrderManager {
 		headers.put("sign",sign);
 		headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 
-		String url = mo9Url + "flashApi/refund/public_list_collect_repay_by_deal_code";
+		String url = flashUrl + "flashApi/refund/public_list_collect_repay_by_deal_code";
 		String res = PostRequest.postRequest(url,params.toJSONString(),headers,2000);
 		logger.debug(dealcode + "还款流水"+ res);
 		if (StringUtils.isBlank(res)){
