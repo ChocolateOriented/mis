@@ -788,9 +788,9 @@
 			</otherwise>
 		</choose>
 
-		<if test="page!= null">
-			LIMIT ${page.firstResult},${page.pageSize}
-		</if>
+      <if test="page!= null and page.pageSize != -1">
+        LIMIT ${page.firstResult},${page.pageSize}
+      </if>
 	</select>
 
 	<!--催收列表count-->
