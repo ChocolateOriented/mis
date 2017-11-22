@@ -565,7 +565,14 @@ public class TMisMigrationRateReportController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "migrationDelete")
 	public String migrationDelete(HttpServletRequest request, HttpServletResponse response) {
-		tMisMigrationRateReportService.deleteAll();
+		try {
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			tMisMigrationRateReportService.deleteAll();
+		} catch (Exception e) {
+			logger.info("",e);
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");  
+		}
 		return "Ok";
 	}
 
