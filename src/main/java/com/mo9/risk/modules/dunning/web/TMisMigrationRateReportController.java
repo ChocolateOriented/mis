@@ -558,5 +558,15 @@ public class TMisMigrationRateReportController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisMigrationRateReport/list";
     }
+	/**
+	 * 迁徙导出日报
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@ResponseBody
+	@RequestMapping(value = "migrationDelete")
+	public String migrationDelete(HttpServletRequest request, HttpServletResponse response) {
+		tMisMigrationRateReportService.deleteAll();
+		return "Ok";
+	}
 
 }
