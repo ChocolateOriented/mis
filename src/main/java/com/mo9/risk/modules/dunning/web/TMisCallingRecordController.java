@@ -51,6 +51,7 @@ public class TMisCallingRecordController extends BaseController {
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 
+	@RequiresPermissions("dunning:tMisCallingRecord:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(@ModelAttribute("tMisCallingRecord") TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisCallingRecord> page = tMisCallingRecordService.findPage(new Page<TMisCallingRecord>(request, response), tMisCallingRecord);
