@@ -118,7 +118,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	public static final Integer DUNNING_FINANCIAL_PERMISSIONS = 1000;    //  财务权限
 	public static final Integer DUNNING_SUPERVISOR = 10000;              //  催收监理
-	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  催收总监
+	public static final Integer DUNNING_ALL_PERMISSIONS = 111;           //  风控总监
 	public static final Integer DUNNING_INNER_PERMISSIONS = 101;         //  催收主管
 	public static final Integer DUNNING_OUTER_PERMISSIONS =  11;         //  委外催收主管
 	public static final Integer DUNNING_COMMISSIONER_PERMISSIONS = 1;    //  催收专员
