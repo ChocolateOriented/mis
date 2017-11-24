@@ -948,4 +948,7 @@
 	ORDER BY  a.cycle desc,a.DateTime ASC
 
 	</select>
+	<delete id="deleteAll">
+	delete from t_mis_migration_rate_report
+	</delete>
 </mapper>

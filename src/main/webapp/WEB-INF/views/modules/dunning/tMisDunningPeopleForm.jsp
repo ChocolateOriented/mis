@@ -71,11 +71,30 @@ $(document).ready(function() {
 		changGroupType();
 	});
 	
+	
+	$("#batchAdd").click(function(){
+		$.jBox($("#importBox").html(), {title:"导入数据", width: 500, 
+		    height:450,  buttons:{"关闭":true}} );
+	});
 });
 
 function changGroupType(){
 	var groupType = $("#groupId option:selected").attr("groupType");
 	$("#groupType").select2("val", groupType);
+}
+
+function batchAddPage(){
+	var url = "${ctx}/dunning/tMisDunningPeople/batchAddPage";
+	$.jBox.open("iframe:" + url, diaName , 500, 450, {
+           buttons: {},
+           loaded: function (h) {
+               $(".jbox-content", document).css("overflow-y", "hidden");
+           }
+    });
+	
+}
+function disableBUtton(){
+	$("#save").attr("disabled","disabled");
 }
 </script>
 </head>
@@ -85,8 +104,26 @@ function changGroupType(){
 		<li class="active"><a href="${ctx}/dunning/tMisDunningPeople/form?id=${tMisDunningPeople.id}">催收人员<shiro:hasPermission name="dunning:tMisDunningPeople:edit">${not empty tMisDunningPeople.dbid?'修改':'添加'}</shiro:hasPermission> <shiro:lacksPermission name="dunning:tMisDunningPeople:edit">查看</shiro:lacksPermission></a></li>
 	</ul>
 	<br />
-	<form:form id="inputForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/save" method="post" class="form-horizontal">
-		<sys:message content="${message}" />
+	<div id="importBox" class="hide">
+		<form  id="importExcel" action="${ctx}/dunning/tMisDunningPeople/fileUpload" method="post" enctype="multipart/form-data"  onsubmit="loading('正在导入，请稍等...');" >
+			<div style="border:1px dashed ;width:300px;height:260px;margin:10px 0px 0px 100px;text-align:center;">
+			
+				<div  style="margin-top: 10px ;">
+	            <input   id="file" type="file" accept=".xls,.xlsx,.csv" name="file" />
+				
+				</div>	
+				<div>
+				
+				</div>	
+				<div  style="margin-top: 180px ;text-align:left; "> 
+					<input type="submit" class="btn btn-primary" id="save"  value="确定上传" onclick="disableBUtton()" />
+				</div>
+			</div>
+			
+		</form>
+	</div>
+	<sys:message content="${message}" />
+	<form:form id="inputForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/save" method="post" class="form-horizontal" >
 		<input type="hidden" id="dbid" name="dbid" value="${tMisDunningPeople.dbid}" />
 		<input type="hidden" id="dunningPeoplename" name="name" value="${tMisDunningPeople.name}" />
 		<div class="control-group">
@@ -107,6 +144,7 @@ function changGroupType(){
 					</c:otherwise>
 				</c:choose>
 				<span class="help-inline"><font color="red">*</font> </span>
+				<input type="button"  class="btn btn-primary" id="batchAdd" value="批量添加" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -183,12 +221,12 @@ function changGroupType(){
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label title="大于1为单笔固定费率，小于1大于0为单笔百分比费率" class="control-label">单笔费率 ：</label>
-			<div class="controls">
-				<form:input path="rate" htmlEscape="false" class="input-xlarge " />
-			</div>
-		</div>
+<!-- 		<div class="control-group"> -->
+<!-- 			<label title="大于1为单笔固定费率，小于1大于0为单笔百分比费率" class="control-label">单笔费率 ：</label> -->
+<!-- 			<div class="controls"> -->
+<%-- 				<form:input path="rate" htmlEscape="false" class="input-xlarge " /> --%>
+<!-- 			</div> -->
+<!-- 		</div> -->
 		<!-- 		<div class="control-group"> -->
 		<!-- 			<label class="control-label">逾期周期起始：</label> -->
 		<!-- 			<div class="controls"> -->

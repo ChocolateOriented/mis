@@ -6,7 +6,6 @@
 <meta name="decorator" content="default" />
 <script type="text/javascript">
 $(document).ready(function() {
-	
 	//队列分配
 	$("#btnDunningcycle").click(function(){
 		 var peopleids = new Array();
@@ -28,7 +27,7 @@ $(document).ready(function() {
 	               }
 	        });
 	 });
-	
+
 	//列表选择
 	$("#allorder").change(function(){
 	 	if($("#allorder").prop('checked')){
@@ -85,7 +84,27 @@ function page(n,s){
 	$("#searchForm").submit();
 	return false;
 }
-
+//分配小组和是否自动分配
+function operationPeoPle(obj){
+	 var peopleids = new Array();
+		$("[name='peopleids']").each(function() {
+			if(this.checked){
+				peopleids.push($(this).val());
+			}
+		});
+		if(peopleids.length==0){
+			$.jBox.tip("请勾选催收人员", 'warning');
+			return;
+		}
+		var diaName=($(obj).attr('id')=='btnDunninggroup'?'分配小组':'设置自动分配');
+		var url = "${ctx}/dunning/tMisDunningPeople/dialogOperationPeoPle?peopleids=" + peopleids+"&operateId="+$(obj).attr("id") ;
+		$.jBox.open("iframe:" + url, diaName , 500, 450, {
+               buttons: {},
+               loaded: function (h) {
+                   $(".jbox-content", document).css("overflow-y", "hidden");
+               }
+        });
+}
 </script>
 </head>
 <body>
@@ -117,8 +136,18 @@ function page(n,s){
 				<label>催收人：</label>
 				<input id="peopleList" name="id" type="hidden" />
 			</li>
+			<li>
+			<label >自动分配：</label>
+					<form:select id="auto" path="auto" class="input-medium">
+						<form:option value="" label="" />
+						<form:option value="t" label="是" />
+						<form:option value="f" label="否" />
+					</form:select>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" /></li>
 			<li class="btns"><input id="btnDunningcycle" class="btn btn-primary" type="button" value="分配队列" /></li>
+			<li class="btns"><input id="btnDunninggroup" class="btn btn-primary" type="button" value="分配小组" onclick="operationPeoPle(this)"/></li>
+			<li class="btns"><input id="btnDunningauto" class="btn btn-primary" type="button" value="是否自动分配" onclick="operationPeoPle(this)"/></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>

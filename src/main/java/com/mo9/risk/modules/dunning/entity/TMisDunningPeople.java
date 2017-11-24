@@ -9,6 +9,7 @@ import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
 /**
@@ -49,6 +50,11 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	
 	private	String sumcorpusamount; // 分案金额
 	
+	
+	private	String groupName; // 所属组中文名.导入用
+	private	String validateId; // 校验是否已经是催收员.导入用
+	
+	
 	public TMisDunningPeople() {
 		super();
 	}
@@ -69,8 +75,10 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setDbid(Integer dbid) {
 		this.dbid = dbid;
 	}
-
+	
+	
 	@Length(min = 1, max = 64, message = "催收人员名称不能为空")
+	@ExcelField(title="催收人员账号", align=2, sort=10)
 	public String getName() {
 		return name;
 	}
@@ -128,7 +136,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setField1(String field1) {
 		this.field1 = field1;
 	}
-
+	@ExcelField(title="是否自动分配", align=2, sort=50)
 	public String getAuto() {
 		return auto;
 	}
@@ -144,7 +152,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setInvalid(String invalid) {
 		Invalid = invalid;
 	}
-
+	@ExcelField(title="催收队列", align=2, sort=40)
 	public String getDunningcycle() {
 		return dunningcycle;
 	}
@@ -162,7 +170,6 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setDunningcycle(String dunningcycle) {
 		this.dunningcycle = dunningcycle;
 	}
-
 	public TMisDunningGroup getGroup() {
 		return group;
 	}
@@ -171,7 +178,17 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.group = group;
 	}
 
+	@ExcelField(title="所属组", align=2, sort=30)
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
 	@Length(min = 0, max = 64, message = "花名长度必须介于 0 和 64 之间")
+	@ExcelField(title="催收人员花名", align=2, sort=20)
 	public String getNickname() {
 		return nickname;
 	}
@@ -210,6 +227,14 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	public void setSumcorpusamount(String sumcorpusamount) {
 		this.sumcorpusamount = sumcorpusamount;
+	}
+
+	public String getValidateId() {
+		return validateId;
+	}
+
+	public void setValidateId(String validateId) {
+		this.validateId = validateId;
 	}
 
 }

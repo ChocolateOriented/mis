@@ -778,5 +778,9 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		in = new ByteArrayInputStream(out.toByteArray());
 		return new ByteArrayDataSource(in, "image/png");
 	}
+	@Transactional(readOnly= false)
+	public void deleteAll() {
+		tMisMigrationRateReportDao.deleteAll();
+	}
 
 }

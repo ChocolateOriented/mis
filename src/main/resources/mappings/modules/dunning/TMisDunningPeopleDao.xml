@@ -54,6 +54,9 @@
 		    <if test="id != null and id != ''">
 				AND a.id = #{id}
 			</if>
+		    <if test="auto != null and auto != ''">
+				AND a.auto = #{auto}
+			</if>
 			<if test="name != null and name != ''">
 				AND a.name LIKE concat('%',#{name},'%')
 			</if>
@@ -86,10 +89,10 @@
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy} a.begin desc
+				ORDER BY ${page.orderBy} a.CreateDate desc
 			</when>
 			<otherwise>
-			    ORDER BY a.begin desc
+			    ORDER BY a.CreateDate desc
 			</otherwise>
 		</choose>
 	</select>
@@ -217,7 +220,42 @@
 			#{extensionNumber}
 		)
 	</insert>
-	
+	<insert id="batchSave">
+		INSERT INTO t_mis_dunning_people(
+			id,
+			name,
+			rate,
+			begin,
+			end,
+			field1,
+			auto,
+			createby,
+			createdate,
+			updateby,
+			updatedate,
+			dunningcycle,
+			nickname,
+			groupId
+		) VALUES 
+		<foreach collection="list"  index="index" item="item" separator=",">
+			(
+			#{item.id},
+			#{item.name},
+			#{item.rate},
+			#{item.begin},
+			#{item.end},
+			'active',
+			#{item.auto},
+			#{item.createBy.id},
+			#{item.createDate},
+			#{item.updateBy.id},
+			#{item.updateDate},
+			#{item.dunningcycle},
+			#{item.nickname},
+			#{item.group.id}
+			)
+		</foreach>
+	</insert>
 	<update id="update">
 		UPDATE t_mis_dunning_people SET 
 <!-- 			dunningpeopletype = #{dunningpeopletype}, -->
@@ -335,6 +373,21 @@
             #{item}
         </foreach>
 	</update>
+	 <update id="operationUpdate">
+		UPDATE t_mis_dunning_people SET 	
+			updatedate = now(),
+			updateby = #{userId},
+			<if test="tMisDunningPeople.group != null and tMisDunningPeople.group.id != null and tMisDunningPeople.group.id != '' ">
+			 groupId= #{tMisDunningPeople.group.id }
+			</if>
+			<if test="tMisDunningPeople.auto != null and tMisDunningPeople.auto != '' ">
+			auto = #{tMisDunningPeople.auto}
+			</if>
+		WHERE id in 
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
 	
 	 <select id="findPeoplesByids" resultType="TMisDunningPeople" useCache="false">
 		SELECT 
@@ -379,5 +432,54 @@
 		 t.peopleId is null
 		 and 
 		 a.nickname is not null
+	</select>
+	
+	<select id="validateBatchAccountAndGroup" resultType="TMisDunningPeople" useCache="false">
+	 SELECT
+	(
+		SELECT
+			id 
+		FROM
+			t_mis_dunning_group
+		WHERE
+			`Name` = #{groupName}
+	) AS 'group.id',
+	(
+		SELECT
+			id
+		FROM
+			sys_user
+		WHERE
+			login_name = #{name}
+	) as 'id',
+	(
+		SELECT
+			name
+		FROM
+			sys_user
+		WHERE
+			login_name = #{name}
+	) as 'name',
+	(
+		SELECT
+			nickname 
+		FROM
+			t_mis_dunning_people
+		WHERE
+			nickname = #{nickname}
+			and
+			Field1='active'
+	)as 'nickname',
+	(
+		SELECT
+			id 
+		FROM
+			t_mis_dunning_people
+		WHERE
+			id = (SELECT id FROM sys_user WHERE login_name = #{name})
+	 		and
+			Field1='active'
+	)as 'validateId'
+	LIMIT 1
 	</select>
 </mapper>

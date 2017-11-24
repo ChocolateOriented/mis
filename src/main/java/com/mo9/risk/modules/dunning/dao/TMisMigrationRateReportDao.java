@@ -225,5 +225,9 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 * @return
 	 */
 	List<TMisMigrationRateReport> newfindMigrateChartList(@Param("migrate")Migrate migrate,@Param("cycleNum")Integer cycleNum);
+	/**
+	 * 删除所有迁徙率的数据
+	 */
+	public void deleteAll();
 
 }
