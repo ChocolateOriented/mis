@@ -70,19 +70,6 @@ public class TMisCallingRecordController extends BaseController {
 					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(5));
 				}
 			}
-			if (callingRecord.getAgentState() != null && !"".equals(callingRecord.getAgentState())) {
-				if (callingRecord.getAgentState().equals("Logged Out")){
-					callingRecord.setAgentState("离线");
-				}
-				else if (callingRecord.getAgentState().equals("Available")){
-					callingRecord.setAgentState("在线");
-				}
-				else if (callingRecord.getAgentState().equals("On Break")){
-					callingRecord.setAgentState("小休");
-				}else {
-					callingRecord.setAgentState("");
-				}
-			}
 		}
 		//催收小组列表
 		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
