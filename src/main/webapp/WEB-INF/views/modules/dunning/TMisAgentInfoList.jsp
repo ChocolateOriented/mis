@@ -53,12 +53,12 @@
 		
 			<li>
 				<label>坐席名称：</label>
-				<input id="agentName" name="agent" type="text" />
+				<input id="agentName" name="agent" type="text" value="${TMisAgentInfo.agent}"/>
 			</li>
 		
 			<li>
 				<label>催收员花名：</label>
-				<input id="nickName" name="nickName" type="text" />
+				<input id="nickName" name="nickName" type="text" value="${TMisAgentInfo.nickName}"/>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" /></li>
 			<li class="clearfix"></li>

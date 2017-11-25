@@ -16,6 +16,8 @@ public class CallCenterWebSocketMessage implements Serializable {
 
 	private String name;	//通话对象姓名
 
+	private String location;	//归属地
+
 	private String result;	//结果
 
 	private String msg;	//结果信息
@@ -58,6 +60,14 @@ public class CallCenterWebSocketMessage implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public String getResult() {

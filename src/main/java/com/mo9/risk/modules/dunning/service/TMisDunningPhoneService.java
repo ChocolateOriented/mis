@@ -1,6 +1,10 @@
 package com.mo9.risk.modules.dunning.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.websocket.Session;
 
@@ -13,17 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentState;
+import com.mo9.risk.modules.dunning.bean.CallCenterCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalling;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterModifyAgent;
 import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
+import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse.CallCenterPageData;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
+import com.mo9.risk.util.ListFilter;
 import com.mo9.risk.util.WebSocketSessionUtil;
+import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.IdGen;
 
 /**
@@ -252,6 +261,202 @@ public class TMisDunningPhoneService {
 		return cbr;
 	}
 	
+	/**
+	 * 获取全部呼叫信息
+	 */
+	public Page<TMisCallingRecord> callInfoAll(CallCenterQueryCallInfo action) {
+		List<CallCenterCallInfo> infos = new ArrayList<CallCenterCallInfo>();
+		Page<TMisCallingRecord> page = new Page<TMisCallingRecord>();
+		String agent = action.getAgent();
+		
+		int pageNo = Integer.parseInt(action.getPage());
+		int pageSize = Integer.parseInt(action.getPagesize());
+		page.setPageNo(pageNo);
+		page.setPageSize(pageSize);
+		
+		int totalAll = 0;
+		int totalIn = 0;
+		int totalOut = 0;
+		int totalPageIn = 0;
+		int totalPageOut = 0;
+		
+		try {
+			//呼入信息
+			action.setPage("1");
+			action.setAgent(null);
+			CallCenterPageResponse<CallCenterCallinInfo> callinRes = callCenterManager.callinInfo(action);
+			
+			if (callinRes != null && callinRes.hasData()) {
+				CallCenterPageData<CallCenterCallinInfo> callinPage = callinRes.getData();
+				totalIn = callinPage.getTotal();
+				totalPageIn = totalIn / pageSize;
+				if (totalPageIn % pageSize > 0) {
+					totalPageIn++;
+				}
+				
+				infos.addAll(callinPage.getResults());
+			}
+			
+			for (int i = 2; i <= pageNo && i <= totalPageIn; i++) {
+				action.setPage(String.valueOf(i));
+				CallCenterPageResponse<CallCenterCallinInfo> nextCallinRes = callCenterManager.callinInfo(action);
+				if (nextCallinRes != null && nextCallinRes.hasData()) {
+					CallCenterPageData<CallCenterCallinInfo> nextCallinPage = nextCallinRes.getData();
+					infos.addAll(nextCallinPage.getResults());
+				}
+			}
+			
+			//呼出信息
+			action.setPage("1");
+			action.setQueue(null);
+			action.setAgent(agent);
+			CallCenterPageResponse<CallCenterCalloutInfo> calloutRes = callCenterManager.calloutInfo(action);
+			if (calloutRes != null && calloutRes.hasData()) {
+				CallCenterPageData<CallCenterCalloutInfo> calloutPage = calloutRes.getData();
+				totalOut = calloutPage.getTotal();
+				totalPageOut = totalOut / pageSize;
+				if (totalPageOut % pageSize > 0) {
+					totalPageOut++;
+				}
+				
+				infos.addAll(calloutPage.getResults());
+			}
+			
+			for (int i = 2; i <= pageNo && i <= totalPageOut; i++) {
+				action.setPage(String.valueOf(i));
+				CallCenterPageResponse<CallCenterCalloutInfo> nextCalloutRes = callCenterManager.calloutInfo(action);
+				if (nextCalloutRes != null && nextCalloutRes.hasData()) {
+					CallCenterPageData<CallCenterCalloutInfo> nextCalloutPage = nextCalloutRes.getData();
+					infos.addAll(nextCalloutPage.getResults());
+				}
+			}
+			
+			List<TMisCallingRecord> records = callingRecordPageList(infos, pageNo, pageSize);
+			
+			totalAll = totalIn + totalOut;
+			page.setCount(totalAll);
+			page.setList(records);
+		} catch (Exception e) {
+			logger.info("获取全部呼叫信息失败," + e);
+		}
+		return page;
+	}
+	
+	/**
+	 * 获取未接呼叫信息
+	 */
+	public Page<TMisCallingRecord> callInfoBusy(CallCenterQueryCallInfo action) {
+		List<CallCenterCallInfo> infos = new ArrayList<CallCenterCallInfo>();
+		Page<TMisCallingRecord> page = new Page<TMisCallingRecord>();
+		int pageNo = Integer.parseInt(action.getPage());
+		int pageSize = Integer.parseInt(action.getPagesize());
+		page.setPageNo(pageNo);
+		page.setPageSize(pageSize);
+		
+		int totalAll = 0;
+		int totalOut = 0;
+		int totalPageOut = 0;
+		
+		try {
+			action.setPage("1");
+			CallCenterPageResponse<CallCenterCalloutInfo> calloutRes = callCenterManager.calloutInfo(action);
+			
+			if (calloutRes != null && calloutRes.hasData()) {
+				CallCenterPageData<CallCenterCalloutInfo> calloutPage = calloutRes.getData();
+				totalOut = calloutPage.getTotal();
+				totalPageOut = totalOut / pageSize;
+				if (totalPageOut % pageSize > 0) {
+					totalPageOut++;
+				}
+				
+				infos.addAll(calloutPage.getResults());
+			}
+			
+			for (int i = 2; i <= totalPageOut; i++) {
+				action.setPage(String.valueOf(i));
+				CallCenterPageResponse<CallCenterCalloutInfo> nextCalloutRes = callCenterManager.calloutInfo(action);
+				if (nextCalloutRes != null && nextCalloutRes.hasData()) {
+					CallCenterPageData<CallCenterCalloutInfo> nextCalloutPage = nextCalloutRes.getData();
+					infos.addAll(nextCalloutPage.getResults());
+				}
+			}
+			
+			ListFilter<CallCenterCallInfo> filter = new ListFilter<CallCenterCallInfo>() {
+				@Override
+				public boolean accept(CallCenterCallInfo o) {
+					return o.getStartTimestamp() == 0;
+				}
+			};
+			
+			List<CallCenterCallInfo> allList = filterCallInfoList(infos, filter);
+			List<TMisCallingRecord> records = callingRecordPageList(allList, pageNo, pageSize);
+			
+			totalAll = allList.size();
+			page.setCount(totalAll);
+			page.setList(records);
+		} catch (Exception e) {
+			logger.info("获取未接呼叫信息失败," + e);
+		}
+		return page;
+	}
+	
+	/**
+	 * 获取队列中放弃呼叫信息
+	 */
+	public Page<TMisCallingRecord> callInfoQueueOff(CallCenterQueryCallInfo action) {
+		List<CallCenterCallInfo> infos = new ArrayList<CallCenterCallInfo>();
+		Page<TMisCallingRecord> page = new Page<TMisCallingRecord>();
+		int pageNo = Integer.parseInt(action.getPage());
+		int pageSize = Integer.parseInt(action.getPagesize());
+		page.setPageNo(pageNo);
+		page.setPageSize(pageSize);
+		
+		int totalAll = 0;
+		int totalIn = 0;
+		int totalPageIn = 0;
+		
+		try {
+			action.setPage("1");
+			CallCenterPageResponse<CallCenterCallinInfo> callinRes = callCenterManager.callinInfo(action);
+			
+			if (callinRes != null && callinRes.hasData()) {
+				CallCenterPageData<CallCenterCallinInfo> callinPage = callinRes.getData();
+				totalIn = callinPage.getTotal();
+				totalPageIn = totalIn / pageSize;
+				if (totalPageIn % pageSize > 0) {
+					totalPageIn++;
+				}
+				
+				infos.addAll(callinPage.getResults());
+			}
+			
+			for (int i = 2; i <= pageNo && i <= totalPageIn; i++) {
+				action.setPage(String.valueOf(i));
+				CallCenterPageResponse<CallCenterCallinInfo> nextCallinRes = callCenterManager.callinInfo(action);
+				if (nextCallinRes != null && nextCallinRes.hasData()) {
+					CallCenterPageData<CallCenterCallinInfo> nextCallinPage = nextCallinRes.getData();
+					infos.addAll(nextCallinPage.getResults());
+				}
+			}
+			
+			ListFilter<CallCenterCallInfo> filter = new ListFilter<CallCenterCallInfo>() {
+				@Override
+				public boolean accept(CallCenterCallInfo o) {
+					return o.getRingTimestamp() == 0;
+				}
+			};
+			
+			List<CallCenterCallInfo> allList = filterCallInfoList(infos, filter);
+			List<TMisCallingRecord> records = callingRecordPageList(allList, pageNo, pageSize);
+			
+			totalAll = allList.size();
+			page.setCount(totalAll);
+			page.setList(records);
+		} catch (Exception e) {
+			logger.info("获取未接呼叫信息失败," + e);
+		}
+		return page;
+	}
 	
 	/**
 	 * 生成唯一客户编号
@@ -266,5 +471,121 @@ public class TMisDunningPhoneService {
 	public boolean isLocalMobile(String mobile) {
 		String location = tMisCallingRecordService.queryMobileLocation(mobile);
 		return "上海".equals(location);
+	}
+	
+	/**
+	 * 获取呼叫信息的分页列表
+	 * @param callInfos
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	private List<CallCenterCallInfo> filterCallInfoList(List<CallCenterCallInfo> callInfos, ListFilter<CallCenterCallInfo> filter) {
+		List<CallCenterCallInfo> acceptList = new ArrayList<CallCenterCallInfo>();
+		for (CallCenterCallInfo info : callInfos) {
+			if (filter.accept(info)) {
+				acceptList.add(info);
+			}
+		}
+		return acceptList;
+	}
+	
+	/**
+	 * 获取通话记录的分页列表并补充通话记录信息
+	 * <p><pre>
+	 * 过滤加拨号码
+	 * 号码对应用户姓名
+	 * 号码归属地</pre></p>
+	 * @param records
+	 * @return
+	 */
+	private List<TMisCallingRecord> callingRecordPageList(List<CallCenterCallInfo> callInfos, int pageNo, int pageSize) {
+		Collections.sort(callInfos, new Comparator<CallCenterCallInfo>() {
+			@Override
+			public int compare(CallCenterCallInfo o1, CallCenterCallInfo o2) {
+				return (int) (o2.getCallTimestamp() - o1.getCallTimestamp());
+			}
+		});
+		
+		int from = (pageNo - 1) * pageSize;
+		int to = pageNo * pageSize;
+		if (to > callInfos.size()) {
+			to = callInfos.size();
+		}
+		List<CallCenterCallInfo> subList =  callInfos.subList(from, to);
+		
+		List<TMisCallingRecord> records = new ArrayList<TMisCallingRecord>();
+		
+		for (CallCenterCallInfo info : subList) {
+			TMisCallingRecord record = null;
+			if (info instanceof CallCenterCallinInfo) {
+				record = new TMisCallingRecord((CallCenterCallinInfo) info);
+			} else if (info instanceof CallCenterCalloutInfo) {
+				record = new TMisCallingRecord((CallCenterCalloutInfo) info);
+			} else {
+				continue;
+			}
+			String number = record.getTargetNumber();
+			if (number == null) {
+				continue;
+			}
+			//过滤加拨号码
+			String realNumber = filterCtiCallInfoNumber(number);
+			record.setTargetNumber(realNumber);
+			//号码对应用户姓名
+			TRiskBuyerPersonalInfo personInfo = personalInfoService.getBuyerInfoByMobile(realNumber);
+			String targetName = personInfo == null ? "" : personInfo.getRealName();
+			record.setTargetName(targetName);
+			//号码归属地
+			String location = tMisCallingRecordService.queryMobileLocation(realNumber);
+			record.setLocation(location);
+			records.add(record);
+		}
+		return records;
+	}
+	
+	/**
+	 * 过滤CTI呼叫信息加拨号码
+	 * @param target
+	 * @return
+	 */
+	public static String filterCtiCallInfoNumber(String target) {
+		if (target == null) {
+			return target;
+		}
+		
+		if (target.startsWith("179690")) {
+			return target.substring(6);
+		}
+		
+		if (target.startsWith("17969")) {
+			return target.substring(5);
+		}
+		
+		if (target.startsWith("01") && !target.startsWith("010") || target.startsWith("00")) {
+			return target.substring(1);
+		}
+		return target;
+	}
+	
+	/**
+	 * 过滤CTI外呼加拨号码
+	 * @param target
+	 * @return
+	 */
+	public static String filterCtiDialNumber(String target) {
+		if (target == null) {
+			return target;
+		}
+		
+		if (target.startsWith("90")) {
+			return target.substring(2);
+		}
+		
+		if (target.startsWith("9")) {
+			return target.substring(1);
+		}
+		
+		return target;
 	}
 }

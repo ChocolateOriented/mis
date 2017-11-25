@@ -276,7 +276,7 @@
 	
 	<select id="queryMobileLocation" resultType="String">
 		SELECT
-			a.province
+			if(a.province = a.city, a.province, CONCAT(a.province, ' ', a.city)) as "location"
 		FROM phone a
 		WHERE a.phone = #{preNumber}
 		limit 1

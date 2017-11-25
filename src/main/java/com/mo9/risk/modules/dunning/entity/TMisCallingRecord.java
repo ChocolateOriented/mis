@@ -32,6 +32,10 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	private String targetNumber;		//通话号码
 
+	private String targetName;		//通话人姓名
+
+	private String location;		//归属地
+
 	private String customerNo;		//呼叫自定义编号
 
 	private Date callTime;	//呼叫创建时间
@@ -206,6 +210,22 @@ public class TMisCallingRecord extends DataEntity<TMisCallingRecord> {
 
 	public void setTargetNumber(String targetNumber) {
 		this.targetNumber = targetNumber;
+	}
+
+	public String getTargetName() {
+		return targetName;
+	}
+
+	public void setTargetName(String targetName) {
+		this.targetName = targetName;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public String getCustomerNo() {

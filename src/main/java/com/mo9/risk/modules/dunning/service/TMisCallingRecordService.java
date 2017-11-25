@@ -109,8 +109,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 		
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("定时同步电话通话信记录结束");
 	}
 	
@@ -138,8 +137,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("每小时同步电话通话信记录结束");
 	}
 
@@ -167,13 +165,13 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 		
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("每日同步电话通话信记录结束");
 	}
-
+	
 	/**
 	 * 手动同步CTI通话记录
+	 * @param date
 	 * @return
 	 */
 	@Transactional(readOnly = false)
@@ -189,17 +187,40 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		c.add(Calendar.DATE, -1);
 		c.add(Calendar.SECOND, -1);
 		Date start = c.getTime();
-
+		
 		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		String starttime = dateFormat.format(start);
 		String endtime = dateFormat.format(end);
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
-
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
-		logger.info("手动同步CTI通话记录");
+		
+		syncAgentCallInfo(action);
+		logger.info("手动同步CTI通话记录结束");
+	}
+	
+	/**
+	 * 同步坐席呼入呼出信息
+	 * @param action
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public void syncAgentCallInfo(CallCenterQueryCallInfo action) {
+		List<TMisAgentInfo> agents = tMisAgentInfoService.findAllList();
+		if (agents == null || agents.isEmpty()) {
+			logger.info("没有需要同步通话记录的坐席");
+			return;
+		}
+		
+		for (TMisAgentInfo agent : agents) {
+			logger.info("同步坐席" + agent.getAgent());
+			action.setQueue(null);
+			action.setAgent(agent.getAgent());
+			syncCalloutInfo(action);
+			action.setAgent(null);
+			action.setQueue(agent.getQueue());
+			syncCallinInfo(action);
+		}
 	}
 	
 	/**
@@ -212,8 +233,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setPage(null);
 		try {
 			CallCenterPageResponse<CallCenterCalloutInfo> result = callCenterManager.calloutInfo(action);
-			if (result == null || !"0".equals(result.getErrorCode())) {
-				throw new ServiceException(result.getErrorMsg());
+			if (result == null) {
+				logger.info("同步呼出通话信息失败");
+				return;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCalloutInfo> page = result.getData();
@@ -259,8 +281,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setPage(null);
 		try {
 			CallCenterPageResponse<CallCenterCallinInfo> result = callCenterManager.callinInfo(action);
-			if (result == null || !"0".equals(result.getErrorCode())) {
-				throw new ServiceException(result.getErrorMsg());
+			if (result == null) {
+				logger.info("同步呼入通话信息失败");
+				return;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCallinInfo> page = result.getData();
@@ -298,7 +321,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	/**
 	 * 保存呼出信息数据
-	 * @param action
+	 * @param calloutInfos
 	 * @return
 	 */
 	private void saveCalloutResults(List<CallCenterCalloutInfo> calloutInfos) {
@@ -318,6 +341,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			}
 			
 			TMisCallingRecord record = new TMisCallingRecord(callInfo);
+			String target = record.getTargetNumber();
+			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+			record.setTargetNumber(target);
 			record.setPeopleId(agentInfo.getPeopleId());
 			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
@@ -326,7 +352,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	/**
 	 * 保存呼入信息数据
-	 * @param action
+	 * @param callinInfos
 	 * @return
 	 */
 	private void saveCallinResults(List<CallCenterCallinInfo> callinInfos) {
@@ -352,6 +378,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			if (StringUtils.isEmpty(record.getExtensionNumber())) {
 				record.setExtensionNumber(agentInfo.getExtension());
 			}
+			String target = record.getTargetNumber();
+			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+			record.setTargetNumber(target);
 			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
 		}
@@ -361,7 +390,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * 获取呼入/呼出的坐席状态
 	 */
 	private String getAgentStateOnMoment(TMisCallingRecord record){
-		TMisAgentInfo agentInfo = tMisAgentInfoService.getLoginLogTodaybyId(record);
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getAgentStateOnMoment(record);
 		if (agentInfo == null) {
 			return CallCenterAgentStatus.LOGGED_OUT;
 		}
