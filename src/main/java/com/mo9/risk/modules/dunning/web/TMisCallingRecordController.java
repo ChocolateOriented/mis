@@ -3,8 +3,18 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.mo9.risk.modules.dunning.entity.*;
-import com.mo9.risk.modules.dunning.service.*;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
+import com.mo9.risk.modules.dunning.service.TMisCallingRecordService;
+import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
+import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningPhoneService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
@@ -24,7 +34,13 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CTI回调Controller
@@ -46,9 +62,6 @@ public class TMisCallingRecordController extends BaseController {
 	private TMisDunningGroupService tMisDunningGroupService;
 
 	@Autowired
-	private TMisDunningGroupService groupService;
-
-	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 
 	@RequiresPermissions("dunning:tMisCallingRecord:view")
@@ -56,20 +69,9 @@ public class TMisCallingRecordController extends BaseController {
 	public String list(@ModelAttribute("tMisCallingRecord") TMisCallingRecord tMisCallingRecord, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisCallingRecord> page = tMisCallingRecordService.findPage(new Page<TMisCallingRecord>(request, response), tMisCallingRecord);
 		for (TMisCallingRecord callingRecord : page.getList()){
-			if (callingRecord.getTargetNumber() != null && !"".equals(callingRecord.getTargetNumber())){
-				if (callingRecord.getTargetNumber().startsWith("0")){
-					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(1));
-				}
-				else if (callingRecord.getTargetNumber().startsWith("9")){
-					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(1));
-				}
-				else if (callingRecord.getTargetNumber().startsWith("179690")){
-					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(6));
-				}
-				else if (callingRecord.getTargetNumber().startsWith("17969")){
-					callingRecord.setTargetNumber(callingRecord.getTargetNumber().substring(5));
-				}
-			}
+			String number = callingRecord.getTargetNumber();
+			String realNumber = TMisDunningPhoneService.filterCtiCallInfoNumber(number);
+			callingRecord.setTargetNumber(realNumber);
 		}
 		//催收小组列表
 		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
@@ -135,18 +137,17 @@ public class TMisCallingRecordController extends BaseController {
 			response.setContentType("audio/wav");
 			int n = 0;
 			byte b[] = new byte[1024];
-			while ((n = input.read(b)) != -1)
-			{
+			while ((n = input.read(b)) != -1) {
 				out.write(b, 0, n);
 			}
 			out.flush();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}finally{
-			if(input != null) {
+		} catch (Exception e) {
+			logger.info("下载电话音频文件失败" + e);
+		} finally {
+			if (input != null) {
 				input.close();
 			}
-			if(out != null) {
+			if (out != null) {
 				out.close();
 			}
 		}
@@ -203,7 +204,7 @@ public class TMisCallingRecordController extends BaseController {
 				tMisDunningGroup.setSupervisor(UserUtils.getUser());
 				supervisorLimit = true;
 			}
-			 groups = groupService.findList(tMisDunningGroup);
+			 groups = tMisDunningGroupService.findList(tMisDunningGroup);
 			StringBuffer stringBuffer = new StringBuffer("");
 			for (TMisDunningGroup group : groups) {
 				stringBuffer.append("," + group.getId());

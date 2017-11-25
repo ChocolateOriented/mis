@@ -1,25 +1,17 @@
 package com.mo9.risk.modules.dunning.bean;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * CTI呼入信息
  */
-public class CallCenterCallinInfo implements Serializable{
+public class CallCenterCallinInfo extends CallCenterCallInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String id;	//记录id
-
 	private String sessionid;	//会话id
-
-	private String agent;	//接听坐席
-
-	private String extension;	//接听分机
 
 	private String caller;	//来电号码
 
@@ -39,36 +31,12 @@ public class CallCenterCallinInfo implements Serializable{
 
 	private Long outQueueTime;	//出队列时间  单位s
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public String getSessionid() {
 		return sessionid;
 	}
 
 	public void setSessionid(String sessionid) {
 		this.sessionid = sessionid;
-	}
-
-	public String getAgent() {
-		return agent;
-	}
-
-	public void setAgent(String agent) {
-		this.agent = agent;
-	}
-
-	public String getExtension() {
-		return extension;
-	}
-
-	public void setExtension(String extension) {
-		this.extension = extension;
 	}
 
 	public String getCaller() {
@@ -149,26 +117,30 @@ public class CallCenterCallinInfo implements Serializable{
 	public void setOutQueueTime(Long outQueueTime) {
 		this.outQueueTime = outQueueTime;
 	}
-	//来电时间
-	public String getStartTime(){
-		String start="";
-		if(inQueueTime!=null&&inQueueTime!=0){
-			SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-			start=sd.format(new Date(inQueueTime*1000));
-		}
-		return start;
+
+	@Override
+	public long getCallTimestamp() {
+		return inQueueTime == null ? 0 : inQueueTime;
 	}
-	//通话时长
-	public String getCallTotalTime(){
-		String times="";
-		if(agentStartTime!=null&&agentStartTime!=0){
-			Long totalTime=agentEndTime-agentStartTime;
-			
-			Long hour=totalTime/3600;
-			Long minutes=totalTime%3600/60;
-			Long second=totalTime%3600%60;
-			times=String.valueOf(hour)+"时"+String.valueOf(minutes)+"分"+String.valueOf(second)+"秒";
-		}
-		return times;
+
+	@Override
+	public long getRingTimestamp() {
+		return agentOfferTime == null ? 0 : agentOfferTime;
 	}
+
+	@Override
+	public long getStartTimestamp() {
+		return agentStartTime == null ? 0 : agentStartTime;
+	}
+
+	@Override
+	public long getEndTimestamp() {
+		return agentEndTime == null ? 0 : agentEndTime;
+	}
+
+	@Override
+	public long getFinishTimestamp() {
+		return outQueueTime == null ? 0 : outQueueTime;
+	}
+
 }

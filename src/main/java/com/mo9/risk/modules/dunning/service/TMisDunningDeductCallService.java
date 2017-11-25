@@ -21,7 +21,6 @@ import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.PostRequest;
 import com.mo9.risk.util.RequestParamSign;
-import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;

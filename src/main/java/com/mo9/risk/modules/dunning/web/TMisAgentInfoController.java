@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,6 +67,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param model
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:view")
 	@RequestMapping(value = {"list", ""})
 	public String findPageList(TMisAgentInfo tmisAgentInfo, HttpServletRequest request, HttpServletResponse response, Model model){
 		Page<TMisAgentInfo> page = tMisAgentInfoService.findPageList(new Page<TMisAgentInfo>(request, response), tmisAgentInfo);
@@ -79,6 +81,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param tmisAgentInfo
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:view")
 	@RequestMapping(value={"form"})
 	public String  agentForm(TMisAgentInfo tmisAgentInfo, Model model){
 		model.addAttribute("tmisAgentInfo", tmisAgentInfo);
@@ -90,6 +93,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param redirectAttributes
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:edit")
 	@RequestMapping(value={"save"})
 	public String changeOrAddAgent(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
 		addMessage(redirectAttributes, StringUtils.isEmpty(tmisAgentInfo.getId())?"添加坐席成功":"修改坐席成功");
@@ -102,6 +106,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param redirectAttributes
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:edit")
 	@RequestMapping(value={"delete"})
 	public String  deleteAgent(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
 		tMisAgentInfoService.delete(tmisAgentInfo);
@@ -114,6 +119,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param redirectAttributes
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:edit")
 	@RequestMapping(value={"bindPage"})
 	public String  bindPage(String id,Model model){
 		List<TMisDunningPeople> users = tMisDunningPeopleService.findAgentPeopleList();
@@ -127,6 +133,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param redirectAttributes
 	 * @return	
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:edit")
 	@RequestMapping(value={"bindAgent"})
 	@ResponseBody
 	public boolean  bindAgent(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
@@ -139,6 +146,7 @@ public class TMisAgentInfoController extends BaseController{
 	 * @param redirectAttributes
 	 * @return
 	 */
+	@RequiresPermissions("dunning:tMisAgentInfo:edit")
 	@RequestMapping(value={"unbind"})
 	public String  unbind(TMisAgentInfo tmisAgentInfo, RedirectAttributes redirectAttributes){
 		tmisAgentInfo.setPeopleId(null);

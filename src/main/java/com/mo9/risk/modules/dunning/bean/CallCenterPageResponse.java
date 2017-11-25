@@ -19,6 +19,18 @@ public class CallCenterPageResponse<T> extends CallCenterBaseResponse{
 		this.data = data;
 	}
 
+    /**
+     * This is equivalent to
+     * <pre>
+     *   this.data != 0 && !page.isEmpty()</pre>
+     */
+	public boolean hasData() {
+		if (data == null) {
+			return false;
+		}
+		return !data.isEmpty();
+	}
+
 	public static class CallCenterPageData<K> {
 		private int total;	//总记录数
 
