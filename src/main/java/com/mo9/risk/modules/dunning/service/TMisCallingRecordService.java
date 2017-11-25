@@ -3,12 +3,16 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -167,7 +171,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		syncCallinInfo(action);
 		logger.info("每日同步电话通话信记录结束");
 	}
-	
+
 	/**
 	 * 手动同步CTI通话记录
 	 * @return
@@ -185,14 +189,14 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		c.add(Calendar.DATE, -1);
 		c.add(Calendar.SECOND, -1);
 		Date start = c.getTime();
-		
+
 		CallCenterQueryCallInfo action = new CallCenterQueryCallInfo();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		String starttime = dateFormat.format(start);
 		String endtime = dateFormat.format(end);
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
-		
+
 		syncCalloutInfo(action);
 		syncCallinInfo(action);
 		logger.info("手动同步CTI通话记录");
@@ -374,5 +378,77 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			return "";
 		}
 		return dao.queryMobileLocation(mobile.substring(0, 7));
+	}
+
+	/**
+	 * 查询软电话日常报表
+	 */
+
+	public Page<DunningPhoneReportFile> exportStatementFile(Page<DunningPhoneReportFile> page, DunningPhoneReportFile entity) {
+		entity.setPage(page);
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.countExportStatementFile(entity));
+		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFile(entity);
+		page.setList(countDunningPhoneReport(reportFiles, entity));
+		return page;
+	}
+
+	/**
+	 * 查询软电话日常报表
+	 */
+
+	public List<DunningPhoneReportFile> exportSoftPhoneReportFile(DunningPhoneReportFile entity) {
+		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFile(entity);
+		return countDunningPhoneReport(reportFiles, entity);
+	}
+
+	/**
+	 * 两个str类型的数字相除返回str
+	 * @param front 除号前
+	 * @param back 除号后
+	 * @return
+	 */
+	private String strDivideStr(String front , String back){
+		if (StringUtils.isEmpty(front) || StringUtils.isEmpty(back)){
+			return "";
+		}
+		Double double1 = Double.valueOf(front);
+		Double double2 = Double.valueOf(back);
+		Double rst = double1/double2;
+		DecimalFormat df = new DecimalFormat("0.00");
+		return  df.format(rst);
+	}
+
+	/**
+	 * str秒转化为str时
+	 * @param second
+	 * @return
+	 */
+	private String strsecond2Strhour(String second){
+		Integer integerSecond = Integer.valueOf(second);
+		Integer integerHour = integerSecond/3600;
+		return  integerHour.toString();
+	}
+
+	/**
+	 * 计算每小时电话报表部分数据
+	 */
+	private List<DunningPhoneReportFile> countDunningPhoneReport(List<DunningPhoneReportFile> reportFiles, DunningPhoneReportFile entity) {
+		for (DunningPhoneReportFile countReport : reportFiles) {
+			countReport.setConnectRate(strDivideStr(countReport.getConnectAmout(), countReport.getCallingAmount()));
+			countReport.setCallingAmountOnHour(strDivideStr(countReport.getCallingAmount(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setConnectAmountOnHour(strDivideStr(countReport.getConnectAmout(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setCallDurationOnHour(strDivideStr(countReport.getCallDuration(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setDealCaseAmountOnHour(strDivideStr(countReport.getDealCaseAmount(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			if (!StringUtils.isEmpty(countReport.getLogiName())) {
+				User user = UserUtils.getByLoginName(countReport.getLogiName());
+				if (!(user.getCompany().getName() == null && "".equals(user.getCompany().getName())
+						&& user.getOffice().getName() == null && "".equals(user.getOffice().getName()))) {
+					countReport.setDepartment(user.getCompany().getName() + user.getOffice().getName());
+				}
+			}
+		}
+		return reportFiles;
 	}
 }

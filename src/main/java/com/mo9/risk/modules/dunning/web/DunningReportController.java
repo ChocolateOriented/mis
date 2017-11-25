@@ -3,12 +3,15 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.service.TMisCallingRecordService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,10 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.mo9.risk.modules.dunning.entity.PerformanceDayReport;
-import com.mo9.risk.modules.dunning.entity.SMisDunningProductivePowerDailyReport;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.DunningReportService;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
@@ -46,6 +45,8 @@ public class DunningReportController extends BaseController {
 	private TMisDunningGroupService groupService;
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
+	@Autowired
+	private TMisCallingRecordService tMisCallingRecordService;
 	
 	/**
 	 * @Description: 催收小组集合
@@ -170,5 +171,19 @@ public class DunningReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
+	}
+	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
+	@RequestMapping(value = "softPhoneCommunicateReportExport")
+	public String softPhoneCommunicateReportExport(DunningPhoneReportFile dunningPhoneReportFile,  HttpServletRequest request, HttpServletResponse response,
+		   RedirectAttributes redirectAttributes){
+		List<DunningPhoneReportFile> entityList = tMisCallingRecordService.exportSoftPhoneReportFile(dunningPhoneReportFile);
+        String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
+		try {
+			new ExportExcel(fileName, DunningPhoneReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
+		} catch (IOException e) {
+			logger.info("软电话通话详单!", e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:"+ adminPath + "/dunning/tMisCallingRecord/getPhoneCallingReport";
 	}
 }
