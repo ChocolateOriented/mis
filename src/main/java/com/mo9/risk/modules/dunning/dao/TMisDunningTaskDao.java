@@ -41,19 +41,19 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	
 	public void generateTast();
 
-	public List<TMisDunningTask> findPayoffDunningTask(Map<String, Object> params);
+	public List<TMisDunningTask> findPayoffDunningTask(Map<String,Object> params);
 
-	public List<TMisDunningTask> findExpiredTask(Map<String, Object> params);
+	public List<TMisDunningTask> findExpiredTask(Map<String,Object> params);
 	
-	public List<DunningPeriod> findDunningPeriod(Map<String, Object> params);
+	public List<DunningPeriod> findDunningPeriod(Map<String,Object> params);
 
-	public List<Map<String,Object>> findDunningTaskByPeople(Map<String, Object> params);
+	public List<Map<String,Object>> findDunningTaskByPeople(Map<String,Object> params);
 
-	public List<TMisDunningOrder> findNeedDunningOrder(Map<String, Object> params);
+	public List<TMisDunningOrder> findNeedDunningOrder(Map<String,Object> params);
 
 	public TMisDunningOrder findOrderByDealcode(String dealcode);
 
-	public TMisDunningTask findDunningTaskByDealcode(Map<String, Object> params);
+	public TMisDunningTask findDunningTaskByDealcode(Map<String,Object> params);
 
 	public DunningUserInfo findDunningUserInfo(String dealcode);
 
@@ -80,15 +80,15 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param order
 	 * @return @Param("week")
 	 */
-	public int updateOuterfiletime(@Param("outerfiletime") Date outerfiletime, @Param("dealcodes") List<String> dealcodes);
+	public int updateOuterfiletime(@Param("outerfiletime")Date outerfiletime, @Param("dealcodes")List<String> dealcodes);
 	
 	/*催收留案功能-留案提交 Patch 0001 by GQWU at 2016-11-10 start*/
-	public int updateDunningTimeByDealcodes(@Param("dealcodes") String[] dealcodes, @Param("deferDate") Date deferDate);
+	public int updateDunningTimeByDealcodes(@Param("dealcodes")String[] dealcodes,@Param("deferDate")Date deferDate);
 	/*催收留案功能-留案提交 Patch 0001 by GQWU at 2016-11-10 end*/
 	
 	/*催收留案功能-订单查询 Patch 0001 by GQWU at 2016-11-25 start*/
 	/*仅查询留案逻辑所需部分数据，非逾期订单完整数据*/
-	public List<DunningOrder> findOrdersByDealcodes(@Param("dealcodes") String[] dealcodes);
+	public List<DunningOrder> findOrdersByDealcodes (@Param("dealcodes")String[] dealcodes);
 	/*催收留案功能-订单查询 Patch 0001 by GQWU at 2016-11-25 end*/
 	
 	/**
@@ -96,7 +96,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param fileLog
 	 * @return
 	 */
-	public int batchInsert(@Param("list") List<DunningOuterFileLog> list);
+	public int batchInsert(@Param("list")List<DunningOuterFileLog> list);
 	
 	/**
 	 * 查询数据列表
@@ -155,7 +155,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * 保存最后电话记录
 	 * @return
 	 */
-	public int updateTelRemark(@Param("telremark") String telremark, @Param("id") String id);
+	public int updateTelRemark(@Param("telremark")String telremark, @Param("id")String id);
 	
 	/**
 	 * 催收绩效月报
@@ -169,7 +169,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dunningpeopleid
 	 * @return
 	 */
-	public int findDunningCount(@Param("dunningpeopleid") String dunningpeopleid);
+	public int findDunningCount(@Param("dunningpeopleid")String dunningpeopleid);
 	
 	
 	/**
@@ -178,7 +178,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param rootprderid
 	 * @return
 	 */
-	public int updateOrderPartial(@Param("reliefamount") BigDecimal reliefamount, @Param("rootorderid") Integer rootorderid);
+	public int updateOrderPartial(@Param("reliefamount")BigDecimal reliefamount,@Param("rootorderid")Integer rootorderid);
 	
 	
 	/**
@@ -212,14 +212,14 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dunningcycle
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfindDelayTaskByDunningcycle(@Param("dunningtaskstatus") String dunningtaskstatus, @Param("dunningcycle") String dunningcycle, @Param("begin") String begin, @Param("end") String end);
+	public List<TMisDunningTaskLog> newfindDelayTaskByDunningcycle(@Param("dunningtaskstatus")String dunningtaskstatus,@Param("dunningcycle")String dunningcycle,@Param("begin")String begin,@Param("end")String end );
 	
 	/**
 	 * 根据逾期天数查询未生成任务task的订单
 	 * @param day
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfingDelayOrderByNotTask(@Param("day") String day);
+	public List<TMisDunningTaskLog> newfingDelayOrderByNotTask(@Param("day")String day);
 	
 	/**
 	 * 根据订单状态和任务状态查询订单任务Log
@@ -227,7 +227,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dunningtaskstatus
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfingTaskByOrderStatusandTaskstatus(@Param("status") String status, @Param("dunningtaskstatus") String dunningtaskstatus);
+	public List<TMisDunningTaskLog> newfingTaskByOrderStatusandTaskstatus(@Param("status")String status,@Param("dunningtaskstatus")String dunningtaskstatus);
 	
 	/**
 	 * 批量添加任务
@@ -258,7 +258,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dealcode
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfingTasksByDealcodes(@Param("dealcodes") List<String> dealcodes, @Param("dunningcycle") String dunningcycle);
+	public List<TMisDunningTaskLog> newfingTasksByDealcodes(@Param("dealcodes")List<String> dealcodes,@Param("dunningcycle")String dunningcycle);
 	
 	
 	/**
@@ -282,20 +282,20 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param numbefore 
 	 * @return
 	 */
-	public List<DunningOrder> findallAtuoSms(@Param("numbefore") Integer numbefore, @Param("numafter") Integer numafter);
+	public List<DunningOrder> findallAtuoSms(@Param("numbefore")Integer numbefore,@Param("numafter") Integer numafter);
 	
 	/**
 	 * 查询预提醒新进入正在催收案件buyerid
 	 * @return
 	 */
-	public Vector<String> findBuyeridByNewTask(@Param("day") String day);
+	public Vector<String> findBuyeridByNewTask(@Param("day")String day);
 	
 	
 	/**
 	 * 查询预提醒新进入正在催收案件buyerid和mobile
 	 * @return
 	 */
-	public Vector<ThreadBuyerid> findThreadBuyeridByNewTask(@Param("day") String day);
+	public Vector<ThreadBuyerid> findThreadBuyeridByNewTask(@Param("day")String day);
 	
 	/**
 	 * 查询用户影像资料
@@ -307,14 +307,14 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * atuoq0  催收预提醒订单的优质老用户（历史逾期1天内还清）
 	 * @return
 	 */
-	public List<String> findAtuoQ0Dealcode(@Param("day") String day, @Param("payoffday") String payoffday);
+	public List<String> findAtuoQ0Dealcode(@Param("day")String day,@Param("payoffday")String payoffday);
 	
 	/**
 	 * 
 	 * @param dealcode
 	 * @return
 	 */
-	public int updatePromisePayDateAndNextFollowDate(@Param("dealcode") String dealcode, @Param("promisepaydate") Date promisepaydate, @Param("nextfollowdate") Date nextfollowdate);
+	public int updatePromisePayDateAndNextFollowDate(@Param("dealcode")String dealcode,@Param("promisepaydate")Date promisepaydate,@Param("nextfollowdate")Date  nextfollowdate);
 	/**
 	 *通过逾期天数查要清洗的号码
 	 * @param overday
