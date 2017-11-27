@@ -86,7 +86,7 @@ public class TMisDunningPhoneService {
 	
 	/**
 	 * 发起呼叫
-	 * @param msg
+	 * @param action
 	 * @return
 	 */
 	@Transactional(readOnly = false)
