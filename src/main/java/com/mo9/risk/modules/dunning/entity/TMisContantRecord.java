@@ -50,6 +50,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private String conclusionid;		//电催结论id
 	private String dunningCycle;		//订单所属队列
 	private String buyerId;		//订单用户id
+	private String newOperateName;		//操作人用花名表示
 	
 	private Integer buyerid;
 	
@@ -463,6 +464,14 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 
 	public void setBuyerId(String buyerId) {
 		this.buyerId = buyerId;
+	}
+
+	public String getNewOperateName() {
+		return newOperateName;
+	}
+
+	public void setNewOperateName(String newOperateName) {
+		this.newOperateName = newOperateName;
 	}
 	
 	
