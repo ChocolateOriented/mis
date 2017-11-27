@@ -173,7 +173,7 @@ public class TMisCallingRecordController extends BaseController {
 			calendar.setTime(date);
 			dunningPhoneReportFile.setDatetimestart(date);
 		}
-		if (dunningPhoneReportFile.getDatetimeend() == null || "".equals(dunningPhoneReportFile.getBreaktimeEnd())){
+		if (dunningPhoneReportFile.getDatetimeend() == null || "".equals(dunningPhoneReportFile.getDatetimeend())){
 			Date date = new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.DAY_OF_MONTH, -1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
