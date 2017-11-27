@@ -416,11 +416,11 @@ public class TMisDunningOuterTaskController extends BaseController {
 
 			TRiskOrder tRiskOrder1= JSON.parseObject(res,TRiskOrder.class);
 			if(("payoff").equals(tRiskOrder1.getStatus())){
-				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
-				return "payoff";
+				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus(),tRiskOrder1.getPayoffTime(),tRiskOrder1.getOverdueAmount());
+				return "OK";
 			}
 			if(("payment").equals(tRiskOrder1.getStatus())){
-				return "payment";
+				return "NO";
 			}
 		}catch (Exception e){
 			logger.warn(e.getMessage());

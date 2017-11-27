@@ -33,4 +33,10 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
      * @return
      */
     public TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback);
+
+    /**
+     * 获取客服通知数目
+     * @param tMisCustomerServiceFeedback
+     */
+    public Integer findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 }

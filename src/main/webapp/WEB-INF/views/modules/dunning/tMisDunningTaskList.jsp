@@ -340,11 +340,11 @@
                     type: 'POST',
                     url : "${ctx}/dunning/tMisDunningTask/orderStatus?dealcode="+dealcode,
                     success : function(data) {
-                        if (data == "payoff") {
+                        if (data == "OK") {
                             alert("同步成功");
                             window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
                             window.parent.window.jBox.close();            //关闭子窗体
-                        } else  if (data == "payment") {
+                        } else  if (data == "NO") {
                             alert("该订单未还清");
                         }else{
                             alert("请联系管理员");
@@ -594,7 +594,7 @@
 					</c:if>
 
 					<c:if test="${dunningOrder.statusText eq '已还清'}">
-						 ${dunningOrder.statusText}
+						${dunningOrder.statusText}
 					</c:if>
 				</td>
 

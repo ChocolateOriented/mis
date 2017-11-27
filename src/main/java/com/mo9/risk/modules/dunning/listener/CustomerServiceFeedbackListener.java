@@ -10,6 +10,7 @@ import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
+import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
 
     @Autowired
     TMisCustomerServiceFeedbackDao feedbackDao;
+
+    @Autowired
+    private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
     @Override
     public MqAction consume(MqMessage msg, Object consumeContext) {
@@ -67,12 +71,13 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
-        tMisCustomerServiceFeedback.setKeyword(tMisCustomerServiceFeedback.getDealcode(),tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText());
+        tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getDealcode(),tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText());
         logger.info(tMisCustomerServiceFeedback.getId());
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
             feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
+
         }
         return MqAction.CommitMessage;
     }

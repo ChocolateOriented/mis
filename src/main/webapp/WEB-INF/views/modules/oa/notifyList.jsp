@@ -45,6 +45,7 @@
 
         function changeFeedback(obj){
             var id = $(obj).attr("feedbackId");
+            $(obj).children("span").css("color", "#999999");
             $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox?id=" + id, "" , 480, 180,{
                 buttons: {
                 },
@@ -66,7 +67,6 @@
             if("${color}"=='solving'){
                 $("#colorChoice").val("solving");
             }
-            $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/notify");
 			$("#searchForm").submit();
         	return false;
         }
@@ -118,6 +118,19 @@
 		<c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
 			<tr class="result">
 				<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(this);">
+					<c:choose>
+						<c:when test="${tMisCustomerServiceFeedback.readFlag eq '1' or fns:getUser() ne tMisCustomerServiceFeedback.dunningpeopleid}">
+						<span class="solveStatus" style="color: #999999">
+							客服消息:订单号{${fns:abbr(tMisCustomerServiceFeedback.dealcode,50)}}
+							<c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
+								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}&nbsp;${fns:abbr(tMisCustomerServiceFeedback.statusText,50)}
+							</c:if>
+							<c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
+								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}
+							</c:if>
+						</span>
+						</c:when>
+						<c:otherwise>
 						<span class="solveStatus">
 							客服消息:订单号{${fns:abbr(tMisCustomerServiceFeedback.dealcode,50)}}
 							<c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
@@ -127,6 +140,9 @@
 								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}
 							</c:if>
 						</span>
+						</c:otherwise>
+					</c:choose>
+
 				    </a>
 				</td>
 				<td>

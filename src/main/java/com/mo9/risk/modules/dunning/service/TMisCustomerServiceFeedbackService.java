@@ -101,4 +101,13 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
 
         return tMisCustomerServiceFeedbackDao.findCodeStatusTagDesPeople(customerServiceFeedback);
     }
+
+    /**
+     * 获取客服通知数目
+     * @param tMisCustomerServiceFeedback
+     */
+    public int findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+
+        return tMisCustomerServiceFeedbackDao.findCustServiceCount(tMisCustomerServiceFeedback);
+    }
 }

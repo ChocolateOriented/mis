@@ -17,6 +17,7 @@
         a.uname AS "uname",
         a.keyword AS keyword,
         a.pushTime AS "pushTime",
+        a.readFlag AS "readFlag",
         a.id AS "id"
     </sql>
 
@@ -47,6 +48,24 @@
         </choose>
     </select>
 
+    <select id="findCustServiceCount" resultType="java.lang.Integer" useCache="false">
+         SELECT
+              count(*)
+         FROM t_mis_customer_service_feedback a
+         INNER JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+         INNER JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
+         <where>
+
+                <if test="readFlag != null and readFlag != ''">
+                    AND a.readFlag = #{readFlag}
+                </if>
+                <if test="dunningpeopleid !=null and dunningpeopleid !=''">
+                    AND t.DunningPeopleId=#{dunningpeopleid}
+                </if>
+
+         </where>
+    </select>
+
     <select id="NotifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
              a.`keyword`,
@@ -55,6 +74,7 @@
              a.`problemStatus`,
              a.`pushTime`,
              a.`id`,
+             a.readFlag,
              t.DunningPeopleId,
              p.groupId
         FROM t_mis_customer_service_feedback a
@@ -125,7 +145,8 @@
             uname,
             keyword,
             pushTime,
-            rootOrderId
+            rootOrderId,
+            readFlag
         )VALUES (
             #{id},
             #{dealcode},
@@ -143,6 +164,7 @@
             #{keyword},
             #{pushTime},
             #{rootorderid}
+            #{readFlag}
         )
     </select>
 
@@ -151,7 +173,8 @@
         problemStatus = #{problemstatus},
         handlingResult=#{handlingresult},
         updateDate=#{updateDate},
-        updateBy=#{updateBy.name}
+        updateBy=#{updateBy.name},
+        readFlag=#{readFlag}
         WHERE id = #{id}
     </update>
 
