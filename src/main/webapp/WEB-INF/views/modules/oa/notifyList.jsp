@@ -45,7 +45,6 @@
 
         function changeFeedback(obj){
             var id = $(obj).attr("feedbackId");
-            $(obj).children("span").css("color", "#999999");
             $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox?id=" + id, "" , 480, 180,{
                 buttons: {
                 },
@@ -67,6 +66,7 @@
             if("${color}"=='solving'){
                 $("#colorChoice").val("solving");
             }
+            $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/notify");
 			$("#searchForm").submit();
         	return false;
         }

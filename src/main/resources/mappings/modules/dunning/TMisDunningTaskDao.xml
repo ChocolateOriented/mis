@@ -2021,10 +2021,7 @@
 
     <update id="asyncUpdate">
         UPDATE t_risk_order
-        SET
-           status = #{status},
-           overdue_amount=#{overdueAmount},
-           payoff_time=#{payoffTime}
+        SET status = #{status}
         WHERE dealcode = #{dealcode}
     </update>
 </mapper>

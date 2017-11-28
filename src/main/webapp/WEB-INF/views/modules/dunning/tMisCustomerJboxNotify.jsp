@@ -13,9 +13,6 @@
 <meta name="decorator" content="default"/>
 <script type="text/javascript">
     $(document).ready(function() {
-        if('${custNotify}'){
-            window.parent.parent.controlNum();
-        }
         function feedbackJbox(n,s){
             $("#feedbackContainer").val(n);
             $("#pictureContainer").val(n);

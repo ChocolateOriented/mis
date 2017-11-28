@@ -269,11 +269,11 @@ function changeStatus( dealcode) {
         type: 'POST',
         url : "${ctx}/dunning/tMisDunningOuterTask/orderStatus?dealcode="+dealcode,
         success : function(data) {
-            if (data == "OK") {
+            if (data == "payoff") {
                 alert("同步成功");
                 window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
                 window.parent.window.jBox.close();            //关闭子窗体
-            } else  if (data == "NO") {
+            } else  if (data == "payment") {
                 alert("该订单未还清");
             }else{
                 alert("请联系管理员");

@@ -16,8 +16,6 @@
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function() {
-
-            getCustServiceNotifyNum();
 			// <c:if test="${tabmode eq '1'}"> 初始化页签
 			$.fn.initJerichoTab({
                 renderTo: '#right', uniqueId: 'jerichotab',
@@ -116,8 +114,7 @@
 					$(this).click();
 				}
 			});
-			// 获取通知数目
-			<c:set var="oaNotifyRemindInterval" value="${fns:getConfig('oa.notify.remind.interval')}"/>
+			// 获取通知数目  <c:set var="oaNotifyRemindInterval" value="${fns:getConfig('oa.notify.remind.interval')}"/>
 			function getNotifyNum(){
 				$.get("${ctx}/oa/oaNotify/self/count?updateSession=0&t="+new Date().getTime(),function(data){
 					var num = parseFloat(data);
@@ -146,23 +143,6 @@
 // 			getNotifyNum3();
 			//setInterval(getNotifyNum, ${oaNotifyRemindInterval});//</c:if>
 		});
-
-		//获取客服通知数
-
-        function getCustServiceNotifyNum(){
-            $.get("${ctx}/dunning/tMisCustomerServiceFeedback/custServiceCount",function(data){
-                var num = parseInt(data);
-                if (num > 0){
-                    $("#notifyNum0").html("("+num+")");
-                }else{
-                    $("#notifyNum0,#notifyNum1").hide()
-                }
-            });
-        }
-
-       setInterval(getCustServiceNotifyNum, 20000);
-
-
 		// <c:if test="${tabmode eq '1'}"> 添加一个页签
 		function addTab($this, refresh){
 			$(".jericho_tab").show();
@@ -187,17 +167,6 @@
 					alert("请先绑定坐席!");
 				}
 			});
-		}
-		function controlNum(){
-		    var text = $("#notifyNum0").html();
-		    text = text.replace('(', '');
-            text = text.replace(')', '');
-            var num = parseInt(text);
-            if (--num <= 0) {
-                $("#notifyNum0").html("");
-			} else {
-                $("#notifyNum0").html("("+ num +")");
-			}
 		}
 	</script>
 </head>
@@ -235,12 +204,12 @@
 					
 					</li>
 					<li id="userInfo" class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#" title="个人信息">您好, ${fns:getUser().name}&nbsp;<span id="notifyNum0" style="color: red;"></span><span id="notifyNum" class="label label-info hide"></span></a>
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" title="个人信息">您好, ${fns:getUser().name}&nbsp;<span id="notifyNum" class="label label-info hide"></span></a>
 						<ul class="dropdown-menu">
 							<li><a href="${ctx}/sys/user/info" target="mainFrame"><i class="icon-user"></i>&nbsp; 个人信息</a></li>
 							<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i class="icon-lock"></i>&nbsp;  修改密码</a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>
-							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  客服通知 <span id="notifyNum1"></span></a></li>
+							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  客服通知 </a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  催收任务 <span id="notifyNum3" class="label label-info hide"></span></a></li>
 						</ul>
 					</li>
