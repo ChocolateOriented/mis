@@ -594,7 +594,7 @@
 					</c:if>
 
 					<c:if test="${dunningOrder.statusText eq '已还清'}">
-						${dunningOrder.statusText}
+						 ${dunningOrder.statusText}
 					</c:if>
 				</td>
 
