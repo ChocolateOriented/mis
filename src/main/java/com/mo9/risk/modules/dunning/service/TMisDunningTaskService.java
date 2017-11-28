@@ -1703,18 +1703,18 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					 *  平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
-					int j = 0;
+//					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
 						/**  平均分配法    */
-//						int j = i % dunningPeoples.size();                            			 // 平均分配法
+						int j = i % dunningPeoples.size();                            			 // 平均分配法
 						
 						/**  蛇形分配法    */
-						if (i / dunningPeoples.size() % 2 == 0) {
-							j = i % dunningPeoples.size();
-						} else {
-							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-						}
+//						if (i / dunningPeoples.size() % 2 == 0) {
+//							j = i % dunningPeoples.size();
+//						} else {
+//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+//						}
 						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						
@@ -1878,16 +1878,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					List<TMisDunningTask> tasks = entry.getValue();
 					logger.info("共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
 					
-					int j = 0;
+//					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-//						int j = i % dunningPeoples.size();  
+						int j = i % dunningPeoples.size();  
 						/**  蛇形分配法    */
-						if (i / dunningPeoples.size() % 2 == 0) {
-							j = i % dunningPeoples.size();
-						} else {
-							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-						}
+//						if (i / dunningPeoples.size() % 2 == 0) {
+//							j = i % dunningPeoples.size();
+//						} else {
+//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+//						}
 						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						/**  任务催收人员添加    */
