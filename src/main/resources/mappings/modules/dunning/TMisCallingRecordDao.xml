@@ -287,6 +287,7 @@
 	  SELECT ss.* FROM (
 		select
 		user.login_name AS logiName,
+  		g.Name as groupName,
 		p.Name as dunningName,
 		r.Agent as agent,
 		a.Direct as extension,
@@ -300,15 +301,19 @@
 		from t_risk_buyer b
 		join t_risk_order o on b.id = o.buyer_id
 		join t_mis_dunning_task t on t.Dealcode = o.dealcode
-		where r.TargetNumber = b.mobile limit 1)
+		<where>
+			AND r.TargetNumber = b.mobile
+		</where>
+		limit 1)
 		) as dealCaseAmount,
 		count(r.StartTime) as connectAmout,
 		sum(r.DurationTime) as callDuration
 		from t_mis_dunning_people p
+		LEFT JOIN t_mis_dunning_group g ON p.GroupId = g.id
 		left join t_mis_calling_record r on r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (SELECT  Agent,min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		right join (SELECT  Agent,min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
 		SELECT
 		l1.Agent,
 		l1.CreateDate AS ontimeStart,
@@ -429,19 +434,13 @@
 		(unix_timestamp(t1.checkout) - unix_timestamp(t1.checkin))  as ontime,
 		t2.break as breaktime,
 		count(1) as callingAmount,
-		count(distinct (select o.dealcode
-		from t_risk_buyer b
-		join t_risk_order o on b.id = o.buyer_id
-		join t_mis_dunning_task t on t.Dealcode = o.dealcode
-		where r.TargetNumber = b.mobile limit 1)
-		) as dealCaseAmount,
 		count(r.StartTime) as connectAmout,
 		sum(r.DurationTime) as callDuration
 		from t_mis_dunning_people p
 		left join t_mis_calling_record r on r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (select l.Agent, min(l.CreateDate) as checkin, max(l.CreateDate) as checkout
+		right join (select l.Agent, min(l.CreateDate) as checkin, max(l.CreateDate) as checkout
 		from t_mis_agent_login_log l
 		<where>
 			<choose>
@@ -548,4 +547,273 @@
 
 	</select>
 
+
+	<select id="exportStatementFileForEveryDay" resultType="com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile">
+		SELECT ss.* FROM (
+		select
+		user.login_name AS logiName,
+		g.Name as groupName,
+		t1.time as dateTime,
+		p.Name as dunningName,
+		r.Agent as agent,
+		a.Direct as extension,
+		p.DunningCycle as queue,
+		t1.checkin as firstCheckIn,
+		t1.checkout as lastCheckOut,
+		t1.ontime  as ontime,
+		t2.break as breaktime,
+		r2.callingAmount as callingAmount,
+		count(distinct (select o.dealcode
+		from t_risk_buyer b
+		join t_risk_order o on b.id = o.buyer_id
+		join t_mis_dunning_task t on t.Dealcode = o.dealcode
+		WHERE r.TargetNumber = b.mobile limit 1
+		)
+		) as dealCaseAmount,
+		r2.connectAmout as connectAmout,
+		r2.callDuration as callDuration
+		from t_mis_dunning_people p
+		LEFT JOIN t_mis_dunning_group g ON p.GroupId = g.id
+		left join t_mis_calling_record r ON r.PeopleId = p.Id
+		LEFT JOIN sys_user user ON user.id = p.Id
+		join t_mis_agent_info a on a.Agent = r.Agent
+		right join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		SELECT
+		l1.Agent,
+		l1.CreateDate AS ontimeStart,
+		(SELECT l2.CreateDate
+		FROM t_mis_agent_login_log l2
+		WHERE l2.Agent = l1.Agent AND l2.CreateDate > l1.CreateDate
+		AND l2.Status = 'Logged Out'
+		ORDER BY dbid
+		LIMIT 1) AS ontimeEnd
+		FROM t_mis_agent_login_log l1
+		<where>
+			AND l1.Status = 'Available'
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND l1.CreateDate >= #{datetimestart}
+					and l1.CreateDate <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND l1.CreateDate >= date_sub(curdate(),interval 1 day)
+					and l1.CreateDate <![CDATA[ <= now() ]]>
+				</otherwise>
+			</choose>
+		</where>
+		) t group by Agent, time) t1 on a.Agent = t1.Agent
+		left join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time, sum(if(t.breakoff is null, 0, unix_timestamp(t.breakoff) - unix_timestamp(t.CreateDate))) as break
+		from
+		(select l1.Agent, l1.CreateDate,
+		(select min(l2.CreateDate) from t_mis_agent_login_log l2
+		where l2.Agent = l1.Agent and l2.CreateDate > l1.CreateDate
+		and l2.Status <![CDATA[ <> ]]> 'On Break' order by dbid) as breakoff
+		from t_mis_agent_login_log l1
+		<where>
+			AND l1.Status = 'On Break'
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND l1.CreateDate >= #{datetimestart}
+					and l1.CreateDate <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND l1.CreateDate >= date_sub(curdate(),interval 1 day)
+					and l1.CreateDate <![CDATA[ < now() ]]>
+				</otherwise>
+			</choose>
+		</where>
+		) t
+		group by t.Agent,time) t2 on a.Agent = t2.Agent AND t1.time = t2.time
+		left join(SELECT Agent, PeopleId,count(StartTime) AS connectAmout,sum(DurationTime) AS callDuration, DATE_FORMAT(CallTime,'%Y-%m-%d') AS time, count(CallTime) as callingAmount FROM t_mis_calling_record  GROUP BY PeopleId, time) r2
+		ON r2.PeopleId = p.Id AND r2.time = t1.time
+		<where>
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND r.CallTime >= #{datetimestart}
+					and r.CallTime <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND r.CallTime >= date_sub(curdate(),interval 1 day)
+					and r.CallTime <![CDATA[ < now() ]]>
+				</otherwise>
+			</choose>
+			<if test="queue != null and queue !=''">
+				AND  p.DunningCycle = #{queue}
+			</if>
+			<if test="extension != null and extension !=''">
+				AND  a.Direct = #{extension}
+			</if>
+			<if test="group != null and group.groupIds != null">
+				AND p.`groupId` IN
+				<if test="group.groupIds.size == 0">
+					('')
+				</if>
+				<if test="group.groupIds.size > 0">
+					<foreach item="groupId" collection="group.groupIds" open="(" close=")" separator=",">
+						#{groupId}
+					</foreach>
+				</if>
+			</if>
+			<if test="peopleId != null and peopleId != ''">
+				AND p.Id = #{peopleId}
+			</if>
+			<if test="peopleIds != null ">
+				AND p.`Id` IN
+				<if test="peopleIds.size == 0">
+					('')
+				</if>
+				<if test="peopleIds.size > 0">
+					<foreach item="peopleId" collection="peopleIds" open="(" close=")" separator=",">
+						#{peopleId}
+					</foreach>
+				</if>
+			</if>
+		</where>
+		group by r.PeopleId ,t1.time) ss
+		<where>
+			<if test="onTimeStart != null and onTimeStart !='' and onTimeEnd != null and onTimeEnd !=''">
+				AND  ontime >= #{onTimeStart} AND ontime <![CDATA[ <= ]]> #{onTimeEnd}
+			</if>
+			<if test="breaktimeStart != null and breaktimeStart !='' and breaktimeEnd != null and breaktimeEnd !=''">
+				AND  breaktime >= #{breaktimeStart} AND breaktime <![CDATA[ <= ]]> #{breaktimeEnd}
+			</if>
+			<if test="callDurationStart != null and callDurationStart !='' and callDurationEnd != null and callDurationEnd !=''">
+				AND  callDuration >= #{callDurationStart} AND callDuration <![CDATA[ <= ]]> #{callDurationEnd}
+			</if>
+		</where>
+
+	</select>
+
+	<select id="countExportStatementFileForEveryDay" resultType="int">
+		SELECT COUNT(1) FROM (
+		select
+		user.login_name AS logiName,
+		t1.time as dateTime,
+		p.Name as dunningName,
+		r.Agent as agent,
+		a.Direct as extension,
+		p.DunningCycle as queue,
+		t1.checkin as firstCheckIn,
+		t1.checkout as lastCheckOut,
+		t1.ontime  as ontime,
+		t2.break as breaktime,
+		r2.callingAmount as callingAmount,
+		r2.connectAmout as connectAmout,
+		r2.callDuration as callDuration
+		from t_mis_dunning_people p
+		left join t_mis_calling_record r ON r.PeopleId = p.Id
+		LEFT JOIN sys_user user ON user.id = p.Id
+		join t_mis_agent_info a on a.Agent = r.Agent
+		right join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		SELECT
+		l1.Agent,
+		l1.CreateDate AS ontimeStart,
+		(SELECT l2.CreateDate
+		FROM t_mis_agent_login_log l2
+		WHERE l2.Agent = l1.Agent AND l2.CreateDate > l1.CreateDate
+		AND l2.Status = 'Logged Out'
+		ORDER BY dbid
+		LIMIT 1) AS ontimeEnd
+		FROM t_mis_agent_login_log l1
+		<where>
+			AND l1.Status = 'Available'
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND l1.CreateDate >= #{datetimestart}
+					and l1.CreateDate <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND l1.CreateDate >= date_sub(curdate(),interval 1 day)
+					and l1.CreateDate <![CDATA[ <= now() ]]>
+				</otherwise>
+			</choose>
+		</where>
+		) t group by Agent, time) t1 on a.Agent = t1.Agent
+		left join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time, sum(if(t.breakoff is null, 0, unix_timestamp(t.breakoff) - unix_timestamp(t.CreateDate))) as break
+		from
+		(select l1.Agent, l1.CreateDate,
+		(select min(l2.CreateDate) from t_mis_agent_login_log l2
+		where l2.Agent = l1.Agent and l2.CreateDate > l1.CreateDate
+		and l2.Status <![CDATA[ <> ]]> 'On Break' order by dbid) as breakoff
+		from t_mis_agent_login_log l1
+		<where>
+			AND l1.Status = 'On Break'
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND l1.CreateDate >= #{datetimestart}
+					and l1.CreateDate <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND l1.CreateDate >= date_sub(curdate(),interval 1 day)
+					and l1.CreateDate <![CDATA[ < now() ]]>
+				</otherwise>
+			</choose>
+		</where>
+		) t
+		group by t.Agent,time) t2 on a.Agent = t2.Agent AND t1.time = t2.time
+		left join(SELECT Agent, PeopleId,count(StartTime) AS connectAmout,sum(DurationTime) AS callDuration, DATE_FORMAT(CallTime,'%Y-%m-%d') AS time, count(CallTime) as callingAmount FROM t_mis_calling_record  GROUP BY PeopleId, time) r2
+		ON r2.PeopleId = p.Id AND r2.time = t1.time
+		<where>
+			<choose>
+				<when test="datetimestart !=null and datetimestart !='' and
+							datetimeend !=null and datetimeend !=''">
+					AND r.CallTime >= #{datetimestart}
+					and r.CallTime <![CDATA[ <= ]]> #{datetimeend}
+				</when>
+				<otherwise>
+					AND r.CallTime >= date_sub(curdate(),interval 1 day)
+					and r.CallTime <![CDATA[ < now() ]]>
+				</otherwise>
+			</choose>
+			<if test="queue != null and queue !=''">
+				AND  p.DunningCycle = #{queue}
+			</if>
+			<if test="extension != null and extension !=''">
+				AND  a.Direct = #{extension}
+			</if>
+			<if test="group != null and group.groupIds != null">
+				AND p.`groupId` IN
+				<if test="group.groupIds.size == 0">
+					('')
+				</if>
+				<if test="group.groupIds.size > 0">
+					<foreach item="groupId" collection="group.groupIds" open="(" close=")" separator=",">
+						#{groupId}
+					</foreach>
+				</if>
+			</if>
+			<if test="peopleId != null and peopleId != ''">
+				AND p.Id = #{peopleId}
+			</if>
+			<if test="peopleIds != null ">
+				AND p.`Id` IN
+				<if test="peopleIds.size == 0">
+					('')
+				</if>
+				<if test="peopleIds.size > 0">
+					<foreach item="peopleId" collection="peopleIds" open="(" close=")" separator=",">
+						#{peopleId}
+					</foreach>
+				</if>
+			</if>
+		</where>
+		group by r.PeopleId ,t1.time) ss
+		<where>
+			<if test="onTimeStart != null and onTimeStart !='' and onTimeEnd != null and onTimeEnd !=''">
+				AND  ontime >= #{onTimeStart} AND ontime <![CDATA[ <= ]]> #{onTimeEnd}
+			</if>
+			<if test="breaktimeStart != null and breaktimeStart !='' and breaktimeEnd != null and breaktimeEnd !=''">
+				AND  breaktime >= #{breaktimeStart} AND breaktime <![CDATA[ <= ]]> #{breaktimeEnd}
+			</if>
+			<if test="callDurationStart != null and callDurationStart !='' and callDurationEnd != null and callDurationEnd !=''">
+				AND  callDuration >= #{callDurationStart} AND callDuration <![CDATA[ <= ]]> #{callDurationEnd}
+			</if>
+		</where>
+
+	</select>
 </mapper>

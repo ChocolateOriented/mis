@@ -13,6 +13,8 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         private String logiName;
         //日期
         private String dateTime;
+        //小组
+        private String groupName;
         //姓名
         private String dunningName;
         //坐席
@@ -30,17 +32,17 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         //在线时长
         private String ontime;
         //小休时长
-        private String breaktime;
+        private String breaktime = "0";
         //拨打电话量
-        private String callingAmount;
+        private String callingAmount = "0";
         //处理案件量
-        private String dealCaseAmount;
+        private String dealCaseAmount = "0";
         //接通量
-        private String connectAmout;
+        private String connectAmout = "0";
         //接通率
         private String connectRate;
         //通话时长
-        private String callDuration;
+        private String callDuration = "0";
         //平均每小时拨打量
         private String callingAmountOnHour;
         //平均每小时接通量
@@ -92,7 +94,16 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setDateTime(String dateTime) {
                 this.dateTime = dateTime;
         }
-        @ExcelField(title = "姓名", type = 1, align = 2, sort = 2)
+        @ExcelField(title = "小组", type = 1, align = 2, sort = 2)
+        public String getGroupName() {
+                return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+                this.groupName = groupName;
+        }
+
+        @ExcelField(title = "姓名", type = 1, align = 2, sort = 3)
         public String getDunningName() {
                 return dunningName;
         }
@@ -100,7 +111,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setDunningName(String dunningName) {
                 this.dunningName = dunningName;
         }
-        @ExcelField(title = "坐席ID", type = 1, align = 2, sort = 3)
+        @ExcelField(title = "坐席ID", type = 1, align = 2, sort = 4)
         public String getAgent() {
                 return agent;
         }
@@ -108,7 +119,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setAgent(String agent) {
                 this.agent = agent;
         }
-        @ExcelField(title = "分机号", type = 1, align = 2, sort = 4)
+        @ExcelField(title = "分机号", type = 1, align = 2, sort = 5)
         public String getExtension() {
                 return extension;
         }
@@ -116,7 +127,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setExtension(String extension) {
                 this.extension = extension;
         }
-        @ExcelField(title = "机构", type = 1, align = 2, sort = 5)
+        @ExcelField(title = "机构", type = 1, align = 2, sort = 6)
         public String getDepartment() {
                 return department;
         }
@@ -124,7 +135,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setDepartment(String department) {
                 this.department = department;
         }
-        @ExcelField(title = "队列", type = 1, align = 2, sort = 6)
+        @ExcelField(title = "队列", type = 1, align = 2, sort = 7)
         public String getQueue() {
                 return queue;
         }
@@ -132,7 +143,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setQueue(String queue) {
                 this.queue = queue;
         }
-        @ExcelField(title = "签入时间", type = 1, align = 2, sort = 7)
+        @ExcelField(title = "签入时间", type = 1, align = 2, sort = 8)
         public String getFirstCheckIn() {
                 return firstCheckIn;
         }
@@ -141,7 +152,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
                 this.firstCheckIn = firstCheckIn;
         }
 
-        @ExcelField(title = "签出时间", type = 1, align = 2, sort = 8)
+        @ExcelField(title = "签出时间", type = 1, align = 2, sort = 9)
         public String getLastCheckOut() {
                 return lastCheckOut;
         }
@@ -149,7 +160,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setLastCheckOut(String lastCheckOut) {
                 this.lastCheckOut = lastCheckOut;
         }
-        @ExcelField(title = "在线时长", type = 1, align = 2, sort = 9)
+        @ExcelField(title = "在线时长", type = 1, align = 2, sort = 10)
         public String getOntime() {
                 return ontime;
         }
@@ -157,7 +168,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setOntime(String ontime) {
                 this.ontime = ontime;
         }
-        @ExcelField(title = "小休时长", type = 1, align = 2, sort = 10)
+        @ExcelField(title = "小休时长", type = 1, align = 2, sort = 11)
         public String getBreaktime() {
                 return breaktime;
         }
@@ -165,7 +176,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setBreaktime(String breaktime) {
                 this.breaktime = breaktime;
         }
-        @ExcelField(title = "拨打电话量", type = 1, align = 2, sort = 11)
+        @ExcelField(title = "拨打电话量", type = 1, align = 2, sort = 12)
         public String getCallingAmount() {
                 return callingAmount;
         }
@@ -173,7 +184,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setCallingAmount(String callingAmount) {
                 this.callingAmount = callingAmount;
         }
-        @ExcelField(title = "处理案件量", type = 1, align = 2, sort = 12)
+        @ExcelField(title = "处理案件量", type = 1, align = 2, sort = 13)
         public String getDealCaseAmount() {
                 return dealCaseAmount;
         }
@@ -181,7 +192,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setDealCaseAmount(String dealCaseAmount) {
                 this.dealCaseAmount = dealCaseAmount;
         }
-        @ExcelField(title = "接通量", type = 1, align = 2, sort = 13)
+        @ExcelField(title = "接通量", type = 1, align = 2, sort = 14)
         public String getConnectAmout() {
                 return connectAmout;
         }
@@ -189,7 +200,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setConnectAmout(String connectAmout) {
                 this.connectAmout = connectAmout;
         }
-        @ExcelField(title = "接通率", type = 1, align = 2, sort = 14)
+        @ExcelField(title = "接通率", type = 1, align = 2, sort = 15)
         public String getConnectRate() {
                 return connectRate;
         }
@@ -197,7 +208,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setConnectRate(String connectRate) {
                 this.connectRate = connectRate;
         }
-        @ExcelField(title = "通话时长", type = 1, align = 2, sort = 15)
+        @ExcelField(title = "通话时长", type = 1, align = 2, sort = 16)
         public String getCallDuration() {
                 return callDuration;
         }
@@ -205,7 +216,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setCallDuration(String callDuration) {
                 this.callDuration = callDuration;
         }
-        @ExcelField(title = "平均每小时拨打量", type = 1, align = 2, sort = 16)
+        @ExcelField(title = "平均每小时拨打量", type = 1, align = 2, sort = 17)
         public String getCallingAmountOnHour() {
                 return callingAmountOnHour;
         }
@@ -213,7 +224,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setCallingAmountOnHour(String callingAmountOnHour) {
                 this.callingAmountOnHour = callingAmountOnHour;
         }
-        @ExcelField(title = "平均每小时接通量", type = 1, align = 2, sort = 17)
+        @ExcelField(title = "平均每小时接通量", type = 1, align = 2, sort = 18)
         public String getConnectAmountOnHour() {
                 return connectAmountOnHour;
         }
@@ -221,7 +232,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setConnectAmountOnHour(String connectAmountOnHour) {
                 this.connectAmountOnHour = connectAmountOnHour;
         }
-        @ExcelField(title = "平均每小时通话时长", type = 1, align = 2, sort = 18)
+        @ExcelField(title = "平均每小时通话时长", type = 1, align = 2, sort = 19)
         public String getCallDurationOnHour() {
                 return callDurationOnHour;
         }
@@ -229,7 +240,7 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         public void setCallDurationOnHour(String callDurationOnHour) {
                 this.callDurationOnHour = callDurationOnHour;
         }
-        @ExcelField(title = "平均每小时处理量", type = 1, align = 2, sort = 19)
+        @ExcelField(title = "平均每小时处理量", type = 1, align = 2, sort = 20)
         public String getDealCaseAmountOnHour() {
                 return dealCaseAmountOnHour;
         }

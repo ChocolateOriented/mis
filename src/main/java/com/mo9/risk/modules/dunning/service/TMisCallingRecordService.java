@@ -417,8 +417,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
 		page.setCount(dao.countExportStatementFile(entity));
-		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFile(entity);
-		page.setList(countDunningPhoneReport(reportFiles, entity));
+		page.setList(exportSoftPhoneReportFile(entity));
 		return page;
 	}
 
@@ -428,7 +427,39 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 
 	public List<DunningPhoneReportFile> exportSoftPhoneReportFile(DunningPhoneReportFile entity) {
 		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFile(entity);
+		for (DunningPhoneReportFile reportFile : reportFiles){
+			if (reportFile.getDateTime() == null || "".equals(reportFile.getDateTime())) {
+				reportFile.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm") + "至" + DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			}
+			if (!StringUtils.isEmpty(reportFile.getLogiName())) {
+				User user = UserUtils.getByLoginName(reportFile.getLogiName());
+				if (!(user.getCompany().getName() == null && "".equals(user.getCompany().getName())
+						&& user.getOffice().getName() == null && "".equals(user.getOffice().getName()))) {
+					reportFile.setDepartment(user.getCompany().getName() + user.getOffice().getName());
+				}
+			}
+		}
+		return reportFiles;
+	}
+
+
+	/**
+	 * 查询软电话日常报表（日常）
+	 */
+	public List<DunningPhoneReportFile> exportSoftPhoneReportFileForEveryDay(DunningPhoneReportFile entity){
+		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFileForEveryDay(entity);
 		return countDunningPhoneReport(reportFiles, entity);
+	}
+
+	/**
+	 * 查询软电话日常报表（日常）
+	 */
+	public Page<DunningPhoneReportFile> exportStatementFileForEveryDay(Page<DunningPhoneReportFile> page,DunningPhoneReportFile entity){
+		entity.setPage(page);
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.countExportStatementFileForEveryDay(entity));
+		page.setList(exportSoftPhoneReportFileForEveryDay(entity));
+		return page;
 	}
 
 	/**
@@ -438,8 +469,8 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * @return
 	 */
 	private String strDivideStr(String front , String back){
-		if (StringUtils.isEmpty(front) || StringUtils.isEmpty(back)){
-			return "";
+		if (StringUtils.isEmpty(front) || StringUtils.isEmpty(back) || "0".equals(front) ||  "0".equals(back)){
+			return "0.00";
 		}
 		Double double1 = Double.valueOf(front);
 		Double double2 = Double.valueOf(back);
@@ -454,6 +485,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * @return
 	 */
 	private String strsecond2Strhour(String second){
+		if ("".equals(second) || second == null){
+			return "0";
+		}
 		Integer integerSecond = Integer.valueOf(second);
 		Integer integerHour = integerSecond/3600;
 		return  integerHour.toString();
@@ -469,7 +503,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			countReport.setConnectAmountOnHour(strDivideStr(countReport.getConnectAmout(), strsecond2Strhour(countReport.getOntime())));
 			countReport.setCallDurationOnHour(strDivideStr(countReport.getCallDuration(), strsecond2Strhour(countReport.getOntime())));
 			countReport.setDealCaseAmountOnHour(strDivideStr(countReport.getDealCaseAmount(), strsecond2Strhour(countReport.getOntime())));
-			countReport.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			if (countReport.getDateTime() == null || "".equals(countReport.getDateTime())) {
+				countReport.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm") + "至" + DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			}
 			if (!StringUtils.isEmpty(countReport.getLogiName())) {
 				User user = UserUtils.getByLoginName(countReport.getLogiName());
 				if (!(user.getCompany().getName() == null && "".equals(user.getCompany().getName())

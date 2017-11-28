@@ -36,4 +36,8 @@ public interface TMisCallingRecordDao extends CrudDao<TMisCallingRecord> {
 	public List<DunningPhoneReportFile> exportStatementFile(DunningPhoneReportFile entity);
 
 	public int countExportStatementFile (DunningPhoneReportFile entity);
+
+	public List<DunningPhoneReportFile> exportStatementFileForEveryDay (DunningPhoneReportFile entity);
+
+	public int countExportStatementFileForEveryDay(DunningPhoneReportFile entity);
 }

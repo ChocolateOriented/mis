@@ -118,16 +118,16 @@
 		var operation = $(obj).attr("operation");
 		var msg = {operation: operation, target: number};
 		webSocket.send(JSON.stringify(msg));
-		
+
 	}
-	
+
 	//点击接听电话
 	function callingPhone(obj) {
 		var operation = $(obj).attr("operation");
 		var msg = {operation: operation};
 		webSocket.send(JSON.stringify(msg));
 	}
-	
+
 	//点击保持通话
 	function continueCalling() {
 		var msg = {operation: $("#holdText").attr("operation"), target: $("#numberValue").val() || ""};
