@@ -313,7 +313,7 @@
 		left join t_mis_calling_record r on r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (SELECT  Agent,min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		right join (SELECT  Agent,min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
 		SELECT
 		l1.Agent,
 		l1.CreateDate AS ontimeStart,
@@ -440,7 +440,7 @@
 		left join t_mis_calling_record r on r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (select l.Agent, min(l.CreateDate) as checkin, max(l.CreateDate) as checkout
+		right join (select l.Agent, min(l.CreateDate) as checkin, max(l.CreateDate) as checkout
 		from t_mis_agent_login_log l
 		<where>
 			<choose>
@@ -577,7 +577,7 @@
 		left join t_mis_calling_record r ON r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		right join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
 		SELECT
 		l1.Agent,
 		l1.CreateDate AS ontimeStart,
@@ -707,7 +707,7 @@
 		left join t_mis_calling_record r ON r.PeopleId = p.Id
 		LEFT JOIN sys_user user ON user.id = p.Id
 		join t_mis_agent_info a on a.Agent = r.Agent
-		left join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
+		right join (SELECT  Agent, DATE_FORMAT(t.ontimeStart,'%Y-%m-%d') AS time, min(t.ontimeStart) as checkin, max(t.ontimeEnd) as checkout, sum(unix_timestamp(t.ontimeEnd) - unix_timestamp(t.ontimeStart)) AS ontime FROM (
 		SELECT
 		l1.Agent,
 		l1.CreateDate AS ontimeStart,

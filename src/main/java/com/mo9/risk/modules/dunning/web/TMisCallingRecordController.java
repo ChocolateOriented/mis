@@ -15,6 +15,7 @@ import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPhoneService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
@@ -162,7 +163,13 @@ public class TMisCallingRecordController extends BaseController {
 	@RequestMapping(value = "getPhoneCallingReport")
 	public String getPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
-		Page<DunningPhoneReportFile> page = tMisCallingRecordService.exportStatementFile(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		Page<DunningPhoneReportFile> page = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			page = tMisCallingRecordService.exportStatementFile(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		}finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
 		model.addAttribute("groupList", map.get("groupList"));
 		model.addAttribute("page", page);
@@ -179,7 +186,13 @@ public class TMisCallingRecordController extends BaseController {
 	@RequestMapping(value = "getPhoneCallingReportForEveryDay")
 	public String getPhoneCallingReportForEveryDay(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
-		Page<DunningPhoneReportFile> page = tMisCallingRecordService.exportStatementFileForEveryDay(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		Page<DunningPhoneReportFile> page = null;
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			page = tMisCallingRecordService.exportStatementFileForEveryDay(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		}finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
 		model.addAttribute("groupList", map.get("groupList"));
 		model.addAttribute("page", page);

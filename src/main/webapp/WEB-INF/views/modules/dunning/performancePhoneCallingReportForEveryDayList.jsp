@@ -88,7 +88,7 @@
 			if(n) $("#pageNo").val(n);
 			if(s) $("#pageSize").val(s);
 			if (!compareTime()){
-                alert("起始时间大于开始时间，请重新输入");
+                alert("起始时间大于开始时间，或查询时间区间大于一周，请输入正确格式");
                 return false;
 			}
 			$("#searchForm").attr("action","${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay");
@@ -130,6 +130,9 @@
             var endTime=$("#datetimeend").val();
             var end=new Date(endTime.replace("-", "/").replace("-", "/"));
             if(end<start){
+                return false;
+            }
+            if (end - start > 604740000){
                 return false;
             }
             return true;

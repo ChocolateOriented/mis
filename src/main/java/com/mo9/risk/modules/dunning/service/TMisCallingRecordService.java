@@ -485,6 +485,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * @return
 	 */
 	private String strsecond2Strhour(String second){
+		if ("".equals(second) || second == null){
+			return "0";
+		}
 		Integer integerSecond = Integer.valueOf(second);
 		Integer integerHour = integerSecond/3600;
 		return  integerHour.toString();
