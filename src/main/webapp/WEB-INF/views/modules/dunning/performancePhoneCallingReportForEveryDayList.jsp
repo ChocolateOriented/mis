@@ -12,7 +12,7 @@
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出软电话通话详单数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#searchForm").attr("action","${ctx}/dunning/report/softPhoneCommunicateReportExport");
+						$("#searchForm").attr("action","${ctx}/dunning/report/softPhoneCommunicateReportExportForEveryDayList");
 						$("#searchForm").submit();
 					}
 				},{buttonsFocus:1});
@@ -91,7 +91,7 @@
                 alert("起始时间大于开始时间，请重新输入");
                 return false;
 			}
-			$("#searchForm").attr("action","${ctx}/dunning/tMisCallingRecord/getPhoneCallingReport");
+			$("#searchForm").attr("action","${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay");
 			$("#searchForm").submit();
             clearSearch();
         	return false;
@@ -138,9 +138,9 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReport">软电话通话详单</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay">软电话通话详单(每日)</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="dunningPhoneReportFile" action="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReport" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="dunningPhoneReportFile" action="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
@@ -182,9 +182,10 @@
 			<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" />
 			<input id="btnExport" class="btn btn-primary" type="button" value="导出" /></li>
 			&nbsp;
-			<a href="javascript:void(0)" style="height:40px;line-height:40px;" onclick="showAndHideSearch()">>高级搜索</a>
+				<a href="javascript:void(0)" style="height:40px;line-height:40px;" onclick="showAndHideSearch()">>高级搜索</a>
 			<li class="clearfix"></li>
 			</div>
+
 			<div id="advancedSearch">
 				<li>
 					<label>机构：</label>
@@ -233,7 +234,12 @@
 					<th>拨打电话量</th>
 					<th>处理案件量</th>
 					<th>接通量</th>
+					<th>接通率</th>
 					<th>通话时长（秒）</th>
+					<th>平均每小时拨打量</th>
+					<th>平均每小时接通量</th>
+					<th>平均每小时通话时长（秒/小时）</th>
+					<th>平均每小时处理量</th>
 				</tr>
 
 			</thead>
@@ -241,11 +247,10 @@
 			<c:forEach items="${page.list}" var="callingReport">
 				<tr>
 					<td  style="word-break: keep-all;white-space:nowrap;">
-						<fmt:formatDate value="${dunningPhoneReportFile.datetimestart}" pattern="yyyy-MM-dd HH:mm"/>至
-						<fmt:formatDate value="${dunningPhoneReportFile.datetimeend}" pattern="yyyy-MM-dd HH:mm"/>
+						${callingReport.dateTime}
 					</td>
-					<td style="word-break: keep-all;white-space:nowrap;">
-							${callingReport.groupName}
+					<td  style="word-break: keep-all;white-space:nowrap;">
+						${callingReport.groupName}
 					</td>
 					<td style="word-break: keep-all;white-space:nowrap;">
 						${callingReport.dunningName}
@@ -284,7 +289,22 @@
 						${callingReport.connectAmout}
 					</td>
 					<td>
+						${callingReport.connectRate}
+					</td>
+					<td>
 						${callingReport.callDuration}
+					</td>
+					<td>
+						${callingReport.callingAmountOnHour}
+					</td>
+					<td>
+						${callingReport.connectAmountOnHour}
+					</td>
+					<td>
+						${callingReport.callDurationOnHour}
+					</td>
+					<td>
+						${callingReport.dealCaseAmountOnHour}
 					</td>
 				</tr>
 			</c:forEach>

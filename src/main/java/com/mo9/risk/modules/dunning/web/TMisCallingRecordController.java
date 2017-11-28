@@ -161,10 +161,47 @@ public class TMisCallingRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
 	@RequestMapping(value = "getPhoneCallingReport")
 	public String getPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
+		Page<DunningPhoneReportFile> page = tMisCallingRecordService.exportStatementFile(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
+		model.addAttribute("groupList", map.get("groupList"));
+		model.addAttribute("page", page);
+		model.addAttribute("supervisorLimit", map.get("supervisorLimit"));
+		model.addAttribute("dunningCommissioner", map.get("dunningCommissioner"));
+		model.addAttribute("dunningPhoneReportFile", map.get("dunningPhoneReportFile"));
+		return "modules/dunning/performancePhoneCallingReportList";
+	}
+
+	/**
+	 * 查询软电话日常报表
+	 */
+	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
+	@RequestMapping(value = "getPhoneCallingReportForEveryDay")
+	public String getPhoneCallingReportForEveryDay(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
+		Page<DunningPhoneReportFile> page = tMisCallingRecordService.exportStatementFileForEveryDay(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
+		model.addAttribute("groupList", map.get("groupList"));
+		model.addAttribute("page", page);
+		model.addAttribute("supervisorLimit", map.get("supervisorLimit"));
+		model.addAttribute("dunningCommissioner", map.get("dunningCommissioner"));
+		model.addAttribute("dunningPhoneReportFile", map.get("dunningPhoneReportFile"));
+		return "modules/dunning/performancePhoneCallingReportForEveryDayList";
+	}
+
+
+	/**
+	 * 初始化软电话日常报表必要数据
+	 * @param dunningPhoneReportFile
+	 * @param dunningPeople
+	 * @return
+	 */
+	private Map<String, Object> initGetPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople){
+		Map<String, Object> map = new HashMap<String, Object>();
 		List<TMisDunningPeople> dunningPeoples = null;
 		List<TMisDunningGroup> groups = new ArrayList<TMisDunningGroup>();
 		if (dunningPhoneReportFile.getDatetimestart() == null || "".equals(dunningPhoneReportFile.getDatetimestart())){
-			Date date = new Date();
+			Date date = null;
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.DAY_OF_MONTH, -1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
 			calendar.set(Calendar.HOUR_OF_DAY, 00);
@@ -174,7 +211,7 @@ public class TMisCallingRecordController extends BaseController {
 			dunningPhoneReportFile.setDatetimestart(date);
 		}
 		if (dunningPhoneReportFile.getDatetimeend() == null || "".equals(dunningPhoneReportFile.getDatetimeend())){
-			Date date = new Date();
+			Date date = null;
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.DAY_OF_MONTH, -1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
@@ -204,7 +241,7 @@ public class TMisCallingRecordController extends BaseController {
 				tMisDunningGroup.setSupervisor(UserUtils.getUser());
 				supervisorLimit = true;
 			}
-			 groups = tMisDunningGroupService.findList(tMisDunningGroup);
+			groups = tMisDunningGroupService.findList(tMisDunningGroup);
 			StringBuffer stringBuffer = new StringBuffer("");
 			for (TMisDunningGroup group : groups) {
 				stringBuffer.append("," + group.getId());
@@ -225,16 +262,12 @@ public class TMisCallingRecordController extends BaseController {
 				}
 			}
 		}
-		Page<DunningPhoneReportFile> page = tMisCallingRecordService.exportStatementFile(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
-		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
-		model.addAttribute("groupList", groups);
-		model.addAttribute("page", page);
-		model.addAttribute("supervisorLimit", supervisorLimit);
-		model.addAttribute("dunningCommissioner", dunningCommissioner);
-		model.addAttribute("dunningPhoneReportFile", dunningPhoneReportFile);
-		return "modules/dunning/performancePhoneCallingReportList";
+		map.put("groupList", groups);
+		map.put("supervisorLimit", supervisorLimit);
+		map.put("dunningCommissioner", dunningCommissioner);
+		map.put("dunningPhoneReportFile", dunningPhoneReportFile);
+		return map;
 	}
-
 
 	@RequiresPermissions("dunning:tMisCallingRecord:edit")
 	@RequestMapping(value = "sync")

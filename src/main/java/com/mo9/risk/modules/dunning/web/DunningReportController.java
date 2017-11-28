@@ -172,12 +172,22 @@ public class DunningReportController extends BaseController {
 		}
 		return "redirect:" + adminPath + "/dunning/tMisDunningTask/findPerformanceDayReport?repage";
 	}
+
+	/**
+	 * 软电话通话详单
+	 * @param dunningPhoneReportFile
+	 * @param request
+	 * @param response
+	 * @param redirectAttributes
+	 * @return
+	 */
+
 	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
 	@RequestMapping(value = "softPhoneCommunicateReportExport")
 	public String softPhoneCommunicateReportExport(DunningPhoneReportFile dunningPhoneReportFile,  HttpServletRequest request, HttpServletResponse response,
-		   RedirectAttributes redirectAttributes){
+												   RedirectAttributes redirectAttributes){
 		List<DunningPhoneReportFile> entityList = tMisCallingRecordService.exportSoftPhoneReportFile(dunningPhoneReportFile);
-        String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
+		String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
 		try {
 			new ExportExcel(fileName, DunningPhoneReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
 		} catch (IOException e) {
@@ -185,5 +195,30 @@ public class DunningReportController extends BaseController {
 			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
 		}
 		return "redirect:"+ adminPath + "/dunning/tMisCallingRecord/getPhoneCallingReport";
+	}
+
+
+	/**
+	 * 软电话通话详单（日常）
+	 * @param dunningPhoneReportFile
+	 * @param request
+	 * @param response
+	 * @param redirectAttributes
+	 * @return
+	 */
+
+	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
+	@RequestMapping(value = "softPhoneCommunicateReportExportForEveryDayList")
+	public String softPhoneCommunicateReportExportForEveryDayList(DunningPhoneReportFile dunningPhoneReportFile,  HttpServletRequest request, HttpServletResponse response,
+												   RedirectAttributes redirectAttributes){
+		List<DunningPhoneReportFile> entityList = tMisCallingRecordService.exportSoftPhoneReportFileForEveryDay(dunningPhoneReportFile);
+		String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
+		try {
+			new ExportExcel(fileName, DunningPhoneReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
+		} catch (IOException e) {
+			logger.info("软电话通话详单!", e);
+			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:"+ adminPath + "/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDayList";
 	}
 }
