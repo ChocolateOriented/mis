@@ -3472,8 +3472,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 
 	@Transactional(readOnly = false)
-	public int asyncUpdate(String dealcode,String status,Date payoffTime,BigDecimal overdueAmount){
-		return tMisDunningTaskDao.asyncUpdate(dealcode,status,payoffTime,overdueAmount);
+	public int asyncUpdate(String dealcode,String status){
+		return tMisDunningTaskDao.asyncUpdate(dealcode,status);
 	}
 	
 }

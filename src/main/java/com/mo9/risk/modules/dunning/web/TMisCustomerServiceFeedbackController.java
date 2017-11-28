@@ -1,16 +1,11 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.oa.entity.OaNotify;
-import com.thinkgem.jeesite.modules.oa.service.OaNotifyService;
-import com.thinkgem.jeesite.modules.sys.entity.User;
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,9 +31,6 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
     @Autowired
     private FeedbackSendService feedbackSendService;
-
-    @Autowired
-    private OaNotifyService oaNotifyService;
 
     @ModelAttribute
     public TMisCustomerServiceFeedback get(@RequestParam(required=false) String id) {
@@ -144,11 +136,6 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
-            if("0".equals(tMisCustomerServiceFeedback.getReadFlag())){
-                tMisCustomerServiceFeedback.setReadFlag("1");
-                tMisCustomerServiceFeedbackService.updateFeedback(tMisCustomerServiceFeedback);
-                model.addAttribute("custNotify", "desc");
-            }
         }catch (Exception e){
             logger.info("加载反馈通知截图失败",e);
             return null;
@@ -157,17 +144,4 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         return "modules/dunning/tMisCustomerJboxNotify";
     }
 
-    /**
-     * 获取客服通知数
-     *
-     */
-    @RequestMapping(value = "custServiceCount")
-    @ResponseBody
-    public String custServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, Model model){
-
-        tMisCustomerServiceFeedback.setReadFlag("0");
-        String userid=UserUtils.getUser().getId();
-        tMisCustomerServiceFeedback.setDunningpeopleid(userid);
-        return String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
-    }
 }

@@ -99,7 +99,6 @@ public class TMisDunningPhoneService {
 		try {
 			callCenterManager.originate(action);
 			msg.setResult("success");
-			msg.setLocation(tMisCallingRecordService.queryMobileLocation(msg.getTarget()));
 		} catch (Exception e) {
 			msg.setResult("error");
 			logger.info("发起呼叫失败：" + e);

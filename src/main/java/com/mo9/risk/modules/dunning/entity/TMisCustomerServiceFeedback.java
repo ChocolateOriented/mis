@@ -34,8 +34,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public static final String loan="loan";//普通订单
     public static final String loan_partial="loan_partial";//普通订单（部分
     public static final String partial="partial";//部分还款订单
-    public static final String read="read";//未读
-    public static final String unread="unread";//已读
 
     private String dealcode; // 订单编号
     private String type; // 订单类型
@@ -54,7 +52,6 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String dunningpeopleid;//催收人员id
     private TMisDunningPeople dunningPeople;
     private List<String> groupIds;
-    private String readFlag;	// 本人阅读状态
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
         return dealcode;
@@ -209,11 +206,8 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         return keyword;
     }
 
-    public void setKeywordText(String dealcode,String tagText,String statusText) {
-        this.keyword = dealcode+","+tagText+","+statusText;
-    }
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
+    public void setKeyword(String dealcode,String tagText,String statusText) {
+        this.keyword = dealcode+":"+tagText+":"+statusText;
     }
 
     public Integer getBuyerId() {
@@ -247,14 +241,4 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public String getDunningpeopleid() {
         return dunningpeopleid;
     }
-
-    @Length(min=0, max=1, message="阅读标记（0：未读；1：已读）长度必须介于 0 和 1 之间")
-    public String getReadFlag() {
-        return readFlag;
-    }
-
-    public void setReadFlag(String readFlag) {
-        this.readFlag = readFlag;
-    }
-
 }
