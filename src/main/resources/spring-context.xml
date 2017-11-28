@@ -111,9 +111,9 @@
 	 
 	<!-- 数据源配置, 使用应用服务器的数据库连接池 -->
 	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/jeesite" />
-	<jee:jndi-lookup id="dataSource_read" jndi-name="java:comp/env/jdbc/jeesite_read" />
+	<jee:jndi-lookup id="dataSource_read_1" jndi-name="java:comp/env/jdbc/jeesite_read1" />
+	<jee:jndi-lookup id="dataSource_read_2" jndi-name="java:comp/env/jdbc/jeesite_read2" />
 	<jee:jndi-lookup id="updateOrderDataSource" jndi-name="java:comp/env/jdbc/jeesite2" />
-<!-- 	<jee:jndi-lookup id="dataSource2" jndi-name="java:comp/env/jdbc/mo9jeesite" /> -->
 	<jee:jndi-lookup id="temporaryDataSource" jndi-name="java:comp/env/jdbc/jeesite3" />
 	
 	<!-- 数据源配置, 不使用连接池 
@@ -125,20 +125,27 @@
 	</bean>-->
 	
 	<!--  多数据源切换配置    -->
-	<bean id="dynamicDataSource" class="com.thinkgem.jeesite.common.db.DynamicDataSource">  
-        <property name="defaultTargetDataSource" ref="dataSource"/>  
-        <property name="targetDataSources">  
-            <map>  
-                <entry key="dataSource" value-ref="dataSource"/>  
-                <entry key="dataSource_read" value-ref="dataSource_read"/>
-                <entry key="updateOrderDataSource" value-ref="updateOrderDataSource"/>  
-<!--                 <entry key="dataSource2" value-ref="dataSource2"/>   -->
- 				<entry key="temporaryDataSource" value-ref="temporaryDataSource"/>  
+  <bean id="dynamicDataSource" class="com.thinkgem.jeesite.common.db.DynamicDataSource">
+    <property name="defaultTargetDataSource" ref="dataSource"/>
+    <property name="targetDataSources">
+      <map>
+        <entry key="dataSource" value-ref="dataSource"/>
+        <entry key="dataSource_read" value-ref="dataSource_read"/>
+        <entry key="updateOrderDataSource" value-ref="updateOrderDataSource"/>
+        <entry key="temporaryDataSource" value-ref="temporaryDataSource"/>
+      </map>
+    </property>
+  </bean>
 
-            </map>  
-        </property>  
-    </bean> 
-    
-	
-	
+  <bean id="dataSource_read" class="com.thinkgem.jeesite.common.db.LoadBalancDataSource">
+    <property name="defaultTargetDataSource" ref="dataSource_read_1"/>
+    <property name="weightDataSource">
+      <map>
+        <entry key-ref="dataSource_read_1" value="5"/>
+        <entry key-ref="dataSource_read_2" value="5"/>
+      </map>
+    </property>
+  </bean>
+
+
 </beans>
