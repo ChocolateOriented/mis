@@ -1881,7 +1881,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 //					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+						int j = i % dunningPeoples.size();
 						/**  蛇形分配法    */
 //						if (i / dunningPeoples.size() % 2 == 0) {
 //							j = i % dunningPeoples.size();
@@ -3471,9 +3471,4 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return result;
 	}
 
-	@Transactional(readOnly = false)
-	public int asyncUpdate(String dealcode,String status){
-		return tMisDunningTaskDao.asyncUpdate(dealcode,status);
-	}
-	
 }

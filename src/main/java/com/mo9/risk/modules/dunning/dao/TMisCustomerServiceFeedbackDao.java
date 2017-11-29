@@ -19,7 +19,7 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
      * @Description 客服推送消息的订单号,标签,时间的通知列表分页展示
      * @param tMisCustomerServiceFeedback
      */
-    public List<TMisCustomerServiceFeedback> NotifyList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
+    public List<TMisCustomerServiceFeedback> notifyList(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 
     /**
      * 更新问题状态,待解决操作
@@ -33,4 +33,10 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
      * @return
      */
     public TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback);
+
+    /**
+     * 获取客服通知数目
+     * @param tMisCustomerServiceFeedback
+     */
+    public Integer findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 }

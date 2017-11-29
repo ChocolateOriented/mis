@@ -109,16 +109,21 @@
 	}
 	
 	//点击呼叫
+    var renumber;
 	function clickCall(obj) {
 		var number = $("#numberValue").val();
-		if(!$("#numberValue").val()){
-			return;
-		}
-
-		var operation = $(obj).attr("operation");
-		var msg = {operation: operation, target: number};
-		webSocket.send(JSON.stringify(msg));
-
+        if($("#numberValue").val()){
+            renumber=$("#numberValue").val();
+            var operation = $(obj).attr("operation");
+            var msg = {operation: operation, target: number};
+            webSocket.send(JSON.stringify(msg));
+        }else{
+            if(renumber){
+                $("#numberValue").val(renumber);
+            }else {
+                return;
+            }
+        }
 	}
 
 	//点击接听电话
@@ -250,6 +255,8 @@
 			$("#backCall").css("display", "block");
 			$(".numberSave").css("display", "block");
 			$("#numberValue").val(data.target);
+            $("#location").text(data.location);
+
 			$("#continues").removeClass("icon-play");
 			$("#continues").addClass("icon-pause");
 			var icon = "${ctxStatic}/images/userinfo.jpg";
@@ -288,6 +295,7 @@
 			if(data.target)
 			$("#numberValue").val(data.target);
 			$(".showName").html(data.name);
+			$("#location").text(data.location);
 			$(".phoneStatus").css("display", "none");
 			$("#calling").css("display", "block");
 			$("#statusPhones").attr("readonly", true);
@@ -551,6 +559,7 @@
 				<i class="icon-user" ></i>
 			</div>
 			<div class="showName" style="text-align: center;margin-bottom:20px; "></div>
+			<div id="location" style="text-align: center;margin-bottom:20px; font-weight: 400;"></div>
 			<div class="numbers-container" style="background-color:red;border:0px; margin: 30px 0px 10px 100px;transform:rotate(140deg);">
 		        <i class="number-content icon-phone" style="color:white;font-size:20px; " onclick="refuseCalling(this)" operation="hangup"></i>
 		 	</div>

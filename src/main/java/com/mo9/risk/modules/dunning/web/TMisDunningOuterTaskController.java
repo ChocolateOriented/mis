@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.web;
 import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.gamaxpay.commonutil.web.PostRequest;
+import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.service.*;
 import com.mo9.risk.util.DateUtils;
@@ -57,6 +58,9 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 public class TMisDunningOuterTaskController extends BaseController {
 
 	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+
+	@Autowired
+	private TMisDunningOrderDao tMisDunningOrderDao;
 
 	@Autowired
 	private TMisDunningConfigureService tMisDunningConfigureService;
@@ -414,13 +418,13 @@ public class TMisDunningOuterTaskController extends BaseController {
 				throw new ServiceException("订单接口回调失败");
 			}
 
-			TRiskOrder tRiskOrder1= JSON.parseObject(res,TRiskOrder.class);
-			if(("payoff").equals(tRiskOrder1.getStatus())){
-				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
-				return "payoff";
+			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
+			if(("payoff").equals(riskOrder.getStatus())){
+				tMisDunningOrderDao.orderSynUpdate(riskOrder);
+				return "OK";
 			}
-			if(("payment").equals(tRiskOrder1.getStatus())){
-				return "payment";
+			if(("payment").equals(riskOrder.getStatus())){
+				return "NO";
 			}
 		}catch (Exception e){
 			logger.warn(e.getMessage());

@@ -32,7 +32,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public static final String cancel="cancel";//订单取消 完成
     public static final String reject="reject";//拒绝 完成
     public static final String loan="loan";//普通订单
-    public static final String loan_partial="loan_partial";//普通订单（部分
+    public static final String loan_partial="loan_partial";//普通订单(部分)
     public static final String partial="partial";//部分还款订单
 
     private String dealcode; // 订单编号
@@ -47,11 +47,15 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private Integer rootorderid;//主订单编号
     private String uname;//用户名
     private Date pushTime;//消息推送时间
+    private Date nearPushTime;//最近推送时间
+    private Date farPushTime;//之前推送时间
     private String keyword;//页面关键字查询
     private Integer buyerId;//订单用户ID
     private String dunningpeopleid;//催收人员id
+    private String nickname;//操作人花名
     private TMisDunningPeople dunningPeople;
     private List<String> groupIds;
+    private String readFlag;	// 本人阅读状态
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
         return dealcode;
@@ -202,12 +206,31 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         this.pushTime = pushTime;
     }
 
+    public void setNearPushTime(Date nearPushTime) {
+        this.nearPushTime = nearPushTime;
+    }
+
+    public Date getNearPushTime() {
+        return nearPushTime;
+    }
+
+    public Date getFarPushTime() {
+        return farPushTime;
+    }
+
+    public void setFarPushTime(Date farPushTime) {
+        this.farPushTime = farPushTime;
+    }
+
     public String getKeyword() {
         return keyword;
     }
 
-    public void setKeyword(String dealcode,String tagText,String statusText) {
-        this.keyword = dealcode+":"+tagText+":"+statusText;
+    public void setKeywordText(String uname,String dealcode,String tagText,String statusText,String pushpeople,String updateBy) {
+        this.keyword = uname+","+dealcode+","+tagText+","+statusText+","+pushpeople+","+updateBy;
+    }
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     public Integer getBuyerId() {
@@ -241,4 +264,22 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public String getDunningpeopleid() {
         return dunningpeopleid;
     }
+
+    @Length(min=0, max=1, message="阅读标记（0：未读；1：已读）长度必须介于 0 和 1 之间")
+    public String getReadFlag() {
+        return readFlag;
+    }
+
+    public void setReadFlag(String readFlag) {
+        this.readFlag = readFlag;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }
