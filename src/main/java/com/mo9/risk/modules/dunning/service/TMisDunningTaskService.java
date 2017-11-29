@@ -7,37 +7,11 @@ import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
-import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
-import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
-import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
-import com.mo9.risk.modules.dunning.entity.AppLoginLog;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
-import com.mo9.risk.modules.dunning.entity.DunningOuterFileLog;
-import com.mo9.risk.modules.dunning.entity.DunningPeriod;
-import com.mo9.risk.modules.dunning.entity.OrderHistory;
-import com.mo9.risk.modules.dunning.entity.PartialOrder;
-import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
+import com.mo9.risk.modules.dunning.dao.*;
+import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
-import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
-import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
-import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
-import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
@@ -1703,18 +1677,18 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					 *  平均分配队列集合的催收人员
 					 */
 					List<TMisDunningTask> tasks = entry.getValue();
-//					int j = 0;
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
 						/**  平均分配法    */
-						int j = i % dunningPeoples.size();                            			 // 平均分配法
+//						int j = i % dunningPeoples.size();                            			 // 平均分配法
 						
 						/**  蛇形分配法    */
-//						if (i / dunningPeoples.size() % 2 == 0) {
-//							j = i % dunningPeoples.size();
-//						} else {
-//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-//						}
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
 						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						
@@ -1878,16 +1852,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					List<TMisDunningTask> tasks = entry.getValue();
 					logger.info("共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
 					
-//					int j = 0;
+					int j = 0;
 					for(int i= 0 ; i < tasks.size() ; i++ ){  
 						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();  
+//						int j = i % dunningPeoples.size();  
 						/**  蛇形分配法    */
-//						if (i / dunningPeoples.size() % 2 == 0) {
-//							j = i % dunningPeoples.size();
-//						} else {
-//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-//						}
+						if (i / dunningPeoples.size() % 2 == 0) {
+							j = i % dunningPeoples.size();
+						} else {
+							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+						}
 						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
 						
 						/**  任务催收人员添加    */
@@ -3471,9 +3445,4 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return result;
 	}
 
-	@Transactional(readOnly = false)
-	public int asyncUpdate(String dealcode,String status){
-		return tMisDunningTaskDao.asyncUpdate(dealcode,status);
-	}
-	
 }

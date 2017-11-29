@@ -2019,9 +2019,4 @@
 		WHERE dealcode = #{dealcode}
 	</update>
 
-    <update id="asyncUpdate">
-        UPDATE t_risk_order
-        SET status = #{status}
-        WHERE dealcode = #{dealcode}
-    </update>
 </mapper>

@@ -9,6 +9,7 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
+import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DerateReason;
@@ -192,6 +193,10 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	@Autowired
 	private RiskOrderManager orderManager;
+
+
+	@Autowired
+	private TMisDunningOrderDao tMisDunningOrderDao;
 
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -2111,7 +2116,6 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	
 	
  	/**
-	
  	 * 获取江湖救急该笔订单状态
  	 *
  	 */
@@ -2135,13 +2139,13 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
  				throw new ServiceException("订单接口回调失败");
  			}
  
- 			TRiskOrder tRiskOrder1= JSON.parseObject(res,TRiskOrder.class);
- 			if(("payoff").equals(tRiskOrder1.getStatus())){
- 				tMisDunningTaskService.asyncUpdate(dealcode,tRiskOrder1.getStatus());
- 				return "payoff";
+ 			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
+ 			if(("payoff").equals(riskOrder.getStatus())){
+ 				tMisDunningOrderDao.orderSynUpdate(riskOrder);
+ 				return "OK";
  			}
- 			if(("payment").equals(tRiskOrder1.getStatus())){
- 				return "payment";
+ 			if(("payment").equals(riskOrder.getStatus())){
+ 				return "NO";
  			}
  		}catch (Exception e){
  			logger.warn(e.getMessage());

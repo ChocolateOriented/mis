@@ -45,6 +45,7 @@
 
         function changeFeedback(obj){
             var id = $(obj).attr("feedbackId");
+            $(obj).children("span").css("color", "#999999");
             $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox?id=" + id, "" , 480, 180,{
                 buttons: {
                 },
@@ -66,7 +67,6 @@
             if("${color}"=='solving'){
                 $("#colorChoice").val("solving");
             }
-            $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/notify");
 			$("#searchForm").submit();
         	return false;
         }
@@ -77,7 +77,7 @@
 	<ul class="nav nav-tabs">
 		<li class="active">通知列表</li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/notify" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="tMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/notify" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<input id="colorChoice" name="colorChoice" type="hidden" value=""/>
@@ -95,13 +95,21 @@
 			<li><label>关键词：</label>
 				<form:input path="keyword"  htmlEscape="false" maxlength="200" class="input-medium"/>
 			</li>
+			<li><label>推送时间</label>
+				<input name="farPushTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${tMisCustomerServiceFeedback.farPushTime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至
+				<input name="nearPushTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${tMisCustomerServiceFeedback.nearPushTime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page()"/></li>
 			<li class="clearfix"></li>
 		</ul>
 		<form:input id="problemstatus" type="hidden" path="problemstatus"/>
 	</form:form>
 	<sys:message content="${message}"/>
-	<table id="contentTable" class="table table-striped table-bordered table-condensed" style="width: 800px">
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" style="width: 1080px">
 		<thead>
 		    <tr>
 				<th style="background: #26d6ff" colspan="2">
@@ -110,7 +118,7 @@
 				</th>
 			</tr>
 			<tr>
-				<th style="width: 500px" >标题</th>
+				<th style="width: 650px" >标题</th>
 				<th>时间</th>
 			</tr>
 		</thead>
@@ -118,6 +126,19 @@
 		<c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
 			<tr class="result">
 				<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(this);">
+					<c:choose>
+						<c:when test="${tMisCustomerServiceFeedback.readFlag eq '1' or fns:getUser() ne tMisCustomerServiceFeedback.dunningpeopleid}">
+						<span class="solveStatus" style="color: #999999">
+							客服消息:订单号{${fns:abbr(tMisCustomerServiceFeedback.dealcode,50)}}
+							<c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
+								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}&nbsp;${fns:abbr(tMisCustomerServiceFeedback.statusText,50)}
+							</c:if>
+							<c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
+								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}
+							</c:if>
+						</span>
+						</c:when>
+						<c:otherwise>
 						<span class="solveStatus">
 							客服消息:订单号{${fns:abbr(tMisCustomerServiceFeedback.dealcode,50)}}
 							<c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
@@ -127,6 +148,9 @@
 								${fns:abbr(tMisCustomerServiceFeedback.tagText,50)}
 							</c:if>
 						</span>
+						</c:otherwise>
+					</c:choose>
+
 				    </a>
 				</td>
 				<td>

@@ -9,9 +9,12 @@ import com.mo9.risk.modules.dunning.bean.dto.Mo9MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
+import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
 
     @Autowired
     TMisCustomerServiceFeedbackDao feedbackDao;
+
+    @Autowired
+    private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
     @Override
     public MqAction consume(MqMessage msg, Object consumeContext) {
@@ -55,7 +61,8 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
         tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
         tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        tMisCustomerServiceFeedback.setUpdateBy(tMisCustomerServiceFeedback.getUpdateBy());
+        String nickname= String.valueOf(UserUtils.getUser().getUpdateBy());
+        tMisCustomerServiceFeedback.setDunningpeopleid(nickname);
         tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
         tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
@@ -67,12 +74,15 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
-        tMisCustomerServiceFeedback.setKeyword(tMisCustomerServiceFeedback.getDealcode(),tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText());
+        tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getUname(),tMisCustomerServiceFeedback.getDealcode(),
+                tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople(),
+                String.valueOf(tMisCustomerServiceFeedback.getDunningpeopleid()));
         logger.info(tMisCustomerServiceFeedback.getId());
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
             feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
+
         }
         return MqAction.CommitMessage;
     }
