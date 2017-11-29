@@ -30,6 +30,7 @@ public class TMisAgentInfoService extends CrudService<TMisAgentInfoDao, TMisAgen
 	public static final Map<String, String> callStatus = new ConcurrentHashMap<String, String>();
 	
 	@Override
+	@Transactional(readOnly = false)
 	public void save(TMisAgentInfo entity) {
 		if (entity.getIsNewRecord()) {
 			CallCenterBaseAction action = new CallCenterBaseAction();
