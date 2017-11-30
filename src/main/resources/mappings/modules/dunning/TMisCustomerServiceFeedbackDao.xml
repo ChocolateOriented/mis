@@ -141,7 +141,7 @@
         WHERE a.id = #{id}
     </select>
 
-    <select id="insert">
+    <insert id="insert">
         INSERT INTO t_mis_customer_service_feedback(
             id,
             dealcode,
@@ -174,10 +174,10 @@
             #{uname},
             #{keyword},
             #{pushTime},
-            #{rootorderid}
+            #{rootorderid},
             #{readFlag}
         )
-    </select>
+    </insert>
 
     <update id="updateFeedback">
         UPDATE t_mis_customer_service_feedback SET

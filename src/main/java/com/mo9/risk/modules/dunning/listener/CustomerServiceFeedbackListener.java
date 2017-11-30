@@ -68,7 +68,6 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
-        tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
