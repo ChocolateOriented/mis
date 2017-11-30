@@ -295,7 +295,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		count(1) as callingAmount,
 		count(distinct (select o.dealcode
 		from t_risk_buyer b
@@ -375,10 +375,13 @@
 				</otherwise>
 			</choose>
 			<if test="queue != null and queue !=''">
-				AND  p.DunningCycle = #{queue}
+				AND  p.DunningCycle LIKE concat(concat('%',#{queue}),'%')
 			</if>
 			<if test="extension != null and extension !=''">
 				AND  a.Direct = #{extension}
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND p.groupId = #{groupId}
 			</if>
 			<if test="group != null and group.groupIds != null">
 				AND p.`groupId` IN
@@ -432,7 +435,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		(unix_timestamp(t1.checkout) - unix_timestamp(t1.checkin))  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		count(1) as callingAmount,
 		count(r.StartTime) as connectAmout,
 		sum(r.DurationTime) as callDuration
@@ -492,7 +495,7 @@
 				</otherwise>
 			</choose>
 			<if test="queue != null and queue !=''">
-				AND  p.DunningCycle = #{queue}
+				AND  p.DunningCycle LIKE concat(concat('%',#{queue}),'%')
 			</if>
 			<if test="extension != null and extension !=''">
 				AND  a.Direct = #{extension}
@@ -507,6 +510,9 @@
 						#{groupId}
 					</foreach>
 				</if>
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND p.groupId = #{groupId}
 			</if>
 			<if test="peopleId != null and peopleId != ''">
 				AND p.Id = #{peopleId}
@@ -525,23 +531,14 @@
 		</where>
 		group by r.PeopleId) ss
 		<where>
-			<if test="onTimeStart != null and onTimeStart !=''">
-				AND  ontime >= #{onTimeStart}
+			<if test="onTimeStart != null and onTimeStart !='' and onTimeEnd != null and onTimeEnd !=''">
+				AND  ontime >= #{onTimeStart} AND ontime <![CDATA[ <= ]]> #{onTimeEnd}
 			</if>
-			<if test=" onTimeEnd != null and onTimeEnd !=''">
-				AND ontime <![CDATA[ <= ]]> #{onTimeEnd}
+			<if test="breaktimeStart != null and breaktimeStart !='' and breaktimeEnd != null and breaktimeEnd !=''">
+				AND  breaktime >= #{breaktimeStart} AND breaktime <![CDATA[ <= ]]> #{breaktimeEnd}
 			</if>
-			<if test="breaktimeStart != null and breaktimeStart !=''">
-				AND  breaktime >= #{breaktimeStart}
-			</if>
-			<if test="breaktimeEnd != null and breaktimeEnd !=''">
-				AND breaktime <![CDATA[ <= ]]> #{breaktimeEnd}
-			</if>
-			<if test="callDurationStart != null and callDurationStart !=''">
-				AND  callDuration >= #{callDurationStart}
-			</if>
-			<if test="callDurationEnd != null and callDurationEnd !=''">
-				AND callDuration <![CDATA[ <= ]]> #{callDurationEnd}
+			<if test="callDurationStart != null and callDurationStart !='' and callDurationEnd != null and callDurationEnd !=''">
+				AND  callDuration >= #{callDurationStart} AND callDuration <![CDATA[ <= ]]> #{callDurationEnd}
 			</if>
 		</where>
 
@@ -561,7 +558,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		r2.callingAmount as callingAmount,
 		count(distinct (select o.dealcode
 		from t_risk_buyer b
@@ -641,10 +638,13 @@
 				</otherwise>
 			</choose>
 			<if test="queue != null and queue !=''">
-				AND  p.DunningCycle = #{queue}
+				AND  p.DunningCycle LIKE concat(concat('%',#{queue}),'%')
 			</if>
 			<if test="extension != null and extension !=''">
 				AND  a.Direct = #{extension}
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND p.groupId = #{groupId}
 			</if>
 			<if test="group != null and group.groupIds != null">
 				AND p.`groupId` IN
@@ -699,7 +699,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		r2.callingAmount as callingAmount,
 		r2.connectAmout as connectAmout,
 		r2.callDuration as callDuration
@@ -771,10 +771,13 @@
 				</otherwise>
 			</choose>
 			<if test="queue != null and queue !=''">
-				AND  p.DunningCycle = #{queue}
+				AND  p.DunningCycle LIKE concat(concat('%',#{queue}),'%')
 			</if>
 			<if test="extension != null and extension !=''">
 				AND  a.Direct = #{extension}
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND p.groupId = #{groupId}
 			</if>
 			<if test="group != null and group.groupIds != null">
 				AND p.`groupId` IN

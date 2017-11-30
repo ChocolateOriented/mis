@@ -173,6 +173,7 @@ public class TMisCallingRecordController extends BaseController {
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes);
 		model.addAttribute("groupList", map.get("groupList"));
 		model.addAttribute("page", page);
+		model.addAttribute("isHide", request.getParameter("isHide"));
 		model.addAttribute("supervisorLimit", map.get("supervisorLimit"));
 		model.addAttribute("dunningCommissioner", map.get("dunningCommissioner"));
 		model.addAttribute("dunningPhoneReportFile", map.get("dunningPhoneReportFile"));
@@ -197,6 +198,7 @@ public class TMisCallingRecordController extends BaseController {
 		model.addAttribute("groupList", map.get("groupList"));
 		model.addAttribute("page", page);
 		model.addAttribute("supervisorLimit", map.get("supervisorLimit"));
+		model.addAttribute("isHide", request.getParameter("isHide"));
 		model.addAttribute("dunningCommissioner", map.get("dunningCommissioner"));
 		model.addAttribute("dunningPhoneReportFile", map.get("dunningPhoneReportFile"));
 		return "modules/dunning/performancePhoneCallingReportForEveryDayList";

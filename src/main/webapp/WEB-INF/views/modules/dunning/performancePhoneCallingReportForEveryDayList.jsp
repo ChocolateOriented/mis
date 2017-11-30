@@ -7,8 +7,14 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-            $("#advancedSearch").hide();//默认隐藏
-            clearSearch();//清空查询条件
+            isHide = '0';
+		    if ("${isHide}" != '1') {
+                $("#advancedSearch").hide();//默认隐藏
+                clearSearch();//清空查询条件
+            }else {
+            	isHide = "${isHide}";
+                $("#isHide").val(isHide);
+		    }
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出软电话通话详单数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
@@ -37,6 +43,8 @@
 
 			//组与花名联动查询
 			$("#groupList").on("change",function(){
+			    $("#dunningName").val('');
+			    $("#peopleId").val('');
 				$("#dunningPeople").select2("val", null);
 			});
 
@@ -62,7 +70,7 @@
 			        },
 			        results: function (data, page) {//选择要显示的数据
                       var resultsData = [] ;
-                      resultsData[0] = {id:null,name:"全部人员"};
+                      resultsData[0] = {id:null,name:"全部人员",value:""};
                       for (var i = 0; i < data.length; i++) {
                         resultsData[i+1] = {id:data[i].name,name:data[i].name,value:data[i].id};
                       }
@@ -93,7 +101,6 @@
 			}
 			$("#searchForm").attr("action","${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay");
 			$("#searchForm").submit();
-            clearSearch();
         	return false;
         }
 
@@ -102,14 +109,27 @@
 			var name = item.name ;
 			if(name == null || name ==''){
 				name = "空" ;
+            }
+			if ((item.value != null || item.value !='') && item.name !="全部人员" && item.name !=""){
+				$("#peopleId").val(item.value);
 			}
-			$("#peopleId").val(item.value);
+			if (item.name =="全部人员"){
+                $("#peopleId").val('');
+			}
 			return name ;
 		}
 
 
 		function showAndHideSearch(){
-		    $("#advancedSearch").toggle();
+            if (isHide == '0'){
+                $("#advancedSearch").show();
+                isHide = '1'
+                $("#isHide").val(isHide);
+            }else {
+                $("#advancedSearch").hide();
+                isHide = '0';
+                $("#isHide").val(isHide);
+            }
 		}
 
 		function clearSearch(){
@@ -146,6 +166,7 @@
 	<form:form id="searchForm" modelAttribute="dunningPhoneReportFile" action="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<input id="isHide"  name="isHide" type="hidden" />
 		<ul class="ul-form">
 		
 			<li><label>时间：</label>
@@ -167,7 +188,7 @@
 									<!-- 添加类型对应的小组 -->
 									<c:forEach items="${groupList}" var="item">
 										<c:if test="${item.type == type.key}">
-											<option value="${item.id}">${item.name}</option>
+											<option value="${item.id}" <c:if test="${dunningPhoneReportFile.groupId == item.id }">selected="selected"</c:if>>${item.name}</option>
 										</c:if>
 									</c:forEach>
 								</optgroup>
@@ -176,8 +197,8 @@
 				</li>
 			<li>
 				<label>催收人：</label>
-				<form:input id="dunningName"  path="peopleName" type="hidden" value=""/>
-				<form:input id="peopleId" path="peopleId" type="hidden"></form:input>
+				<form:input id="dunningName" name="dunningName" path="peopleName" type="hidden" value=""/>
+				<form:input id="peopleId" name="peopleId" path="peopleId" type="hidden" value="${dunningPhoneReportFile.peopleId}"></form:input>
 			</li>
 			</div>
 			<div align="right">
