@@ -62,21 +62,17 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
         tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
         tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        tMisCustomerServiceFeedback.setUpdateBy(tMisCustomerServiceFeedback.getUpdateBy());
         tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
         tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
-        tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
-        tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
         tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getUname(),tMisCustomerServiceFeedback.getDealcode(),
-                tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople(),
-                tMisCustomerServiceFeedback.getUpdateBy().getName());
+                tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople());
 
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
             logger.info(tMisCustomerServiceFeedback.getId() + ": insert");
