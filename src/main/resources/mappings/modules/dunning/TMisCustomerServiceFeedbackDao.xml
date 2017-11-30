@@ -9,7 +9,7 @@
         a.hashtag AS "hashtag",
         a.problemdescription AS "problemdescription",
         a.updateDate AS "updateDate",
-        a.updateBy AS "nickname",
+        a.updateBy AS "updateBy.name",
         a.pushpeople AS "pushpeople",
         a.operate AS "operate",
         a.handlingResult AS "handlingresult",
@@ -108,7 +108,7 @@
             AND a.pushTime BETWEEN #{farPushTime} AND #{nearPushTime}
         </if>
         <if test="updateBy !=null and updateBy !=''">
-            AND a.updateBy LIKE  concat ('%',#{nickname},'%')
+            AND a.updateBy LIKE  concat ('%',#{updateBy.name},'%')
         </if>
         <if test="groupIds != null">
             AND p.groupId in
@@ -169,7 +169,7 @@
             #{hashtag},
             #{problemdescription},
             #{updateDate},
-            #{updateBy},
+            #{updateBy.name},
             #{pushpeople},
             #{operate},
             #{handlingresult},
@@ -186,7 +186,7 @@
         problemStatus = #{problemstatus},
         handlingResult=#{handlingresult},
         updateDate=#{updateDate},
-        updateBy=#{nickname},
+        updateBy=#{updateBy.name},
         readFlag=#{readFlag}
         WHERE id = #{id}
     </update>

@@ -88,7 +88,7 @@
                     ${tMisCustomerServiceFeedback.problemdescription}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.pushTime}
+                    <fmt:formatDate value="${tMisCustomerServiceFeedback.pushTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </td>
                 <td>
                     <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">

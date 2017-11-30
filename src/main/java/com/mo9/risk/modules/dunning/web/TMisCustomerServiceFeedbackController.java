@@ -148,7 +148,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
      */
     @RequestMapping(value = "custServiceCount")
     @ResponseBody
-    public String custServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback, Model model){
+    public String custServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
         tMisCustomerServiceFeedback.setReadFlag("0");
         String userid=UserUtils.getUser().getId();
