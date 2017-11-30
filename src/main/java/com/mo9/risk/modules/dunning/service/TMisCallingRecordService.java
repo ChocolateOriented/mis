@@ -489,7 +489,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 */
 	private String strsecond2Strhour(String second){
 		if ("".equals(second) || second == null){
-			return "0.00";
+			return "0";
 		}
 		DecimalFormat df   = new DecimalFormat("####0.0000000000");
 		Double doubleSecond = Double.valueOf(second);
