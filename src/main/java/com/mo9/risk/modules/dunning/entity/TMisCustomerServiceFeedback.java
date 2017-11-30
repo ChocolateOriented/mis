@@ -227,8 +227,8 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
         return keyword;
     }
 
-    public void setKeywordText(String uname,String dealcode,String tagText,String statusText,String pushpeople,String updateBy) {
-        this.keyword = uname+","+dealcode+","+tagText+","+statusText+","+pushpeople+","+updateBy;
+    public void setKeywordText(String uname,String dealcode,String tagText,String statusText,String pushpeople) {
+        this.keyword = uname+","+dealcode+","+tagText+","+statusText+","+pushpeople;
     }
     public void setKeyword(String keyword) {
         this.keyword = keyword;
