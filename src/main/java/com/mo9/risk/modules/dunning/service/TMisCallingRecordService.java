@@ -5,10 +5,7 @@ package com.mo9.risk.modules.dunning.service;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
 import com.thinkgem.jeesite.common.utils.DateUtils;
@@ -417,6 +414,8 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
 		page.setCount(dao.countExportStatementFile(entity));
+		List<DunningPhoneReportFile> list = exportSoftPhoneReportFile(entity);
+		filterPhoneReportByDepartment(list,entity,page);
 		page.setList(exportSoftPhoneReportFile(entity));
 		return page;
 	}
@@ -439,6 +438,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 				}
 			}
 		}
+		filterPhoneReportByDepartment(reportFiles,entity,null);
 		return reportFiles;
 	}
 
@@ -448,6 +448,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 */
 	public List<DunningPhoneReportFile> exportSoftPhoneReportFileForEveryDay(DunningPhoneReportFile entity){
 		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFileForEveryDay(entity);
+		filterPhoneReportByDepartment(reportFiles,entity,null);
 		return countDunningPhoneReport(reportFiles, entity);
 	}
 
@@ -458,7 +459,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
 		page.setCount(dao.countExportStatementFileForEveryDay(entity));
-		page.setList(exportSoftPhoneReportFileForEveryDay(entity));
+		List<DunningPhoneReportFile> list = exportSoftPhoneReportFileForEveryDay(entity);
+		filterPhoneReportByDepartment(list,entity,page);
+		page.setList(list);
 		return page;
 	}
 
@@ -486,11 +489,12 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 */
 	private String strsecond2Strhour(String second){
 		if ("".equals(second) || second == null){
-			return "0";
+			return "0.00";
 		}
-		Integer integerSecond = Integer.valueOf(second);
-		Integer integerHour = integerSecond/3600;
-		return  integerHour.toString();
+		DecimalFormat df   = new DecimalFormat("####0.0000000000");
+		Double doubleSecond = Double.valueOf(second);
+		Double doubleHour = doubleSecond/3600.00;
+		return  df.format(doubleHour).toString();
 	}
 
 	/**
@@ -516,4 +520,30 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		}
 		return reportFiles;
 	}
+
+	/**
+	 * 过滤查询出来的数据，通过机构名称
+	 * @param reportFiles
+	 * @param entity
+	 * @param page
+	 */
+	private void filterPhoneReportByDepartment(List<DunningPhoneReportFile> reportFiles, DunningPhoneReportFile entity,Page<DunningPhoneReportFile> page){
+		if (!(entity.getDepartment() == null || "".equals(entity.getDepartment()))){
+			if (!(entity.getDepartment() == null || "".equals(entity.getDepartment().trim()))){
+				Iterator<DunningPhoneReportFile> it = reportFiles.iterator();
+				while(it.hasNext()){
+					DunningPhoneReportFile file = it.next();
+					if(!(file.getDepartment() == null || "".equals(file.getDepartment()))) {
+						if (!file.getDepartment().equals(entity.getDepartment())) {
+							it.remove();
+							if (page != null) {
+								page.setCount(page.getCount() - 1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
