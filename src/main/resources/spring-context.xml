@@ -113,6 +113,7 @@
 	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/jeesite" />
 	<jee:jndi-lookup id="dataSource_read_1" jndi-name="java:comp/env/jdbc/jeesite_read1" />
 	<jee:jndi-lookup id="dataSource_read_2" jndi-name="java:comp/env/jdbc/jeesite_read2" />
+	<jee:jndi-lookup id="dataSource_read_3" jndi-name="java:comp/env/jdbc/jeesite_read3" />
 	<jee:jndi-lookup id="updateOrderDataSource" jndi-name="java:comp/env/jdbc/jeesite2" />
 	<jee:jndi-lookup id="temporaryDataSource" jndi-name="java:comp/env/jdbc/jeesite3" />
 	
@@ -141,8 +142,9 @@
     <property name="defaultTargetDataSource" ref="dataSource_read_1"/>
     <property name="weightDataSource">
       <map>
-        <entry key-ref="dataSource_read_1" value="5"/>
-        <entry key-ref="dataSource_read_2" value="5"/>
+        <entry key-ref="dataSource_read_1" value="1"/>
+        <entry key-ref="dataSource_read_2" value="1"/>
+        <entry key-ref="dataSource_read_3" value="1"/>
       </map>
     </property>
   </bean>

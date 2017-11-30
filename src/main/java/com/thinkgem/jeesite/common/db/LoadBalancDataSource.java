@@ -55,6 +55,7 @@ public class LoadBalancDataSource extends AbstractRoutingDataSource {
 		Integer n = ThreadLocalRandom.current().nextInt(weightSum);
 		for (Integer limit : weightLimitList) {
 			if (n < limit){
+				//System.out.println(limit);
 				return limit;
 			}
 		}
