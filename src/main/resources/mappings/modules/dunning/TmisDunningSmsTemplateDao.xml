@@ -129,7 +129,7 @@
 			#{createBy.name},
 			#{updateBy.name},
 			#{sendReason},
-			#{invalid}
+			't'
 		)
 	</insert>
 	
