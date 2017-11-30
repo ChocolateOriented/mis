@@ -55,14 +55,14 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
     private MqAction customerServiceFeedback_problem(MqMessage msg) {
 
         String json = msg.getBody();
+        logger.info(json);
         TMisCustomerServicefeedbackDto feedback = JSON.parseObject(json, TMisCustomerServicefeedbackDto.class );
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
         tMisCustomerServiceFeedback.setDealcode(feedback.getLoanDealCode());
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
         tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
         tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        String nickname= String.valueOf(UserUtils.getUser().getUpdateBy());
-        tMisCustomerServiceFeedback.setDunningpeopleid(nickname);
+        tMisCustomerServiceFeedback.setUpdateBy(tMisCustomerServiceFeedback.getUpdateBy());
         tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
         tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
@@ -76,14 +76,18 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         }
         tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getUname(),tMisCustomerServiceFeedback.getDealcode(),
                 tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople(),
-                String.valueOf(tMisCustomerServiceFeedback.getDunningpeopleid()));
-        logger.info(tMisCustomerServiceFeedback.getId());
+                tMisCustomerServiceFeedback.getUpdateBy().getName());
+
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
+            logger.info(tMisCustomerServiceFeedback.getId() + ": insert");
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
+            logger.info(tMisCustomerServiceFeedback.getId() + ": update");
             feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
 
         }
+
+        logger.info(tMisCustomerServiceFeedback.getId() + ": consume complete");
         return MqAction.CommitMessage;
     }
 }
