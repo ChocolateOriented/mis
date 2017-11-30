@@ -295,7 +295,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		count(1) as callingAmount,
 		count(distinct (select o.dealcode
 		from t_risk_buyer b
@@ -435,7 +435,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		(unix_timestamp(t1.checkout) - unix_timestamp(t1.checkin))  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		count(1) as callingAmount,
 		count(r.StartTime) as connectAmout,
 		sum(r.DurationTime) as callDuration
@@ -558,7 +558,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		r2.callingAmount as callingAmount,
 		count(distinct (select o.dealcode
 		from t_risk_buyer b
@@ -699,7 +699,7 @@
 		t1.checkin as firstCheckIn,
 		t1.checkout as lastCheckOut,
 		t1.ontime  as ontime,
-		t2.break as breaktime,
+		if(t2.break is null, 0, t2.break) as breaktime,
 		r2.callingAmount as callingAmount,
 		r2.connectAmout as connectAmout,
 		r2.callDuration as callDuration
