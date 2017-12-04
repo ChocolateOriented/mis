@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.gamaxpay.commonutil.msf.BaseResponse;
 import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
+import com.mo9.risk.modules.dunning.bean.BlackListRelation;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
@@ -38,6 +39,7 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.manager.RiskqQualityInfoManager;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
@@ -175,6 +177,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	private TMisDunningTaskSupportService tMisDunningTaskSupportService;
 	@Autowired
 	private TMisDunnedConclusionService tMisDunnedConclusionService;
+	@Autowired
+	private RiskqQualityInfoManager riskqQualityInfoManager;
+
+
 	public TMisDunningTask get(String id) {
 		return super.get(id);
 	}
@@ -960,21 +966,45 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		List<DunningOrder> orders = dao.newfindOrderPageList(entity);
 		page.setList(orders);
 		
-		//分页金额统计
 		double creditamount = 0;
 		double corpusamount = 0;
 		if (orders != null && orders.size() != 0) {
 			for (DunningOrder order : orders) {
+				//分页金额统计
 				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
 				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
+				//添加黑名单关系
+				this.appendBlackNodeNum(order);
 			}
 		}
 		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
 		page.setMessage(message);
-		
+
 		return page;
 	}
-	
+
+	/**
+	 * @Description  添加黑名单关系
+	 * @param order
+	 * @return void
+	 */
+	private void appendBlackNodeNum(DunningOrder order) {
+		String mobile = order.getMobile();
+		if (StringUtils.isBlank(mobile)){
+			return;
+		}
+
+		try {
+			BlackListRelation relation = riskqQualityInfoManager.blackListRelation(order.getMobile());
+			order.setBlackListRelaNum(String.valueOf(relation.getNum()));
+			order.setBlackListNumFromMo9(relation.getNumFromMo9());
+			order.setBlackListNumFromThird(relation.getNumFromThird());
+		} catch (Exception e) {
+			order.setBlackListRelaNum("获取失败");
+			logger.info("黑名单关系获取失败",e);
+		}
+	}
+
 	/**
 	 * 查询催收列表数据
 	 * @param entity
