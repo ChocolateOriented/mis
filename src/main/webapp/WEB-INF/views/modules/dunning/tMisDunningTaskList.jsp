@@ -298,7 +298,7 @@
 				});
 			}
 		});
-		
+
 		//参数单位：毫秒    输出单位：天（向上取整）
 		function dateDiff(startDate, endDate){
 			return Math.ceil((endDate-startDate)/1000/3600/24);
@@ -541,7 +541,7 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-
+                <th>黑名单联系人数</th>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 				<th>号码清洗</th>
 				</c:if>
@@ -631,7 +631,10 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-
+				<td>
+					${dunningOrder.blackListRelaNum}
+						<%--,${dunningOrder.blackListNumFromMo9},${dunningOrder.blackListNumFromThird}--%>
+				</td>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
 					  <c:if test="${dunningOrder.status eq 'payment'}">

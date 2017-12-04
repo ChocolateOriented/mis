@@ -102,6 +102,10 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Integer endAmount;		//查询结束-欠款金额
 	
 	private Boolean firstOrder;		//初次订单
+	private String blackListRelaNum; //黑名单联系人数量
+	private Integer blackListNumFromMo9;//mo9黑名单数量
+	private Integer blackListNumFromThird;//第三方黑名单数量
+
 	
 	public String getPlatformExt() {
 		return platformExt;
@@ -602,4 +606,27 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.firstOrder = firstOrder;
 	}
 
+	public String getBlackListRelaNum() {
+		return blackListRelaNum;
+	}
+
+	public void setBlackListRelaNum(String blackListRelaNum) {
+		this.blackListRelaNum = blackListRelaNum;
+	}
+
+	public Integer getBlackListNumFromMo9() {
+		return blackListNumFromMo9;
+	}
+
+	public void setBlackListNumFromMo9(Integer blackListNumFromMo9) {
+		this.blackListNumFromMo9 = blackListNumFromMo9;
+	}
+
+	public Integer getBlackListNumFromThird() {
+		return blackListNumFromThird;
+	}
+
+	public void setBlackListNumFromThird(Integer blackListNumFromThird) {
+		this.blackListNumFromThird = blackListNumFromThird;
+	}
 }

@@ -3,12 +3,16 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.modules.dunning.manager.RiskScorecardManager;
+import com.mo9.risk.modules.dunning.dao.TMisDunningScoreCardDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
+import com.mo9.risk.modules.dunning.manager.RiskqQualityInfoManager;
+import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +20,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.mo9.risk.modules.dunning.dao.TMisDunningScoreCardDao;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
-import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
-import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 
 /**
  * 评分卡Service
@@ -35,7 +32,7 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCardDao, TMisDunningScoreCard> {
 
 	@Autowired
-	private RiskScorecardManager riskScorecardManager;
+	private RiskqQualityInfoManager riskScorecardManager;
 	
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningScoreCardService.class);
 	
