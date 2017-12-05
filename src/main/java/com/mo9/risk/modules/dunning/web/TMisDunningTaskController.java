@@ -41,6 +41,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
+import com.mo9.risk.modules.dunning.service.RiskQualityInfoService;
 import com.mo9.risk.modules.dunning.service.TBuyerContactService;
 import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
 import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
@@ -51,7 +52,6 @@ import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
 import com.mo9.risk.modules.dunning.service.TMisDunningInformationRecoveryService;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
-import com.mo9.risk.modules.dunning.service.TMisDunningScoreCardService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
@@ -187,7 +187,7 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningTagService tMisDunningTagService ;
 	
 	@Autowired
-	private TMisDunningScoreCardService tMisDunningScoreCardService;
+	private RiskQualityInfoService tMisDunningScoreCardService;
 
 	@Autowired
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
