@@ -24,6 +24,9 @@
 		#Complaint {
 			background-color: #ff6600;
 		}
+		#Other {
+			background-color: #008000;
+		}
 		
 		.suspense {
 			z-index: 10000;

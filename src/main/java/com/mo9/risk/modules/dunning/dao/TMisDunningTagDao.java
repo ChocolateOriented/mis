@@ -32,4 +32,6 @@ public interface TMisDunningTagDao extends CrudDao<TMisDunningTag> {
 	 */
 
 	public List<String> getExistTagByBuyerid(String buyerid);
+
+	public String typeExist(TMisDunningTag tMisDunningTag);
 }

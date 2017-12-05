@@ -84,6 +84,9 @@
 					<c:if test="${empty exist['Complaint']}">
 						<option value="Complaint" ${tMisDunningTag.tagtype eq 'Complaint' ? 'selected' : ''}>投诉或投诉倾向</option>
 					</c:if>
+					<c:if test="${empty exist['Other']}">
+						<option value="Other" ${tMisDunningTag.tagtype eq 'Other' ? 'selected' : ''}>其他</option>
+					</c:if>
 				</select>
 				<span class="help-inline"><font color="red">*</font></span>
 			</div>
