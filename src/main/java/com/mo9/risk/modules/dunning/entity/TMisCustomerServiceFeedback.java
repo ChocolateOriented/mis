@@ -3,6 +3,7 @@ package com.mo9.risk.modules.dunning.entity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.hibernate.validator.constraints.Length;
@@ -208,7 +209,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     }
 
     public void setNearPushTime(Date nearPushTime) {
-        this.nearPushTime = nearPushTime;
+        this.nearPushTime = null != nearPushTime ? DateUtils.endDate(nearPushTime) : nearPushTime;
     }
 
     public Date getNearPushTime() {
