@@ -269,11 +269,11 @@ function changeStatus( dealcode) {
         type: 'POST',
         url : "${ctx}/dunning/tMisDunningOuterTask/orderStatus?dealcode="+dealcode,
         success : function(data) {
-            if (data == "payoff") {
+            if (data == "OK") {
                 alert("同步成功");
                 window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
                 window.parent.window.jBox.close();            //关闭子窗体
-            } else  if (data == "payment") {
+            } else  if (data == "NO") {
                 alert("该订单未还清");
             }else{
                 alert("请联系管理员");
@@ -340,7 +340,14 @@ function changeStatus( dealcode) {
 				</form:select></li>
 			<li>
 			<li><label>催款人</label> <form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden" /></li>
-
+			<li><label>最近催收</label>
+				<input name="beginDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.beginDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至
+				<input name="endDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.endDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" /></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空" /></li>
 			<li class="btns">

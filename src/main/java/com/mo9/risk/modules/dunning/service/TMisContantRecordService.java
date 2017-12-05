@@ -36,7 +36,9 @@ import com.mo9.risk.util.MsfClient;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -394,6 +396,14 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			// 联系人姓名
 			dunning.setContactsname(tMisContantRecord.getContactsname());
 			dunning.setDunningCycle(task.getDunningcycle());
+			//操作人使用其花名
+			User user= UserUtils.getUser();
+			TMisDunningPeople dunningPeople = tmisPeopleDao.get(user.getId());
+			if(dunningPeople==null){
+				dunning.setNewOperateName(user.getName());
+			}else{
+				dunning.setNewOperateName(dunningPeople.getNickname());
+			}
 			save(dunning);
 			if (!"".equals(dunningtaskdbid) && null != dunningtaskdbid) {
 				dunningTaskDao.updatedunningtime(dunningtaskdbid);

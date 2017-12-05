@@ -364,6 +364,4 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public int updateLatestLoginTime(DunningOrder dunningOrder);
-
-	public  int asyncUpdate(@Param("dealcode") String dealcode, @Param("status") String status);
 }

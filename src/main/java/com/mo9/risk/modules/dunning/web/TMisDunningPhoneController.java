@@ -3,6 +3,10 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.Session;
@@ -20,6 +24,7 @@ import com.mo9.risk.modules.dunning.bean.CallCenterPageResponse;
 import com.mo9.risk.modules.dunning.bean.CallCenterQueryCallInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterWebSocketMessage;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
+import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
 import com.mo9.risk.modules.dunning.service.TMisAgentInfoService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPhoneService;
 import com.mo9.risk.util.WebSocketSessionUtil;
@@ -51,12 +56,13 @@ public class TMisDunningPhoneController extends BaseController {
 		TMisAgentInfo info = tMisAgentInfoService.getInfoByPeopleId(userId);
 		return info != null && info.getAgent() != null;
 	}
+	
 	@RequestMapping(value = "${adminPath}/dunning/tMisDunningPhone/phones")
 	@RequiresPermissions("dunning:phone:view")
-	public String phones(Model model,HttpServletRequest request, HttpServletResponse response) {
+	public String phones(Model model, HttpServletRequest request, HttpServletResponse response) {
 		String userId = UserUtils.getUser().getId();
 		TMisAgentInfo info = tMisAgentInfoService.getInfoByPeopleId(userId);
-		String url =  DictUtils.getDictValue("websocketUrl", "callcenter", "");
+		String url = DictUtils.getDictValue("websocketUrl", "callcenter", "");
 		model.addAttribute("userId", userId);
 		model.addAttribute("agent", info.getAgent());
 		model.addAttribute("queue", info.getQueue());
@@ -64,52 +70,115 @@ public class TMisDunningPhoneController extends BaseController {
 		model.addAttribute("url", url);
 		return "modules/dunning/tMisDunningKeyPhone";
 	}
+	
 	/**
 	 * 个人呼出信息获取
 	 * @param callCenterQueryCallInfo
 	 */
 	@RequestMapping(value = "f/numberPhone/callout")
-	public  String  callout(CallCenterQueryCallInfo callCenterQueryCallInfo,HttpServletRequest request, HttpServletResponse response,Model model){
-		if(StringUtils.isEmpty(callCenterQueryCallInfo.getPage())){
+	public String callout(CallCenterQueryCallInfo callCenterQueryCallInfo,HttpServletRequest request, HttpServletResponse response, Model model){
+		if (StringUtils.isEmpty(callCenterQueryCallInfo.getPage())) {
 			callCenterQueryCallInfo.setPage("1");
 			callCenterQueryCallInfo.setPagesize("30");
 		}
 		CallCenterPageResponse<CallCenterCalloutInfo> callOutInfo = phoneService.callOutInfo(callCenterQueryCallInfo);
-		if(callOutInfo!=null&&callOutInfo.getData()!=null){
+		if (callOutInfo != null && callOutInfo.getData() != null) {
 			Page<CallCenterCalloutInfo> page=new Page<CallCenterCalloutInfo>(request, response);
 			page.setCount(callOutInfo.getData().getTotal());
 			page.setPageNo(callOutInfo.getData().getPage());
 			page.setPageSize(callOutInfo.getData().getPageSize());
 			page.setList(callOutInfo.getData().getResults());
 			model.addAttribute("page",page);
-			model.addAttribute("call","callout");
+			model.addAttribute("type","callout");
 		}
 		return "/modules/dunning/tMisDunningcallingPhoneInfo";
 	}
+	
 	/**
 	 * 个人呼入信息获取
 	 * @param callCenterQueryCallInfo
 	 */
 	@RequestMapping(value = "f/numberPhone/callin")
-	public  String  callin(CallCenterQueryCallInfo callCenterQueryCallInfo,HttpServletRequest request, HttpServletResponse response,Model model){
-		if(StringUtils.isEmpty(callCenterQueryCallInfo.getPage())){
+	public String callin(CallCenterQueryCallInfo callCenterQueryCallInfo, HttpServletRequest request, HttpServletResponse response, Model model){
+		if (StringUtils.isEmpty(callCenterQueryCallInfo.getPage())) {
 			callCenterQueryCallInfo.setPage("1");
 			callCenterQueryCallInfo.setPagesize("30");
 		}
 		CallCenterPageResponse<CallCenterCallinInfo> callinInfo = phoneService.callinInfo(callCenterQueryCallInfo);
-		if(callinInfo!=null&&callinInfo.getData()!=null){
-			Page<CallCenterCallinInfo> page=new Page<CallCenterCallinInfo>(request, response);
+		if (callinInfo != null && callinInfo.getData() != null) {
+			Page<CallCenterCallinInfo> page = new Page<CallCenterCallinInfo>(request, response);
 			page.setCount(callinInfo.getData().getTotal());
 			page.setPageNo(callinInfo.getData().getPage());
 			page.setPageSize(callinInfo.getData().getPageSize());
 			page.setList(callinInfo.getData().getResults());
-			model.addAttribute("page",page);
-			model.addAttribute("call","callin");
+			model.addAttribute("page", page);
+			model.addAttribute("type", "callin");
 		}
 		return "/modules/dunning/tMisDunningcallingPhoneInfo";
 	}
+	
+	/**
+	 * 个人全部呼叫信息获取
+	 * @param callCenterQueryCallInfo
+	 */
+	@RequestMapping(value = "f/numberPhone/callAll")
+	public String callinfoAll(CallCenterQueryCallInfo callCenterQueryCallInfo, HttpServletRequest request, HttpServletResponse response, Model model){
+		if(StringUtils.isEmpty(callCenterQueryCallInfo.getPage())){
+			callCenterQueryCallInfo.setPage("1");
+			callCenterQueryCallInfo.setPagesize("30");
+		}
+		String starttime = getTodayStarttime();
+		callCenterQueryCallInfo.setStarttime(starttime);
+		
+		Page<TMisCallingRecord> page = phoneService.callInfoAll(callCenterQueryCallInfo);
+		model.addAttribute("page", page);
+		model.addAttribute("type", "callAll");
+		return "/modules/dunning/tMisDunningcallingPhoneInfo";
+	}
+	
+	/**
+	 * 个人未接呼叫信息获取
+	 * @param callCenterQueryCallInfo
+	 */
+	@RequestMapping(value = "f/numberPhone/callBusy")
+	public String callinfoBusy(CallCenterQueryCallInfo callCenterQueryCallInfo, HttpServletRequest request, HttpServletResponse response, Model model){
+		if(StringUtils.isEmpty(callCenterQueryCallInfo.getPage())){
+			callCenterQueryCallInfo.setPage("1");
+			callCenterQueryCallInfo.setPagesize("30");
+		}
+		String starttime = getTodayStarttime();
+		callCenterQueryCallInfo.setStarttime(starttime);
+		
+		Page<TMisCallingRecord> page = phoneService.callInfoBusy(callCenterQueryCallInfo);
+		model.addAttribute("page", page);
+		model.addAttribute("type", "callBusy");
+		return "/modules/dunning/tMisDunningcallingPhoneInfo";
+	}
+	
+	/**
+	 * 个人队列中放弃信息获取
+	 * @param callCenterQueryCallInfo
+	 */
+	@RequestMapping(value = "f/numberPhone/callQueueOff")
+	public String callinfoQueueOff(CallCenterQueryCallInfo callCenterQueryCallInfo, HttpServletRequest request, HttpServletResponse response, Model model){
+		if(StringUtils.isEmpty(callCenterQueryCallInfo.getPage())){
+			callCenterQueryCallInfo.setPage("1");
+			callCenterQueryCallInfo.setPagesize("30");
+		}
+		String starttime = getTodayStarttime();
+		callCenterQueryCallInfo.setStarttime(starttime);
+		
+		Page<TMisCallingRecord> page = phoneService.callInfoQueueOff(callCenterQueryCallInfo);
+		model.addAttribute("page", page);
+		model.addAttribute("type", "callQueueOff");
+		return "/modules/dunning/tMisDunningcallingPhoneInfo";
+	}
+	
 	/**
 	 * 从父页面点击号码跳转软电话页面
+	 * @param target
+	 * @param peopleId
+	 * @param name
 	 * @param request
 	 * @param response
 	 * @return
@@ -141,5 +210,19 @@ public class TMisDunningPhoneController extends BaseController {
 		message.setOperation("originate");
 		phoneService.originate(message);
 		return true;
+	}
+	
+	/**
+	 * 获取查询cti当天呼叫信息起始时间
+	 */
+	private String getTodayStarttime() {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.add(Calendar.SECOND, -1);
+		Date start = c.getTime();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		return dateFormat.format(start);
 	}
 }

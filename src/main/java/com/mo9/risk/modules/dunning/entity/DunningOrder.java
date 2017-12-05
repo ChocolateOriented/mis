@@ -63,7 +63,11 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date beginOuterfiletime;		// 开始到期还款日期
 	private Date endOuterfiletime;		// 结束到期还款日期
 	
-	private Date dunningtime;
+	private Date dunningtime;//最近催收时间
+
+	private Date beginDunningtime;//最近催收时间
+
+	private Date endDunningtime;//最近催收时间
 	
 	private String dunningcycle;		// 催收周期(队列)
 	
@@ -102,6 +106,10 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Integer endAmount;		//查询结束-欠款金额
 	
 	private Boolean firstOrder;		//初次订单
+	private String blackListRelaNum; //黑名单联系人数量
+	private Integer blackListNumFromMo9;//mo9黑名单数量
+	private Integer blackListNumFromThird;//第三方黑名单数量
+
 	
 	public String getPlatformExt() {
 		return platformExt;
@@ -602,4 +610,42 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.firstOrder = firstOrder;
 	}
 
+	public String getBlackListRelaNum() {
+		return blackListRelaNum;
+	}
+
+	public void setBlackListRelaNum(String blackListRelaNum) {
+		this.blackListRelaNum = blackListRelaNum;
+	}
+
+	public Integer getBlackListNumFromMo9() {
+		return blackListNumFromMo9;
+	}
+
+	public void setBlackListNumFromMo9(Integer blackListNumFromMo9) {
+		this.blackListNumFromMo9 = blackListNumFromMo9;
+	}
+
+	public Integer getBlackListNumFromThird() {
+		return blackListNumFromThird;
+	}
+
+	public void setBlackListNumFromThird(Integer blackListNumFromThird) {
+		this.blackListNumFromThird = blackListNumFromThird;
+	}
+	public Date getBeginDunningtime() {
+		return beginDunningtime;
+	}
+
+	public void setBeginDunningtime(Date beginDunningtime) {
+		this.beginDunningtime = beginDunningtime;
+	}
+
+	public Date getEndDunningtime() {
+		return endDunningtime;
+	}
+
+	public void setEndDunningtime(Date endDunningtime) {
+		this.endDunningtime = null != endDunningtime ? DateUtils.endDate(endDunningtime) : endDunningtime;
+	}
 }

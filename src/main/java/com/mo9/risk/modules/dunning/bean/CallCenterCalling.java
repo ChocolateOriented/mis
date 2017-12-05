@@ -4,9 +4,14 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * CTI呼叫请求
- * <blockquote><pre>
- * 发起呼叫,呼叫中断,呼叫保持,取消保持
- * 呼叫转移,呼叫监听,呼叫强插</pre></blockquote>
+ * <p><pre>
+ * 发起呼叫
+ * 呼叫中断
+ * 呼叫保持
+ * 取消保持
+ * 呼叫转移
+ * 呼叫监听
+ * 呼叫强插</pre></p>
  */
 public class CallCenterCalling extends CallCenterBaseAction {
 

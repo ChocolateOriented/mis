@@ -298,7 +298,7 @@
 				});
 			}
 		});
-		
+
 		//参数单位：毫秒    输出单位：天（向上取整）
 		function dateDiff(startDate, endDate){
 			return Math.ceil((endDate-startDate)/1000/3600/24);
@@ -340,11 +340,11 @@
                     type: 'POST',
                     url : "${ctx}/dunning/tMisDunningTask/orderStatus?dealcode="+dealcode,
                     success : function(data) {
-                        if (data == "payoff") {
+                        if (data == "OK") {
                             alert("同步成功");
                             window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
                             window.parent.window.jBox.close();            //关闭子窗体
-                        } else  if (data == "payment") {
+                        } else  if (data == "NO") {
                             alert("该订单未还清");
                         }else{
                             alert("请联系管理员");
@@ -477,7 +477,16 @@
 					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</li>
 			</shiro:hasPermission>
-				
+
+			<li><label>最近催收</label>
+				<input name="beginDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.beginDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至
+				<input name="endDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.endDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+
 			<li><label>最近登录时间</label>
 				<input name="beginlatestlogintime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${dunningOrder.beginlatestlogintime}" pattern="yyyy-MM-dd"/>"
@@ -541,7 +550,7 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-
+                <th>黑名单联系人数</th>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 				<th>号码清洗</th>
 				</c:if>
@@ -594,7 +603,7 @@
 					</c:if>
 
 					<c:if test="${dunningOrder.statusText eq '已还清'}">
-						 ${dunningOrder.statusText}
+						${dunningOrder.statusText}
 					</c:if>
 				</td>
 
@@ -631,7 +640,10 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-
+				<td>
+					${dunningOrder.blackListRelaNum}
+						<%--,${dunningOrder.blackListNumFromMo9},${dunningOrder.blackListNumFromThird}--%>
+				</td>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
 					  <c:if test="${dunningOrder.status eq 'payment'}">

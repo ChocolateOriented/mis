@@ -3,12 +3,13 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -105,8 +106,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 		
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("定时同步电话通话信记录结束");
 	}
 	
@@ -134,8 +134,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("每小时同步电话通话信记录结束");
 	}
 
@@ -163,13 +162,13 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 		
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
+		syncAgentCallInfo(action);
 		logger.info("每日同步电话通话信记录结束");
 	}
 	
 	/**
 	 * 手动同步CTI通话记录
+	 * @param date
 	 * @return
 	 */
 	@Transactional(readOnly = false)
@@ -193,9 +192,32 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setStarttime(starttime);
 		action.setEndtime(endtime);
 		
-		syncCalloutInfo(action);
-		syncCallinInfo(action);
-		logger.info("手动同步CTI通话记录");
+		syncAgentCallInfo(action);
+		logger.info("手动同步CTI通话记录结束");
+	}
+	
+	/**
+	 * 同步坐席呼入呼出信息
+	 * @param action
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public void syncAgentCallInfo(CallCenterQueryCallInfo action) {
+		List<TMisAgentInfo> agents = tMisAgentInfoService.findAllList();
+		if (agents == null || agents.isEmpty()) {
+			logger.info("没有需要同步通话记录的坐席");
+			return;
+		}
+		
+		for (TMisAgentInfo agent : agents) {
+			logger.info("同步坐席" + agent.getAgent());
+			action.setQueue(null);
+			action.setAgent(agent.getAgent());
+			syncCalloutInfo(action);
+			action.setAgent(null);
+			action.setQueue(agent.getQueue());
+			syncCallinInfo(action);
+		}
 	}
 	
 	/**
@@ -208,8 +230,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setPage(null);
 		try {
 			CallCenterPageResponse<CallCenterCalloutInfo> result = callCenterManager.calloutInfo(action);
-			if (result == null || !"0".equals(result.getErrorCode())) {
-				throw new ServiceException(result.getErrorMsg());
+			if (result == null) {
+				logger.info("同步呼出通话信息失败");
+				return;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCalloutInfo> page = result.getData();
@@ -255,8 +278,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		action.setPage(null);
 		try {
 			CallCenterPageResponse<CallCenterCallinInfo> result = callCenterManager.callinInfo(action);
-			if (result == null || !"0".equals(result.getErrorCode())) {
-				throw new ServiceException(result.getErrorMsg());
+			if (result == null) {
+				logger.info("同步呼入通话信息失败");
+				return;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCallinInfo> page = result.getData();
@@ -294,7 +318,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	/**
 	 * 保存呼出信息数据
-	 * @param action
+	 * @param calloutInfos
 	 * @return
 	 */
 	private void saveCalloutResults(List<CallCenterCalloutInfo> calloutInfos) {
@@ -314,6 +338,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			}
 			
 			TMisCallingRecord record = new TMisCallingRecord(callInfo);
+			String target = record.getTargetNumber();
+			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+			record.setTargetNumber(target);
 			record.setPeopleId(agentInfo.getPeopleId());
 			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
@@ -322,7 +349,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	
 	/**
 	 * 保存呼入信息数据
-	 * @param action
+	 * @param callinInfos
 	 * @return
 	 */
 	private void saveCallinResults(List<CallCenterCallinInfo> callinInfos) {
@@ -348,6 +375,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			if (StringUtils.isEmpty(record.getExtensionNumber())) {
 				record.setExtensionNumber(agentInfo.getExtension());
 			}
+			String target = record.getTargetNumber();
+			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+			record.setTargetNumber(target);
 			record.setAgentState(getAgentStateOnMoment(record));
 			save(record);
 		}
@@ -357,7 +387,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	 * 获取呼入/呼出的坐席状态
 	 */
 	private String getAgentStateOnMoment(TMisCallingRecord record){
-		TMisAgentInfo agentInfo = tMisAgentInfoService.getLoginLogTodaybyId(record);
+		TMisAgentInfo agentInfo = tMisAgentInfoService.getAgentStateOnMoment(record);
 		if (agentInfo == null) {
 			return CallCenterAgentStatus.LOGGED_OUT;
 		}
@@ -375,4 +405,145 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		}
 		return dao.queryMobileLocation(mobile.substring(0, 7));
 	}
+
+	/**
+	 * 查询软电话日常报表
+	 */
+
+	public Page<DunningPhoneReportFile> exportStatementFile(Page<DunningPhoneReportFile> page, DunningPhoneReportFile entity) {
+		entity.setPage(page);
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.countExportStatementFile(entity));
+		List<DunningPhoneReportFile> list = exportSoftPhoneReportFile(entity);
+		filterPhoneReportByDepartment(list,entity,page);
+		page.setList(exportSoftPhoneReportFile(entity));
+		return page;
+	}
+
+	/**
+	 * 查询软电话日常报表
+	 */
+
+	public List<DunningPhoneReportFile> exportSoftPhoneReportFile(DunningPhoneReportFile entity) {
+		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFile(entity);
+		for (DunningPhoneReportFile reportFile : reportFiles){
+			if (reportFile.getDateTime() == null || "".equals(reportFile.getDateTime())) {
+				reportFile.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm") + "至" + DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			}
+			if (!StringUtils.isEmpty(reportFile.getLogiName())) {
+				User user = UserUtils.getByLoginName(reportFile.getLogiName());
+				if (!(user.getCompany().getName() == null && "".equals(user.getCompany().getName())
+						&& user.getOffice().getName() == null && "".equals(user.getOffice().getName()))) {
+					reportFile.setDepartment(user.getCompany().getName() + user.getOffice().getName());
+				}
+			}
+		}
+		filterPhoneReportByDepartment(reportFiles,entity,null);
+		return reportFiles;
+	}
+
+
+	/**
+	 * 查询软电话日常报表（日常）
+	 */
+	public List<DunningPhoneReportFile> exportSoftPhoneReportFileForEveryDay(DunningPhoneReportFile entity){
+		List<DunningPhoneReportFile> reportFiles = dao.exportStatementFileForEveryDay(entity);
+		filterPhoneReportByDepartment(reportFiles,entity,null);
+		return countDunningPhoneReport(reportFiles, entity);
+	}
+
+	/**
+	 * 查询软电话日常报表（日常）
+	 */
+	public Page<DunningPhoneReportFile> exportStatementFileForEveryDay(Page<DunningPhoneReportFile> page,DunningPhoneReportFile entity){
+		entity.setPage(page);
+		page.setUsePaginationInterceptor(false);
+		page.setCount(dao.countExportStatementFileForEveryDay(entity));
+		List<DunningPhoneReportFile> list = exportSoftPhoneReportFileForEveryDay(entity);
+		filterPhoneReportByDepartment(list,entity,page);
+		page.setList(list);
+		return page;
+	}
+
+	/**
+	 * 两个str类型的数字相除返回str
+	 * @param front 除号前
+	 * @param back 除号后
+	 * @return
+	 */
+	private String strDivideStr(String front , String back){
+		if (StringUtils.isEmpty(front) || StringUtils.isEmpty(back) || "0".equals(front) ||  "0".equals(back)){
+			return "0.00";
+		}
+		Double double1 = Double.valueOf(front);
+		Double double2 = Double.valueOf(back);
+		Double rst = double1/double2;
+		DecimalFormat df = new DecimalFormat("0.00");
+		return  df.format(rst);
+	}
+
+	/**
+	 * str秒转化为str时
+	 * @param second
+	 * @return
+	 */
+	private String strsecond2Strhour(String second){
+		if ("".equals(second) || second == null){
+			return "0";
+		}
+		DecimalFormat df   = new DecimalFormat("####0.0000000000");
+		Double doubleSecond = Double.valueOf(second);
+		Double doubleHour = doubleSecond/3600.00;
+		return  df.format(doubleHour).toString();
+	}
+
+	/**
+	 * 计算每小时电话报表部分数据
+	 */
+	private List<DunningPhoneReportFile> countDunningPhoneReport(List<DunningPhoneReportFile> reportFiles, DunningPhoneReportFile entity) {
+		for (DunningPhoneReportFile countReport : reportFiles) {
+			countReport.setConnectRate(strDivideStr(countReport.getConnectAmout(), countReport.getCallingAmount()));
+			countReport.setCallingAmountOnHour(strDivideStr(countReport.getCallingAmount(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setConnectAmountOnHour(strDivideStr(countReport.getConnectAmout(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setCallDurationOnHour(strDivideStr(countReport.getCallDuration(), strsecond2Strhour(countReport.getOntime())));
+			countReport.setDealCaseAmountOnHour(strDivideStr(countReport.getDealCaseAmount(), strsecond2Strhour(countReport.getOntime())));
+			if (countReport.getDateTime() == null || "".equals(countReport.getDateTime())) {
+				countReport.setDateTime(DateUtils.formatDate(entity.getDatetimestart(), "yyyy-MM-dd HH:mm") + "至" + DateUtils.formatDate(entity.getDatetimeend(), "yyyy-MM-dd HH:mm"));
+			}
+			if (!StringUtils.isEmpty(countReport.getLogiName())) {
+				User user = UserUtils.getByLoginName(countReport.getLogiName());
+				if (!(user.getCompany().getName() == null && "".equals(user.getCompany().getName())
+						&& user.getOffice().getName() == null && "".equals(user.getOffice().getName()))) {
+					countReport.setDepartment(user.getCompany().getName() + user.getOffice().getName());
+				}
+			}
+		}
+		return reportFiles;
+	}
+
+	/**
+	 * 过滤查询出来的数据，通过机构名称
+	 * @param reportFiles
+	 * @param entity
+	 * @param page
+	 */
+	private void filterPhoneReportByDepartment(List<DunningPhoneReportFile> reportFiles, DunningPhoneReportFile entity,Page<DunningPhoneReportFile> page){
+		if (!(entity.getDepartment() == null || "".equals(entity.getDepartment()))){
+			if (!(entity.getDepartment() == null || "".equals(entity.getDepartment().trim()))){
+				Iterator<DunningPhoneReportFile> it = reportFiles.iterator();
+				while(it.hasNext()){
+					DunningPhoneReportFile file = it.next();
+					if(!(file.getDepartment() == null || "".equals(file.getDepartment()))) {
+						if (!file.getDepartment().equals(entity.getDepartment())) {
+							it.remove();
+							if (page != null) {
+								page.setCount(page.getCount() - 1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

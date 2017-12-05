@@ -3,10 +3,13 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
+import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
+
+import java.util.List;
 
 @MyBatisDao
 public interface TMisCallingRecordDao extends CrudDao<TMisCallingRecord> {
@@ -27,4 +30,14 @@ public interface TMisCallingRecordDao extends CrudDao<TMisCallingRecord> {
 	 */
 	public String queryMobileLocation(String preNumber);
 
+	/**
+	 * 导出软电话日常报表
+	 */
+	public List<DunningPhoneReportFile> exportStatementFile(DunningPhoneReportFile entity);
+
+	public int countExportStatementFile (DunningPhoneReportFile entity);
+
+	public List<DunningPhoneReportFile> exportStatementFileForEveryDay (DunningPhoneReportFile entity);
+
+	public int countExportStatementFileForEveryDay(DunningPhoneReportFile entity);
 }

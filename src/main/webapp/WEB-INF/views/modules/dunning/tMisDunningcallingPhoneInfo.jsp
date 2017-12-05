@@ -2,40 +2,29 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title >呼出呼入</title>
-	<meta name="decorator" content="default"/>
-	<script type="text/javascript">
-
-    
-
-  function page(n, s) {
-          if (n) window.parent.$("#page").val(n);
-          if (s) window.parent.$("#pageSize").val(s);
-          if('${call}'=="callin"){
-	          window.location = "${pageContext.request.contextPath}/f/numberPhone/callin?" + window.parent.$("#searchForm").serialize();
-          }
-          if('${call}'=="callout"){
-	          window.location = "${pageContext.request.contextPath}/f/numberPhone/callout?" + window.parent.$("#searchForm").serialize();
-          }
-          return false;
-   }
-	</script>
+<title >呼叫信息</title>
+<meta name="decorator" content="default"/>
+<script type="text/javascript">
+	function page(n, s) {
+		if (n) window.parent.$("#page").val(n);
+		if (s) window.parent.$("#pageSize").val(s);
+		window.location = "${pageContext.request.contextPath}/f/numberPhone/${type}?" + window.parent.$("#searchForm").serialize();
+		return false;
+	}
+</script>
 </head>
 <body>
 	<table id="accountTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
 				<th>编号</th>
-				<c:if test="${call eq 'callout' }">
-				<th>呼出时间</th>
-				<th>呼出号码</th>
+				<th>时间</th>
+				<th>通话类型</th>
+				<th>号码</th>
+				<th>归属地</th>
+				<th>姓名</th>
+				<th>通话状态</th>
 				<th>通话时长</th>
-				</c:if>
-				<c:if test="${call eq 'callin' }">
-				<th>呼入时间</th>
-				<th>呼入号码</th>
-				<th>通话时长</th>
-				</c:if>
 			</tr>
 		</thead>
 		<tbody>
@@ -44,46 +33,34 @@
 					<td>
 						${ status.index + 1}
 					</td>
-					<c:if test="${call eq 'callout' }">
-						<td>
-							${calling.callOutTime}
-							
-						</td>
-						<td>
-							${calling.target }
-						</td>
-						<td>
-							<c:if test="${calling.channelAnswerTime eq 0 }">
-							 无应答
-							</c:if>
-							<c:if test="${calling.channelAnswerTime ne 0}">
-							${calling.callTotalTime }
-							</c:if>
-						</td>
-					</c:if>
-					<c:if test="${call eq 'callin' }">
-						<td>
-							${calling.startTime}
-						</td>
-						<td>
-							
-							<c:if test="${calling.agentStartTime eq 0 }">
-							 <font color="red">${calling.caller }</font>
-							</c:if>
-							<c:if test="${calling.agentStartTime ne 0 }">
-							 ${calling.caller }
-							</c:if>
-						</td>
-						<td>
-							<c:if test="${calling.agentStartTime eq 0 }">
-							 <font color="red">未接</font>
-							</c:if>
-							<c:if test="${calling.agentStartTime ne 0}">
-							${calling.callTotalTime }
-							</c:if>
-						</td>
-					</c:if>
-					
+					<td>
+						<fmt:formatDate value="${calling.callTime}" pattern="HH:mm:ss"/>
+					</td>
+					<td>
+						${calling.callType.desc}
+					</td>
+					<td>
+						${calling.targetNumber}
+					</td>
+					<td>
+						${calling.location}
+					</td>
+					<td>
+						${calling.targetName}
+					</td>
+					<td>
+						<c:choose>
+							<c:when test="${type eq 'callAll' and (calling.callStateText eq '未接' or calling.callStateText eq '队列中放弃')}">
+								<strong style="color:red;">${calling.callStateText}</strong>
+							</c:when>
+							<c:otherwise>
+								${calling.callStateText}
+							</c:otherwise>
+						</c:choose>
+					</td>
+					<td>
+						${calling.durationTimeText}
+					</td>
 				</tr>
 			</c:forEach>
 		</tbody>

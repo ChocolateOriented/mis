@@ -922,6 +922,10 @@
             	AND o.status = 'payment'
             ]]>
         </if>
+        <!-- #最近催收时间-->
+        <if test="beginDunningtime != null and endDunningtime != null and beginDunningtime != '' and endDunningtime != ''">
+            AND t.dunningtime BETWEEN #{beginDunningtime} AND #{endDunningtime}
+        </if>
         <!-- 			# 最近登录时间  -->
         <if test="beginlatestlogintime != null and endlatestlogintime != null and beginlatestlogintime != '' and endlatestlogintime != ''">
             AND t.latestlogintime BETWEEN #{beginlatestlogintime} AND #{endlatestlogintime}
@@ -1030,7 +1034,10 @@
         <if test="beginOutsourcingEndDate != null and endOutsourcingEndDate != null and beginOutsourcingEndDate != '' and endOutsourcingEndDate != ''">
             AND t.outsourcingEndDate BETWEEN #{beginOutsourcingEndDate} AND #{endOutsourcingEndDate}
         </if>
-        
+        <!-- #最近催收时间-->
+        <if test="beginDunningtime != null and endDunningtime != null and beginDunningtime != '' and endDunningtime != ''">
+            AND t.dunningtime BETWEEN #{beginDunningtime} AND #{endDunningtime}
+        </if>
         <!-- 只显示未删除的催收人员  -->
 <!--         AND p.Invalid = 't' -->
         ) AS d
@@ -2019,9 +2026,4 @@
 		WHERE dealcode = #{dealcode}
 	</update>
 
-    <update id="asyncUpdate">
-        UPDATE t_risk_order
-        SET status = #{status}
-        WHERE dealcode = #{dealcode}
-    </update>
 </mapper>

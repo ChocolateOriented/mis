@@ -17,6 +17,7 @@
         a.uname AS "uname",
         a.keyword AS keyword,
         a.pushTime AS "pushTime",
+        a.readFlag AS "readFlag",
         a.id AS "id"
     </sql>
 
@@ -47,14 +48,34 @@
         </choose>
     </select>
 
-    <select id="NotifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
+    <select id="findCustServiceCount" resultType="java.lang.Integer" useCache="false">
+         SELECT
+              count(*)
+         FROM t_mis_customer_service_feedback a
+         INNER JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+         INNER JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
+         <where>
+                <if test="readFlag != null and readFlag != ''">
+                    AND a.readFlag = #{readFlag}
+                </if>
+                <if test="dunningpeopleid !=null and dunningpeopleid !=''">
+                    AND t.DunningPeopleId=#{dunningpeopleid}
+                </if>
+         </where>
+    </select>
+
+    <select id="notifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
              a.`keyword`,
+             a.`uname`,
              a.`dealcode`,
              a.`hashtag`,
              a.`problemStatus`,
+             a.`pushpeople`,
              a.`pushTime`,
+             a.`updateBy`,
              a.`id`,
+             a.readFlag,
              t.DunningPeopleId,
              p.groupId
         FROM t_mis_customer_service_feedback a
@@ -65,6 +86,9 @@
         <if test="keyword !=null and keyword!=''">
             AND a.keyword LIKE concat('%',#{keyword},'%')
         </if>
+        <if test="uname !=null and uname!=''">
+            AND a.uname LIKE concat('%',#{uname},'%')
+        </if>
         <if test="dealcode !=null and dealcode!=''">
             AND a.dealcode LIKE concat('%',#{dealcode},'%')
         </if>
@@ -74,8 +98,17 @@
         <if test="problemstatus !=null and problemstatus!='' and problemstatus != 'ALL'">
             AND a.problemStatus LIKE concat('%',#{problemstatus},'%')
         </if>
-        <if test="updateDate !=null and updateDate!=''">
-            AND a.updateDate=#{updateDate}
+        <if test="pushpeople !=null and pushpeople !=''">
+            AND a.pushpeople LIKE  concat ('%',#{pushpeople},'%')
+        </if>
+        <if test="pushTime !=null and pushTime!=''">
+            AND a.pushTime=#{pushTime}
+        </if>
+        <if test="farPushTime != null and nearPushTime != null and farPushTime != '' and nearPushTime != ''">
+            AND a.pushTime BETWEEN #{farPushTime} AND #{nearPushTime}
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            AND a.updateBy LIKE  concat ('%',#{updateBy.name},'%')
         </if>
         <if test="groupIds != null">
             AND p.groupId in
@@ -108,7 +141,7 @@
         WHERE a.id = #{id}
     </select>
 
-    <select id="insert">
+    <insert id="insert">
         INSERT INTO t_mis_customer_service_feedback(
             id,
             dealcode,
@@ -125,7 +158,8 @@
             uname,
             keyword,
             pushTime,
-            rootOrderId
+            rootOrderId,
+            readFlag
         )VALUES (
             #{id},
             #{dealcode},
@@ -142,16 +176,18 @@
             #{uname},
             #{keyword},
             #{pushTime},
-            #{rootorderid}
+            #{rootorderid},
+            #{readFlag}
         )
-    </select>
+    </insert>
 
     <update id="updateFeedback">
         UPDATE t_mis_customer_service_feedback SET
         problemStatus = #{problemstatus},
         handlingResult=#{handlingresult},
         updateDate=#{updateDate},
-        updateBy=#{updateBy.name}
+        updateBy=#{updateBy.name},
+        readFlag=#{readFlag}
         WHERE id = #{id}
     </update>
 

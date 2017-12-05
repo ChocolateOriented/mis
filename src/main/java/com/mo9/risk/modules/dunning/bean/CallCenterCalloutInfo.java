@@ -1,23 +1,15 @@
 package com.mo9.risk.modules.dunning.bean;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * CTI呼出信息
  */
-public class CallCenterCalloutInfo implements Serializable{
+public class CallCenterCalloutInfo extends CallCenterCallInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private String id;	//记录id
-
-	private String agent;	//坐席号
-
-	private String extension;	//分机号码
 
 	private String target;	//目标号码
 
@@ -41,30 +33,6 @@ public class CallCenterCalloutInfo implements Serializable{
 
 	public void setAgentState(String agentState) {
 		this.agentState = agentState;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getAgent() {
-		return agent;
-	}
-
-	public void setAgent(String agent) {
-		this.agent = agent;
-	}
-
-	public String getExtension() {
-		return extension;
-	}
-
-	public void setExtension(String extension) {
-		this.extension = extension;
 	}
 
 	public String getTarget() {
@@ -125,26 +93,30 @@ public class CallCenterCalloutInfo implements Serializable{
 	public void setCustomerno(String customerno) {
 		this.customerno = customerno;
 	}
-	//呼叫时间
-	public String getCallOutTime(){
-		String start="";
-		if(channelCreateTime!=null&&channelCreateTime!=0){
-			SimpleDateFormat sd=new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-			start=sd.format(new Date(channelCreateTime*1000));
-		}
-		return start;
+
+	@Override
+	public long getCallTimestamp() {
+		return channelCreateTime == null ? 0 : channelCreateTime;
 	}
-	//通话时长
-	public String getCallTotalTime(){
-		String times="";
-		if(channelAnswerTime!=null&&channelAnswerTime!=0){
-			Long totalTime=channelHangupTime-channelAnswerTime;
-			
-			Long hour=totalTime/3600;
-			Long minutes=totalTime%3600/60;
-			Long second=totalTime%3600%60;
-			times=String.valueOf(hour)+"时"+String.valueOf(minutes)+"分"+String.valueOf(second)+"秒";
-		}
-		return times;
+
+	@Override
+	public long getRingTimestamp() {
+		return channelCreateTime == null ? 0 : channelCreateTime;
 	}
+
+	@Override
+	public long getStartTimestamp() {
+		return channelAnswerTime == null ? 0 : channelAnswerTime;
+	}
+
+	@Override
+	public long getEndTimestamp() {
+		return channelAnswerTime == null ? 0 : channelAnswerTime;
+	}
+
+	@Override
+	public long getFinishTimestamp() {
+		return channelHangupTime == null ? 0 : channelHangupTime;
+	}
+
 }

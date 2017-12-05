@@ -9,9 +9,12 @@ import com.mo9.risk.modules.dunning.bean.dto.Mo9MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
+import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
 
     @Autowired
     TMisCustomerServiceFeedbackDao feedbackDao;
+
+    @Autowired
+    private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
     @Override
     public MqAction consume(MqMessage msg, Object consumeContext) {
@@ -49,31 +55,35 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
     private MqAction customerServiceFeedback_problem(MqMessage msg) {
 
         String json = msg.getBody();
+        logger.info(json);
         TMisCustomerServicefeedbackDto feedback = JSON.parseObject(json, TMisCustomerServicefeedbackDto.class );
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
         tMisCustomerServiceFeedback.setDealcode(feedback.getLoanDealCode());
         tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
         tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
         tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        tMisCustomerServiceFeedback.setUpdateBy(tMisCustomerServiceFeedback.getUpdateBy());
         tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
         tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
         tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
-        tMisCustomerServiceFeedback.setOperate(tMisCustomerServiceFeedback.getOperate());
-        tMisCustomerServiceFeedback.setHandlingresult(tMisCustomerServiceFeedback.getHandlingresult());
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
-        tMisCustomerServiceFeedback.setKeyword(tMisCustomerServiceFeedback.getDealcode(),tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText());
-        logger.info(tMisCustomerServiceFeedback.getId());
+        tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getUname(),tMisCustomerServiceFeedback.getDealcode(),
+                tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople());
+
         if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
+            logger.info(tMisCustomerServiceFeedback.getId() + ": insert");
             feedbackDao.insert(tMisCustomerServiceFeedback);
         } else{
+            logger.info(tMisCustomerServiceFeedback.getId() + ": update");
             feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
+
         }
+
+        logger.info(tMisCustomerServiceFeedback.getId() + ": consume complete");
         return MqAction.CommitMessage;
     }
 }

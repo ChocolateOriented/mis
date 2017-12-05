@@ -443,6 +443,8 @@
 			t_mis_dunning_group
 		WHERE
 			`Name` = #{groupName}
+			and DelFlag = '0'
+		LIMIT 1
 	) AS 'group.id',
 	(
 		SELECT
@@ -451,6 +453,8 @@
 			sys_user
 		WHERE
 			login_name = #{name}
+			and del_flag ='0'
+		LIMIT 1
 	) as 'id',
 	(
 		SELECT
@@ -459,6 +463,8 @@
 			sys_user
 		WHERE
 			login_name = #{name}
+			and del_flag ='0'
+		LIMIT 1
 	) as 'name',
 	(
 		SELECT
@@ -468,7 +474,8 @@
 		WHERE
 			nickname = #{nickname}
 			and
-			Field1='active'
+			Invalid='t'
+		LIMIT 1
 	)as 'nickname',
 	(
 		SELECT
@@ -477,9 +484,8 @@
 			t_mis_dunning_people
 		WHERE
 			id = (SELECT id FROM sys_user WHERE login_name = #{name})
-	 		and
-			Field1='active'
+		LIMIT 1
 	)as 'validateId'
-	LIMIT 1
+	
 	</select>
 </mapper>

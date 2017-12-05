@@ -87,7 +87,7 @@
 	$(document).ready(function() {
 		//加载子页面
 		 if (null == currentPageUrl){
-			calloutin();
+			callinfo();
         }
 		//第一次打开该页面判断用户是否有坐席没有不让操作软电话页面
 		if(!"${agent}"){
@@ -109,25 +109,30 @@
 	}
 	
 	//点击呼叫
+    var renumber;
 	function clickCall(obj) {
 		var number = $("#numberValue").val();
-		if(!$("#numberValue").val()){
-			return;
-		}
-
-		var operation = $(obj).attr("operation");
-		var msg = {operation: operation, target: number};
-		webSocket.send(JSON.stringify(msg));
-		
+        if($("#numberValue").val()){
+            renumber=$("#numberValue").val();
+            var operation = $(obj).attr("operation");
+            var msg = {operation: operation, target: number};
+            webSocket.send(JSON.stringify(msg));
+        }else{
+            if(renumber){
+                $("#numberValue").val(renumber);
+            }else {
+                return;
+            }
+        }
 	}
-	
+
 	//点击接听电话
 	function callingPhone(obj) {
 		var operation = $(obj).attr("operation");
 		var msg = {operation: operation};
 		webSocket.send(JSON.stringify(msg));
 	}
-	
+
 	//点击保持通话
 	function continueCalling() {
 		var msg = {operation: $("#holdText").attr("operation"), target: $("#numberValue").val() || ""};
@@ -250,6 +255,8 @@
 			$("#backCall").css("display", "block");
 			$(".numberSave").css("display", "block");
 			$("#numberValue").val(data.target);
+            $("#location").text(data.location);
+
 			$("#continues").removeClass("icon-play");
 			$("#continues").addClass("icon-pause");
 			var icon = "${ctxStatic}/images/userinfo.jpg";
@@ -288,6 +295,7 @@
 			if(data.target)
 			$("#numberValue").val(data.target);
 			$(".showName").html(data.name);
+			$("#location").text(data.location);
 			$(".phoneStatus").css("display", "none");
 			$("#calling").css("display", "block");
 			$("#statusPhones").attr("readonly", true);
@@ -411,19 +419,21 @@
 	}
 	
 	var currentPageUrl = null;
-	//呼出呼入
-	function calloutin(obj) {
-		currentPageUrl = "${pageContext.request.contextPath}/f/numberPhone/" + (obj ? ($(obj).attr("typecall") || "callout") : "callout") + "?";
-		if((!obj)||$(obj).attr("typecall")=="callout"){
-			$("#calloutPage").addClass("active");
-			$("#agent").attr("disabled",false);
-			$("#queue").attr("disabled",true);
-			$("#callinPage").removeClass("active");
-		}else{
-			$("#callinPage").addClass("active");
-			$("#calloutPage").removeClass("active");
-			$("#agent").attr("disabled",true);
-			$("#queue").attr("disabled",false);
+	//呼叫信息
+	function callinfo(obj) {
+		currentPageUrl = "${pageContext.request.contextPath}/f/numberPhone/" + (obj ? ($(obj).attr("typecall") || "callAll") : "callAll") + "?";
+		var type = obj ? $(obj).attr("typecall") : "callAll";
+		$("#callinfoTab li").removeClass("active");
+		$("#" + type).addClass("active");
+		if (type == "callBusy") {
+			$("#agent").attr("disabled", false);
+			$("#queue").attr("disabled", true);
+		} else if (type == "callQueueOff") {
+			$("#agent").attr("disabled", true);
+			$("#queue").attr("disabled", false);
+		} else {
+			$("#agent").attr("disabled", false);
+			$("#queue").attr("disabled", false);
 		}
 		$("#page").val("");
 		$("#pageSize").val("");
@@ -457,7 +467,7 @@
 <div id="messages"></div>
  <div style="width:270px; height:620px;position:absolute; border:1px solid gold;border-radius: 25px;background-color:#F8F8F8; left:2%;" >
  	<div style="height:60px;width:280px;position:absolute;">
- 		<div style="top:20px;left:130px;position:absolute;margin:0 auto;">
+ 		<div style="top:20px;left:120px;position:absolute;margin:0 auto;">
 <!-- 			<i class="icon-legal" style="font-size:15px;color:gray;"></i> -->
 			<font size="4" color="orange">mo</font><font color="blue">9</font>
  		</div>
@@ -549,6 +559,7 @@
 				<i class="icon-user" ></i>
 			</div>
 			<div class="showName" style="text-align: center;margin-bottom:20px; "></div>
+			<div id="location" style="text-align: center;margin-bottom:20px; font-weight: 400;"></div>
 			<div class="numbers-container" style="background-color:red;border:0px; margin: 30px 0px 10px 100px;transform:rotate(140deg);">
 		        <i class="number-content icon-phone" style="color:white;font-size:20px; " onclick="refuseCalling(this)" operation="hangup"></i>
 		 	</div>
@@ -598,12 +609,13 @@
 		</div>
 	</div>
  </div>
- <div style="width:1200px; height:800px;position:absolute; background-color:white; left:30%;" >
- <ul class="nav nav-tabs">
-    <li id="calloutPage" class="active" style="cursor: pointer;"><a typecall="callout" onclick="calloutin(this)">呼出</a></li>
-    <li id="callinPage" style="cursor: pointer;"><a typecall="callin" onclick="calloutin(this)">呼入</a></li>
+ <div style="width:1200px;height:800px;position:absolute;background-color:white;left:30%;" >
+ <ul id="callinfoTab" class="nav nav-tabs">
+    <li id="callAll" class="active" style="cursor: pointer;"><a typecall="callAll" onclick="callinfo(this)">全部</a></li>
+    <li id="callBusy" style="cursor: pointer;"><a typecall="callBusy" onclick="callinfo(this)">未接</a></li>
+    <li id="callQueueOff" style="cursor: pointer;"><a typecall="callQueueOff" onclick="callinfo(this)">队列中放弃</a></li>
 </ul>
-<iframe id="ifm" name="ifm" frameborder="0" style="width:1200px;height: 800px;"></iframe>
+<iframe id="ifm" name="ifm" frameborder="0" style="width:1200px;height:800px;"></iframe>
 <form id="searchForm" method="post" >
     <input id="page" name="page" type="hidden" value=""/>
     <input id="pageSize" name="pagesize" type="hidden" value=""/>

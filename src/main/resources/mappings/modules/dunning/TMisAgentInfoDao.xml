@@ -72,13 +72,13 @@
 			a.updatedate as "updatedate",
 			p.nickname as "nickName"
 		FROM t_mis_agent_info a
-		left join t_mis_dunning_people  p on a.peopleId=p.id
+		LEFT JOIN t_mis_dunning_people  p on a.peopleId = p.id
 		<where>
 		<if test="agent != null and agent != '' ">
-			a.agent=#{agent}
+			AND a.agent = #{agent}
 		</if>
 		<if test="nickName != null and nickName != '' ">
-		and	p.nickName=#{nickName}
+			AND	p.nickName LIKE CONCAT('%', #{nickName}, '%')
 		</if>
 		</where>
 		<choose>
@@ -199,7 +199,7 @@
 		)
 	</insert>
 
-	<select id="getLoginLogTodaybyId" resultType="TMisAgentInfo">
+	<select id="getAgentStateOnMoment" resultType="TMisAgentInfo">
 		SELECT
 			status
 		FROM

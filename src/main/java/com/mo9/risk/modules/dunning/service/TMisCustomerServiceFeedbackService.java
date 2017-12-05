@@ -52,7 +52,7 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
      * @Description 客服推送消息的订单号,标签,时间的通知列表分页展示
      * @param page
      */
-    public Page<TMisCustomerServiceFeedback> NotifyList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+    public Page<TMisCustomerServiceFeedback> notifyList(Page<TMisCustomerServiceFeedback> page, TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
         int permissions = getPermissions();
         List<String> allowedGroupIds = new ArrayList<String>();
@@ -79,7 +79,7 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
         }
         tMisCustomerServiceFeedback.setPage(page);
         page.setOrderBy("pushTime DESC");
-        page.setList(dao.NotifyList(tMisCustomerServiceFeedback));
+        page.setList(dao.notifyList(tMisCustomerServiceFeedback));
         return page;
     }
 
@@ -100,5 +100,14 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
     public TMisCustomerServiceFeedback findCodeStatusTagDesPeople(TMisCustomerServiceFeedback customerServiceFeedback){
 
         return tMisCustomerServiceFeedbackDao.findCodeStatusTagDesPeople(customerServiceFeedback);
+    }
+
+    /**
+     * 获取客服通知数目
+     * @param tMisCustomerServiceFeedback
+     */
+    public int findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+
+        return tMisCustomerServiceFeedbackDao.findCustServiceCount(tMisCustomerServiceFeedback);
     }
 }

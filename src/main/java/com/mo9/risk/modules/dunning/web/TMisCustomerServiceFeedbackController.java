@@ -1,11 +1,16 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.oa.entity.OaNotify;
+import com.thinkgem.jeesite.modules.oa.service.OaNotifyService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,18 +36,6 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
     @Autowired
     private FeedbackSendService feedbackSendService;
-
-    @ModelAttribute
-    public TMisCustomerServiceFeedback get(@RequestParam(required=false) String id) {
-        TMisCustomerServiceFeedback entity = null;
-        if (StringUtils.isNotBlank(id)){
-            entity = tMisCustomerServiceFeedbackService.get(id);
-        }
-        if (entity == null){
-            entity = new TMisCustomerServiceFeedback();
-        }
-        return entity;
-    }
 
     /**
      * 分页展示问题案件列表
@@ -114,12 +107,12 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
      */
     @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
     @RequestMapping(value = {"notify", ""})
-    public String NotifyList(String colorChoice,TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
+    public String notifyList(String colorChoice, @ModelAttribute("tMisCustomerServiceFeedback") TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
         if (StringUtils.isEmpty(tMisCustomerServiceFeedback.getProblemstatus())){
             tMisCustomerServiceFeedback.setProblemstatus("UNRESOLVED");
         }
 
-        Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.NotifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
+        Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.notifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
         model.addAttribute("color", colorChoice);
         return "modules/oa/notifyList";
@@ -136,6 +129,11 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
+            if("0".equals(tMisCustomerServiceFeedback.getReadFlag())){
+                tMisCustomerServiceFeedback.setReadFlag("1");
+                tMisCustomerServiceFeedbackService.updateFeedback(tMisCustomerServiceFeedback);
+                model.addAttribute("custNotify", "desc");
+            }
         }catch (Exception e){
             logger.info("加载反馈通知截图失败",e);
             return null;
@@ -144,4 +142,17 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         return "modules/dunning/tMisCustomerJboxNotify";
     }
 
+    /**
+     * 获取客服通知数
+     *
+     */
+    @RequestMapping(value = "custServiceCount")
+    @ResponseBody
+    public String custServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
+
+        tMisCustomerServiceFeedback.setReadFlag("0");
+        String userid=UserUtils.getUser().getId();
+        tMisCustomerServiceFeedback.setDunningpeopleid(userid);
+        return String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
+    }
 }
