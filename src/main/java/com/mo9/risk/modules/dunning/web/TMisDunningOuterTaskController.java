@@ -84,7 +84,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 	@Autowired
 	private TMisDunningTagService tMisDunningTagService;
 	@Autowired
-	private TMisDunningScoreCardService tMisDunningScoreCardService;
+	private RiskQualityInfoService tMisDunningScoreCardService;
 	
 	@ModelAttribute("dunningOrder")
 	public DunningOrder getDunningOrder(@RequestParam(required=false) String id) {

@@ -40,4 +40,13 @@ public class BlackListRelation {
 	public void setNumFromThird(int numFromThird) {
 		this.numFromThird = numFromThird;
 	}
+
+	@Override
+	public String toString() {
+		return "BlackListRelation{" +
+				"num=" + num +
+				", numFromMo9=" + numFromMo9 +
+				", numFromThird=" + numFromThird +
+				'}';
+	}
 }
