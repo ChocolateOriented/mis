@@ -170,5 +170,13 @@
 		WHERE a.buyerid = #{buyerid}
 		AND delflag = '0'
 	</select>
+	<select id="typeExist" resultType="String">
+		SELECT
+			id
+		FROM t_mis_dunning_tag a
+		WHERE a.buyerid = #{buyerid}
+		AND tagtype =#{buyerid}
+		AND delflag = '0'
+	</select>
 
 </mapper>

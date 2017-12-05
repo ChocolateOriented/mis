@@ -142,7 +142,7 @@
 			}
 		});
 		if(!window.parent.messageHide()){
-			$("[ value='CANTACT'],[ value='COMMUNCATE']").remove();
+			$(".hides").remove();
 		}
 		
 	});
@@ -170,15 +170,15 @@
 				<select class="input-small" path="" id="contactstype" name="contactstype">
 					<option value=""></option>
 					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option>
-					<option value="MARRIED" <c:if test="${'MARRIED' eq contactstype}">selected</c:if> >夫妻 </option>
-					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
-					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
-					<option value="RELATIVES"<c:if test="${'RELATIVES' eq contactstype}">selected</c:if>>亲戚</option>
-					<option value="FRIEND"<c:if test="${'FRIEND' eq contactstype}">selected</c:if>>朋友</option>
-					<option value="WORKMATE"<c:if test="${'WORKMATE' eq contactstype}">selected</c:if>>同事</option>
-					<option value="WORKTEL"<c:if test="${'WORKTEL' eq contactstype}">selected</c:if>>工作电话</option>
-					<option value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>通讯录</option>
-					<option value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
+					<option class="hides" value="MARRIED" <c:if test="${'MARRIED' eq contactstype}">selected</c:if> >夫妻 </option>
+					<option class="hides" value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
+					<option class="hides" value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
+					<option class="hides" value="RELATIVES"<c:if test="${'RELATIVES' eq contactstype}">selected</c:if>>亲戚</option>
+					<option class="hides" value="FRIEND"<c:if test="${'FRIEND' eq contactstype}">selected</c:if>>朋友</option>
+					<option class="hides" value="WORKMATE"<c:if test="${'WORKMATE' eq contactstype}">selected</c:if>>同事</option>
+					<option class="hides" value="WORKTEL"<c:if test="${'WORKTEL' eq contactstype}">selected</c:if>>工作电话</option>
+					<option class="hides" value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>通讯录</option>
+					<option class="hides" value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
 				</select>
 			</div>
 			<div style="width:18%;display:inline-block;text-align:right;">
