@@ -42,7 +42,7 @@ public class RiskQualityInfoService extends BaseService{
 	@Autowired
 	ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-	private static final String BLACK_LIST_CACHE_PREFIX = "RiskQualityInfo_blackListRelation_";
+	public static final String BLACK_LIST_CACHE_PREFIX = "RiskQualityInfo_blackListRelation_";
 	private static final Map<String, String> rounddownMap;
 	static  
     {  
@@ -161,19 +161,27 @@ public class RiskQualityInfoService extends BaseService{
 	}
 
 	/**
-	 * @Description  获取全部任务的黑名单联系人信息
+	 * @Description  获取逾期任务的黑名单联系人信息
 	 * @author jxli
 	 * @version 2017/12/5
 	 */
-	@Scheduled(cron = "0 30 4 * * ?")
+	@Scheduled(cron = "0 30 1 * * ?")
 	public void refreshBlacklistRelation() {
 		final List<String> paymentOrderUserMobile = dao.findPaymentOrderUserMobile();
 		logger.info("正在获取黑名单联系人信息, 共"+paymentOrderUserMobile.size());
+		int count = 0;
 		for (int i = 0; i < paymentOrderUserMobile.size(); i++) {
 			String mobile = paymentOrderUserMobile.get(i);
-			threadPoolTaskExecutor.submit(new CacheBlacklistRelationTask(mobile));
+			//只取缓存中没有的数据
+			String cache = JedisUtils.get(BLACK_LIST_CACHE_PREFIX +mobile);
+			if (StringUtils.isBlank(cache)){
+				threadPoolTaskExecutor.submit(new CacheBlacklistRelationTask(mobile));
+				count++;
+			}
 		}
+		logger.info("获取黑名单联系人信息任务创建完成, 共"+count);
 	}
+
 	/**
 	 * @Description 通过手机号, 从缓存获取黑名单联系人信息
 	 * @param mobile
@@ -199,7 +207,7 @@ public class RiskQualityInfoService extends BaseService{
 		public void run() {
 			try {
 				BlackListRelation blackListRelation = qualityInfoManager.blackListRelation(mobile);
-				JedisUtils.set(BLACK_LIST_CACHE_PREFIX + mobile,JSONObject.toJSONString(blackListRelation),60*60*24*2);
+				JedisUtils.set(BLACK_LIST_CACHE_PREFIX + mobile,JSONObject.toJSONString(blackListRelation),0);
 			} catch (Exception e) {
 				logger.info(mobile+"黑名单联系人获取失败",e);
 			}

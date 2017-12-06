@@ -75,7 +75,7 @@ public class RiskQualityInfoManager {
 		if (StringUtils.isBlank(mobile)){
 			throw new IllegalArgumentException("手机号不能为空");
 		}
-		String url = riskUrl + "relagraph/api/route/v1/queryRelGraph";
+		String url = riskUrl + "relagraph/api/route/v1/queryBlackContactNum";
 		Map<String,String> param = new HashMap<String, String>();
 		param.put("mobile",mobile);
 
@@ -86,49 +86,14 @@ public class RiskQualityInfoManager {
 			throw new ServiceException("获取黑名单关系接口");
 		}
 		JSONObject repJson = JSON.parseObject(res);
-		String nodesStr = repJson.getString("nodes");
-		if (StringUtils.isBlank(nodesStr)){
+		String data = repJson.getString("data");
+		if (StringUtils.isBlank(data)){
 				logger.info("黑名单关系接口发生异常,"+res);
 				throw new ApiFailException("获取失败");
 		}
-		JSONObject nodes = JSON.parseObject(nodesStr);
-		JSONArray nodeData = nodes.getJSONArray("rows");
-		if (nodeData == null){
-			return new BlackListRelation(0,0,0);
-		}
-
-		BlackListRelation relation = new BlackListRelation();
-		int num = 0;
-		int numFromMo9 = 0;
-		int numFromThird = 0;
-		for (int i = 0; i < nodeData.size(); i++) {
-			 JSONObject node = nodeData.getJSONObject(i);
-
-			 Boolean idcardBlackHit = node.getBoolean("idcardBlackHit");
-			 if (idcardBlackHit == null){
-			 	idcardBlackHit=false;
-			 }
-			 Boolean mobileBlackHit = node.getBoolean("mobileBlackHit");
-			 if (mobileBlackHit == null){
-			 	mobileBlackHit =false;
-			 }
-			 if (idcardBlackHit || mobileBlackHit ){
-			 	num++;
-			 }else {
-			 	continue;
-			 }
-
-			 String from = node.getString("blackThirdMerchant");
-			 if ("mo9".equals(from)){
-			 	numFromMo9++;
-			 }
-			 if ("third".equals(from)){
-			 	numFromThird++;
-			 }
-		}
-		relation.setNum(num);
-		relation.setNumFromMo9(numFromMo9);
-		relation.setNumFromThird(numFromThird);
+		BlackListRelation relation = JSON.parseObject(data,BlackListRelation.class);
 		return relation;
 	}
+
+
 }
