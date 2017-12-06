@@ -165,7 +165,7 @@ public class RiskQualityInfoService extends BaseService{
 	 * @author jxli
 	 * @version 2017/12/5
 	 */
-	@Scheduled(cron = "0 30 4 * * ?")
+	@Scheduled(cron = "0 30 1 * * ?")
 	public void refreshBlacklistRelation() {
 		final List<String> paymentOrderUserMobile = dao.findPaymentOrderUserMobile();
 		logger.info("正在获取黑名单联系人信息, 共"+paymentOrderUserMobile.size());

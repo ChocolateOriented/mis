@@ -93,6 +93,7 @@
 		FROM t_risk_order o
 		JOIN t_risk_buyer b on o.buyer_id = b.id
 		WHERE o.merchant_id = '7'
+		  AND DATEDIFF(CURDATE(), o.repayment_time) >= -1
 			AND o.status = 'payment'
 	</select>
 
