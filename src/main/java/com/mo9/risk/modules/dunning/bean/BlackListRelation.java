@@ -7,11 +7,13 @@ public class BlackListRelation {
 	private int num;
 	private int numFromMo9;
 	private int numFromThird;
+	private int numUnknow;
 
-	public BlackListRelation(int num, int numFromMo9, int numFromThird) {
+	public BlackListRelation(int num, int numFromMo9, int numFromThird, int numUnknow) {
 		this.num = num;
 		this.numFromMo9 = numFromMo9;
 		this.numFromThird = numFromThird;
+		this.numUnknow = numUnknow;
 	}
 
 	public BlackListRelation() {
@@ -41,12 +43,21 @@ public class BlackListRelation {
 		this.numFromThird = numFromThird;
 	}
 
+	public int getNumUnknow() {
+		return numUnknow;
+	}
+
+	public void setNumUnknow(int numUnknow) {
+		this.numUnknow = numUnknow;
+	}
+
 	@Override
 	public String toString() {
 		return "BlackListRelation{" +
 				"num=" + num +
 				", numFromMo9=" + numFromMo9 +
 				", numFromThird=" + numFromThird +
+				", numUnknow=" + numUnknow +
 				'}';
 	}
 }
