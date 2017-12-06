@@ -198,13 +198,13 @@
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 			<div style="width:18%;display:inline-block;text-align:right;">
-				<label>结果代码：</label>
+				<label>行动码：</label>
 			</div>
 			<div style="width:35%;display:inline-block;">
 				<select path="" class="input-small required" id="telstatus" name="telstatus">
 					<option value=""></option>
-					<c:forEach var="result" items="${mobileResultList}">
-						<option value="${result}">${result}</option>
+					<c:forEach var="result" items="${mobileResultMap}">
+						<option value="${result.key}">${result.value}</option>
 					</c:forEach>
 				</select>
 				<span class="help-inline"><font color="red">*</font> </span>
@@ -228,7 +228,7 @@
 			</div>
 			<div style="width:50%;display:inline-block;">
 				<input id="promisepaydate" name="promisepaydate" type="text" readonly="readonly" maxlength="20" class="Wdate required" style="width:150px"
-					value="<fmt:formatDate value="${TMisContantRecord.promisepaydate}" pattern="yyyy-MM-dd"/>"
+						value="<fmt:formatDate value="${TMisContantRecord.promisepaydate}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,minDate:'%y-%M-%d'});"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
