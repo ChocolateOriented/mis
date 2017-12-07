@@ -66,7 +66,7 @@
     <!-- 核心线程数，默认为1 -->
     <property name="corePoolSize" value="1"/>
     <!-- 最大线程数，默认为Integer.MAX_VALUE -->
-    <property name="maxPoolSize" value="30"/>
+    <property name="maxPoolSize" value="10"/>
     <!-- 队列最大长度，一般需要设置值: 大于等于notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
     <property name="queueCapacity" value="1000"/>
 

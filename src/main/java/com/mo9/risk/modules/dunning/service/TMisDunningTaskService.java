@@ -995,14 +995,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		try {
 			BlackListRelation relation = riskQualityInfoService.getBlackListRelationByMobile(mobile);
 			if (relation == null){
-				order.setBlackListRelaNum("获取失败");
+				order.setBlackListRelaNum(null);
 				return;
 			}
-			order.setBlackListRelaNum(String.valueOf(relation.getNum()));
+			order.setBlackListRelaNum(relation.getNum());
 			order.setBlackListNumFromMo9(relation.getNumFromMo9());
 			order.setBlackListNumFromThird(relation.getNumFromThird());
+			order.setBlackListNumUnknow(relation.getNumUnknow());
 		} catch (Exception e) {
-			order.setBlackListRelaNum("获取失败");
+			order.setBlackListRelaNum(null);
 			logger.info("黑名单关系获取失败",e);
 		}
 	}
