@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningLetterDao">
+    
+	<sql id="TmisDunningLetterColumns">
+		l.id  AS "id",
+		l.dealcode AS "dealcode",
+		l.sendResult AS "sendResult",
+		l.sendDate AS "sendDate",
+		l.resultDate AS "resultDate",
+		l.CreateBy AS "createBy.id",
+		l.CreateDate AS "createDate",
+		l.UpdateBy AS "updateBy.id",
+		l.UpdateDate AS "updateDate"
+	</sql>
+	
+	<select id="get" resultType="TMisDunningLetter">
+		SELECT 
+			<include refid="TmisDunningLetterColumns"/>
+		FROM t_mis_dunning_letter l
+		WHERE l.id = #{id}
+	</select>
+	<insert id="insert">
+		INSERT INTO t_mis_dunning_letter(
+		    id,
+		    dealcode,
+		    sendResult,
+			sendDate,
+			resultDate,
+			createDate,
+			updateDate,
+			createBy,
+			updateBy
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{sendResult},
+			#{sendDate},
+			#{resultDate},
+			#{createDate},
+			#{updateDate},
+			#{createBy.name},
+			#{updateBy.name}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_mis_dunning_letter SET 
+		  	dealcode =#{dealcode},	
+		  	sendResult =#{sendResult},	
+			sendDate = #{sendDate},
+			resultDate = #{resultDate},
+			updateDate = #{updateDate},
+			updateBy = #{updateBy.name},
+		WHERE id = #{id} 
+	</update>
+
+</mapper>
