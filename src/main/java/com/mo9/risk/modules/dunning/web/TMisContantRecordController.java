@@ -186,10 +186,10 @@ public class TMisContantRecordController extends BaseController {
 				if(record.getContanttype() != null){
 					record.setContanttypestr(record.getContanttype().getDesc());
 				}
-				//电话应答状态汉字话
-//				if(record.getTelstatus()  != null){
-//					record.setTelstatusstr(record.getTelstatus().getDesc());
-//				}
+				//电话应答状态汉字化
+				if(record.getTelstatus()  != null){
+					record.setTelstatusstr(record.getTelstatus().getDesc());
+				}
 				
 				//联系人类型汉字话
 				if(record.getContactstype()  != null){

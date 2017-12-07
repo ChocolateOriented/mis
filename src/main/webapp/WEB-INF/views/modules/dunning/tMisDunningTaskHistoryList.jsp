@@ -136,7 +136,7 @@
 				<th>联系人姓名</th>
 				<th>联系人电话</th>
 				<th>是否有效联络</th>
-				<th>结果代码</th>
+				<th>行动码</th>
 				<th>备注</th>
 				<th>催收人</th>
 				<th>操作人</th>
@@ -210,7 +210,7 @@
 				</td>
 				<td>
 <%-- 					${tMisContantRecord.telstatusstr} --%>
-					${tMisContantRecord.telstatus}
+					${tMisContantRecord.telstatusstr}
 				</td>
 				<td>
 <%-- 					<c:choose>   --%>
