@@ -9,6 +9,7 @@ import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
 import com.mo9.risk.modules.dunning.bean.QianxilvNew;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
 import com.mo9.risk.util.ChartUtils;
@@ -32,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -584,6 +586,43 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		return migrateCycleData;
+	}
+	
+	//迁徙报表优化
+	public  Collection<TMisMigrationData>  getDataList(Migrate migrate,Integer cycleNum) {
+		List<TMisMigrationRateReport> migrateList = this.newfindMigrateChartListFromRisk(migrate, cycleNum);
+
+		if(null==migrateList){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		// 将数据按周期分组
+		Map<String, TMisMigrationData> migrateCycleData = new HashMap<String, TMisMigrationData>();
+
+		for (int i = 0; i < migrateList.size(); i++) {
+			TMisMigrationRateReport migrationRateReport = migrateList.get(i);
+			String cycle = migrationRateReport.getCycle();
+
+			// 获取对应周期的数据集合
+			List<BigDecimal> data;
+			if (!migrateCycleData.containsKey(cycle)) {// 若不存在则新建一个TMisMigrationData
+				data = new ArrayList<BigDecimal>();
+				TMisMigrationData migrateChart=new TMisMigrationData();
+			
+				migrateChart.setData(data);
+				String start = sd.format(migrationRateReport.getDatetimeStart());
+				String end = sd.format(migrationRateReport.getDatetimeEnd());
+				migrateChart.setName(start + "-" + end);
+
+				migrateCycleData.put(cycle, migrateChart);
+			} else {
+				data = migrateCycleData.get(cycle).getData();
+			}
+			data.add(migrationRateReport.getCpvalue());
+		}
+
+		return    migrateCycleData.values();
 	}
 
 	/**

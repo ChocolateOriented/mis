@@ -57,6 +57,7 @@ public class TMisDunningTagController extends BaseController {
 		String lockStr = buyerid + "." + tMisDunningTag.getTagtype().toString();
 		
 		boolean addable = false;
+		String id="";
 		try {
 			//自旋等待5秒
 			long timestamp = System.currentTimeMillis();
@@ -64,17 +65,20 @@ public class TMisDunningTagController extends BaseController {
 			while (value != null && timestamp - value < 5000) {
 				value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
 			}
-			addable = tMisDunningTagService.preCheckExist(tMisDunningTag.getBuyerid());
+			addable = tMisDunningTagService.typeExist(tMisDunningTag);
+			if (!addable) {
+				result.put("status", "NO");
+				result.put("msg", "无法添加更多标签");
+				return result;
+			}
+			 id = tMisDunningTagService.saveTag(tMisDunningTag);
 		} catch (Exception e) {
+			logger.warn (e.getMessage());
+		} finally {
 			TMisDunningTagService.dealcodeTagType.remove(lockStr);
+			
 		}
 		
-		if (!addable) {
-			result.put("status", "NO");
-			result.put("msg", "无法添加更多标签");
-			return result;
-		}
-		String id = tMisDunningTagService.saveTag(tMisDunningTag);
 		result.put("status", "OK");
 		result.put("id", id);
 		return result;

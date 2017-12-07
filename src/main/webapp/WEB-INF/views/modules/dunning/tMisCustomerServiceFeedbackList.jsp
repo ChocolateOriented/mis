@@ -103,14 +103,22 @@
                 </td>
                 <td>
                     <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
-                        <shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-                            <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
-                                   value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
-                        </shiro:hasPermission>
-                        <shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
-                            <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
-                                   value="待解决" style="padding:0px 8px 0px 8px;"/>
-                        </shiro:lacksPermission>
+                        <c:choose>
+                            <c:when test="${fns:contains(tMisCustomerServiceFeedback.tagText, '投诉催收')}">
+                                <shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+                                    <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                           value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
+                                </shiro:hasPermission>
+                                <shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
+                                    <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                           value="待解决" style="padding:0px 8px 0px 8px;"/>
+                                </shiro:lacksPermission>
+                            </c:when>
+                            <c:otherwise>
+                                <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                       value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
+                            </c:otherwise>
+                        </c:choose>
                     </c:if>
                 </td>
                 <td>

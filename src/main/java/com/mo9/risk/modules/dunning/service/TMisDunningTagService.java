@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.service;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,5 +107,15 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 		}
 		
 		return TagType.values().length > existTags.size();
+	}
+	/**
+	 * 保证标签唯一
+	 * @param buyerid
+	 * @param tagtype
+	 * @return
+	 */
+	public boolean typeExist(TMisDunningTag tMisDunningTag) {
+		
+		return  StringUtils.isBlank(dao.typeExist(tMisDunningTag));
 	}
 }

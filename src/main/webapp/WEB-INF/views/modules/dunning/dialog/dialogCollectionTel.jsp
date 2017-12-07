@@ -142,7 +142,7 @@
 			}
 		});
 		if(!window.parent.messageHide()){
-			$("[ value='CANTACT'],[ value='COMMUNCATE']").remove();
+			$(".hides").remove();
 		}
 		
 	});
@@ -170,15 +170,15 @@
 				<select class="input-small" path="" id="contactstype" name="contactstype">
 					<option value=""></option>
 					<option value="SELF" <c:if test="${'SELF' eq contactstype}">selected</c:if>>本人</option>
-					<option value="MARRIED" <c:if test="${'MARRIED' eq contactstype}">selected</c:if> >夫妻 </option>
-					<option value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
-					<option value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
-					<option value="RELATIVES"<c:if test="${'RELATIVES' eq contactstype}">selected</c:if>>亲戚</option>
-					<option value="FRIEND"<c:if test="${'FRIEND' eq contactstype}">selected</c:if>>朋友</option>
-					<option value="WORKMATE"<c:if test="${'WORKMATE' eq contactstype}">selected</c:if>>同事</option>
-					<option value="WORKTEL"<c:if test="${'WORKTEL' eq contactstype}">selected</c:if>>工作电话</option>
-					<option value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>通讯录</option>
-					<option value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
+					<option class="hides" value="MARRIED" <c:if test="${'MARRIED' eq contactstype}">selected</c:if> >夫妻 </option>
+					<option class="hides" value="PARENT"<c:if test="${'PARENT' eq contactstype}">selected</c:if>>父母</option>
+					<option class="hides" value="CHILDREN"<c:if test="${'CHILDREN' eq contactstype}">selected</c:if>>子女</option>
+					<option class="hides" value="RELATIVES"<c:if test="${'RELATIVES' eq contactstype}">selected</c:if>>亲戚</option>
+					<option class="hides" value="FRIEND"<c:if test="${'FRIEND' eq contactstype}">selected</c:if>>朋友</option>
+					<option class="hides" value="WORKMATE"<c:if test="${'WORKMATE' eq contactstype}">selected</c:if>>同事</option>
+					<option class="hides" value="WORKTEL"<c:if test="${'WORKTEL' eq contactstype}">selected</c:if>>工作电话</option>
+					<option class="hides" value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>通讯录</option>
+					<option class="hides" value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
 				</select>
 			</div>
 			<div style="width:18%;display:inline-block;text-align:right;">
@@ -198,13 +198,13 @@
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 			<div style="width:18%;display:inline-block;text-align:right;">
-				<label>结果代码：</label>
+				<label>行动码：</label>
 			</div>
 			<div style="width:35%;display:inline-block;">
 				<select path="" class="input-small required" id="telstatus" name="telstatus">
 					<option value=""></option>
-					<c:forEach var="result" items="${mobileResultList}">
-						<option value="${result}">${result}</option>
+					<c:forEach var="result" items="${mobileResultMap}">
+						<option value="${result.key}">${result.value}</option>
 					</c:forEach>
 				</select>
 				<span class="help-inline"><font color="red">*</font> </span>
@@ -228,7 +228,7 @@
 			</div>
 			<div style="width:50%;display:inline-block;">
 				<input id="promisepaydate" name="promisepaydate" type="text" readonly="readonly" maxlength="20" class="Wdate required" style="width:150px"
-					value="<fmt:formatDate value="${TMisContantRecord.promisepaydate}" pattern="yyyy-MM-dd"/>"
+						value="<fmt:formatDate value="${TMisContantRecord.promisepaydate}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false,minDate:'%y-%M-%d'});"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>

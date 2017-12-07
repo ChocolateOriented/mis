@@ -499,7 +499,16 @@
 					<form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden"/>
 				</li>
 			</shiro:hasPermission>
-				
+
+			<li><label>最近催收</label>
+				<input name="beginDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.beginDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至
+				<input name="endDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${dunningOrder.endDunningtime}" pattern="yyyy-MM-dd"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+			</li>
+
 			<li><label>最近登录时间</label>
 				<input name="beginlatestlogintime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${dunningOrder.beginlatestlogintime}" pattern="yyyy-MM-dd"/>"

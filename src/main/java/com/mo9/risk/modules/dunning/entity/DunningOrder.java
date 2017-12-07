@@ -63,7 +63,11 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date beginOuterfiletime;		// 开始到期还款日期
 	private Date endOuterfiletime;		// 结束到期还款日期
 	
-	private Date dunningtime;
+	private Date dunningtime;//最近催收时间
+
+	private Date beginDunningtime;//最近催收时间
+
+	private Date endDunningtime;//最近催收时间
 	
 	private String dunningcycle;		// 催收周期(队列)
 	
@@ -637,5 +641,20 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setBlackListNumFromThird(Integer blackListNumFromThird) {
 		this.blackListNumFromThird = blackListNumFromThird;
+	}
+	public Date getBeginDunningtime() {
+		return beginDunningtime;
+	}
+
+	public void setBeginDunningtime(Date beginDunningtime) {
+		this.beginDunningtime = beginDunningtime;
+	}
+
+	public Date getEndDunningtime() {
+		return endDunningtime;
+	}
+
+	public void setEndDunningtime(Date endDunningtime) {
+		this.endDunningtime = null != endDunningtime ? DateUtils.endDate(endDunningtime) : endDunningtime;
 	}
 }

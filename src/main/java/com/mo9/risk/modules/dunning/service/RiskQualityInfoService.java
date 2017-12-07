@@ -14,6 +14,8 @@ import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
+
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -46,48 +48,42 @@ public class RiskQualityInfoService extends BaseService{
 	private static final Map<String, String> rounddownMap;
 	static  
     {  
-		rounddownMap = new HashMap<String, String>();  
-		rounddownMap.put("6.5", "a1");  
-		rounddownMap.put("6.4", "a2");  
-		rounddownMap.put("6.3", "a3");  
-		rounddownMap.put("6.2", "a4");  
-		rounddownMap.put("6.1", "a5");  
-		
-		rounddownMap.put("6.0", "b1");  
-		rounddownMap.put("5.9", "b2");  
-		rounddownMap.put("5.8", "b3");  
-		rounddownMap.put("5.7", "b4");  
-		rounddownMap.put("5.6", "b5");  
-		
-		rounddownMap.put("5.5", "c1");  
-		rounddownMap.put("5.4", "c2");  
-		rounddownMap.put("5.3", "c3");  
-		rounddownMap.put("5.2", "c4");  
-		rounddownMap.put("5.1", "c5");  
-		
-		rounddownMap.put("5.0", "d1");  
-		rounddownMap.put("4.9", "d2");  
-		rounddownMap.put("4.8", "d3");  
-		rounddownMap.put("4.7", "d4");  
-		rounddownMap.put("4.6", "d5");  
-		
-		rounddownMap.put("4.5", "e1");  
-		rounddownMap.put("4.4", "e2");  
-		rounddownMap.put("4.3", "e3");  
-		rounddownMap.put("4.2", "e4");  
-		rounddownMap.put("4.1", "e5");  
-		
-		rounddownMap.put("4.0", "f1");  
-		rounddownMap.put("3.9", "f2");  
-		rounddownMap.put("3.8", "f3");  
-		rounddownMap.put("3.7", "f4");  
-		rounddownMap.put("3.6", "f5");  
-		
-		rounddownMap.put("3.5", "g1");  
-		rounddownMap.put("3.4", "g2");  
-		rounddownMap.put("3.3", "g3");  
-		rounddownMap.put("3.2", "g4");  
-		rounddownMap.put("3.1", "g5");  
+		rounddownMap = new HashMap<String, String>();
+		rounddownMap.put("120", "a1");
+		rounddownMap.put("119", "a2");
+		rounddownMap.put("118", "a3");
+		rounddownMap.put("117", "a4");
+		rounddownMap.put("116", "a5");
+
+		rounddownMap.put("115", "b1");
+		rounddownMap.put("114", "b2");
+		rounddownMap.put("113", "b3");
+		rounddownMap.put("112", "b4");
+		rounddownMap.put("111", "b5");
+
+		rounddownMap.put("110", "c1");
+		rounddownMap.put("109", "c2");
+		rounddownMap.put("108", "c3");
+		rounddownMap.put("107", "c4");
+		rounddownMap.put("106", "c5");
+
+		rounddownMap.put("105", "d1");
+		rounddownMap.put("104", "d2");
+		rounddownMap.put("103", "d3");
+		rounddownMap.put("102", "d4");
+		rounddownMap.put("101", "d5");
+
+		rounddownMap.put("100", "e1");
+		rounddownMap.put("99", "e2");
+		rounddownMap.put("98", "e3");
+		rounddownMap.put("97", "e4");
+		rounddownMap.put("96", "e5");
+
+		rounddownMap.put("95", "f1");
+		rounddownMap.put("94", "f2");
+		rounddownMap.put("93", "f3");
+		rounddownMap.put("92", "f4");
+		rounddownMap.put("91", "f5");
     }
 	
 	/**
@@ -148,16 +144,17 @@ public class RiskQualityInfoService extends BaseService{
 			}
 		}
 	}
-	
+
 	private String getCalculateGrade(double score){
-		if(score > 650){
+		if(score > 600){
 			return "a1";
 		}
-		if(score < 310){
-			return "g5";
+		if(score < 455){
+			return "g";
 		}
-		DecimalFormat df = new DecimalFormat("#,###.0");
-		return rounddownMap.get(df.format(score * 0.01));
+		DecimalFormat df = new DecimalFormat("0");
+		df.setRoundingMode(RoundingMode.DOWN);
+		return rounddownMap.get(df.format(score/5.0));
 	}
 
 	/**

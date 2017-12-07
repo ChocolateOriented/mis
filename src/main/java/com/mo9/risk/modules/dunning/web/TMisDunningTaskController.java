@@ -1336,7 +1336,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "collectionTel")
-	public String collectionTel(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
+	public String collectionTel(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
@@ -1349,7 +1349,15 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		String contactstype = request.getParameter("contactstype");
 		MobileResult[] values = MobileResult.values();
 		List<MobileResult> mobileResultList = Arrays.asList(values);
-		model.addAttribute("mobileResultList", mobileResultList);
+		//获取MobileResult中文名称并传回前端
+		Map<MobileResult,String> mobileResultMap=new HashMap<>();
+		for (MobileResult mobileResult:values){
+			System.out.println("---------------------------MobileResultName="+mobileResult.getMobileResultName());
+			mobileResultMap.put(mobileResult,mobileResult.getMobileResultName());
+		}
+		model.addAttribute("mobileResultMap",mobileResultMap);
+
+		//model.addAttribute("mobileResultList", mobileResultList);
 		model.addAttribute("contactMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
 		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() :"");
 		
