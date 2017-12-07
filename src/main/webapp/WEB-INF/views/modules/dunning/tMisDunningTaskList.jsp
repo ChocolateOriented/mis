@@ -253,22 +253,17 @@
 				
 			 });
 
-		  //还清异常订单同步
-          $("#orderSync").click(function(){
+		  //获取黑名单联系人信息
+          $("#acquireBlackRelationNum").click(function(){
             $.ajax({
               type: 'POST',
-              url : "${ctx}/dunning/tMisDunningTask/orderSync",
+              url : "${ctx}/dunning/tMisDunningTask/acquireBlackRelationNum",
               success : function(data) {
-                if (data == "OK") {
-                  alert("异常订单同步成功");
-                } else {
-                  alert("异常订单同步失败:"+data.message);
-                }
               },
               error : function(XMLHttpRequest, textStatus, errorThrown){
-                alert("保存失败:"+textStatus);
               }
             });
+            alert("正在获取黑名单信息");
           });
 			
 			
@@ -359,6 +354,33 @@
         }
 
 	</script>
+	<style type="text/css">
+		.showSuspense{
+			position: relative;
+		}
+		.showSuspense .suspense {
+			display: none;
+		}
+		.showSuspense:hover .suspense{
+			z-index: 10000;
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			width: 100px;
+			background-color: white;
+			opacity: 0.9;
+			border: solid red 1px;
+			border-radius: 5px;
+			outline: none;
+			padding-left: 20px;
+			padding-top: 20px;
+			display: block;
+		}
+
+		.beautif {
+			padding-bottom: 10px;
+		}
+	</style>
 </head>
 <body>
 	<ul class="nav nav-tabs">
@@ -515,7 +537,7 @@
 		<input id="automatic"  class="btn btn-primary" type="button" value="自动分配"/>
 		<input id="autoAssignNewOrder"  class="btn btn-primary" type="button" value="新订单任务"/>
 		<input id="autoRepayment"  class="btn btn-primary" type="button" value="扫描还款"/>
-		<input id="orderSync"  class="btn btn-primary" type="button" value="订单同步"/>
+		<input id="acquireBlackRelationNum"  class="btn btn-primary" type="button" value="黑名单信息获取"/>
 	</shiro:hasPermission>
 	<!-- 催收留案功能-委外订单截止日期设置按钮 Patch 0001 by GQWU at 2016-11-9 end-->
 
@@ -641,7 +663,21 @@
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
-					${dunningOrder.blackListRelaNum}
+					<c:choose>
+						<c:when test="${dunningOrder.blackListRelaNum eq null}">
+							获取失败
+						</c:when>
+						<c:otherwise>
+							<div name="detail" class="showSuspense">
+								<font color="red">${dunningOrder.blackListRelaNum}</font>
+								<div class="suspense" tabindex="0">
+									<div class="beautif">mo9黑名单: ${dunningOrder.blackListNumFromMo9}</div>
+									<div class="beautif">第三方黑名单: ${dunningOrder.blackListNumFromThird}</div>
+									<div class="beautif">未知: ${dunningOrder.blackListNumUnknow}</div>
+								</div>
+							</div>
+						</c:otherwise>
+					</c:choose>
 						<%--,${dunningOrder.blackListNumFromMo9},${dunningOrder.blackListNumFromThird}--%>
 				</td>
 				<c:if test="${tmiscycle eq 'numberClean' }">

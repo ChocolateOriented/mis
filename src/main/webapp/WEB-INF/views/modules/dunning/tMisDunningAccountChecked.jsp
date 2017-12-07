@@ -6,15 +6,6 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 
-      function showDetail(obj) {
-        $(".suspense").css("display", "none");
-        $(obj).children(".suspense").css("display", "block");
-      }
-
-      function hideDetail() {
-        $(".suspense").css("display", "none");
-      }
-
       function page(n, s) {
         if (n) window.parent.$("#pageNo").val(n);
         if (s) window.parent.$("#pageSize").val(s);
@@ -180,12 +171,17 @@
       }
 	</script>
 	<style type="text/css">
-		.suspense {
+		.showSuspense{
+			position: relative;
+		}
+		.showSuspense .suspense {
+			display: none;
+		}
+		.showSuspense:hover .suspense{
 			z-index: 10000;
 			position: absolute;
 			top: 10px;
 			left: 10px;
-			height: 200px;
 			width: 250px;
 			background-color: white;
 			opacity: 0.9;
@@ -194,6 +190,7 @@
 			outline: none;
 			padding-left: 20px;
 			padding-top: 20px;
+			display: block;
 		}
 
 		.beautif {
@@ -259,9 +256,9 @@
 					${tmessage.remittanceamount }
 				</td>
 				<td >
-					<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+					<div name="detail" class="showSuspense">
 						<font color="red">${ fn:substring(tmessage.remittanceSerialNumber,0,3)}******${ fn:substring(tmessage.remittanceSerialNumber,tmessage.remittanceSerialNumber.length()-3,-1)}</font>
-					    <div class="suspense" style="display:none; " tabindex="0">
+					    <div class="suspense" tabindex="0">
 							   <div class="beautif">交易时间:<fmt:formatDate value="${tmessage.remittancetime }" pattern="yyyy-MM-dd HH:mm:ss"/></div>
 							   <div class="beautif">交易金额:${tmessage.remittanceamount }</div>
 							   <div class="beautif">对方名称:${tmessage.remittanceName }</div>

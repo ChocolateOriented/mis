@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.RiskQualityInfoDao">
+    
+	<sql id="TMisDunningScoreCardColumns">
+		a.dbid as "dbid",
+		a.id as "id",
+		a.dealcode as "dealcode",
+		a.buyerid as "buyerid",
+		a.buyername as "buyername",
+		a.mobile as "mobile",
+		a.score as "score",
+		a.grade as "grade",
+		a.createby as "createby",
+		a.createdate as "createdate",
+		a.updateby as "updateby",
+		a.updatedate as "updatedate"
+	</sql>
+    
+	<insert id="insertScoreCard">
+		INSERT INTO t_mis_dunning_scorecard(
+			id,
+			dealcode,
+			buyerid,
+			buyername,
+			mobile,
+			score,
+			grade,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{dealcode},
+			#{buyerid},
+			#{buyername},
+			#{mobile},
+			#{score},
+			#{grade},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<select id="getNewRiskOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+			o.id as "id",
+			o.dealcode as "dealcode",
+			o.buyer_id as "buyerid",
+			o.first_order as "firstOrder",
+			i.real_name as "realname",
+			b.mobile as "mobile"
+		FROM t_risk_order o
+		JOIN t_risk_buyer b on o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard i on i.buyer_id = b.id
+		WHERE o.merchant_id = '7'
+		AND DATEDIFF(CURDATE(), o.repayment_time)= #{overduedays}
+		AND o.status = 'payment'
+	</select>
+
+
+	<select id="getRiskOrder" resultType="com.mo9.risk.modules.dunning.entity.DunningOrder">
+		SELECT
+		o.id as "id",
+		o.dealcode as "dealcode",
+		o.buyer_id as "buyerid",
+		o.first_order as "firstOrder",
+		i.real_name as "realname",
+		b.mobile as "mobile"
+		FROM t_risk_order o
+		JOIN t_risk_buyer b on o.buyer_id = b.id
+		LEFT JOIN t_risk_buyer_idcard i on i.buyer_id = b.id
+		WHERE o.merchant_id = '7'
+		AND DATEDIFF(CURDATE(), o.repayment_time)= #{overduedays}
+		AND o.status = 'payment'
+	</select>
+	
+	<select id="getScoreCardByDealcode" resultType="TMisDunningScoreCard">
+		SELECT
+			<include refid="TMisDunningScoreCardColumns"/>
+		FROM t_mis_dunning_scorecard a
+		WHERE dealcode = #{dealcode}
+		limit 1
+	</select>
+
+	<select id="findPaymentOrderUserMobile" resultType="java.lang.String">
+		SELECT
+			DISTINCT
+			b.mobile as "mobile"
+		FROM t_risk_order o
+		JOIN t_risk_buyer b on o.buyer_id = b.id
+		WHERE o.merchant_id = '7'
+		  AND DATEDIFF(CURDATE(), o.repayment_time) >= -1
+			AND o.status = 'payment'
+	</select>
+
+</mapper>

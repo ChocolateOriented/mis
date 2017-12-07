@@ -9,7 +9,7 @@ package com.mo9.risk.modules.dunning.entity;
 public enum MobileResult {
 	 ALPA("声称已还"),
 	 BUSY("电话占线"),
-	 CUT("一接就挂/呼入限制"),
+	 CUT("一接就挂"),
 	 FEE("费用减免"),
 	 INSY("无还款成意"),
 	 KNOW("愿意还款"),
@@ -32,7 +32,7 @@ public enum MobileResult {
 		}
 
 		public String getMobileResultName() {
-			return mobileResultName;
+			return this.mobileResultName;
 		}
 		
 	
