@@ -3307,7 +3307,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	  * 迁徙率计算insertDB
 	  */
-	@Scheduled(cron = "0 20 6 * * ?")
+	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB_job() {
 		logger.info("开始今天迁徙计算");
