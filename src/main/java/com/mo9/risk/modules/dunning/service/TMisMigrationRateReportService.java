@@ -629,7 +629,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 * @return void
 	 * @Description 自动邮件
 	 */
-	@Scheduled(cron = "0 0 8 * * ?")
+	@Scheduled(cron = "0 20 8 * * ?")
 	public void autoSendMail() {
 		StringBuilder receiver = new StringBuilder();
 		List<Dict> emails = DictUtils.getDictList("migration_rate_report_email");
