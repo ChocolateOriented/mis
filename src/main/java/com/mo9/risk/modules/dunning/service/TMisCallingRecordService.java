@@ -9,6 +9,7 @@ import java.util.*;
 
 import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
 import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -16,7 +17,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.bean.CallCenterAgentStatus;
 import com.mo9.risk.modules.dunning.bean.CallCenterCallinInfo;
 import com.mo9.risk.modules.dunning.bean.CallCenterCalloutInfo;
@@ -210,6 +210,9 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		}
 		
 		for (TMisAgentInfo agent : agents) {
+			if (StringUtils.isEmpty(agent.getPeopleId())) {
+				continue;
+			}
 			logger.info("同步坐席" + agent.getAgent());
 			action.setQueue(null);
 			action.setAgent(agent.getAgent());
