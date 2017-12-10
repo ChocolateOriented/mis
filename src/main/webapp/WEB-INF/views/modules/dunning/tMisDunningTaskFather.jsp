@@ -404,8 +404,8 @@
 	<ul class="nav nav-tabs">
 		<c:if test="${overdueDays>controlDay}">
 			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a id="customerDetails" href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/customerDetails" onclick="childPage(this)">单位&联系人</a></li></shiro:hasPermission>
-			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/communicationDetails" onclick="childPage(this)">通讯录</a></li></shiro:hasPermission>
-	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/communicationRecord" onclick="childPage(this)">通话记录</a></li></shiro:hasPermission>
+			<shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/communicationDetails" onclick="childPage(this)">关联人</a></li></shiro:hasPermission>
+	        <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/communicationRecord" onclick="childPage(this)">关联人联系记录</a></li></shiro:hasPermission>
 		</c:if>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisDunnedConclusion/list" id="conclusion" onclick="childPage(this)">电催结论记录</a></li></shiro:hasPermission>
         <shiro:hasPermission name="dunning:tMisDunningTask:view"><li><a href="javascript:void 0;" url="${ctx}/dunning/tMisContantRecord/list" onclick="childPage(this)">催款历史</a></li></shiro:hasPermission>

@@ -15,15 +15,6 @@ import com.mo9.risk.util.InsertRedisThread;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.JedisUtils;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdbc.DbUtils;
@@ -32,6 +23,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 通话记录Service
@@ -362,7 +355,7 @@ public class TRiskBuyerContactRecordsService {
 			//匹配通讯录
 			TMisSendMsgInfo contactInfo = buyerContactsMap.get(recordTel);
 			if (contactInfo != null) {
-				String name = contactInfo.getName() + "(通讯录)";
+				String name = contactInfo.getName() + "(关联人)";
 				contactRecord.setName(name);
 				continue;
 			}

@@ -123,7 +123,7 @@
 								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when>
 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
-								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
+								<c:when test = "${cp.familyrelation=='callLog'}">(关联人联系记录)</c:when>
 								<c:when test = "${cp.familyrelation=='worktel'}">(单位)</c:when>
 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
 								<c:otherwise></c:otherwise>
