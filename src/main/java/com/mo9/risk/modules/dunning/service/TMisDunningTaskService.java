@@ -39,7 +39,6 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
-import com.mo9.risk.modules.dunning.manager.RiskqQualityInfoManager;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
@@ -56,7 +55,6 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.util.ListSortUtil;
 import com.thinkgem.jeesite.util.NumberUtil;
-
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
@@ -178,7 +176,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	@Autowired
-	private RiskqQualityInfoManager riskqQualityInfoManager;
+	private RiskQualityInfoService riskQualityInfoService;
 
 
 	public TMisDunningTask get(String id) {
@@ -995,12 +993,17 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 
 		try {
-			BlackListRelation relation = riskqQualityInfoManager.blackListRelation(order.getMobile());
-			order.setBlackListRelaNum(String.valueOf(relation.getNum()));
+			BlackListRelation relation = riskQualityInfoService.getBlackListRelationByMobile(mobile);
+			if (relation == null){
+				order.setBlackListRelaNum(null);
+				return;
+			}
+			order.setBlackListRelaNum(relation.getNum());
 			order.setBlackListNumFromMo9(relation.getNumFromMo9());
 			order.setBlackListNumFromThird(relation.getNumFromThird());
+			order.setBlackListNumUnknow(relation.getNumUnknow());
 		} catch (Exception e) {
-			order.setBlackListRelaNum("获取失败");
+			order.setBlackListRelaNum(null);
 			logger.info("黑名单关系获取失败",e);
 		}
 	}
@@ -3304,7 +3307,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	/**
 	  * 迁徙率计算insertDB
 	  */
-	@Scheduled(cron = "0 20 6 * * ?")
+	@Scheduled(cron = "0 0 8 * * ?")
 	@Transactional(readOnly = false)
 	public void autoInsertMigrationRateReportDB_job() {
 		logger.info("开始今天迁徙计算");

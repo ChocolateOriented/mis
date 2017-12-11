@@ -3,11 +3,16 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.modules.dunning.dao.TMisDunningScoreCardDao;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mo9.risk.modules.dunning.bean.BlackListRelation;
+import com.mo9.risk.modules.dunning.dao.RiskQualityInfoDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
-import com.mo9.risk.modules.dunning.manager.RiskqQualityInfoManager;
-import com.thinkgem.jeesite.common.service.CrudService;
+import com.mo9.risk.modules.dunning.manager.RiskQualityInfoManager;
+import com.thinkgem.jeesite.common.service.BaseService;
+import com.thinkgem.jeesite.common.utils.JedisUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
 import java.math.RoundingMode;
@@ -15,30 +20,32 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 评分卡Service
- * @author shijlu
- * @version 2017-08-29
+ * @Description 用户质量信息
+ * @author jxli
+ * @version 2017/12/5
  */
 @Service
 @Transactional(readOnly = true)
 @Lazy(false)
-public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCardDao, TMisDunningScoreCard> {
+public class RiskQualityInfoService extends BaseService{
 
 	@Autowired
-	private RiskqQualityInfoManager riskScorecardManager;
-	
-	private static Logger logger = LoggerFactory.getLogger(TMisDunningScoreCardService.class);
-	
-	private static final Map<String, String> rounddownMap;  
+	RiskQualityInfoDao dao;
+	@Autowired
+	private RiskQualityInfoManager qualityInfoManager;
+	@Autowired
+	ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+	public static final String BLACK_LIST_CACHE_PREFIX = "RiskQualityInfo_blackListRelation_";
+	private static final Map<String, String> rounddownMap;
 	static  
     {  
 		rounddownMap = new HashMap<String, String>();
@@ -111,7 +118,7 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 			boolean oldOrder = order.getFirstOrder() == null ? false : !order.getFirstOrder();
 			
 			try {
-				String result = riskScorecardManager.scApplicationCol(mobile, dealcode, buyerId, orderId, oldOrder);
+				String result = qualityInfoManager.scApplicationCol(mobile, dealcode, buyerId, orderId, oldOrder);
 				if (null == result || "".equals(result)) {
 					logger.info("获取评分数据无效，订单号" + dealcode);
 					continue;
@@ -131,7 +138,7 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 				user.setName("auto_admin");
 				tMisDunningScoreCard.setCreateBy(user);
 				tMisDunningScoreCard.setUpdateBy(user);
-				save(tMisDunningScoreCard);
+				dao.insertScoreCard(tMisDunningScoreCard);
 			} catch (Exception e) {
 				logger.info("订单" + dealcode + "获取评分数据失败" + e.getMessage());
 			}
@@ -148,5 +155,59 @@ public class TMisDunningScoreCardService extends CrudService<TMisDunningScoreCar
 		DecimalFormat df = new DecimalFormat("0");
 		df.setRoundingMode(RoundingMode.DOWN);
 		return rounddownMap.get(df.format(score/5.0));
+	}
+
+	/**
+	 * @Description  获取逾期任务的黑名单联系人信息
+	 * @author jxli
+	 * @version 2017/12/5
+	 */
+	@Scheduled(cron = "0 30 3 * * ?")
+	public void refreshBlacklistRelation() {
+		final List<String> paymentOrderUserMobile = dao.findPaymentOrderUserMobile();
+		logger.info("正在获取黑名单联系人信息, 共"+paymentOrderUserMobile.size());
+		int count = 0;
+		for (int i = 0; i < paymentOrderUserMobile.size(); i++) {
+			String mobile = paymentOrderUserMobile.get(i);
+			//只取缓存中没有的数据
+			String cache = JedisUtils.get(BLACK_LIST_CACHE_PREFIX +mobile);
+			if (StringUtils.isBlank(cache)){
+				threadPoolTaskExecutor.submit(new CacheBlacklistRelationTask(mobile));
+				count++;
+			}
+		}
+		logger.info("获取黑名单联系人信息任务创建完成, 共"+count);
+	}
+
+	/**
+	 * @Description 通过手机号, 从缓存获取黑名单联系人信息
+	 * @param mobile
+	 * @return com.mo9.risk.modules.dunning.bean.BlackListRelation
+	 */
+	public BlackListRelation getBlackListRelationByMobile(String mobile) {
+		String cache = JedisUtils.get(BLACK_LIST_CACHE_PREFIX +mobile);
+		if (StringUtils.isBlank(cache)){
+			return null ;
+		}
+		return JSON.parseObject(cache,BlackListRelation.class);
+	}
+
+	class CacheBlacklistRelationTask implements Runnable {
+
+		private String mobile;
+
+		public CacheBlacklistRelationTask(String mobile) {
+			this.mobile = mobile;
+		}
+
+		@Override
+		public void run() {
+			try {
+				BlackListRelation blackListRelation = qualityInfoManager.blackListRelation(mobile);
+				JedisUtils.set(BLACK_LIST_CACHE_PREFIX + mobile,JSONObject.toJSONString(blackListRelation),0);
+			} catch (Exception e) {
+				logger.info(mobile+"黑名单联系人获取失败",e);
+			}
+		}
 	}
 }

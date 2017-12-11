@@ -11,7 +11,7 @@ public enum MobileResult {
 	 BUSY("电话占线"),
 	 CUT("一接就挂"),
 	 FEE("费用减免"),
-	 INSY("无还款成意"),
+	 INSY("无还款诚意"),
 	 KNOW("愿意还款"),
 	 LOOO("空号"),
 	 MESF("传真"),

@@ -3,13 +3,11 @@
  */
 package com.mo9.risk.modules.dunning.dao;
 
-import com.thinkgem.jeesite.common.persistence.CrudDao;
-import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
-
-import java.util.List;
-
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
+import com.thinkgem.jeesite.common.persistence.BaseDao;
+import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
+import java.util.List;
 
 /**
  * 评分卡DAO接口
@@ -17,7 +15,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
  * @version 2017-08-29
  */
 @MyBatisDao
-public interface TMisDunningScoreCardDao extends CrudDao<TMisDunningScoreCard> {
+public interface RiskQualityInfoDao  extends BaseDao {
 
 	/**
 	 * 根据订单号获取评分卡
@@ -32,4 +30,18 @@ public interface TMisDunningScoreCardDao extends CrudDao<TMisDunningScoreCard> {
 	 * @return
 	 */
 	public List<DunningOrder> getNewRiskOrder(DunningOrder order);
+
+	/**
+	 * @Description 保存评分卡 
+	 * @param tMisDunningScoreCard
+	 * @return void
+	 */
+	void insertScoreCard(TMisDunningScoreCard tMisDunningScoreCard);
+
+	/**
+	 * @Description 查询未还清订单用户的手机
+	 * @param
+	 * @return java.util.List<java.lang.String>
+	 */
+	List<String> findPaymentOrderUserMobile();
 }

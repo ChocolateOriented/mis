@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
  * Created by jxli on 2017/9/7.
  */
 @Service
-public class RiskqQualityInfoManager {
+public class RiskQualityInfoManager {
 	/**
 	 * 日志对象
 	 */
@@ -75,45 +75,25 @@ public class RiskqQualityInfoManager {
 		if (StringUtils.isBlank(mobile)){
 			throw new IllegalArgumentException("手机号不能为空");
 		}
-		String url = riskUrl + "relagraph/api/route/v1/getNodeRela";
+		String url = riskUrl + "relagraph/api/route/v1/queryBlackContactNum";
 		Map<String,String> param = new HashMap<String, String>();
 		param.put("mobile",mobile);
 
-		logger.debug("黑名单关系接口url：" + url);
-		String res = GetRequest.getRequest(url,param,2000);
+		String res = GetRequest.getRequest(url,param);
 		logger.debug(url + "返回参数" + res);
 
 		if (StringUtils.isBlank(res)) {
 			throw new ServiceException("获取黑名单关系接口");
 		}
 		JSONObject repJson = JSON.parseObject(res);
-		String nodesStr = repJson.getString("data");
-		if (StringUtils.isBlank(nodesStr)){
+		String data = repJson.getString("data");
+		if (StringUtils.isBlank(data)){
 				logger.info("黑名单关系接口发生异常,"+res);
 				throw new ApiFailException("获取失败");
 		}
-		JSONObject nodes = JSON.parseObject(nodesStr);
-		JSONArray blackNodes = nodes.getJSONArray("clBlackNode");
-		if (blackNodes == null){
-			return new BlackListRelation(0,0,0);
-		}
-
-		BlackListRelation relation = new BlackListRelation();
-		relation.setNum(blackNodes.size());
-		int numFromMo9 = 0;
-		int numFromThird = 0;
-		for (int i = 0; i < blackNodes.size(); i++) {
-			 JSONObject node = blackNodes.getJSONObject(i);
-			 String from = node.getString("blackThirdMerchant");
-			 if ("mo9".equals(from)){
-			 	numFromMo9++;
-			 }
-			 if ("third".equals(from)){
-			 	numFromThird++;
-			 }
-		}
-		relation.setNumFromMo9(numFromMo9);
-		relation.setNumFromThird(numFromThird);
+		BlackListRelation relation = JSON.parseObject(data,BlackListRelation.class);
 		return relation;
 	}
+
+
 }

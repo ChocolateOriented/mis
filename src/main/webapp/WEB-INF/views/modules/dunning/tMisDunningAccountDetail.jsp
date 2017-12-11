@@ -6,15 +6,6 @@
 	<title>入账对公明细</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
-      function showDetail(obj) {
-        $(".suspense").css("display", "none");
-        $(obj).children(".suspense").css("display", "block");
-      }
-
-      function hideDetail() {
-        $(".suspense").css("display", "none");
-      }
-
 	  $(document).ready(function() {
 			
 		var a=/^[0-9]*(\.[0-9]{1,2})?$/;
@@ -65,7 +56,13 @@
         }
 	</script>
 	<style type="text/css">
-		.suspense {
+		.showSuspense{
+			position: relative;
+		}
+		.showSuspense .suspense {
+			display: none;
+		}
+		.showSuspense:hover .suspense{
 			z-index: 10000;
 			position: absolute;
 			top: 10px;
@@ -78,6 +75,7 @@
 			outline: none;
 			padding-left: 20px;
 			padding-top: 20px;
+			display: block;
 		}
 
 		.beautif {
@@ -198,9 +196,9 @@
 				<td>
 					<c:choose>
 						<c:when test="${fn:length(tmessage.refunds) > 0}">
-							<div name="detail" onmouseover="showDetail(this);" onmouseout="hideDetail();" style="position:relative;">
+							<div name="detail" class="showSuspense">
 								<font color="red">${tmessage.refunds[0].refundStatusText}</font>
-								<div class="suspense" style="display:none; " tabindex="0">
+								<div class="suspense" tabindex="0">
 									<c:forEach items="${tmessage.refunds}" var="refund">
 										<div class="beautif">退款审核时间:<fmt:formatDate value="${refund.auditTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
 										<div class="beautif">退款完成时间:<fmt:formatDate value="${refund.refundTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
