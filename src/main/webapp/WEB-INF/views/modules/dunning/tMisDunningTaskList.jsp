@@ -572,7 +572,7 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-                <th>黑名单联系人数</th>
+                <%--<th>黑名单联系人数</th>--%>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 				<th>号码清洗</th>
 				</c:if>
@@ -662,24 +662,23 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-				<td>
-					<c:choose>
-						<c:when test="${dunningOrder.blackListRelaNum eq null}">
-							获取失败
-						</c:when>
-						<c:otherwise>
-							<div name="detail" class="showSuspense">
-								<font color="red">${dunningOrder.blackListRelaNum}</font>
-								<div class="suspense" tabindex="0">
-									<div class="beautif">mo9黑名单: ${dunningOrder.blackListNumFromMo9}</div>
-									<div class="beautif">第三方黑名单: ${dunningOrder.blackListNumFromThird}</div>
-									<div class="beautif">未知: ${dunningOrder.blackListNumUnknow}</div>
-								</div>
-							</div>
-						</c:otherwise>
-					</c:choose>
-						<%--,${dunningOrder.blackListNumFromMo9},${dunningOrder.blackListNumFromThird}--%>
-				</td>
+				<%--<td>--%>
+					<%--<c:choose>--%>
+						<%--<c:when test="${dunningOrder.blackListRelaNum eq null}">--%>
+							<%--获取失败--%>
+						<%--</c:when>--%>
+						<%--<c:otherwise>--%>
+							<%--<div name="detail" class="showSuspense">--%>
+								<%--<font color="red">${dunningOrder.blackListRelaNum}</font>--%>
+								<%--<div class="suspense" tabindex="0">--%>
+									<%--<div class="beautif">mo9黑名单: ${dunningOrder.blackListNumFromMo9}</div>--%>
+									<%--<div class="beautif">第三方黑名单: ${dunningOrder.blackListNumFromThird}</div>--%>
+									<%--<div class="beautif">未知: ${dunningOrder.blackListNumUnknow}</div>--%>
+								<%--</div>--%>
+							<%--</div>--%>
+						<%--</c:otherwise>--%>
+					<%--</c:choose>--%>
+				<%--</td>--%>
 				<c:if test="${tmiscycle eq 'numberClean' }">
 					<td>
 					  <c:if test="${dunningOrder.status eq 'payment'}">

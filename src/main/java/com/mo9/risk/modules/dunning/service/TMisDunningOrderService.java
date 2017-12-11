@@ -151,7 +151,6 @@ public class TMisDunningOrderService extends BaseService{
 	 * @return boolean 是否成功
 	 */
 	public boolean tryRepairAbnormalOrder(String dealcode, String paychannel,BigDecimal payamount, String thirdCode) {
-		for (int tryTime = 0; tryTime < 3; tryTime++) {
 			try {
 				orderManager.repay(dealcode, paychannel, payamount, thirdCode);
 			} catch (ServiceException e){
@@ -159,11 +158,9 @@ public class TMisDunningOrderService extends BaseService{
 				return false;
 			} catch (Exception e) {
 				logger.info("重试回调江湖救急接口发生错误", e);
-				continue;
+				return false;
 			}
 			return true;
-		}
-		return false;
 	}
 
 	/**
