@@ -281,7 +281,8 @@
 	<select id="findDetailByDealcodeandTel" resultType="TMisContantRecord">
 		SELECT 
 			a.createdate AS "createDate",
-			a.createby AS "createBy.name",
+<!--			a.createby AS "createBy.name", -->
+			CASE WHEN a.createby = p.Name THEN p.Nickname ELSE a.createby END AS "createBy.name",
 			CASE WHEN p.Name = 'sys' THEN '' ELSE p.Nickname END AS "peoplename",
 			a.telstatus AS "telstatus",
 			a.remark AS "remark",
