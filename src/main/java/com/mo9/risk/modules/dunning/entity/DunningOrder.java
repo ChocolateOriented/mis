@@ -92,6 +92,7 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Date nextfollowdate; 	// 下次跟进时间
 	private Date beginnextfollowdate ; //查询开始-下次跟进时间
 	private Date endnextfollowdate ; //查询结束-下次跟进时间
+	private String actionCode;
 	private NumberCleanResult numberCleanResult ; //号码清洗结果
 	
 	private String quality;
@@ -537,6 +538,14 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setEndnextfollowdate(Date endnextfollowdate) {
 		this.endnextfollowdate =  null != endnextfollowdate ? DateUtils.endDate(endnextfollowdate) : endnextfollowdate;
+	}
+
+	public String getActionCode() {
+		return actionCode;
+	}
+
+	public void setActionCode(String actionCode) {
+		this.actionCode = actionCode;
 	}
 
 	public String getQuality() {
