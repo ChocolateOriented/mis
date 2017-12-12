@@ -558,7 +558,7 @@ public class ChartUtils {
      * @param title
      * @param map
      */
-    public static void setRenderer(XYPlot plot,String title,XYSeriesCollection x,List list){
+    public static void setRenderer(XYPlot plot,String title,XYSeriesCollection x){
         XYLineAndShapeRenderer xylineandshaperenderer = (XYLineAndShapeRenderer)plot.getRenderer();
         // 设置曲线是否显示数据点(控制折点)
         xylineandshaperenderer.setBaseShapesVisible(true);
@@ -577,7 +577,7 @@ public class ChartUtils {
         //第一个参数,控制距离拐点的距离,第二个参数,控制相对拐点的位置,第三个参数,第四个参数是控制旋转的
         xylineandshaperenderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(
                 ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_LEFT));
-        xylineandshaperenderer.setBaseItemLabelGenerator(new JFreeChartLabelGenerator(title,list));
+        xylineandshaperenderer.setBaseItemLabelGenerator(new JFreeChartLabelGenerator(title,x));
         plot.setRenderer(xylineandshaperenderer);
     }
 
@@ -614,11 +614,13 @@ public class ChartUtils {
     public static BufferedImage getJfreechartimage(JFreeChart jfreechart,String title,XYSeriesCollection c){
 
         java.util.List series = c.getSeries();
+
         BufferedImage big = jfreechart.createBufferedImage(530, 350);
 
         if("C-P1".equals(title)){
             for(int i = 0;i<series.size();i++){
-                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
+                int maxX = (int)c.getSeries(i).getMaxX()-1;
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
                 int x = big.getWidth() - small.getWidth()-32;
@@ -632,16 +634,19 @@ public class ChartUtils {
         }else {
             for(int i = 0;i<series.size();i++){
 
-                //前面的标签框
-                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMinY()+"");
+                int maxX = (int)c.getSeries(i).getMaxX()-1;
+
+                //右边的标签框
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
                 int x = big.getWidth() - small.getWidth()-32;
                 int y = big.getHeight() - (9-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
 
-                //后面的标签框
-                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
+                //左边的标签框
+                int minX = (int)c.getSeries(i).getMinX()-1;
+                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(minX)+"");
                 //BufferedImage small2 = ChartUtils.getSmall();
                 //Graphics2D g = big.createGraphics();
                 int x2 = big.getWidth() - 11*small2.getWidth()+5;

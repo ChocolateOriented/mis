@@ -769,20 +769,19 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	}
 	public ByteArrayDataSource createChart2(List<ChartSeries> chartSeries, String title) throws IOException {
 
-		final int xSize = 16;
+		//final int xSize = 16;
+
 		XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
-		List list = new ArrayList();
 		for (ChartSeries serie : chartSeries) {
 
 			XYSeries xySeries = new XYSeries(serie.getName());
 			String name = serie.getName();
 			List<Object> data = serie.getData();
-
+			int xSize =data.size();
 			if (data == null) {
 
 				continue;
 			}
-			list.add(data.size());
 			for (int index = 0; index < xSize; index++) {
 				Double result = null;
 				if (index < data.size()) {
@@ -821,7 +820,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		//设置x轴和y轴
 		ChartUtils.setAxis(plot);
 		//设置线条
-		ChartUtils.setRenderer(plot,title,xySeriesCollection,list);
+		ChartUtils.setRenderer(plot,title,xySeriesCollection);
 		BufferedImage big = ChartUtils.getJfreechartimage(jfreechart,title,xySeriesCollection);
 
 
