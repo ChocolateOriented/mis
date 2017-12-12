@@ -632,15 +632,16 @@ public class ChartUtils {
         }else {
             for(int i = 0;i<series.size();i++){
 
-                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
+                //前面的标签框
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMinY()+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
                 int x = big.getWidth() - small.getWidth()-32;
                 int y = big.getHeight() - (9-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
 
-
-                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMinY()+"");
+                //后面的标签框
+                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
                 //BufferedImage small2 = ChartUtils.getSmall();
                 //Graphics2D g = big.createGraphics();
                 int x2 = big.getWidth() - 11*small2.getWidth()+5;
