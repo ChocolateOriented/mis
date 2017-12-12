@@ -23,13 +23,13 @@ import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
 
 /**
  * Jfreechart工具类
@@ -48,8 +48,8 @@ public class ChartUtils {
             new Color(31,129,188), new Color(92,92,97), new Color(144,237,125), new Color(255,188,117),
             new Color(153,158,255), new Color(255,117,153), new Color(253,236,109), new Color(128,133,232),
             new Color(158,90,102),new Color(255, 204, 102) };//颜色
-    public static Color[] CHART_XYCOLORS={new Color(8,255,26),new Color(94,94,94),
-            new Color(81,107,255),new Color(255,234,137), new Color(255,130,130),
+    public static Color[] CHART_XYCOLORS={new Color(81,107,255),new Color(255,234,137), new Color(255,130,130),
+            new Color(8,255,26),new Color(94,94,94),
             new Color(255,156,173),new Color(255, 204, 102)};
 
     static {
@@ -521,7 +521,7 @@ public class ChartUtils {
         //设置横线是是实体线
         plot.setRangeGridlineStroke(new BasicStroke(1));
         // 设置曲线图与xy轴的距离
-        plot.setAxisOffset(new RectangleInsets(30D, 0D, 0D, 10D));
+        plot.setAxisOffset(new RectangleInsets(30D, 0D, 0D, 70D));
     }
 
     /**
@@ -535,6 +535,7 @@ public class ChartUtils {
         domainAxis.setUpperMargin(0.2);
         //设置x轴刻度的颜色
         domainAxis.setTickLabelPaint(new Color(162,162,162));
+        domainAxis.setUpperBound(16.9);
 
 
         //设置y
@@ -545,7 +546,7 @@ public class ChartUtils {
         numberaxis.setTickLabelPaint(new Color(162,162,162));
         //设置y轴起始段不需要从0开始
         numberaxis.setAutoRangeIncludesZero(false);
-        numberaxis.setUpperMargin(0.15);//设置y轴距离图片顶端的距离
+        numberaxis.setUpperMargin(0.3);//设置y轴距离图片顶端的距离
         numberaxis.setLowerMargin(0.15);//设置y轴距离图片底端的距离
 
 
@@ -557,30 +558,103 @@ public class ChartUtils {
      * @param title
      * @param map
      */
-    public static void setRenderer(XYPlot plot,String title,Map map){
+    public static void setRenderer(XYPlot plot,String title,XYSeriesCollection x,List list){
         XYLineAndShapeRenderer xylineandshaperenderer = (XYLineAndShapeRenderer)plot.getRenderer();
         // 设置曲线是否显示数据点(控制折点)
         xylineandshaperenderer.setBaseShapesVisible(true);
         xylineandshaperenderer.setBaseItemLabelsVisible(true);
         //设置线条的颜色
-
-        for (int i = 0;i<map.size();i++){
+        List series = x.getSeries();
+        for (int i = 0;i<series.size();i++){
             //设置线条颜色
             xylineandshaperenderer.setSeriesPaint(i,ChartUtils.CHART_XYCOLORS[i]);
             //设置标签颜色
             xylineandshaperenderer.setSeriesItemLabelPaint(i,ChartUtils.CHART_XYCOLORS[i]);
         }
         //设置线条的粗细
-        xylineandshaperenderer.setStroke(new BasicStroke(2.5f));
+        xylineandshaperenderer.setStroke(new BasicStroke(1.5f));
         xylineandshaperenderer.setBaseItemLabelFont(new Font("宋体",Font.PLAIN,10));
         //第一个参数,控制距离拐点的距离,第二个参数,控制相对拐点的位置,第三个参数,第四个参数是控制旋转的
         xylineandshaperenderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(
                 ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_LEFT));
-        xylineandshaperenderer.setBaseItemLabelGenerator(new JFreeChartLabelGenerator(title,map));
+        xylineandshaperenderer.setBaseItemLabelGenerator(new JFreeChartLabelGenerator(title,list));
         plot.setRenderer(xylineandshaperenderer);
     }
 
+    /**
+     * 获取图片里面的小标签
+     * @return
+     */
+    public static BufferedImage getSmall(Color color,String  content){
+        //public static BufferedImage getSmall(){
+        //设置画布
+        BufferedImage bufferedImage = new BufferedImage(43, 15, BufferedImage.TYPE_INT_RGB);
+        //设置画笔
+        Graphics2D g = bufferedImage.createGraphics();
+        //设置背景颜色
+        g.setBackground(color);
+        //矩形框(原点x坐标，原点y坐标，矩形的长，矩形的宽)
+        g.clearRect(0,   0,   100,   100);
+        //画笔的颜色
+        g.setColor(Color.black);
+        //画笔的字体
+        g.setFont(new Font("宋体",Font.TRUETYPE_FONT,12));
+        //写的内容
+        g.drawString(content,8,11);
+        g.dispose();
 
+        return bufferedImage;
+    }
+
+    /**
+     * 获取融合后的图片
+     * @param jfreechart
+     * @return
+     */
+    public static BufferedImage getJfreechartimage(JFreeChart jfreechart,String title,XYSeriesCollection c){
+
+        java.util.List series = c.getSeries();
+        BufferedImage big = jfreechart.createBufferedImage(530, 350);
+
+        if("C-P1".equals(title)){
+            for(int i = 0;i<series.size();i++){
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
+                //BufferedImage small = ChartUtils.getSmall();
+                Graphics2D g = big.createGraphics();
+                int x = big.getWidth() - small.getWidth()-32;
+                int y = big.getHeight() - (18-i)*small.getHeight();
+                g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
+
+
+                g.dispose();
+            }
+
+        }else {
+            for(int i = 0;i<series.size();i++){
+
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMaxY()+"");
+                //BufferedImage small = ChartUtils.getSmall();
+                Graphics2D g = big.createGraphics();
+                int x = big.getWidth() - small.getWidth()-32;
+                int y = big.getHeight() - (9-i)*small.getHeight();
+                g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
+
+
+                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getMinY()+"");
+                //BufferedImage small2 = ChartUtils.getSmall();
+                //Graphics2D g = big.createGraphics();
+                int x2 = big.getWidth() - 11*small2.getWidth()+5;
+                int y2 = big.getHeight() - (9-i)*small2.getHeight();
+                g.drawImage(small2, x2, y2, small2.getWidth(), small2.getHeight(), null);
+                g.dispose();
+            }
+
+        }
+
+        return big;
+
+
+    }
 
 
     }

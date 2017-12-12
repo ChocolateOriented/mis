@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -682,14 +683,17 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver.toString());
-		String data = DateUtils.getDate("MM月dd日");
-		mailSender.setSubject("截止"+data+"迁徙率");
+		String date = DateUtils.getDate("MM月dd日");
+		Date beforeDay = DateUtils.getBeforeDay();
+		String yesterday = DateUtils.formatDate(beforeDay,"MM月dd日");
+
+		mailSender.setSubject("截止"+yesterday+"迁徙率");
 
 		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
 		StringBuilder content = new StringBuilder();
 		content.append("<table>");
 		content.append("<tr><td colspan='2'><img src="+url+"'static/images/mo9image.png' /><p></td></tr>");
-		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+data+"迁徙数据，烦请查阅</font></p></td></tr>");
+		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
 		content.append("</table>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
 		content.append("<tr bgcolor='#EAEAEA'><th height='40px'>C-P1</th><th>"+cp1newSeries.get(0).getName()+"</th><th>"+cp1newSeries.get(1).getName()+"</th><th>同比</th></tr>");
@@ -710,7 +714,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #000'></td></tr>");
 		content.append("<tr><td colspan='2'><div align ='right'><font color='#4D4D4D' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
-		content.append("<tr><td colspan='2'><div align ='right'><font color='#4D4D4D' size='4'>"+data+"</font></div></td></tr>");
+		content.append("<tr><td colspan='2'><div align ='right'><font color='#4D4D4D' size='4'>"+date+"</font></div></td></tr>");
 		content.append("</table>");
 
 
@@ -756,8 +760,10 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		if (lastCycleData.size() >= index) {
 			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
 			last = lastValue + "%";
-			DecimalFormat df = new DecimalFormat("#.00%");
-			change = df.format(1 - (lastValue / currentValue));
+			//DecimalFormat df = new DecimalFormat("#.0%");
+			//change = df.format(1 - (lastValue / currentValue));
+			//change = df.format(currentValue-lastValue);
+			change = (currentValue-lastValue) + "%";
 		}
 		return new MigrateChange(current, last, change);
 	}
@@ -765,8 +771,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		final int xSize = 16;
 		XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
-		Map<Integer, Integer> map = new HashMap();
-
+		List list = new ArrayList();
 		for (ChartSeries serie : chartSeries) {
 
 			XYSeries xySeries = new XYSeries(serie.getName());
@@ -777,7 +782,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 				continue;
 			}
-			map.put(chartSeries.indexOf(serie), data.size());
+			list.add(data.size());
 			for (int index = 0; index < xSize; index++) {
 				Double result = null;
 				if (index < data.size()) {
@@ -788,15 +793,18 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 					}
 				}
 				xySeries.add(index + 1, result);
+
+
 			}
 			xySeriesCollection.addSeries(xySeries);
+
 
 		}
 
 
 		JFreeChart jfreechart =  ChartUtils.createXYChart(title, // 标题
 				"", // categoryAxisLabel （category轴，横轴，X轴标签）
-				"%", // valueAxisLabel（value轴，纵轴，Y轴的标签）
+				"单位(%)", // valueAxisLabel（value轴，纵轴，Y轴的标签）
 				xySeriesCollection, // dataset
 				PlotOrientation.VERTICAL,
 				true, // legend
@@ -813,11 +821,14 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		//设置x轴和y轴
 		ChartUtils.setAxis(plot);
 		//设置线条
-		ChartUtils.setRenderer(plot,title,map);
+		ChartUtils.setRenderer(plot,title,xySeriesCollection,list);
+		BufferedImage big = ChartUtils.getJfreechartimage(jfreechart,title,xySeriesCollection);
+
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(30 * 1024);
 		try {
-			ChartUtilities.writeChartAsPNG(out, jfreechart, 530, 350);
+			ChartUtilities.writeBufferedImageAsPNG(out,big);
+			//ChartUtilities.writeChartAsPNG(out, jfreechart, 530, 350);
 			out.flush();
 		} catch (Exception e) {
 			// logger.info("创建图表"+title+"失败", e);

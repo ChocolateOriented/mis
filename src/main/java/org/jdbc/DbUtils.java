@@ -1,24 +1,15 @@
 package org.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
 import com.thinkgem.jeesite.modules.buyer.entity.MRiskBuyerReport;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.text.DateFormat;
+import java.util.*;
+import java.util.Date;
 
 //import org.apache.log4j.Logger;
 
@@ -308,7 +299,7 @@ public class DbUtils {
 		String sql = "SELECT  " +
 				" CASE WHEN w.company_tel IS NOT NULL THEN concat(w.company_name,'(单位&联系人)')" +
 				" WHEN b.type IS NOT NULL THEN concat(c.name,'(单位&联系人)')" +
-				" WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(通讯录)')" +
+				" WHEN d.contact_name IS NOT NULL THEN concat(d.contact_name,'(关联人)')" +
 				" WHEN d.contact_name IS NULL AND c.name IS NOT NULL THEN c.name" +
 				" ELSE '未知'" +
 				" END as 'name'," +
