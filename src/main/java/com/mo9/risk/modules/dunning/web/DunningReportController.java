@@ -156,10 +156,12 @@ public class DunningReportController extends BaseController {
 			RedirectAttributes redirectAttributes) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
-			performanceDayReport.setDatetimestart(
-					null == performanceDayReport.getDatetimestart() ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimestart());
-			performanceDayReport
-					.setDatetimeend(null == performanceDayReport.getDatetimeend() ? DateUtils.getDateToDay(new Date()) : performanceDayReport.getDatetimeend());
+			if(null == performanceDayReport.getDatetimestart()){
+				performanceDayReport.setDatetimestart(DateUtils.getDateToDay(new Date()));
+			}
+			if(null == performanceDayReport.getDatetimeend()){
+				performanceDayReport.setDatetimeend( DateUtils.getDateToDay(new Date()));
+			}
 			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
 			List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
 			new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();

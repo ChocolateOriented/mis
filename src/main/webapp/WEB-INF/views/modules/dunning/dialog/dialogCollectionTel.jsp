@@ -177,8 +177,8 @@
 					<option class="hides" value="FRIEND"<c:if test="${'FRIEND' eq contactstype}">selected</c:if>>朋友</option>
 					<option class="hides" value="WORKMATE"<c:if test="${'WORKMATE' eq contactstype}">selected</c:if>>同事</option>
 					<option class="hides" value="WORKTEL"<c:if test="${'WORKTEL' eq contactstype}">selected</c:if>>工作电话</option>
-					<option class="hides" value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>通讯录</option>
-					<option class="hides" value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>通话记录</option>
+					<option class="hides" value="CANTACT"<c:if test="${'CANTACT' eq contactstype}">selected</c:if>>关联人</option>
+					<option class="hides" value="COMMUNCATE"<c:if test="${'COMMUNCATE' eq contactstype}">selected</c:if>>关联人联系记录</option>
 				</select>
 			</div>
 			<div style="width:18%;display:inline-block;text-align:right;">

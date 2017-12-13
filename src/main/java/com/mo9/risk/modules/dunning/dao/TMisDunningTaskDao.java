@@ -155,7 +155,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * 保存最后电话记录
 	 * @return
 	 */
-	public int updateTelRemark(@Param("telremark")String telremark, @Param("id")String id);
+	public int updateDunningAction(@Param("telremark")String telremark, @Param("actionCode") String actionCode, @Param("id")String id);
 	
 	/**
 	 * 催收绩效月报

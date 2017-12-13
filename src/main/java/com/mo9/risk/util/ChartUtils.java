@@ -1,37 +1,12 @@
 package com.mo9.risk.util;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Vector;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.DateTickUnitType;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.labels.ItemLabelAnchor;
-import org.jfree.chart.labels.ItemLabelPosition;
-import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
-import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
-import org.jfree.chart.labels.StandardXYItemLabelGenerator;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.DefaultDrawingSupplier;
-import org.jfree.chart.plot.PieLabelLinkStyle;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.labels.*;
+import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StackedBarRenderer;
@@ -43,8 +18,18 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
 
 /**
  * Jfreechart工具类
@@ -58,11 +43,14 @@ import org.jfree.ui.TextAnchor;
  */
 public class ChartUtils {
     private static String NO_DATA_MSG = "数据加载失败";
-    private static Font FONT = new Font("宋体", Font.PLAIN, 12);
+    private static Font FONT = new Font("宋体", Font.TRUETYPE_FONT, 12);
     public static Color[] CHART_COLORS = {
             new Color(31,129,188), new Color(92,92,97), new Color(144,237,125), new Color(255,188,117),
             new Color(153,158,255), new Color(255,117,153), new Color(253,236,109), new Color(128,133,232),
             new Color(158,90,102),new Color(255, 204, 102) };//颜色
+    public static Color[] CHART_XYCOLORS={new Color(81,107,255),new Color(255,234,137), new Color(255,130,130),
+            new Color(8,255,26),new Color(94,94,94),
+            new Color(255,156,173),new Color(255, 204, 102)};
 
     static {
         setChartTheme();
@@ -458,4 +446,222 @@ public class ChartUtils {
     public static JFreeChart createLineChart(String title, String categoryAxisLabel, String valueAxisLabel, CategoryDataset dataset){
        return ChartFactory.createLineChart(title, categoryAxisLabel, valueAxisLabel, dataset);
     }
-}
+
+    /**
+     * 创建图表对象XYChart
+     * @param title
+     * @param s
+     * @param s1
+     * @param xySeriesCollection
+     * @param vertical
+     * @param b
+     * @param b1
+     * @param b2
+     * @return
+     */
+    public static JFreeChart createXYChart(String title, String s, String s1, XYSeriesCollection xySeriesCollection, PlotOrientation vertical, boolean b, boolean b1, boolean b2) {
+        JFreeChart jfreechart = ChartFactory.createXYLineChart(
+                title, // 标题
+                s, // categoryAxisLabel （category轴，横轴，X轴标签）
+                s1, // valueAxisLabel（value轴，纵轴，Y轴的标签）
+                xySeriesCollection, // dataset
+                vertical,
+                b, // legend
+                b1, // tooltips
+                b2); // URLs
+
+        return jfreechart;
+
+    }
+
+    /**
+     * 设置图示
+     * @param jfreechart
+     */
+    public static void setJfreeChart(JFreeChart jfreechart){
+        //图示外框去掉
+        jfreechart.getLegend().setFrame(new BlockBorder(Color.WHITE));
+        //修改字体的齿轮
+        jfreechart.setTextAntiAlias(false);
+        //修改背景颜色
+        jfreechart.setBackgroundPaint(Color.white);
+        //修改图示框里面的字体颜色
+        jfreechart.getLegend().setItemPaint(Color.gray);
+    }
+
+    /**
+     * 设置字体以及背景网格
+     * @param jfreechart
+     * @param plot
+     */
+
+    public static void setFont(JFreeChart jfreechart,XYPlot plot){
+        // 设置配置字体（解决中文乱码的通用方法）
+        Font xfont = new Font("宋体", Font.PLAIN, 12); // X轴
+        Font yfont = new Font("宋体", Font.PLAIN, 12); // Y轴
+        Font kfont = new Font("宋体", Font.PLAIN, 12); // 底部
+        Font titleFont = new Font("宋体", Font.PLAIN, 20); // 图片标题
+        //设置背景颜色
+
+        plot.setOutlinePaint(Color.white);//设置外框颜色
+        plot.setOutlineVisible(false);//设置外框是否可见
+        plot.getDomainAxis().setLabelFont(xfont);
+        plot.getRangeAxis().setLabelFont(yfont);
+        plot.getRangeAxis().setLabelPaint(new Color(162,162,162));
+        jfreechart.getLegend().setItemFont(kfont);
+        jfreechart.getTitle().setFont(titleFont);
+
+
+
+        // 设置网格背景颜色
+        plot.setBackgroundPaint(Color.white);
+        // 设置网格竖线颜色
+        plot.setDomainGridlinesVisible(false);
+        // 设置网格横线颜色
+        plot.setRangeGridlinePaint(new Color(162,162,162));
+        //设置横线是是实体线
+        plot.setRangeGridlineStroke(new BasicStroke(1));
+        // 设置曲线图与xy轴的距离
+        plot.setAxisOffset(new RectangleInsets(30D, 0D, 0D, 70D));
+    }
+
+    /**
+     * 设置XY轴
+     * @param plot
+     */
+    public static void setAxis(XYPlot plot){
+        //设置x数据距离图片左端的距离
+        ValueAxis domainAxis = plot.getDomainAxis();
+        //设置x轴到图片顶端的距离
+        domainAxis.setUpperMargin(0.2);
+        //设置x轴刻度的颜色
+        domainAxis.setTickLabelPaint(new Color(162,162,162));
+        domainAxis.setUpperBound(16.9);
+
+
+        //设置y
+        NumberAxis numberaxis  = (NumberAxis)plot.getRangeAxis();
+        //去除y轴那条线
+        numberaxis.setAxisLineVisible(false);
+        //设置坐标轴刻度的颜色
+        numberaxis.setTickLabelPaint(new Color(162,162,162));
+        //设置y轴起始段不需要从0开始
+        numberaxis.setAutoRangeIncludesZero(false);
+        numberaxis.setUpperMargin(0.3);//设置y轴距离图片顶端的距离
+        numberaxis.setLowerMargin(0.15);//设置y轴距离图片底端的距离
+
+
+    }
+
+    /**
+     * 设置线条
+     * @param plot
+     * @param title
+     * @param map
+     */
+    public static void setRenderer(XYPlot plot,String title,XYSeriesCollection x){
+        XYLineAndShapeRenderer xylineandshaperenderer = (XYLineAndShapeRenderer)plot.getRenderer();
+        // 设置曲线是否显示数据点(控制折点)
+        xylineandshaperenderer.setBaseShapesVisible(true);
+        xylineandshaperenderer.setBaseItemLabelsVisible(true);
+        //设置线条的颜色
+        List series = x.getSeries();
+        for (int i = 0;i<series.size();i++){
+            //设置线条颜色
+            xylineandshaperenderer.setSeriesPaint(i,ChartUtils.CHART_XYCOLORS[i]);
+            //设置标签颜色
+            xylineandshaperenderer.setSeriesItemLabelPaint(i,ChartUtils.CHART_XYCOLORS[i]);
+        }
+        //设置线条的粗细
+        xylineandshaperenderer.setStroke(new BasicStroke(1.5f));
+        xylineandshaperenderer.setBaseItemLabelFont(new Font("宋体",Font.PLAIN,10));
+        //第一个参数,控制距离拐点的距离,第二个参数,控制相对拐点的位置,第三个参数,第四个参数是控制旋转的
+        xylineandshaperenderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(
+                ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_LEFT));
+        xylineandshaperenderer.setBaseItemLabelGenerator(new JFreeChartLabelGenerator(title,x));
+        plot.setRenderer(xylineandshaperenderer);
+    }
+
+    /**
+     * 获取图片里面的小标签
+     * @return
+     */
+    public static BufferedImage getSmall(Color color,String  content){
+        //public static BufferedImage getSmall(){
+        //设置画布
+        BufferedImage bufferedImage = new BufferedImage(43, 15, BufferedImage.TYPE_INT_RGB);
+        //设置画笔
+        Graphics2D g = bufferedImage.createGraphics();
+        //设置背景颜色
+        g.setBackground(color);
+        //矩形框(原点x坐标，原点y坐标，矩形的长，矩形的宽)
+        g.clearRect(0,   0,   100,   100);
+        //画笔的颜色
+        g.setColor(Color.black);
+        //画笔的字体
+        g.setFont(new Font("宋体",Font.TRUETYPE_FONT,12));
+        //写的内容
+        g.drawString(content,8,11);
+        g.dispose();
+
+        return bufferedImage;
+    }
+
+    /**
+     * 获取融合后的图片
+     * @param jfreechart
+     * @return
+     */
+    public static BufferedImage getJfreechartimage(JFreeChart jfreechart,String title,XYSeriesCollection c){
+
+        java.util.List series = c.getSeries();
+
+        BufferedImage big = jfreechart.createBufferedImage(530, 350);
+
+        if("C-P1".equals(title)){
+            for(int i = 0;i<series.size();i++){
+                int maxX = (int)c.getSeries(i).getMaxX()-1;
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+                //BufferedImage small = ChartUtils.getSmall();
+                Graphics2D g = big.createGraphics();
+                int x = big.getWidth() - small.getWidth()-32;
+                int y = big.getHeight() - (18-i)*small.getHeight();
+                g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
+
+
+                g.dispose();
+            }
+
+        }else {
+            for(int i = 0;i<series.size();i++){
+
+                int maxX = (int)c.getSeries(i).getMaxX()-1;
+
+                //右边的标签框
+                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+                //BufferedImage small = ChartUtils.getSmall();
+                Graphics2D g = big.createGraphics();
+                int x = big.getWidth() - small.getWidth()-32;
+                int y = big.getHeight() - (9-i)*small.getHeight();
+                g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
+
+                //左边的标签框
+                int minX = (int)c.getSeries(i).getMinX()-1;
+                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(minX)+"");
+                //BufferedImage small2 = ChartUtils.getSmall();
+                //Graphics2D g = big.createGraphics();
+                int x2 = big.getWidth() - 11*small2.getWidth()+5;
+                int y2 = big.getHeight() - (9-i)*small2.getHeight();
+                g.drawImage(small2, x2, y2, small2.getWidth(), small2.getHeight(), null);
+                g.dispose();
+            }
+
+        }
+
+        return big;
+
+
+    }
+
+
+    }

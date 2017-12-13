@@ -3,11 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
-import com.mo9.risk.modules.dunning.bean.ChartSeries;
-import com.mo9.risk.modules.dunning.bean.MigrateChange;
-import com.mo9.risk.modules.dunning.bean.QianxilvCorpu;
-import com.mo9.risk.modules.dunning.bean.QianxilvNew;
-import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
+import com.mo9.risk.modules.dunning.bean.*;
 import com.mo9.risk.modules.dunning.dao.TMisMigrationRateReportDao;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
 import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
@@ -22,7 +18,25 @@ import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
-import java.awt.Color;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.activation.DataSource;
+import javax.mail.util.ByteArrayDataSource;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,26 +45,8 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.block.BlockBorder;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 迁徙率Service
@@ -647,6 +643,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		DataSource cp2newChart;
 		DataSource cp3newChart;
 		DataSource cp4newChart;
+		//DataSource imge = this.getImageSource();
 
 		DataSource cp1corpusChart;
 		DataSource cp2corpusChart;
@@ -664,16 +661,16 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		List<ChartSeries> cp4corpusSeries = this.getCycleData(Migrate.cp4corpus, 2);
 		try {
 			//获取户数迁徙率
-			cp1newChart = this.createChart(cp1newSeries, "户数迁徙_C-P1");
-			cp2newChart = this.createChart(cp2newSeries, "户数迁徙_C-P2");
-			cp3newChart = this.createChart(cp3newSeries, "户数迁徙_C-P3");
-			cp4newChart = this.createChart(cp4newSeries, "户数迁徙_C-P4");
+			cp1newChart = this.createChart2(cp1newSeries, "C-P1");
+			cp2newChart = this.createChart2(cp2newSeries, "C-P2");
+			cp3newChart = this.createChart2(cp3newSeries, "C-P3");
+			cp4newChart = this.createChart2(cp4newSeries, "C-P4");
 
 			//获取本金迁徙率
-			cp1corpusChart = this.createChart(cp1corpusSeries, "本金迁徙_C-P1");
-			cp2corpusChart = this.createChart(cp2corpusSeries, "本金迁徙_C-P2");
-			cp3corpusChart = this.createChart(cp3corpusSeries, "本金迁徙_C-P3");
-			cp4corpusChart = this.createChart(cp4corpusSeries, "本金迁徙_C-P4");
+			cp1corpusChart = this.createChart2(cp1corpusSeries, "C-P1");
+			cp2corpusChart = this.createChart2(cp2corpusSeries, "C-P2");
+			cp3corpusChart = this.createChart2(cp3corpusSeries, "C-P3");
+			cp4corpusChart = this.createChart2(cp4corpusSeries, "C-P4");
 
 		} catch (Exception e) {
 			logger.warn("月报表自动邮件添加附件失败", e);
@@ -686,35 +683,53 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver.toString());
-		String data = DateUtils.getDate("MM月dd日");
-		mailSender.setSubject("截止"+data+"迁徙率");
+		String date = DateUtils.getDate("yyyy年MM月dd日");
+		Date beforeDay = DateUtils.getBeforeDay();
+		String yesterday = DateUtils.formatDate(beforeDay,"MM月dd日");
 
+		mailSender.setSubject("截止"+yesterday+"迁徙率");
+
+		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
 		StringBuilder content = new StringBuilder();
-		content.append("<p>下图为截止"+data+"迁徙数据，烦请查阅</p>");
+		content.append("<table>");
+		content.append("<tr><td colspan='2'><img src="+url+"'static/images/mo9image.png' /><p></td></tr>");
+		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
+		content.append("</table>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
-		content.append("<tr><th>C-P1</th><th>"+cp1newSeries.get(0).getName()+"</th><th>"+cp1newSeries.get(1).getName()+"</th><th>同比</th></tr>");
-		content.append("<tr><td>户数迁徙</td><td>"+cp1newChange.getCurrentVlue()+"</td><td>"+cp1newChange.getLastVlue()+"</td><td>"+cp1newChange.getChange()+"</td></tr>");
-		content.append("<tr><td>本金迁徙</td><td>"+cp1corpusChange.getCurrentVlue()+"</td><td>"+cp1corpusChange.getLastVlue()+"</td><td>"+cp1corpusChange.getChange()+"</td></tr>");
+		content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
+		content.append("<tr><td height='40px'  bgcolor='#EAEAEA'><font color='#858585'>户数迁徙</font></td><td><font color='#858585'>"+cp1newChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getChange()+"</font></td></tr>");
+		content.append("<tr><td height='40px' bgcolor='#EAEAEA' ><font color='#858585'>本金迁徙</font></td><td><font color='#858585'>"+cp1corpusChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getChange()+"</font></td></tr>");
 		content.append("</table>");
 
-		content.append("<p>户数迁徙</p>");
+
+		content.append("<p><font color='#0993FF' size='4'>户数迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
 		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("</table>");
 
-		content.append("<p>本金迁徙</p>");
+		content.append("<p><font color='#0993FF' size='4'>本金迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
 		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585	' size='4'>"+date+"</font></div></td></tr>");
 		content.append("</table>");
+
+
 
 		mailSender.setContent(content.toString());
 		//添加图片
+
 		mailSender.addImage(cp1newChart,"cp1newChart");
 		mailSender.addImage(cp2newChart,"cp2newChart");
 		mailSender.addImage(cp3newChart,"cp3newChart");
 		mailSender.addImage(cp4newChart,"cp4newChart");
+		//mailSender.addImage(imge,"imge");
 
 		mailSender.addImage(cp1corpusChart,"cp1corpusChart");
 		mailSender.addImage(cp2corpusChart,"cp2corpusChart");
@@ -748,11 +763,93 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		if (lastCycleData.size() >= index) {
 			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
 			last = lastValue + "%";
-			DecimalFormat df = new DecimalFormat("#.00%");
-			change = df.format(1 - (lastValue / currentValue));
+			DecimalFormat df = new DecimalFormat("#.00");
+			//change = df.format(1 - (lastValue / currentValue));
+			change = df.format(currentValue-lastValue) +"%";
+			//change = (currentValue-lastValue) + "%";
 		}
 		return new MigrateChange(current, last, change);
 	}
+	public ByteArrayDataSource createChart2(List<ChartSeries> chartSeries, String title) throws IOException {
+
+		//final int xSize = 16;
+
+		XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+		for (ChartSeries serie : chartSeries) {
+
+			XYSeries xySeries = new XYSeries(serie.getName());
+			String name = serie.getName();
+			List<Object> data = serie.getData();
+			int xSize =data.size();
+			if (data == null) {
+
+				continue;
+			}
+			for (int index = 0; index < xSize; index++) {
+				Double result = null;
+				if (index < data.size()) {
+
+					Object value = data.get(index);
+					if (value != null) {
+						result = Double.parseDouble(value.toString());
+					}
+				}
+				xySeries.add(index + 1, result);
+
+
+			}
+			xySeriesCollection.addSeries(xySeries);
+
+
+		}
+
+
+		JFreeChart jfreechart =  ChartUtils.createXYChart(title, // 标题
+				"", // categoryAxisLabel （category轴，横轴，X轴标签）
+				"单位(%)", // valueAxisLabel（value轴，纵轴，Y轴的标签）
+				xySeriesCollection, // dataset
+				PlotOrientation.VERTICAL,
+				true, // legend
+				false, // tooltips
+				false); // URLs);
+
+
+		//设置背景颜色
+		XYPlot plot = (XYPlot) jfreechart.getPlot(); // 获得 plot：XYPlot！
+		//设置图示
+		ChartUtils.setJfreeChart(jfreechart);
+		//设置字体以及背景网格
+		ChartUtils.setFont(jfreechart,plot);
+		//设置x轴和y轴
+		ChartUtils.setAxis(plot);
+		//设置线条
+		ChartUtils.setRenderer(plot,title,xySeriesCollection);
+		BufferedImage big = ChartUtils.getJfreechartimage(jfreechart,title,xySeriesCollection);
+
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream(30 * 1024);
+		try {
+			ChartUtilities.writeBufferedImageAsPNG(out,big);
+			//ChartUtilities.writeChartAsPNG(out, jfreechart, 530, 350);
+			out.flush();
+		} catch (Exception e) {
+			// logger.info("创建图表"+title+"失败", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+			}
+		}
+		ByteArrayInputStream in;
+		in = new ByteArrayInputStream(out.toByteArray());
+		return new ByteArrayDataSource(in, "image/png");
+
+	}
+
+
 
 	/**
 	 * @Description 创建图表

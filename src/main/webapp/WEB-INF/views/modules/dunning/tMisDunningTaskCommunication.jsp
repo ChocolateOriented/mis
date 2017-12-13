@@ -99,7 +99,7 @@
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">		
 		<thead>
 			<th>序号</th>
-			<th>通讯录姓名</th>
+			<th>关联人姓名</th>
 			<th>匹配</th>
 			<th>号码</th>
 			<th>历史记录</th>
@@ -123,7 +123,7 @@
 								<c:when test = "${cp.familyrelation=='children'}">(子女)</c:when>
 								<c:when test = "${cp.familyrelation=='relatives'}">(亲属)</c:when>
 								<c:when test = "${cp.familyrelation=='friend'}">(朋友)</c:when>
-								<c:when test = "${cp.familyrelation=='callLog'}">(通话记录)</c:when>
+								<c:when test = "${cp.familyrelation=='callLog'}">(关联人联系记录)</c:when>
 								<c:when test = "${cp.familyrelation=='worktel'}">(单位)</c:when>
 								<c:when test = "${cp.familyrelation=='unknown'}"></c:when>
 								<c:otherwise></c:otherwise>

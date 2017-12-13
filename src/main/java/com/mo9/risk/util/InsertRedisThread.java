@@ -212,7 +212,7 @@ public class InsertRedisThread  implements Runnable{
 			//匹配通讯录
 			TMisSendMsgInfo contactInfo = buyerContactsMap.get(recordTel);
 			if (contactInfo != null) {
-				String name = contactInfo.getName() + "(通讯录)";
+				String name = contactInfo.getName() + "(关联人)";
 				contactRecord.setName(name);
 				continue;
 			}
