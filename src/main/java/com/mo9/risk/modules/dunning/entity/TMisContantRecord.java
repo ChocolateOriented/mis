@@ -39,8 +39,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	private String smsTemplateId;		// 短信模板id
 	private String smstempstr;
 	private Boolean iseffective;		//是否有效联络
-	private TelStatus telstatus;		//电话应答状态
-	private String telstatusstr;
+	private String telstatus;		//电话应答状态
 	private String field1;		// field1
 	private String dunningpeoplename;		//催收人员id
 	private String peoplename;  //催收人员
@@ -335,11 +334,11 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	}
 
 	//@Length(min=0, max=128, message="telstatus长度必须介于 0 和 128 之间")
-	public TelStatus getTelstatus() {
+	public String getTelstatus() {
 		return telstatus;
 	}
 
-	public void setTelstatus(TelStatus telstatus) {
+	public void setTelstatus(String telstatus) {
 		this.telstatus = telstatus;
 	}
 	
@@ -387,11 +386,7 @@ public class TMisContantRecord extends DataEntity<TMisContantRecord> {
 	}
 
 	public String getTelstatusstr() {
-		return telstatusstr;
-	}
-
-	public void setTelstatusstr(String telstatusstr) {
-		this.telstatusstr = telstatusstr;
+		return MobileResult.getActionDesc(this.telstatus);
 	}
 	
 	public String getPeoplename() {

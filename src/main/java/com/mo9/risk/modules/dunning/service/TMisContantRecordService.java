@@ -366,9 +366,10 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 				dunning.setSmstemp(null);
 				dunning.setTelstatus(tMisContantRecord.getTelstatus());
 				if (null != task) {
-					tMisDunningTaskDao.updateTelRemark(
+					tMisDunningTaskDao.updateDunningAction(
 							!"".equals(tMisContantRecord.getRemark()) ? tMisContantRecord.getRemark()
-									: tMisContantRecord.getContanttarget() + tMisContantRecord.getTelstatus().getDesc(),
+									: tMisContantRecord.getContanttarget() + tMisContantRecord.getTelstatusstr(),
+							tMisContantRecord.getTelstatus(),
 							task.getId());
 				}
 			}
@@ -626,7 +627,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 							Date nextfollowDate = calendar2.getTime();
 							tMisDunnedConclusion.setNextfollowdate(nextfollowDate);
 							//结果码
-							tMisDunnedConclusion.setResultcode(TelStatus.valueOf("LOOO"));
+							tMisDunnedConclusion.setResultcode("LOOO");
 							//备注
 							tMisDunnedConclusion.setRemark(remark.toString());
 							tMisDunnedConclusion.setDealcode(tMisContantRecord.getDealcode());

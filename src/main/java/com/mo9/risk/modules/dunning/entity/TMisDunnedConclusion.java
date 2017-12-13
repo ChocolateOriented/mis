@@ -9,7 +9,6 @@ import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.enums.DunningOverdueReason;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
@@ -29,8 +28,7 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 	private Boolean iseffective;		//是否有效联络
 	private DunningOverdueReason overduereason;		//逾期原因
 	private String overduereasonstr;
-	private TelStatus resultcode;		//结果代码
-	private String resultcodestr;
+	private String resultcode;		//结果代码
 	private Date promisepaydate;		//承诺还款日
 	private Date nextfollowdate;		//下次跟进日期
 	private String remark;		//备注
@@ -122,13 +120,12 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 		this.overduereasonstr = overduereasonstr;
 	}
 
-	public TelStatus getResultcode() {
+	public String getResultcode() {
 		return resultcode;
 	}
 
-	public void setResultcode(TelStatus resultcode) {
+	public void setResultcode(String resultcode) {
 		this.resultcode = resultcode;
-		this.resultcodestr = resultcode.getDesc();
 	}
 
 	public Date getPromisepaydate() {
@@ -148,11 +145,7 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 	}
 
 	public String getResultcodestr() {
-		return resultcodestr;
-	}
-
-	public void setResultcodestr(String resultcodestr) {
-		this.resultcodestr = resultcodestr;
+		return MobileResult.getConclusionDesc(resultcode);
 	}
 
 	@Length(min=0, max=1000, message="备注长度必须介于 0 和 1000 之间")

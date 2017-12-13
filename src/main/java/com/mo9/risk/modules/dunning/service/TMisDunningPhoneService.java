@@ -456,7 +456,7 @@ public class TMisDunningPhoneService {
 			page.setCount(totalAll);
 			page.setList(records);
 		} catch (Exception e) {
-			logger.info("获取未接呼叫信息失败," + e);
+			logger.info("获取队列中放弃叫信息失败," + e);
 		}
 		return page;
 	}

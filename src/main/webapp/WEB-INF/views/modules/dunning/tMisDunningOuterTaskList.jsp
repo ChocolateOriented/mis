@@ -348,6 +348,15 @@ function changeStatus( dealcode) {
 					   value="<fmt:formatDate value="${dunningOrder.endDunningtime}" pattern="yyyy-MM-dd"/>"
 					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
+			<li><label>行动码</label>
+			<form:select path="actionCode" class="input-medium">
+				<form:option selected="selected" value="" label="全部"/>
+				<c:forEach items="${mobileResultMap}" var="mobileResult">
+					<form:option value="${mobileResult.key}" label="${mobileResult.value}"/>
+				</c:forEach>
+				<form:option value="empty" label="空"/>
+			</form:select>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();" /></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空" /></li>
 			<li class="btns">
