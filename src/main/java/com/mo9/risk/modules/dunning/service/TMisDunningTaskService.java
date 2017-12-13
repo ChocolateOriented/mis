@@ -27,6 +27,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -2382,7 +2383,61 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
     	
     }
-	
+
+	/**
+	 * 委外手动留案
+	 * @param dealcode
+	 */
+	@Transactional(readOnly = false)
+	public String outExtensionAssign(List<String> dealcodes, String dunningcycle, Date outsourcingenddate){
+		try {
+			/**  查询手动分配订单任务Log   */
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			logger.info("newfingTasksByDealcodes-查询手动留案订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
+
+			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
+
+			if(!assignDunningTaskLogs.isEmpty()){
+
+				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){
+					TMisDunningTaskLog indunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
+					if (indunningTaskLog.getOutsourcingBeginDate() == null){
+						throw new RuntimeException("有未成功分案的案子，无法手工留案");
+					}
+					/**
+					 * 任务task修改
+					 */
+					TMisDunningTask dunningTask = new TMisDunningTask();
+					dunningTask.setId(indunningTaskLog.getTaskid());
+					dunningTask.setUpdateBy(UserUtils.getUser());
+					dunningTask.setOutsourcingenddate(outsourcingenddate);
+					dunningTask.setExtensionDate(outsourcingenddate);
+					tasks.add(dunningTask);
+
+				}
+				/**
+				 * 修改手动修改任务
+				 */
+				tMisDunningTaskDao.batchUpdateOutExtensionTask(tasks);
+
+			}else{
+				logger.info("没有手动留案任务！" + new Date());
+			}
+			return "实际留案未还款订单" + assignDunningTaskLogs.size() + "条";
+		} catch (RuntimeException e){
+			logger.error("选中的案子中有未成功分案的案子，无法手工留案");
+			logger.error("手动留案任务失败,全部事务回滚");
+			return "选中的案子中有未成功分案的案子，手工留案操作失败";
+		} catch (Exception e) {
+			logger.error("手动留案任务失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
+			throw new ServiceException(e);
+		} finally {
+			logger.info("手动留案任务结束" + new Date());
+		}
+
+	}
+
     
 //	/**
 //	 * 根据逾期天数，返回该月该日的归属队列

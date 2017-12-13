@@ -986,7 +986,8 @@
         o.outerfiletime AS outerfiletime,
         t.dunningcycle AS dunningcycle,
         t.outsourcingBeginDate AS outsourcingBeginDate,
-        t.outsourcingEndDate AS outsourcingEndDate
+        t.outsourcingEndDate AS outsourcingEndDate,
+        t.extensionDate as extensionDate
         FROM
         t_risk_order AS o
         LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
@@ -1049,6 +1050,12 @@
         <!-- #最近催收时间-->
         <if test="beginDunningtime != null and endDunningtime != null and beginDunningtime != '' and endDunningtime != ''">
             AND t.dunningtime BETWEEN #{beginDunningtime} AND #{endDunningtime}
+        </if>
+        <if test="extension == 'on'">
+            AND t.extensionDate is not NULL
+        </if>
+        <if test="extension == 'off'">
+            AND t.extensionDate is NULL
         </if>
         <!-- 			# 行动码-->
         <if test="actionCode != null and actionCode != ''">
@@ -1693,6 +1700,7 @@
 					(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
 					t.id as "taskid",
 					t.DunningCycle as "dunningcycle",
+                    t.OutsourcingBeginDate as "outsourcingBeginDate",
 					p.id as "dunningpeopleid",
 					p.Name as "dunningpeoplename" 
 			FROM t_mis_dunning_task t   
@@ -1740,6 +1748,20 @@
 				</set>
 				WHERE id = #{item.id}
 		 </foreach>
+    </update>
+
+    <update id="batchUpdateOutExtensionTask"  >
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_mis_dunning_task
+            <set>
+                updatedate = now(),
+                updateby = #{item.updateBy.id},
+                outsourcingenddate = #{item.outsourcingenddate},
+                extensionDate = #{item.extensionDate},
+                nextfollowdate = null
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
     </update>
 
  	<select id="findAtuoQ0Dealcode" resultType="string">

@@ -364,4 +364,13 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public int updateLatestLoginTime(DunningOrder dunningOrder);
+
+
+	/**
+	 * 委外留案
+
+	 * @param dunningTasks
+	 * @return
+	 */
+	public int batchUpdateOutExtensionTask(List<TMisDunningTask> dunningTasks);
 }
