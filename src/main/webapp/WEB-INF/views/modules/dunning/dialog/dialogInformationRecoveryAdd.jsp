@@ -114,7 +114,7 @@
     </div>
     <div class="control-group">
         <div style="width:25%;display:inline-block;text-align:right;">
-            <select class="input-small" path="contactRelationship" id="contactRelationship" name="contactRelationship" onchange="contactNameClear()">
+            <select class="input-small" path="contactRelationship" id="contactRelationship" name="contactRelationship" onchange="contactNameClear()" required>
                 <option value="">关系</option>
                 <option value="SELF" <c:if test="${'SELF' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>本人</option>
                 <option value="MARRIED" <c:if test="${'MARRIED' eq DunningInformationRecovery.contactRelationship}">selected</c:if> >夫妻 </option>
@@ -126,11 +126,13 @@
                 <option value="WORKPHONE"<c:if test="${'WORKPHONE' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>工作电话</option>
             </select>
         </div>
-        <div style="width:28%;display:inline-block;text-align:right;">
+        <span class="help-inline"><font color="red">*</font> </span>
+        <div style="width:25%;display:inline-block;text-align:right;">
             <label>姓名：</label>
         </div>
         <div style="width:35%;display:inline-block;text-align:left;">
-            <input class="input-small" value="${DunningInformationRecovery.contactName}" path="contactName" id="contactName" name="contactName" htmlEscape="false" maxlength="5"/>
+            <input class="input-small" value="${DunningInformationRecovery.contactName}" path="contactName" id="contactName" name="contactName" required htmlEscape="false" maxlength="5"/>
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
     </div>
     <input id="buyerid" type="hidden"  name="buyerid" value="${buyerid}">
