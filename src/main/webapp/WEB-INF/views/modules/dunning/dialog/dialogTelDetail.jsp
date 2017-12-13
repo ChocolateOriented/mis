@@ -19,7 +19,7 @@
 				<th>时间</th>
 				<th>催收人</th>
 				<th>操作人</th>
-				<th>结果代码</th>
+				<th>行动码</th>
 				<th>备注</th>
 			</tr>
 		</thead>
@@ -34,7 +34,7 @@
 				</td>
 				<td>${tmiscontantrecord.createBy.name}</td>
 				<td>
-					${tmiscontantrecord.telstatus.desc}
+					${tmiscontantrecord.telstatusstr}
 				</td>
 				<td>
 					${tmiscontantrecord.remark}
