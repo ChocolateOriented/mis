@@ -3,21 +3,18 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
+import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
+import com.mo9.risk.modules.dunning.service.TMisMigrationRateReportService;
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,18 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.db.DynamicDataSource;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
-import com.thinkgem.jeesite.common.utils.DateUtils;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
-import com.mo9.risk.modules.dunning.entity.TMisMigrationData;
-import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport;
-import com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport.Migrate;
-import com.mo9.risk.modules.dunning.service.TMisMigrationRateReportService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 迁徙率Controller
@@ -700,13 +692,26 @@ public class TMisMigrationRateReportController extends BaseController {
 	@RequestMapping(value = "migrationDelete")
 	public String migrationDelete(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
+			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
 			tMisMigrationRateReportService.deleteAll();
 		} catch (Exception e) {
 			logger.info("",e);
 		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
+			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
+		return "Ok";
+	}
+	/**
+	 * 手动邮件发送
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@ResponseBody
+	@RequestMapping(value = "migration5")
+	public String migration5(HttpServletRequest request, HttpServletResponse response) {
+
+			tMisMigrationRateReportService.autoSendMail();
+
+
 		return "Ok";
 	}
 
