@@ -89,6 +89,25 @@ $(document).ready(function() {
 			
 		});
 	});
+
+    $("#migration5").click(function(){
+        $.ajax({
+            url:"${ctx}/dunning/tMisMigrationRateReport/migration5",
+            type:"GET",
+            data:{},
+            success:function(data){
+                if(data=="Ok"){
+                    alert("发送成功");
+
+                }
+
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown){
+                alert("发送失败:"+textStatus);
+            }
+
+        });
+    });
 	
 	
 });
@@ -109,6 +128,7 @@ $(document).ready(function() {
 	
 	<input id="migration4" class="btn btn-primary" type="button" value="迁徙率历史数据" />
 	<input id="migrationDelete" class="btn btn-primary" type="button" value="删除迁徙率数据" />
+	<input id="migration5" class="btn btn-primary" type="button" value="手动发送迁徙表邮件" />
 	
 	
 </body>

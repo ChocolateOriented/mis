@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class ChartUtils {
     private static String NO_DATA_MSG = "数据加载失败";
-    private static Font FONT = new Font("宋体", Font.PLAIN, 12);
+    private static Font FONT = new Font("宋体", Font.TRUETYPE_FONT, 12);
     public static Color[] CHART_COLORS = {
             new Color(31,129,188), new Color(92,92,97), new Color(144,237,125), new Color(255,188,117),
             new Color(153,158,255), new Color(255,117,153), new Color(253,236,109), new Color(128,133,232),
@@ -497,9 +497,9 @@ public class ChartUtils {
 
     public static void setFont(JFreeChart jfreechart,XYPlot plot){
         // 设置配置字体（解决中文乱码的通用方法）
-        Font xfont = new Font("宋体", Font.PLAIN, 16); // X轴
-        Font yfont = new Font("宋体", Font.PLAIN, 16); // Y轴
-        Font kfont = new Font("宋体", Font.PLAIN, 14); // 底部
+        Font xfont = new Font("宋体", Font.PLAIN, 12); // X轴
+        Font yfont = new Font("宋体", Font.PLAIN, 12); // Y轴
+        Font kfont = new Font("宋体", Font.PLAIN, 12); // 底部
         Font titleFont = new Font("宋体", Font.PLAIN, 20); // 图片标题
         //设置背景颜色
 
@@ -507,6 +507,7 @@ public class ChartUtils {
         plot.setOutlineVisible(false);//设置外框是否可见
         plot.getDomainAxis().setLabelFont(xfont);
         plot.getRangeAxis().setLabelFont(yfont);
+        plot.getRangeAxis().setLabelPaint(new Color(162,162,162));
         jfreechart.getLegend().setItemFont(kfont);
         jfreechart.getTitle().setFont(titleFont);
 

@@ -683,7 +683,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver.toString());
-		String date = DateUtils.getDate("MM月dd日");
+		String date = DateUtils.getDate("yyyy年MM月dd日");
 		Date beforeDay = DateUtils.getBeforeDay();
 		String yesterday = DateUtils.formatDate(beforeDay,"MM月dd日");
 
@@ -696,9 +696,9 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
 		content.append("</table>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
-		content.append("<tr bgcolor='#EAEAEA'><th height='40px'>C-P1</th><th>"+cp1newSeries.get(0).getName()+"</th><th>"+cp1newSeries.get(1).getName()+"</th><th>同比</th></tr>");
-		content.append("<tr><td height='40px'  bgcolor='#EAEAEA'>户数迁徙</td><td>"+cp1newChange.getCurrentVlue()+"</td><td>"+cp1newChange.getLastVlue()+"</td><td>"+cp1newChange.getChange()+"</td></tr>");
-		content.append("<tr><td height='40px' bgcolor='#EAEAEA' >本金迁徙</td><td>"+cp1corpusChange.getCurrentVlue()+"</td><td>"+cp1corpusChange.getLastVlue()+"</td><td>"+cp1corpusChange.getChange()+"</td></tr>");
+		content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
+		content.append("<tr><td height='40px'  bgcolor='#EAEAEA'><font color='#858585'>户数迁徙</font></td><td><font color='#858585'>"+cp1newChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getChange()+"</font></td></tr>");
+		content.append("<tr><td height='40px' bgcolor='#EAEAEA' ><font color='#858585'>本金迁徙</font></td><td><font color='#858585'>"+cp1corpusChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getChange()+"</font></td></tr>");
 		content.append("</table>");
 
 
@@ -712,9 +712,12 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
 		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
-		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #000'></td></tr>");
-		content.append("<tr><td colspan='2'><div align ='right'><font color='#4D4D4D' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
-		content.append("<tr><td colspan='2'><div align ='right'><font color='#4D4D4D' size='4'>"+date+"</font></div></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585	' size='4'>"+date+"</font></div></td></tr>");
 		content.append("</table>");
 
 
@@ -760,10 +763,10 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		if (lastCycleData.size() >= index) {
 			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
 			last = lastValue + "%";
-			//DecimalFormat df = new DecimalFormat("#.0%");
+			DecimalFormat df = new DecimalFormat("#.00");
 			//change = df.format(1 - (lastValue / currentValue));
-			//change = df.format(currentValue-lastValue);
-			change = (currentValue-lastValue) + "%";
+			change = df.format(currentValue-lastValue) +"%";
+			//change = (currentValue-lastValue) + "%";
 		}
 		return new MigrateChange(current, last, change);
 	}
