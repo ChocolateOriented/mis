@@ -121,7 +121,8 @@
 				<td>
 					${(vs.index+1) + (communicationsPage.pageNo-1) * communicationsPage.pageSize} 
 				</td>
-				<td>${p.name}</td>
+				<%--<td>${p.name}</td>--%>
+				<td>${fns:replace(p.name,"通讯录","关联人")}</td>
 <!-- 				<td> -->
 <%-- 				<c:choose> --%>
 <%-- 						<c:when test = "${p.rcname != '未知'}"> --%>
