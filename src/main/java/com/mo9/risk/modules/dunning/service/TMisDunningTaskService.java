@@ -972,7 +972,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
 				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
 				//添加黑名单关系
-				//this.appendBlackNodeNum(order);
+				this.appendBlackNodeNum(order);
 			}
 		}
 		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
