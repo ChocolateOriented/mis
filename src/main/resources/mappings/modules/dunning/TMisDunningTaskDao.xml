@@ -231,9 +231,10 @@
         </foreach>
     </update>
 
-    <update id="updateTelRemark">
+    <update id="updateDunningAction">
 		UPDATE t_mis_dunning_task SET 	
-			TelRemark = #{telremark}
+			TelRemark = #{telremark},
+			ActionCode = #{actionCode}
 		WHERE id = #{id}
 	</update>
 
@@ -930,6 +931,17 @@
         <if test="beginlatestlogintime != null and endlatestlogintime != null and beginlatestlogintime != '' and endlatestlogintime != ''">
             AND t.latestlogintime BETWEEN #{beginlatestlogintime} AND #{endlatestlogintime}
         </if>
+        <!-- 			# 行动码 -->
+        <if test="actionCode != null and actionCode != ''">
+            <choose>
+            	<when test="actionCode == 'empty'">
+            		AND t.actioncode is null
+            	</when>
+            	<otherwise>
+            		AND t.actioncode = #{actionCode}
+            	</otherwise>
+            </choose>
+        </if>
     </where>
   </sql>
 
@@ -1037,6 +1049,17 @@
         <!-- #最近催收时间-->
         <if test="beginDunningtime != null and endDunningtime != null and beginDunningtime != '' and endDunningtime != ''">
             AND t.dunningtime BETWEEN #{beginDunningtime} AND #{endDunningtime}
+        </if>
+        <!-- 			# 行动码-->
+        <if test="actionCode != null and actionCode != ''">
+            <choose>
+            	<when test="actionCode == 'empty'">
+            		AND t.actioncode is null
+            	</when>
+            	<otherwise>
+            		AND t.actioncode = #{actionCode}
+            	</otherwise>
+            </choose>
         </if>
         <!-- 只显示未删除的催收人员  -->
 <!--         AND p.Invalid = 't' -->

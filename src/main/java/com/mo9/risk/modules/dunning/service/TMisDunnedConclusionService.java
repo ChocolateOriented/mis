@@ -111,7 +111,7 @@ public class TMisDunnedConclusionService extends CrudService<TMisDunnedConclusio
 				buffer.append("-").append(record.getContactsname());
 			}
 			buffer.append(" ").append(record.getContanttarget());
-			buffer.append(" ").append(record.getTelstatus() == null ? "" : record.getTelstatus().getDesc());
+			buffer.append(" ").append(record.getTelstatus() == null ? "" : record.getTelstatusstr());
 			buffer.append("/");
 		}
 		buffer.deleteCharAt(buffer.length() - 1);

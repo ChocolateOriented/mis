@@ -27,7 +27,6 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -3399,7 +3398,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				//电催结论备注
 				if(++cycle<20){
 					remark.append(recordList.get(i).getContactstype().getDesc()+"-"+recordList.get(i).getContactsname()+"-"+recordList.get(i).getContanttarget()+"-"+
-							recordList.get(i).getTelstatus().toString());
+							recordList.get(i).getTelstatus());
 					if(StringUtils.isEmpty(recordList.get(i).getRemark())){
 						remark.append(";");
 					}else{
@@ -3412,7 +3411,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				}else{
 					//如果存的结果码是则按到优先顺序判断
 					if(telconclusion.get(recordTemp.get("telStatus").toString())!=null){
-						Integer priority = telconclusion.get(recordList.get(i).getTelstatus().toString());
+						Integer priority = telconclusion.get(recordList.get(i).getTelstatus());
 						if(priority!=null&&telconclusion.get(recordTemp.get("telStatus").toString())>priority){
 							recordTemp.put("telStatus", recordList.get(i).getTelstatus());
 						}
@@ -3476,7 +3475,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			if(findDirCreate!=null){
 				Date findIsEffective = tcontDao.findIsEffective(dunningPeopleId,decalode,dunningCycle,findDirCreate);
 				if(findIsEffective==null){
-					recordTemp.put("telStatus", TelStatus.valueOf("LOOO"));
+					recordTemp.put("telStatus", "LOOO");
 				}
 			}
 		}else{
@@ -3493,7 +3492,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		Date nextfollowDate = calendar.getTime();
 		tMisDunnedConclusion.setNextfollowdate(nextfollowDate);
 		//结果码
-		tMisDunnedConclusion.setResultcode((TelStatus) recordTemp.get("telStatus"));
+		tMisDunnedConclusion.setResultcode((String) recordTemp.get("telStatus"));
 		tMisDunnedConclusion.setActions(actions);
 		//备注
 		tMisDunnedConclusion.setRemark(remark.toString());
