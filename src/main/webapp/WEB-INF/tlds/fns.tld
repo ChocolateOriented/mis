@@ -225,6 +225,14 @@
     <function-signature>java.lang.String jsGetVal(java.lang.String)</function-signature>
     <example>${fns:jsGetVal('row.user.id')}  返回：!row?'':!row.user?'':!row.user.id?'':row.user.id</example>  
   </function>
+
+  <function>
+    <description>替换字符串</description>
+    <name>replace</name>
+    <function-class>org.apache.commons.lang3.StringUtils</function-class>
+    <function-signature>java.lang.String replace(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+    <example>${fns:replace(str,old,new)}</example>
+  </function>
   
   <!-- DateUtils -->
   <function>
