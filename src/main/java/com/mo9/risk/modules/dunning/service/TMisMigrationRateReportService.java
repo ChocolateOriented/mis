@@ -692,7 +692,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
 		StringBuilder content = new StringBuilder();
 		content.append("<table>");
-		content.append("<tr><td colspan='2'><img src="+url+"'static/images/mo9image.png' /><p></td></tr>");
+		content.append("<tr><td colspan='2'><img src='"+url+"static/images/mo9image.png'/><p></td></tr>");
 		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
 		content.append("</table>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
