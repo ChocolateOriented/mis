@@ -239,8 +239,8 @@
 		//从父页面跳转到软电话页面
 		function phoneFatherPage(phone,name){
 			if(confirm("确定拨打该电话吗")){
-				var reg = new RegExp("_");
-				var phone=phone.replace(reg,"");
+				var phone = phone.replace(/(\s|_)/g, "");
+				phone = phone.replace("+86", "");
 				$.post("${ctx}/dunning/tMisDunningPhone/fatherPageTOPhonePage", {target:phone, peopleId: "${userId}",name:name}, function(data) {
 					if (!data) {
 						alert("当前坐席状态无法外呼");

@@ -25,7 +25,7 @@
 				var method = $(obj).attr("method");
 				var contactMobile = $(obj).attr("contactMobile");
 				var contactstype = $(obj).attr("contactstype");
-				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&mobileSelf=${mobileSelf}&contactMobile=" + contactMobile + "&contactstype=" + contactstype;
+				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&mobileSelf=${mobileSelf}&contactMobile=" + encodeURIComponent(contactMobile) + "&contactstype=" + contactstype;
 // 				alert(url);
 				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {
 		           top: '0%',
@@ -51,7 +51,7 @@
 			var method = $(obj).attr("method");
 			var mobile = $(obj).attr("mobile");
 			var type = $(obj).attr("type");
-			var url = "${ctx}/dunning/tMisContantRecord/" + method + "?contanttarget="+ mobile +"&dealcode=${dealcode}&contanttype=" + type;
+			var url = "${ctx}/dunning/tMisContantRecord/" + method + "?contanttarget="+ encodeURIComponent(mobile) +"&dealcode=${dealcode}&contanttype=" + type;
 			$.jBox.open("iframe:" + url, $(obj).attr("title"), 600, 350, {            
                    buttons: {"确定": "ok"},
                    loaded: function (h) {
