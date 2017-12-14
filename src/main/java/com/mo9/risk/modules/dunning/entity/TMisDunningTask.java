@@ -74,7 +74,9 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private Date nextfollowdate; 	// 下次跟进时间
 	
 	private String quality;
-	
+
+	private Date extensionDate;
+
 	public TMisDunningTask() {
 		super();
 	}
@@ -310,7 +312,15 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	public void setQuality(String quality) {
 		this.quality = quality;
 	}
-	
+
+	public Date getExtensionDate() {
+		return extensionDate;
+	}
+
+	public void setExtensionDate(Date extensionDate) {
+		this.extensionDate = extensionDate;
+	}
+
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
 //	public String getCreateby() {
 //		return createby;
