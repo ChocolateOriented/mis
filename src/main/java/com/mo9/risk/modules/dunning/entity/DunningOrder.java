@@ -112,6 +112,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	private Integer blackListNumFromThird;//第三方黑名单数量
 	private Integer blackListNumUnknow;//未知来源
 
+	private String extension; // 手动留案 on off
+
 	
 	public String getPlatformExt() {
 		return platformExt;
@@ -665,5 +667,13 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 
 	public void setEndDunningtime(Date endDunningtime) {
 		this.endDunningtime = null != endDunningtime ? DateUtils.endDate(endDunningtime) : endDunningtime;
+	}
+
+	public String getExtension() {
+		return extension;
+	}
+
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 }

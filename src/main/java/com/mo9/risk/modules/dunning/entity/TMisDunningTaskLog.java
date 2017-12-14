@@ -47,7 +47,8 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 //	private Date updatedate;		// 修改时间
 	
 	private String taskid;	 // 任务ID
-		
+
+
 	public TMisDunningTaskLog() {
 		super();
 	}
@@ -236,10 +237,5 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 	public void setModifyamount(Integer modifyamount) {
 		this.modifyamount = modifyamount;
 	}
-	
 
-	
-	
-	
-	
 }
