@@ -49,8 +49,6 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 	private String taskid;	 // 任务ID
 
 
-	private Date OutsourcingBeginDate; //分案日期
-
 	public TMisDunningTaskLog() {
 		super();
 	}
@@ -240,11 +238,4 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 		this.modifyamount = modifyamount;
 	}
 
-	public Date getOutsourcingBeginDate() {
-		return OutsourcingBeginDate;
-	}
-
-	public void setOutsourcingBeginDate(Date outsourcingBeginDate) {
-		OutsourcingBeginDate = outsourcingBeginDate;
-	}
 }

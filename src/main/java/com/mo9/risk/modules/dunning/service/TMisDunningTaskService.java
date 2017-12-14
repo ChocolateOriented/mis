@@ -972,7 +972,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
 				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
 				//添加黑名单关系
-				this.appendBlackNodeNum(order);
+				//this.appendBlackNodeNum(order);
 			}
 		}
 		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
@@ -2386,29 +2386,26 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 	/**
 	 * 委外手动留案
-	 * @param dealcode
 	 */
 	@Transactional(readOnly = false)
 	public String outExtensionAssign(List<String> dealcodes, String dunningcycle, Date outsourcingenddate){
 		try {
-			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
-			logger.info("newfingTasksByDealcodes-查询手动留案订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
-
+			/**  查询task判断是否已经分案   */
+			List<TMisDunningTask>  assignDunningTask = tMisDunningTaskDao.findDunningTaskByDealcodeOfList(dealcodes);
 			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
 
-			if(!assignDunningTaskLogs.isEmpty()){
+			if(!assignDunningTask.isEmpty()){
 
-				for(int i= 0 ; i < assignDunningTaskLogs.size() ; i++ ){
-					TMisDunningTaskLog indunningTaskLog = (TMisDunningTaskLog)assignDunningTaskLogs.get(i);
-					if (indunningTaskLog.getOutsourcingBeginDate() == null){
+				for(int i= 0 ; i < assignDunningTask.size() ; i++ ){
+					TMisDunningTask indunningTask = (TMisDunningTask)assignDunningTask.get(i);
+					if (indunningTask.getOutsourcingbegindate() == null){
 						throw new RuntimeException("有未成功分案的案子，无法手工留案");
 					}
 					/**
 					 * 任务task修改
 					 */
 					TMisDunningTask dunningTask = new TMisDunningTask();
-					dunningTask.setId(indunningTaskLog.getTaskid());
+					dunningTask.setId(indunningTask.getId());
 					dunningTask.setUpdateBy(UserUtils.getUser());
 					dunningTask.setOutsourcingenddate(outsourcingenddate);
 					dunningTask.setExtensionDate(outsourcingenddate);
@@ -2423,7 +2420,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}else{
 				logger.info("没有手动留案任务！" + new Date());
 			}
-			return "实际留案未还款订单" + assignDunningTaskLogs.size() + "条";
+			return "实际留案未还款订单" + assignDunningTask.size() + "条";
 		} catch (RuntimeException e){
 			logger.error("选中的案子中有未成功分案的案子，无法手工留案");
 			logger.error("手动留案任务失败,全部事务回滚");

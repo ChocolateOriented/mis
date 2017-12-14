@@ -55,6 +55,8 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 
 	public TMisDunningTask findDunningTaskByDealcode(Map<String,Object> params);
 
+	public List<TMisDunningTask> findDunningTaskByDealcodeOfList(@Param("dealcodes")List<String> dealcodes);
+
 	public DunningUserInfo findDunningUserInfo(String dealcode);
 
 	public int updateOrder(TMisDunningOrder order);

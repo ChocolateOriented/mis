@@ -1718,6 +1718,14 @@
        		</foreach>
 			ORDER BY corpusAmount DESC
 	</select>
+
+    <select id="findDunningTaskByDealcodeOfList" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningTask">
+        select * from t_mis_dunning_task
+        where Dealcode in
+        <foreach item="item" index="index" collection="dealcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 	
  	
  	<update id="batchUpdateDistributionTask"  >
