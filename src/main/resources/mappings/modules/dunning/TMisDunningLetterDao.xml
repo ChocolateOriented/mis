@@ -6,27 +6,85 @@
 		l.id  AS "id",
 		l.dealcode AS "dealcode",
 		l.sendResult AS "sendResult",
+		l.postCode AS "postCode",
 		l.sendDate AS "sendDate",
 		l.resultDate AS "resultDate",
+		l.downLoadFlag AS "downLoadFlag",
 		l.CreateBy AS "createBy.id",
 		l.CreateDate AS "createDate",
 		l.UpdateBy AS "updateBy.id",
 		l.UpdateDate AS "updateDate"
 	</sql>
 	
+	<sql id="countRemainAmmount">
+    	CASE WHEN o.`status` = 'payoff' THEN 0 ELSE IFNULL(o.credit_amount, 0) - CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) ELSE 0 END + IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0) END
+  	</sql>
+  	
+  	
 	<select id="get" resultType="TMisDunningLetter">
-		SELECT 
-			<include refid="TmisDunningLetterColumns"/>
-		FROM t_mis_dunning_letter l
-		WHERE l.id = #{id}
+	SELECT
+	c.real_name AS "realname",
+	o.Dealcode AS "dealcode",
+	c.ocr_addr AS "ocrAddr",
+	<include refid="countRemainAmmount" /> AS creditamount,
+	DATEDIFF(CURDATE(), o.repayment_time) AS "overduedays",
+	<include refid="TmisDunningLetterColumns" />
+	FROM
+	t_mis_dunning_letter AS l
+	LEFT JOIN t_risk_order AS o ON l.dealcode= o.dealcode
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id =c.buyer_id
+	WHERE
+	o.type = 'loan'
+	AND o.merchant_id = 7
+	AND o.STATUS='payment'
+	WHERE l.id = #{id}
 	</select>
+	
+	
+	<select id="findList" resultType="TMisDunningLetter">
+	SELECT
+	c.real_name AS "realname",
+	c.ocr_addr AS "ocrAddr",
+	<include refid="countRemainAmmount" /> AS creditamount,
+	DATEDIFF(CURDATE(), o.repayment_time) AS "overduedays",
+	<include refid="TmisDunningLetterColumns"/>
+	FROM
+	t_mis_dunning_letter AS l
+	LEFT  JOIN t_risk_order AS o ON l.dealcode = o.dealcode
+	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+	WHERE
+	o.type = 'loan'
+	AND o.merchant_id = 7
+	AND o. STATUS='payment'
+	<if test="realname != null and realname != ''">
+	 and c.real_name = #{realname}
+	</if>
+	<if test="sendResult != null and sendResult != ''">
+	 and l.sendResult = #{sendResult}
+	</if>
+	<if test="dealcode != null and dealcode != ''">
+	 and l.dealcode = #{dealcode}
+	</if>
+	<if test="sendBeginDate != null and sendBeginDate != '' and sendEndDate != null and sendEndDate != ''">
+	 and l.sendDate between #{sendBeginDate} and #{sendEndDate}
+	</if>
+	<if test="resultBeginDate != null and resultBeginDate != '' and resultEndDate != null and resultEndDate != '' ">
+	 and l.resultDate between #{resultBeginDate} and #{resultEndDate}
+	</if>
+	<if test="beginOverduedays != null and beginOverduedays != '' and endOverduedays != null and endOverduedays != ''">
+	 and DATEDIFF(CURDATE(), o.repayment_time) between #{beginOverduedays} and #{endOverduedays}
+	</if>
+	</select>
+	
 	<insert id="insert">
 		INSERT INTO t_mis_dunning_letter(
 		    id,
 		    dealcode,
 		    sendResult,
+		    postCode,
 			sendDate,
 			resultDate,
+			downLoadFlag,
 			createDate,
 			updateDate,
 			createBy,
@@ -35,24 +93,154 @@
 			#{id},
 			#{dealcode},
 			#{sendResult},
+			#{postCode},
 			#{sendDate},
 			#{resultDate},
+			#{downLoadFlag},
 			#{createDate},
 			#{updateDate},
 			#{createBy.name},
 			#{updateBy.name}
 		)
 	</insert>
+	<insert id="saveList">
+		INSERT INTO t_mis_dunning_letter(
+		    id,
+		    dealcode,
+		    sendResult,
+		    postCode,
+			sendDate,
+			resultDate,
+			downLoadFlag,
+			createDate,
+			updateDate,
+			createBy,
+			updateBy
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator=","  >
+		 (
+			#{item.id},
+			#{item.dealcode},
+			#{item.sendResult},
+			#{item.postCode},
+			#{item.sendDate},
+			#{item.resultDate},
+			#{item.downLoadFlag},
+			#{item.createDate},
+			#{item.updateDate},
+			#{item.createBy.name},
+			#{item.updateBy.name}
+		)
+		</foreach>
+	</insert>
+	
+	<insert id="saveLogList">
+		INSERT INTO t_mis_dunning_letter_log(
+		    id,
+		    dealcode,
+		    sendResult,
+		    postCode,
+			sendDate,
+			resultDate,
+			downLoadFlag,
+			createDate,
+			updateDate,
+			createBy,
+			updateBy
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator=","  >
+		 (
+			#{item.id},
+			#{item.dealcode},
+			#{item.sendResult},
+			#{item.postCode},
+			#{item.sendDate},
+			#{item.resultDate},
+			#{item.downLoadFlag},
+			#{item.createDate},
+			#{item.updateDate},
+			#{item.createBy.name},
+			#{item.updateBy.name}
+		)
+		</foreach>
+	</insert>
 	
 	<update id="update">
 		UPDATE t_mis_dunning_letter SET 
 		  	dealcode =#{dealcode},	
 		  	sendResult =#{sendResult},	
+		  	postCode =#{postCode},	
 			sendDate = #{sendDate},
 			resultDate = #{resultDate},
 			updateDate = #{updateDate},
-			updateBy = #{updateBy.name},
+			updateBy = #{updateBy.name}
 		WHERE id = #{id} 
 	</update>
-
+	<update id="updateStatus">
+		UPDATE t_mis_dunning_letter SET 
+		  	sendResult =#{sendResult},
+		  	<if test="sendDate != null and sendDate != '' ">
+		  	sendDate=#{sendDate},
+		  	</if>
+		  	<if test="postCode != null and postCode != '' ">
+	  		postCode =#{postCode},	
+		  	</if>
+		  	<if test="downLoadFlag != null and downLoadFlag != '' ">
+		  	downLoadFlag =#{downLoadFlag},	
+		  	</if>
+			resultDate = #{resultDate},
+			updateDate = #{updateDate},
+			updateBy = #{updateBy.name}
+		WHERE dealcode =#{dealcode}
+	</update>
+	
+	<select id="findSynDealcode" resultType="TMisDunningLetter">
+		SELECT
+		o.Dealcode AS "dealcode"
+		FROM
+		t_mis_dunning_task AS t
+		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
+		LEFT JOIN t_mis_dunning_letter AS l ON o.dealcode=l.dealcode 
+		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+		WHERE
+		o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o. STATUS='payment'
+		AND l.dealcode is null
+		AND c.ocr_addr is not null
+		AND DATEDIFF(CURDATE(), o.repayment_time) &gt;=60
+	
+	</select>
+	
+	<select id="findSendList" resultType="TMisDunningLetter">
+		SELECT
+		l.dealcode AS "dealcode"
+		FROM
+		t_mis_dunning_letter AS l
+		where
+		 l.sendResult='BESEND'
+		and l.dealcode in 
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="lettersDownLoad" resultType="com.mo9.risk.modules.dunning.bean.TMisDunningLetterDownLoad">
+		SELECT
+		curdate() AS "sendLetterDate",
+		c.ocr_addr AS "ocrAddr",
+		c.real_name AS "realname",
+		l.dealcode AS "dealcode",
+		<include refid="countRemainAmmount" /> AS creditamount
+		FROM
+		t_mis_dunning_letter AS l
+		LEFT  JOIN t_risk_order AS o ON l.dealcode = o.dealcode
+		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
+		WHERE
+		o.type = 'loan'
+		AND o.merchant_id = 7
+		AND o. STATUS='payment'
+		and l.sendResult = 'BEPOST'
+	</select>
+	
+	
 </mapper>
