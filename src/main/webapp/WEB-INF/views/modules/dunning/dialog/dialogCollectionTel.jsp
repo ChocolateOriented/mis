@@ -141,7 +141,7 @@
 				$("#iseffective").val("0");
 			}
 		});
-		if(!window.parent.messageHide()){
+		if(!window.parent.parent.messageHide()){
 			$(".hides").remove();
 		}
 		
