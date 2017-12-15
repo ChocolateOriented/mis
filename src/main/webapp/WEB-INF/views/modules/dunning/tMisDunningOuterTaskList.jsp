@@ -128,6 +128,41 @@ $(document).ready(function() {
 	         });
 			
 	 });
+
+
+    // 手动留案
+    $("#extensionbutton").click(function(){
+        var orders = new Array();
+        var dunningcycle = new Array();
+        $("[name='orders']").each(function() {
+            if(this.checked){
+                if("" == $(this).attr("orders") || "" == $(this).attr("dunningcycle")){
+                    $.jBox.tip("数据异常,需先将数据补充完整", 'warning');
+                    return;
+                }
+                orders.push($(this).attr("orders"));
+                dunningcycle.push($(this).attr("dunningcycle"));
+            }
+        });
+        if(orders.length==0){
+            $.jBox.tip("请选择需要移动的案件", 'warning');
+            return;
+        }
+        var uniqueid = unique(dunningcycle);
+        if(uniqueid.length != 1 ){
+            $.jBox.tip("请选择同队列的案件", 'warning');
+            return;
+        }
+        var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutExtension?dunningcycle=" + uniqueid;
+        $.jBox.open("iframe:" + url, "手动留案" , 490, 250, {
+            buttons: {},
+            loaded: function (h) {
+                $(".jbox-content", document).css("overflow-y", "hidden");
+            }
+        });
+
+    });
+
 	//系统短信发送
 	$("#autosend").click(function(){
 		
@@ -339,6 +374,12 @@ function changeStatus( dealcode) {
 					<form:option value="Q5">Q5</form:option>
 				</form:select></li>
 			<li>
+			<li><label>留案：</label> <form:select path="extension" class="input-medium">
+				<form:option value="">全部</form:option>
+				<form:option value="on">是</form:option>
+				<form:option value="off">否</form:option>
+			</form:select></li>
+			<li>
 			<li><label>催款人</label> <form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden" /></li>
 			<li><label>最近催收</label>
 				<input name="beginDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
@@ -366,6 +407,7 @@ function changeStatus( dealcode) {
 		</ul>
 	</form:form>
 	<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
+	<input id="extensionbutton" class="btn btn-primary" type="button" value="手动留案" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />
 	</shiro:hasPermission>
