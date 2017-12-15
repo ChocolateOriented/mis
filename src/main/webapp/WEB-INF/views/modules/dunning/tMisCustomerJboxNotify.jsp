@@ -37,7 +37,7 @@
         </div>
         <div id="peopleContainer" style="margin-top: 70px">
             <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
-                <span>问题已解决</span><span style="margin-left: 200px">解决人:${tMisCustomerServiceFeedback.updateBy.name}</span>
+                <span>问题已解决</span><span style="margin-left: 200px">解决人:${tMisCustomerServiceFeedback.nickname}</span>
             </c:if>
             <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
                 <span style="margin-left: 260px">客服:${fns:abbr(tMisCustomerServiceFeedback.pushpeople,50)}<span/>

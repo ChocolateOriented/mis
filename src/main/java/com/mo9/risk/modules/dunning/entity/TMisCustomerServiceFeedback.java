@@ -5,7 +5,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
@@ -43,7 +42,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
     private String problemdescription;//问题描述
-    private String pushpeople;//推送人
+        private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
     private Integer rootorderid;//主订单编号
