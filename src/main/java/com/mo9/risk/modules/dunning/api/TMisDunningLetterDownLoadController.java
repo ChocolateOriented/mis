@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.mo9.risk.modules.dunning.bean.TMisDunningLetterDownLoad;
-import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.mo9.risk.modules.dunning.service.TMisDunningLetterService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
@@ -23,14 +22,14 @@ public class TMisDunningLetterDownLoadController extends BaseController {
 	@Autowired
 	TMisDunningLetterService tMisDunningLetterService;
 	/**
-	 * 号码清洗回调
-	 * @param reqNo
-	 * @param check_result
+	 * 下载信函的数据
+	 * @param identity
 	 * @param request
+	 * @param response
 	 */
 	@RequestMapping(value = "downLoad")
 	public  void  numberCleanBack(String identity,HttpServletRequest request, HttpServletResponse response){
-		String fileName = "信函" + DateUtils.getDate("yyyy/MM/dd")+".xlsx";
+		String fileName = "信函" + DateUtils.getDate("yyyyMMdd")+".xlsx";
 		List<TMisDunningLetterDownLoad> letterList = tMisDunningLetterService.lettersDownLoad(identity); 
 		
 		if (null == letterList || letterList.isEmpty()) {
@@ -39,6 +38,7 @@ public class TMisDunningLetterDownLoadController extends BaseController {
 		}
 		try {
 			new ExportExcel("", TMisDunningLetterDownLoad.class).setDataList(letterList).write(response, fileName).dispose();
+			logger.info("下载成功");
 		} catch (Exception e) {
 			logger.warn("下载失败！失败信息："+e);
 		}

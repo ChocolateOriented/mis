@@ -74,6 +74,15 @@ public class TMisDunningLetterController extends BaseController {
 		return "Ok";
 	}
 	/**
+	 * 补发下载邮件
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@ResponseBody
+	@RequestMapping(value = "downLoadMail")
+	public void downLoadMail( String identity ,HttpServletRequest request, HttpServletResponse response) {
+		tMisDunningLetterService.sendMail(identity);
+	}
+	/**
 	 * 发送信函
 	 */
 //	@RequiresPermissions("dunning:tMisDunningTask:adminview")

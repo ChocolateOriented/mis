@@ -106,8 +106,11 @@
 		});
 		
 		function page(n,s){
+			if(n)
 			$("#pageNo").val(n);
-			$("#pageSize").val(40);
+			if(s)
+			$("#pageSize").val(s);
+			$("#pageSize").val($("#sizes").val());
 			$("#searchForm").submit();
 			return false;
 		}
@@ -184,7 +187,7 @@
 					value="<fmt:formatDate value="${TMisDunningLetter.resultEndDate}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  /></li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="button" value="查询" onclick=" return page()" /></li>
 			<li class="btns"><input id="empty" class="btn btn-primary" type="button" value="清空"/></li>
 			<li class="btns"><input id="sendLetters" class="btn btn-primary" type="button" value="发送信函" /></li>
 			<li class="btns"><input id="exportOuterFile" class="btn btn-primary" type="button" value="导出" /></li>

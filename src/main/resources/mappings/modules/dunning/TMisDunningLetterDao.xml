@@ -240,6 +240,7 @@
 		AND o.merchant_id = 7
 		AND o. STATUS='payment'
 		and l.sendResult = 'BEPOST'
+		and  l.downLoadFlag = #{downLoadFlag}
 	</select>
 	
 	
