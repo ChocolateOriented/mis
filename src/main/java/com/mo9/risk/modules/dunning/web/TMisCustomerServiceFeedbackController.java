@@ -1,15 +1,15 @@
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.service.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.oa.entity.OaNotify;
-import com.thinkgem.jeesite.modules.oa.service.OaNotifyService;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 客服问题推送
@@ -36,6 +38,13 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
     @Autowired
     private FeedbackSendService feedbackSendService;
+
+
+    @Autowired
+    private TMisDunningOrderService tMisDunningOrderService;
+
+    @Autowired
+    private TMisDunningTaskService tMisDunningTaskService;
 
     /**
      * 分页展示问题案件列表
@@ -109,7 +118,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @RequestMapping(value = {"notify", ""})
     public String notifyList(String colorChoice, @ModelAttribute("tMisCustomerServiceFeedback") TMisCustomerServiceFeedback tMisCustomerServiceFeedback, HttpServletRequest request, HttpServletResponse response, Model model){
         if (StringUtils.isEmpty(tMisCustomerServiceFeedback.getProblemstatus())){
-            tMisCustomerServiceFeedback.setProblemstatus("UNRESOLVED");
+            tMisCustomerServiceFeedback.setProblemstatus("");
         }
 
         Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.notifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
@@ -154,5 +163,34 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         String userid=UserUtils.getUser().getId();
         tMisCustomerServiceFeedback.setDunningpeopleid(userid);
         return String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
+    }
+
+    /**
+     * 跳转到订单详情页面
+     * @param tMisCallingRecord
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
+    @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
+    @RequestMapping(value = "gotoTaskOrder")
+    public String gotoTask(@RequestParam("dealcode") String dealcode, HttpServletRequest request, HttpServletResponse response, Model model) {
+
+        if (dealcode == null) {
+            return "views/error/500";
+        }
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("DEALCODE", dealcode);
+        DunningOrder order = tMisDunningOrderService.findOrderByDealcode(dealcode);
+        TMisDunningTask task = tMisDunningTaskService.findDunningTaskByDealcode(params);
+
+        if (order == null || task == null) {
+            return "views/error/500";
+        }
+
+        return "redirect:" + adminPath + "/dunning/tMisDunningTask/pageFather?buyerId="
+                + order.getBuyerid() + "&dealcode=" + dealcode + "&dunningtaskdbid=" + task.getId() + "&status=" + order.getStatus();
     }
 }

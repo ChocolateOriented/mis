@@ -111,8 +111,9 @@
         <if test="hashtag !=null and hashtag!=''">
             AND a.hashtag LIKE concat('%',#{hashtag},'%')
         </if>
-        <if test="problemstatus !=null and problemstatus!='' and problemstatus != 'ALL'">
-            AND a.problemStatus LIKE concat('%',#{problemstatus},'%')
+        <if test="problemstatus !=null and problemstatus!='' ">
+            <!--AND a.problemStatus LIKE concat('%',#{problemstatus},'%')-->
+            AND a.problemStatus = #{problemstatus}
         </if>
         <!--<if test="pushpeople !=null and pushpeople !=''">-->
             <!--AND a.pushpeople LIKE  concat ('%',#{pushpeople},'%')-->

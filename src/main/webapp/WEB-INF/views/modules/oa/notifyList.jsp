@@ -29,18 +29,18 @@
 
                 })
 			}
-			$('#btnAll').click(function () {
-                $("#colorChoice").val("all");
-				$("#problemstatus").val("ALL");
-                $("#searchForm").submit();
-
-			})
-        $('#btnToBeSolved').click(function () {
-            $("#colorChoice").val("solving");
-            $("#problemstatus").val("UNRESOLVED");
-            $("#searchForm").submit();
-
-        })
+//			$('#btnAll').click(function () {
+//                $("#colorChoice").val("all");
+//				$("#problemstatus").val("ALL");
+//                $("#searchForm").submit();
+//
+//			})
+//        $('#btnToBeSolved').click(function () {
+//            $("#colorChoice").val("solving");
+//            $("#problemstatus").val("UNRESOLVED");
+//            $("#searchForm").submit();
+//
+//        })
 		});
 
         function changeFeedback(obj){
@@ -82,8 +82,16 @@
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<input id="colorChoice" name="colorChoice" type="hidden" value=""/>
 		<ul class="ul-form">
+			<li>状态：
+				<form:select path="problemstatus" htmlEscape="false" maxlength="100" class="input-small">
+					<form:option selected="selected" value="" label="全部"/>
+					<form:option  value="RESOLVED" label="已解决"/>
+					<form:option  value="UNRESOLVED" label="未解决"/>
+
+				</form:select>
+			</li>
 			<li><label>类别：</label>
-				<form:select path="hashtag" htmlEscape="false" maxlength="200" class="input-medium">
+				<form:select path="hashtag" htmlEscape="false" maxlength="200" class="input-small">
 					<form:option selected="selected" value="" label="不限"/>
 					<form:option  value="ORDER_DEDUCT" label="订单代扣"/>
 					<form:option  value="WRITE_OFF" label="催销账"/>
@@ -93,30 +101,30 @@
 				</form:select>
 			</li>
 			<li><label>关键词：</label>
-				<form:input path="keyword"  htmlEscape="false" maxlength="200" class="input-medium"/>
+				<form:input path="keyword"  htmlEscape="false" maxlength="200" class="input-small"/>
 			</li>
 			<li><label>推送时间</label>
-				<input name="farPushTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+				<input name="farPushTime" type="text" readonly="readonly" maxlength="20" class="input-small Wdate"
 					   value="<fmt:formatDate value="${tMisCustomerServiceFeedback.farPushTime}" pattern="yyyy-MM-dd"/>"
 					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至
-				<input name="nearPushTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+				<input name="nearPushTime" type="text" readonly="readonly" maxlength="20" class="input-small Wdate"
 					   value="<fmt:formatDate value="${tMisCustomerServiceFeedback.nearPushTime}" pattern="yyyy-MM-dd"/>"
 					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"  onclick="return page()"/></li>
 			<li class="clearfix"></li>
 		</ul>
-		<form:input id="problemstatus" type="hidden" path="problemstatus"/>
+		<%--<form:input id="problemstatus" type="hidden" path="problemstatus"/>--%>
 	</form:form>
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed" style="width: 1080px">
 		<thead>
-		    <tr>
-				<th style="background: #26d6ff" colspan="2">
-					<span type="button" id="btnAll" value="" style="cursor: pointer;">全部</span>&nbsp;|&nbsp;
-					<span type="button" id="btnToBeSolved" value="待解决" style="cursor: pointer;color: #1a1a1a;">待解决</span>
-				</th>
-			</tr>
+		    <%--<tr>--%>
+				<%--<th style="background: #26d6ff" colspan="2">--%>
+					<%--<span type="button" id="btnAll" value="" style="cursor: pointer;">全部</span>&nbsp;|&nbsp;--%>
+					<%--<span type="button" id="btnToBeSolved" value="待解决" style="cursor: pointer;color: #1a1a1a;">待解决</span>--%>
+				<%--</th>--%>
+			<%--</tr>--%>
 			<tr>
 				<th style="width: 650px" >标题</th>
 				<th>时间</th>

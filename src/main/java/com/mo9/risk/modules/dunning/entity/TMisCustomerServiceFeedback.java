@@ -42,7 +42,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private String problemstatus;//客服反馈的问题状态 solved 已解决 unsolved 未解决
     private String hashtag;//推送标签类别
     private String problemdescription;//问题描述
-        private String pushpeople;//推送人
+    private String pushpeople;//推送人
     private String operate;//操作
     private String handlingresult;//处理结果
     private Integer rootorderid;//主订单编号
@@ -110,6 +110,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public String getStatusText() {
         return RESOLVED.equals(this.problemstatus) ?  "已解决" :
                 UNRESOLVED.equals(this.problemstatus) ?  "未解决" : "";
+
     }
 
     public void setProblemstatus(String problemstatus) {
