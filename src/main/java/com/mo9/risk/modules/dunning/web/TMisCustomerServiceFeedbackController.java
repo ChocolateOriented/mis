@@ -152,6 +152,27 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     }
 
     /**
+     * 如果非催收专员客服通知弹框
+     * @param customerServiceFeedback
+     * @param request
+     * @param model
+     * @return
+     */
+    @RequiresPermissions("dunning:tMisCustomerServiceFeedback:view")
+    @RequestMapping(value ="feedbackJbox2")
+    public String jboxNotify2(TMisCustomerServiceFeedback customerServiceFeedback, HttpServletRequest request, Model model){
+
+        TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
+        try{
+            tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
+        }catch (Exception e){
+            logger.info("加载反馈通知截图失败",e);
+            return null;
+        }
+        model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
+        return "modules/dunning/tMisCustomerJboxNotify";
+    }
+    /**
      * 获取客服通知数
      *
      */
@@ -162,7 +183,8 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         tMisCustomerServiceFeedback.setReadFlag("0");
         String userid=UserUtils.getUser().getId();
         tMisCustomerServiceFeedback.setDunningpeopleid(userid);
-        return String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
+        return  String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
+
     }
 
     /**
