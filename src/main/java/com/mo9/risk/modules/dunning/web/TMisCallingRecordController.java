@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
 import com.mo9.risk.modules.dunning.entity.TMisCallingRecord;
@@ -162,11 +163,14 @@ public class TMisCallingRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
 	@RequestMapping(value = "getPhoneCallingReport")
 	public String getPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
+		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople, 0);
 		Page<DunningPhoneReportFile> page = null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			String peopleName = dunningPhoneReportFile.getPeopleName();
+			initDunningPhoneReportFile(dunningPhoneReportFile);
 			page = tMisCallingRecordService.exportStatementFile(new Page<DunningPhoneReportFile>(request, response), dunningPhoneReportFile);
+			dunningPhoneReportFile.setPeopleName(peopleName);
 		}finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
@@ -186,7 +190,7 @@ public class TMisCallingRecordController extends BaseController {
 	@RequiresPermissions("dunning:tMisCallingRecord:viewReport")
 	@RequestMapping(value = "getPhoneCallingReportForEveryDay")
 	public String getPhoneCallingReportForEveryDay(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople);
+		Map<String, Object> map = initGetPhoneCallingReport(dunningPhoneReportFile, dunningPeople, -1);
 		Page<DunningPhoneReportFile> page = null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
@@ -211,14 +215,14 @@ public class TMisCallingRecordController extends BaseController {
 	 * @param dunningPeople
 	 * @return
 	 */
-	private Map<String, Object> initGetPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople){
+	private Map<String, Object> initGetPhoneCallingReport(DunningPhoneReportFile dunningPhoneReportFile, TMisDunningPeople dunningPeople, int day){
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<TMisDunningPeople> dunningPeoples = null;
 		List<TMisDunningGroup> groups = new ArrayList<TMisDunningGroup>();
 		if (dunningPhoneReportFile.getDatetimestart() == null || "".equals(dunningPhoneReportFile.getDatetimestart())){
 			Date date = null;
 			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.DAY_OF_MONTH, -1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
+			calendar.add(Calendar.DAY_OF_MONTH, day);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
 			calendar.set(Calendar.HOUR_OF_DAY, 00);
 			calendar.set(Calendar.MINUTE, 00);
 			date = calendar.getTime();
@@ -228,7 +232,7 @@ public class TMisCallingRecordController extends BaseController {
 		if (dunningPhoneReportFile.getDatetimeend() == null || "".equals(dunningPhoneReportFile.getDatetimeend())){
 			Date date = null;
 			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.DAY_OF_MONTH, -1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
+			calendar.add(Calendar.DAY_OF_MONTH, day);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
 			calendar.set(Calendar.MINUTE, 59);
 			date = calendar.getTime();
@@ -282,6 +286,24 @@ public class TMisCallingRecordController extends BaseController {
 		map.put("dunningCommissioner", dunningCommissioner);
 		map.put("dunningPhoneReportFile", dunningPhoneReportFile);
 		return map;
+	}
+
+	/**
+	 * 将名字拼接字符串转化为list
+	 * @param dunningPhoneReportFile
+	 * @return
+	 */
+	private void initDunningPhoneReportFile(DunningPhoneReportFile dunningPhoneReportFile){
+
+		if(!StringUtils.isEmpty(dunningPhoneReportFile.getPeopleName())){
+			String[] names = dunningPhoneReportFile.getPeopleName().split(",");
+			List<String> peopleIds = new ArrayList<String>();
+			dunningPhoneReportFile.setPeopleIds(peopleIds);
+			for (String name :names){
+				dunningPhoneReportFile.getPeopleIds().add(name);
+			}
+			dunningPhoneReportFile.setPeopleName("");
+		}
 	}
 
 	@RequiresPermissions("dunning:tMisCallingRecord:edit")

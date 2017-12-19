@@ -75,6 +75,9 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         //查询通话时长end
         private String callDurationEnd;
 
+        //自动分案
+        private String auto;
+
 
         private TMisDunningGroup group;
 
@@ -359,5 +362,13 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
 
         public void setPeopleId(String peopleId) {
                 this.peopleId = peopleId;
+        }
+
+        public String getAuto() {
+                return auto;
+        }
+
+        public void setAuto(String auto) {
+                this.auto = auto;
         }
 }
