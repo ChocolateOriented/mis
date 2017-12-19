@@ -328,7 +328,8 @@
 		</tr>
 		</tbody>
 	</table>
-	<h4>&nbsp;&nbsp;借款信息&nbsp;&nbsp;<%--  <span style="color:red; font-size:15px;">${isDelayable ? '可' : '不可'}续期</span> --%></h4>
+	<h4>&nbsp;&nbsp;借款信息&nbsp;&nbsp;<span style="color:red; font-size:15px;">${fn:contains(personalInfo.finProduct, 'jinRongZhongXin') ?
+	'weixin36' : 'mo9'}</span></h4>
 	<table id="customerTable2" class="table table-striped table-bordered table-condensed">
 		<tbody>
 			<tr>
