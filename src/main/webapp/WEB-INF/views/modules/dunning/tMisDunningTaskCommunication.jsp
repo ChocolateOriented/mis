@@ -99,7 +99,7 @@
 	<table id="customerTable" class="table table-striped table-bordered table-condensed">		
 		<thead>
 			<th>序号</th>
-			<th>通讯录姓名</th>
+			<th>关联人姓名</th>
 			<th>匹配</th>
 			<th>号码</th>
 			<th>历史记录</th>

@@ -255,6 +255,19 @@ public class TMisDunningOuterTaskController extends BaseController {
 	}
 
 	/**
+	 * 加载委外手动分案页面
+	 * @param dunningcycle
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "dialogOutExtension")
+	public String dialogOutExtension( Model model, String dunningcycle) {
+		model.addAttribute("dunningcycle", dunningcycle);
+		return "modules/dunning/dialog/dialogOutExtension";
+	}
+
+	/**
 	 * 获取手动分案催收人员
 	 * @param request
 	 */
@@ -315,6 +328,39 @@ public class TMisDunningOuterTaskController extends BaseController {
 		}
 		return  mes;
 	}
+
+	/**
+	 * 委外手动分案
+	 * @param orders
+	 * @param dunningcycle
+	 * @param outsourcingenddate
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "outExtensionSave")
+	@ResponseBody
+	public String outExtensionSave(String orders,String dunningcycle, Date outsourcingenddate) {
+		String mes = "";
+		try {
+			if(null == orders  ||"".equals(orders) || "".equals(dunningcycle) || null == dunningcycle){
+				return "订单不能为空";
+			}
+			List<String> dealcodes = new ArrayList<String>();
+			for(String string :Arrays.asList(orders.split(","))){
+				if(!"".equals(string.split("#")[0])){
+					dealcodes.add(string.split("#")[0]);
+				}
+			}
+			String outAssignmes = tMisDunningTaskService.outExtensionAssign(dealcodes, dunningcycle, outsourcingenddate);
+			mes = "OK,手动勾选"+dealcodes.size()+"条订单," + outAssignmes;
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			logger.warn("订单已还款更新任务失败"+ new Date());
+			return "分配异常，失败";
+		}
+		return  mes;
+	}
+
 	/**
 	 * 系统短信定时任务分配
 	 * @return

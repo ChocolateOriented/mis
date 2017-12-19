@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningMaxRepayNumberAndPrincipalDao">
+
+    <select id="getPersonalMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
+        SELECT a.day as dateTime,a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select dp.day,(select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.cnt_dealcode) as maxDealcode ,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, date_format(o.payoff_time, '%Y-%m-%d') as day, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime} and o.payoff_time <![CDATA[ < ]]> adddate(#{dateTime},interval 1 day)
+        group by t.DunningPeopleId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, cnt_dealcode desc
+        ) dp group by dp.day,dp.DunningCycle ORDER BY dp.day,DunningCycle) a JOIN (select dp.day,(select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, date_format(o.payoff_time, '%Y-%m-%d') as day, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime} and o.payoff_time <![CDATA[ < ]]> adddate(#{dateTime},interval 1 day)
+        group by t.DunningPeopleId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, sum_corpus desc
+        ) dp group by dp.day,dp.DunningCycle ORDER BY dp.day,DunningCycle) as b ON  a.name = b.name AND a.cycle = b.cycle AND a.day = b.day
+    </select>
+
+    <select id="countPersonalMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="int">
+        SELECT count(*) FROM (
+        SELECT a.day as dateTime,a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select dp.day,(select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.cnt_dealcode) as maxDealcode ,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, date_format(o.payoff_time, '%Y-%m-%d') as day, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime} and o.payoff_time <![CDATA[ < ]]> adddate(#{dateTime},interval 1 day)
+        group by t.DunningPeopleId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, cnt_dealcode desc
+        ) dp group by dp.day,dp.DunningCycle ORDER BY dp.day,DunningCycle) a JOIN (select dp.day,(select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, date_format(o.payoff_time, '%Y-%m-%d') as day, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime} and o.payoff_time <![CDATA[ < ]]> adddate(#{dateTime},interval 1 day)
+        group by t.DunningPeopleId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, sum_corpus desc
+        ) dp group by dp.day,dp.DunningCycle ORDER BY dp.day,DunningCycle) as b ON  a.name = b.name AND a.cycle = b.cycle AND a.day = b.day) as c
+    </select>
+    
+    
+    <select id="getGroupMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
+        SELECT a.day as dateTime,a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, date_format(o.payoff_time, '%Y-%m-%d') as day, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime}
+        and o.payoff_time <![CDATA[ < ]]>  adddate(#{dateTime},interval 1 day)
+        group by p.GroupId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, cnt_dealcode desc
+        ) dg group by dg.day,dg.DunningCycle ORDER BY dg.day,DunningCycle) a join (select
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name,  max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        SELECT
+        p.GroupId                                           AS groupid,
+        date_format(o.payoff_time, '%Y-%m-%d')              AS day,
+        sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) AS sum_corpus,
+        t.DunningCycle                                      AS DunningCycle
+        FROM t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        WHERE t.dealcode = o.dealcode
+        AND t.DunningPeopleId = p.id
+        AND o.status = 'payoff'
+        AND o.type = 'loan'
+        AND o.merchant_id = 7
+        AND o.payoff_time >= #{dateTime} AND o.payoff_time <![CDATA[ < ]]>  adddate(#{dateTime},interval 1 day)
+        GROUP BY p.GroupId, date_format(o.payoff_time, '%Y-%m-%d')
+        ORDER BY day, sum_corpus DESC
+        )dg  group by dg.day,dg.DunningCycle ORDER BY dg.day,DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name AND a.day = b.day
+    </select>
+
+
+    <select id="countGroupMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="int">
+        SELECT COUNT(1) FROM (
+        SELECT a.day as dateTime,a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, date_format(o.payoff_time, '%Y-%m-%d') as day, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{dateTime}
+        and o.payoff_time <![CDATA[ < ]]>  adddate(#{dateTime},interval 1 day)
+        group by p.GroupId, date_format(o.payoff_time, '%Y-%m-%d')
+        order by day, cnt_dealcode desc
+        ) dg group by dg.day,dg.DunningCycle ORDER BY dg.day,DunningCycle) a join (select
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name,  max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        SELECT
+        p.GroupId                                           AS groupid,
+        date_format(o.payoff_time, '%Y-%m-%d')              AS day,
+        sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) AS sum_corpus,
+        t.DunningCycle                                      AS DunningCycle
+        FROM t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        WHERE t.dealcode = o.dealcode
+        AND t.DunningPeopleId = p.id
+        AND o.status = 'payoff'
+        AND o.type = 'loan'
+        AND o.merchant_id = 7
+        AND o.payoff_time >= #{dateTime} AND o.payoff_time <![CDATA[ < ]]>  adddate(#{dateTime},interval 1 day)
+        GROUP BY p.GroupId, date_format(o.payoff_time, '%Y-%m-%d')
+        ORDER BY day, sum_corpus DESC
+        )dg  group by dg.day,dg.DunningCycle ORDER BY dg.day,DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name AND a.day = b.day) as c
+    </select>
+
+    <select id="getPersonalMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
+        SELECT  a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select (select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        AND o.payoff_time <![CDATA[ < ]]> #{1}
+        group by t.DunningPeopleId
+        order by  cnt_dealcode desc
+        ) dp group by dp.DunningCycle ORDER BY DunningCycle) a join (select (select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        AND o.payoff_time <![CDATA[ < ]]> #{1}
+        group by t.DunningPeopleId
+        order by  sum_corpus desc
+        ) dp group by dp.DunningCycle ORDER BY DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name
+    </select>
+
+    <select id="countPersonalMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="int">
+        SELECT count(1) FROM  (SELECT  a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select (select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        AND o.payoff_time <![CDATA[ < ]]> #{1}
+        group by t.DunningPeopleId
+        order by  cnt_dealcode desc
+        ) dp group by dp.DunningCycle ORDER BY DunningCycle) a join (select (select p.name from t_mis_dunning_people p where p.id = dp.people) as name,max(dp.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select t.DunningPeopleId as people, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o
+        where t.dealcode = o.dealcode
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        AND o.payoff_time <![CDATA[ < ]]> #{1}
+        group by t.DunningPeopleId
+        order by  sum_corpus desc
+        ) dp group by dp.DunningCycle ORDER BY DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name) c
+    </select>
+
+    <select id="getGroupMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
+        SELECT a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select
+         (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        and o.payoff_time <![CDATA[ < ]]> #{1}
+        group by p.GroupId
+        order by cnt_dealcode desc
+        ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) a join ( select
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        and o.payoff_time <![CDATA[ < ]]> #{1}
+        group by p.GroupId
+        order by sum_corpus desc
+        ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name;
+    </select>
+
+
+    <select id="countGroupMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="int">
+        SELECT count(1) FROM (SELECT a.name as name,a.cycle as cycle,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        and o.payoff_time <![CDATA[ < ]]> #{1}
+        group by p.GroupId
+        order by cnt_dealcode desc
+        ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) a join ( select
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        from (
+        select p.GroupId as groupid, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
+        from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
+        where t.dealcode = o.dealcode
+        and t.DunningPeopleId = p.id
+        and o.status = 'payoff'
+        and o.type = 'loan'
+        and o.merchant_id = 7
+        and o.payoff_time >= #{0}
+        and o.payoff_time <![CDATA[ < ]]> #{1}
+        group by p.GroupId
+        order by sum_corpus desc
+        ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) b
+        on a.cycle = b.cycle AND a.name = b.name) c
+    </select>
+
+</mapper>

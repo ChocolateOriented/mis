@@ -27,6 +27,7 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
+import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -1807,6 +1808,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			 * 根据逾期天数查询未生成任务task的订单
 			 */
 			String begin_Q0 = this.getCycleDict_Q0().get("begin");
+			logger.info("newfingDelayOrderByNotTask_day:"+begin_Q0  + new Date());
 			List<TMisDunningTaskLog>  newDunningTaskLogs = tMisDunningTaskDao.newfingDelayOrderByNotTask(begin_Q0);
 			logger.info("newfingDelayOrderByNotTask-查询新的逾期周期订单并生成任务" +newDunningTaskLogs.size()  + "条-"  + new Date());
 //			Map<String, List<TMisDunningPeople>> cyclePeoplemMap = this.getDunningcyclePeopleLists();
@@ -1839,6 +1841,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 						continue;
 					}
+					logger.info("逾期天数:"+dunningTaskLog.getOverduedays()+ "对应队列："+ dict.getLabel()  + new Date());
 					
 					/**  * auto Q0 队列 begin  */
 					if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
@@ -2382,7 +2385,58 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
     	
     }
-	
+
+	/**
+	 * 委外手动留案
+	 */
+	@Transactional(readOnly = false)
+	public String outExtensionAssign(List<String> dealcodes, String dunningcycle, Date outsourcingenddate){
+		try {
+			/**  查询task判断是否已经分案   */
+			List<TMisDunningTask>  assignDunningTask = tMisDunningTaskDao.findDunningTaskByDealcodeOfList(dealcodes);
+			List<TMisDunningTask> tasks = new ArrayList<TMisDunningTask>();
+
+			if(!assignDunningTask.isEmpty()){
+
+				for(int i= 0 ; i < assignDunningTask.size() ; i++ ){
+					TMisDunningTask indunningTask = (TMisDunningTask)assignDunningTask.get(i);
+					if (indunningTask.getOutsourcingbegindate() == null){
+						throw new RuntimeException("有未成功分案的案子，无法手工留案");
+					}
+					/**
+					 * 任务task修改
+					 */
+					TMisDunningTask dunningTask = new TMisDunningTask();
+					dunningTask.setId(indunningTask.getId());
+					dunningTask.setUpdateBy(UserUtils.getUser());
+					dunningTask.setOutsourcingenddate(outsourcingenddate);
+					dunningTask.setExtensionDate(outsourcingenddate);
+					tasks.add(dunningTask);
+
+				}
+				/**
+				 * 修改手动修改任务
+				 */
+				tMisDunningTaskDao.batchUpdateOutExtensionTask(tasks);
+
+			}else{
+				logger.info("没有手动留案任务！" + new Date());
+			}
+			return "实际留案未还款订单" + assignDunningTask.size() + "条";
+		} catch (RuntimeException e){
+			logger.error("选中的案子中有未成功分案的案子，无法手工留案");
+			logger.error("手动留案任务失败,全部事务回滚");
+			return "选中的案子中有未成功分案的案子，手工留案操作失败";
+		} catch (Exception e) {
+			logger.error("手动留案任务失败,全部事务回滚");
+			logger.error("错误信息"+e.getMessage());
+			throw new ServiceException(e);
+		} finally {
+			logger.info("手动留案任务结束" + new Date());
+		}
+
+	}
+
     
 //	/**
 //	 * 根据逾期天数，返回该月该日的归属队列

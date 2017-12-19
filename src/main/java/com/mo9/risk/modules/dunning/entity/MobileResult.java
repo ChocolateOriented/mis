@@ -70,7 +70,7 @@ public class MobileResult {
 	 * @return 结果代码描述
 	 */
 	public static String getConclusionDesc(String conclusionCode) {
-		String conclusionDesc = actions.get(conclusionCode);
+		String conclusionDesc = conclusions.get(conclusionCode);
 		return conclusionDesc == null ? "" : conclusionDesc;
 	}
 

@@ -1498,13 +1498,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 			return "借贷人信息不完全，无法执行此操作";
 		}
 		dunningInformationRecovery.setBuyerId(Integer.valueOf(buyerId));
-		if (dunningInformationRecovery.getContactRelationship() ==null || "".equals(dunningInformationRecovery.getContactRelationship())
-				||dunningInformationRecovery.getContactName() == null || "".equals(dunningInformationRecovery.getContactName())){
-			dunningInformationRecovery.setContactName("");
-			dunningInformationRecovery.setContactRelationship("");
-		}
 		tMisDunningInformationRecoveryService.saveInformationRecovery(dunningInformationRecovery);
-
 		return "OK";
 	}
 
