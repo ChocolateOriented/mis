@@ -406,7 +406,14 @@
 				<form:input path="dealcode"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 
-<%-- 			<c:if test="${tmiscycle eq 'numberClean' }"> --%>
+			<li><label>产品</label>
+				<form:select id="status" path="platformExt" class="input-medium">
+					<form:option selected="selected" value="" label="全部"/>
+					<form:option value="jinRongZhongXin" label="weixin36"/>
+					<form:option value="mo9" label="mo9"/>
+				</form:select>
+			</li>
+		<%-- 			<c:if test="${tmiscycle eq 'numberClean' }"> --%>
 <!-- 				<li><label>号码清洗</label> -->
 <%-- 					<form:select  id="numberCleanResult" path="numberCleanResult" class="input-medium"> --%>
 <%-- 						<form:option selected="selected" value="" label="全部"/> --%>
@@ -428,13 +435,6 @@
 			</form:select>
 			</li>
 
-			<li><label>订单渠道</label>
-				<form:select  id="status" path="platformExt" class="input-medium">
-					<form:option selected="selected" value="" label="全部"/>
-					<form:option value="weixin" label="微信"/>
-				</form:select>
-			</li>
-			
 			<li><label>逾期天数</label>
 				<form:input  path="beginOverduedays"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  />
 				- 
@@ -571,6 +571,7 @@
 				<th><input type="checkbox" id="allorder"  /></th>
 				<th>序号</th>
 				<th>提醒</th>
+				<th>产品</th>
 				<th>姓名</th>
 				<th>手机号</th>
 				<th>欠款金额</th>
@@ -578,7 +579,6 @@
 				<th>到期还款日期</th>
 				<th>逾期天数</th>
 				<th>订单状态</th>
-				<th>订单渠道</th>
 				<th>催收备注</th>
 				<th>催收人</th>
 				<!-- 催收留案功能-催收截止日 Patch 0001 by GQWU at 2016-11-9 start-->
@@ -609,6 +609,16 @@
 					<c:if test="${dunningOrder.taskOverdue}">
 						<i class="icon-flag" style="color:#c71c22;"></i>
 					</c:if>
+				</td>
+				<td>
+					<c:choose>
+						<c:when test="${fn:contains(dunningOrder.platformExt, 'jinRongZhongXin')}">
+							weixin36
+						</c:when>
+						<c:otherwise>
+							mo9
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td>
 					<a href="${ctx}/dunning/tMisDunningTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}&status=${dunningOrder.status}" target="_blank" >
@@ -645,17 +655,6 @@
 						${dunningOrder.statusText}
 					</c:if>
 				</td>
-				<td>
-					<c:choose>
-						<c:when test="${dunningOrder.platformExt eq 'weixin'}">
-                            微信
-						</c:when>
-						<c:otherwise>
-							其他
-						</c:otherwise>
-					</c:choose>
-				</td>
-
 				<td title="${dunningOrder.telremark}">
 					<c:choose>  
 						<c:when test="${fn:length(dunningOrder.telremark) > 15}">  

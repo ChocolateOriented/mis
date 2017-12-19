@@ -876,8 +876,13 @@
             <!-- 			    # 订单状态 payoff 已还清 payment  -->
             AND o.status = #{status}
 				</if>
-        <if test="platformExt != null and platformExt != ''">
-          AND o.platform_ext = #{platformExt}
+        <if test="platformExt != null and platformExt != ''" >
+          <if test="platformExt == 'mo9'">
+            AND o.platform_ext NOT LIKE '%jinRongZhongXin%'
+          </if>
+          <if test="platformExt == 'jinRongZhongXin'">
+            AND o.platform_ext LIKE '%jinRongZhongXin%'
+          </if>
         </if>
 				<if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
 					AND t.`DunningPeopleId` in
