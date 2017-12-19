@@ -132,6 +132,7 @@
 		o.remit_time as "remitTime",
 		o.repayment_time as "repaymentTime",
 		o.buyer_id as "buyerId",
+		o.platform_ext AS "finProduct",
 		b.mobile as "mobile",
 		b.mobile_city as "mobileCity",
 		b.marital as "marital", 
