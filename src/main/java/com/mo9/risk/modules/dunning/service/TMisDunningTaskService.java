@@ -1809,6 +1809,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			 * 根据逾期天数查询未生成任务task的订单
 			 */
 			String begin_Q0 = this.getCycleDict_Q0().get("begin");
+			logger.info("newfingDelayOrderByNotTask_day:"+begin_Q0  + new Date());
 			List<TMisDunningTaskLog>  newDunningTaskLogs = tMisDunningTaskDao.newfingDelayOrderByNotTask(begin_Q0);
 			logger.info("newfingDelayOrderByNotTask-查询新的逾期周期订单并生成任务" +newDunningTaskLogs.size()  + "条-"  + new Date());
 //			Map<String, List<TMisDunningPeople>> cyclePeoplemMap = this.getDunningcyclePeopleLists();
@@ -1841,6 +1842,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 						continue;
 					}
+					logger.info("逾期天数:"+dunningTaskLog.getOverduedays()+ "对应队列："+ dict.getLabel()  + new Date());
 					
 					/**  * auto Q0 队列 begin  */
 					if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
