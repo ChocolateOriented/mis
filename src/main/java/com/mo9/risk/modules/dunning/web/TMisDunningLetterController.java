@@ -54,7 +54,7 @@ public class TMisDunningLetterController extends BaseController {
 		}
 		return entity;
 	}
-	
+	@RequiresPermissions("dunning:tMisDunningLetter:view")
 	@RequestMapping(value = {"list", ""})
 	public String findPageList(TMisDunningLetter tMisDunningLetter, HttpServletRequest request, HttpServletResponse response, Model model){
 		Page<TMisDunningLetter> page = tMisDunningLetterService.findPageList(new Page<TMisDunningLetter>(request, response), tMisDunningLetter);
@@ -64,7 +64,7 @@ public class TMisDunningLetterController extends BaseController {
 		return "modules/dunning/tMisDunningletter";
 	}
 	/**
-	 * 同步待发送数据
+	 * 同步历史案件
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@ResponseBody
@@ -74,18 +74,28 @@ public class TMisDunningLetterController extends BaseController {
 		return "Ok";
 	}
 	/**
+	 * 同步当天案件
+	 */
+	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@ResponseBody
+	@RequestMapping(value = "synDealcodeToday")
+	public String synDealcodeToday(HttpServletRequest request, HttpServletResponse response) {
+		tMisDunningLetterService.synDealcodeToday();
+		return "Ok";
+	}
+	/**
 	 * 补发下载邮件
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@ResponseBody
 	@RequestMapping(value = "downLoadMail")
-	public void downLoadMail( String identity ,HttpServletRequest request, HttpServletResponse response) {
-		tMisDunningLetterService.sendMail(identity);
+	public void downLoadMail( String identity ,Integer count ,HttpServletRequest request, HttpServletResponse response) {
+		tMisDunningLetterService.sendMail(identity,count);
 	}
 	/**
 	 * 发送信函
 	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequiresPermissions("dunning:tMisDunningLetter:view")
 	@RequestMapping(value = "sendLetterDealcodes")
 	public String sendLetters(@RequestParam("sendLetterDealcodes") List<String> sendLetterDealcodes,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningLetter/list?repage";
@@ -100,7 +110,7 @@ public class TMisDunningLetterController extends BaseController {
 	/**
 	 * 信函导出
 	 */
-//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+	@RequiresPermissions("dunning:tMisDunningLetter:view")
 	@RequestMapping(value = "exportFile")
 	public String migrateExport(TMisDunningLetter tMisDunningLetter,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningLetter/list?repage";
@@ -124,7 +134,7 @@ public class TMisDunningLetterController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequiresPermissions("dunning:tMisDunningLetter:view")
 	@RequestMapping(value = "fileUpload")
 	public String fileUpload( Model model,MultipartFile file, RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningLetter/list?repage";

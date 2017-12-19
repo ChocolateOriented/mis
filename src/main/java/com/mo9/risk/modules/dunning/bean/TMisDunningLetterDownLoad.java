@@ -2,9 +2,7 @@ package com.mo9.risk.modules.dunning.bean;
 
 import java.util.Date;
 
-import org.hibernate.validator.constraints.Length;
 
-import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 
 /**

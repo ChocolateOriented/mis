@@ -13,10 +13,25 @@
 			 $("#empty").click(function(){
         		 window.location.href="${ctx}/dunning/tMisDunningLetter";
 			 }); 	
-			//同步按钮
+			//同步历史按钮
 			$("#synButton").click(function(){
 				$.ajax({
 					url:"${ctx}/dunning/tMisDunningLetter/synDealcode",
+					type:"GET",
+					data:{},
+					success:function(data){
+							top.$.jBox.tip("同步完成");
+					},
+					error : function(XMLHttpRequest, textStatus, errorThrown){
+		                   alert("同步失败:"+textStatus);
+		                }
+					
+				});
+			});
+			//同步当天按钮
+			$("#synButtonToday").click(function(){
+				$.ajax({
+					url:"${ctx}/dunning/tMisDunningLetter/synDealcodeToday",
 					type:"GET",
 					data:{},
 					success:function(data){
@@ -164,6 +179,13 @@
 				</c:forEach>
 			</form:select>
 			</li>
+			<li><label>订单状态</label>
+			<form:select  id="orderStatus" path="orderStatus" class="input-medium">
+					<form:option value="">全 部</form:option>
+					<form:option value="payment">未还清</form:option>
+					<form:option value="payoff">已还清</form:option>
+			</form:select>
+			</li>
 			
 			<li><label>逾期天数</label>
 				<form:input  path="beginOverduedays"  htmlEscape="false" maxlength="3" class="digits"  style="width:35px;"  />
@@ -171,6 +193,14 @@
 				<form:input  path="endOverduedays"  htmlEscape="false" maxlength="3" class="digits" style="width:35px;"   />
 			</li>
 			
+			<li><label>订单还清时间</label>
+				<input name="payoffBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${TMisDunningLetter.payoffBeginDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 至 
+				<input name="payoffEndDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${TMisDunningLetter.payoffEndDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> 
+			</li>
 			<li><label>信函发送时间</label>
 				<input name="sendBeginDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${TMisDunningLetter.sendBeginDate}" pattern="yyyy-MM-dd"/>"
@@ -196,7 +226,8 @@
 		</ul>
 	</form:form>
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
-		<input id="synButton"  class="btn btn-primary" type="button" value="同步待发送数据"/>
+		<input id="synButton"  class="btn btn-primary" type="button" value="同步历史案件"/>
+		<input id="synButtonToday"  class="btn btn-primary" type="button" value="同步当天案件"/>
 	</shiro:hasPermission>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
@@ -210,6 +241,8 @@
 				<th>欠款金额</th>
 				<th>逾期天数</th>
 				<th>户籍地址</th>
+				<th>订单状态</th>
+				<th>订单还清日期</th>
 				<th>信函发送时间</th>
 				<th>结果更新时间</th>
 			</tr>
@@ -226,6 +259,15 @@
 				<td>${letters.creditamount }</td>
 				<td>${letters.overduedays }</td>
 				<td>${letters.ocrAddr }</td>
+				<td>
+				<c:if test="${letters.orderStatus eq 'payment' }">
+				未还清
+				</c:if>
+				<c:if test="${letters.orderStatus eq 'payoff' }">
+				已还清
+				</c:if>
+				</td>
+				<td><fmt:formatDate value="${letters.payoffDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				<td><fmt:formatDate value="${letters.sendDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				<td><fmt:formatDate value="${letters.resultDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 			</tr>

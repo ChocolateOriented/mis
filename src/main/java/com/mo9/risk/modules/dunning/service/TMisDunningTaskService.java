@@ -14,7 +14,6 @@ import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
 import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TRiskBuyer2contactsDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;

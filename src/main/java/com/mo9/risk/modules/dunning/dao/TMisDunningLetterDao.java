@@ -19,10 +19,16 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 public interface TMisDunningLetterDao  extends CrudDao<TMisDunningLetter> {
 	public List<TMisAgentInfo> findList(TMisAgentInfo entity);
 	/**
-	 * 同步逾期60+案件
+	 * 同步逾期历史60+(可配置)案件
+	 * @param daySyn 
 	 * @return
 	 */
-	public List<TMisDunningLetter> findSynDealcode();
+	public List<TMisDunningLetter> findSynDealcode(Integer daySyn);
+	/**
+	 * 同步逾期60(可配置)当天案件
+	 * @return
+	 */
+	public List<TMisDunningLetter> findSynDealcodeToday(Integer daySyn);
 	/**
 	 * 批量保存信函
 	 * @param synDealcodeList
@@ -52,6 +58,13 @@ public interface TMisDunningLetterDao  extends CrudDao<TMisDunningLetter> {
 	 * @return
 	 */
 	public List<TMisDunningLetterDownLoad> lettersDownLoad(String identity);
+	/**
+	 * 通过每次发送邮件的标识找对应要发送的信函订单量
+	 * @param uuid
+	 * @return
+	 */
+	public int findcountLetter(String uuid);
+	
 
 	
 }

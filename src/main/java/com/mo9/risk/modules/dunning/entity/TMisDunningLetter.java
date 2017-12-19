@@ -44,6 +44,12 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	private Date sendLetterDate;
 	//下载标识(下载邮件用)
 	private String downLoadFlag;
+	//订单状态
+	private String orderStatus;
+	//订单还清日期
+	private Date payoffDate;
+	private Date payoffBeginDate;
+	private Date payoffEndDate;
 	
 	private String beginOverduedays;
 	
@@ -80,6 +86,20 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	}
 	public void setPostCode(String postCode) {
 		this.postCode = postCode;
+	}
+	@ExcelField(title="订单状态", type=1, align=2, sort=63)
+	public String getOrderStatus() {
+		return orderStatus;
+	}
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+	@ExcelField(title="订单还清日期", type=1, align=2, sort=66)
+	public Date getPayoffDate() {
+		return payoffDate;
+	}
+	public void setPayoffDate(Date payoffDate) {
+		this.payoffDate = payoffDate;
 	}
 	@ExcelField(title="信函发送时间", type=1, align=2, sort=70)
 	public Date getSendDate() {
@@ -177,6 +197,18 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	}
 	public void setDownLoadFlag(String downLoadFlag) {
 		this.downLoadFlag = downLoadFlag;
+	}
+	public Date getPayoffBeginDate() {
+		return payoffBeginDate;
+	}
+	public void setPayoffBeginDate(Date payoffBeginDate) {
+		this.payoffBeginDate = payoffBeginDate;
+	}
+	public Date getPayoffEndDate() {
+		return payoffEndDate;
+	}
+	public void setPayoffEndDate(Date payoffEndDate) {
+		this.payoffEndDate = payoffEndDate;
 	}
 
 
