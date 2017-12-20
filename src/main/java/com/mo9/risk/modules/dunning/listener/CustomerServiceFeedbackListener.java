@@ -1,26 +1,16 @@
 package com.mo9.risk.modules.dunning.listener;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.mo9.mqclient.IMqMsgListener;
 import com.mo9.mqclient.MqAction;
 import com.mo9.mqclient.MqMessage;
-import com.mo9.risk.modules.dunning.bean.dto.Mo9MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * 客服后台数据接收
@@ -68,6 +58,8 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
         tMisCustomerServiceFeedback.setUname(feedback.getUserName());
         tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
+        tMisCustomerServiceFeedback.setReadFlag("0");
+
         if(("partial").equals(feedback.getLoanOrderType())){
             tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
         }
