@@ -1,5 +1,6 @@
 package com.mo9.risk.util;
 
+import com.mo9.risk.modules.dunning.entity.SeriesPic;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -537,6 +538,7 @@ public class ChartUtils {
         //设置x轴刻度的颜色
         domainAxis.setTickLabelPaint(new Color(162,162,162));
         domainAxis.setUpperBound(16.9);
+        domainAxis.setRange(-0.9,16.9);
 
 
         //设置y
@@ -589,7 +591,7 @@ public class ChartUtils {
     public static BufferedImage getSmall(Color color,String  content){
         //public static BufferedImage getSmall(){
         //设置画布
-        BufferedImage bufferedImage = new BufferedImage(43, 15, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImage = new BufferedImage(35, 15, BufferedImage.TYPE_INT_RGB);
         //设置画笔
         Graphics2D g = bufferedImage.createGraphics();
         //设置背景颜色
@@ -601,7 +603,7 @@ public class ChartUtils {
         //画笔的字体
         g.setFont(new Font("宋体",Font.TRUETYPE_FONT,12));
         //写的内容
-        g.drawString(content,8,11);
+        g.drawString(content,6,11);
         g.dispose();
 
         return bufferedImage;
@@ -618,13 +620,37 @@ public class ChartUtils {
 
         BufferedImage big = jfreechart.createBufferedImage(530, 350);
 
+        List<SeriesPic> seriesPicsMax = new ArrayList<>();
+        List<SeriesPic> seriesPicsMin = new ArrayList<>();
+
+
+
+        for (int i = 0;i<series.size();i++){
+
+            int maxX = (int)c.getSeries(i).getMaxX()-1;
+            seriesPicsMax.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX).doubleValue()));
+
+        }
+
+        for (int i = 0;i<series.size();i++){
+
+
+            int minX = (int)c.getSeries(i).getMinX()-1;
+            seriesPicsMin.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(minX).doubleValue()));
+
+        }
+        Collections.sort(seriesPicsMax);
+        Collections.sort(seriesPicsMin);
+
         if("C-P1".equals(title)){
             for(int i = 0;i<series.size();i++){
                 int maxX = (int)c.getSeries(i).getMaxX()-1;
-                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+
+                //BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+                BufferedImage small = ChartUtils.getSmall(seriesPicsMax.get(i).getColor(),seriesPicsMax.get(i).getValue()+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
-                int x = big.getWidth() - small.getWidth()-32;
+                int x = big.getWidth() - 2*small.getWidth()-5;
                 int y = big.getHeight() - (18-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
 
@@ -638,19 +664,21 @@ public class ChartUtils {
                 int maxX = (int)c.getSeries(i).getMaxX()-1;
 
                 //右边的标签框
-                BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+                //BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
+                BufferedImage small = ChartUtils.getSmall(seriesPicsMax.get(i).getColor(),seriesPicsMax.get(i).getValue()+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
-                int x = big.getWidth() - small.getWidth()-32;
+                int x = big.getWidth() - 2*small.getWidth()-5;
                 int y = big.getHeight() - (9-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
 
                 //左边的标签框
                 int minX = (int)c.getSeries(i).getMinX()-1;
-                BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(minX)+"");
+               // BufferedImage small2 = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(minX)+"");
+                BufferedImage small2 = ChartUtils.getSmall(seriesPicsMin.get(i).getColor(),seriesPicsMin.get(i).getValue()+"");
                 //BufferedImage small2 = ChartUtils.getSmall();
                 //Graphics2D g = big.createGraphics();
-                int x2 = big.getWidth() - 11*small2.getWidth()+5;
+                int x2 = big.getWidth() - 14*small2.getWidth()+13;
                 int y2 = big.getHeight() - (9-i)*small2.getHeight();
                 g.drawImage(small2, x2, y2, small2.getWidth(), small2.getHeight(), null);
                 g.dispose();

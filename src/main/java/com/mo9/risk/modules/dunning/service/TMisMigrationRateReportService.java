@@ -554,7 +554,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			return null;
 		}
 
-		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		SimpleDateFormat sd=new SimpleDateFormat("yyyyMM_dd");
 		//将数据按周期分组
 		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
 		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
@@ -571,7 +571,17 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				chartSeries.setData(data);
 				String start = sd.format(migrationRateReport.getDatetimeStart());
 				String end = sd.format(migrationRateReport.getDatetimeEnd());
-				chartSeries.setName(start+"-"+end);
+
+
+				int day = Integer.parseInt(end.substring(7));
+				if(day > 16){
+					int a = day % 2 == 0 ? day / 2: (day / 2) +1;
+					chartSeries.setName(end.substring(0,7) + a + "+");
+
+				}else {
+					chartSeries.setName(end);
+				}
+				//chartSeries.setName(start+"-"+end);
 
 				migrateCycleMap.put(cycle, chartSeries);
 				migrateCycleData.add(chartSeries);
