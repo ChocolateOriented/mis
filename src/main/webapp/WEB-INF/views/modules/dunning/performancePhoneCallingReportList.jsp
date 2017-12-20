@@ -44,8 +44,7 @@
 			//组与花名联动查询
 			$("#groupList").on("change",function(){
                 $("#dunningName").val('');
-                $("#peopleId").val('');
-				$("#dunningPeople").select2("val", null);
+				$("#dunningName").select2("val", null);
 			});
 
 
@@ -68,25 +67,40 @@
                         }
                         return param;
 			        },
-			        results: function (data, page) {//选择要显示的数据
-                      var resultsData = [] ;
-                        resultsData[0] = {id:null,name:"全部人员",value:""};
-                      for (var i = 0; i < data.length; i++) {
-                        resultsData[i+1] = {id:data[i].name,name:data[i].name,value:data[i].id};
-                      }
-                      return { results: resultsData };
-			        },
-			        cache: true
+                    results: function (data, page) {//选择要显示的数据
+                        return { results: data };
+                    },
+                    cache: true
 			    },
-			    formatResult:formatPeopleList, //选择显示字段
-			    formatSelection:formatPeopleList, //选择选中后填写字段
-			    initSelection: function(element, callback) {//回显
-                  var name=$(element).val();
-                  if (name=="") {
-                    return;
-                  }
-                  callback({id:name,name:name})
-			    },
+                multiple: true,
+                initSelection: function(element, callback) {//回显
+                    var ids=$(element).val().split(",");
+                    if (ids=="") {
+                        return;
+                    }
+                    //根据组查询选项
+                    $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+                        data: function(){
+                            var groupId = $("#groupList").val();
+                            return {groupId:groupId}
+                        },
+                        dataType: "json"
+                    }).done(function(data) {
+
+                        var backData = [];
+                        var index = 0 ;
+                        for ( var item in data) {
+                            //若回显ids里包含选项则选中
+                            if (ids.indexOf(data[item].id) > -1 ) {
+                                backData[index] = data[item] ;
+                                index++;
+                            }
+                        }
+                        callback(backData)
+                    });
+                },
+                formatResult:formatPeopleList, //选择显示字段
+                formatSelection:formatPeopleList, //选择选中后填写字段
 		        width:170
 			});
 
@@ -199,7 +213,6 @@
 			<li>
 				<label>催收人：</label>
 				<form:input id="dunningName" name="dunningName" path="peopleName" type="hidden" value=""/>
-				<form:input id="peopleId" name="peopleId" path="peopleId" type="hidden"></form:input>
 			</li>
 			</div>
 			<div align="right">
@@ -228,13 +241,21 @@
 					<label>小休时长</label>
 					<form:input path="breaktimeStart" id="breaktimeStart"  style="width:90px;" /> - <form:input path="breaktimeEnd" id="breaktimeEnd"  style="width:90px;" />
 				</li>
-				<li>
+<%--				<li>
 					<label>分机号：</label>
 					<form:input id="extension" path="extension"/>
-				</li>
+				</li>--%>
 				<li>
 					<label>通话时长</label>
 					<form:input path="callDurationStart" id="callDurationStart"  style="width:90px;" /> - <form:input path="callDurationEnd" id="callDurationEnd"  style="width:90px;" />
+				</li>
+				<li>
+					<label>自动分配</label>
+					<form:select path="auto"  style="width:105px;">
+						<form:option value="">全部</form:option>
+						<form:option value="t">是</form:option>
+						<form:option value="f">否</form:option>
+					</form:select>
 				</li>
 			</div>
 			
@@ -248,7 +269,7 @@
 					<th>小组</th>
 					<th>姓名</th>
 					<th>坐席ID</th>
-					<th>分机号</th>
+					<th>花名</th>
 					<th>机构</th>
 					<th>队列</th>
 					<th>签入时间</th>

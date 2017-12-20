@@ -7,9 +7,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by jxguo on 2017/11/13.
+ * Created by jxguo on 2017/12/18.
  */
-public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
+public class DunningPhoneDetailReportFile extends DataEntity<com.mo9.risk.modules.dunning.entity.DunningPhoneDetailReportFile>{
+
         private String logiName;
         //日期
         private String dateTime;
@@ -19,8 +20,8 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         private String dunningName;
         //坐席
         private String agent;
-        //分机号
-        private String extension;
+        //花名
+        private String nickname;
         //机构
         private String department;
         //队列
@@ -39,18 +40,9 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
         private String dealCaseAmount = "0";
         //接通量
         private String connectAmout = "0";
-        //接通率
-        private String connectRate;
+
         //通话时长
         private String callDuration = "0";
-        //平均每小时拨打量
-        private String callingAmountOnHour;
-        //平均每小时接通量
-        private String connectAmountOnHour;
-        //平均每小时通话时间
-        private String callDurationOnHour;
-        //平均每小时处理量
-        private String dealCaseAmountOnHour;
 
         //查询结束时间
         private Date datetimestart;
@@ -89,286 +81,253 @@ public class DunningPhoneReportFile extends DataEntity<DunningPhoneReportFile> {
 
         private String peopleId;
 
+        //分机号
+         private String extension;
+
         @ExcelField(title = "日期", type = 1, align = 2, sort = 1)
         public String getDateTime() {
-                return dateTime;
+            return dateTime;
         }
 
         public void setDateTime(String dateTime) {
-                this.dateTime = dateTime;
+            this.dateTime = dateTime;
         }
         @ExcelField(title = "小组", type = 1, align = 2, sort = 2)
         public String getGroupName() {
-                return groupName;
+            return groupName;
         }
 
         public void setGroupName(String groupName) {
-                this.groupName = groupName;
+            this.groupName = groupName;
         }
 
         @ExcelField(title = "姓名", type = 1, align = 2, sort = 3)
         public String getDunningName() {
-                return dunningName;
+            return dunningName;
         }
 
         public void setDunningName(String dunningName) {
-                this.dunningName = dunningName;
+            this.dunningName = dunningName;
         }
         @ExcelField(title = "坐席ID", type = 1, align = 2, sort = 4)
         public String getAgent() {
-                return agent;
+            return agent;
         }
 
         public void setAgent(String agent) {
-                this.agent = agent;
-        }
-        @ExcelField(title = "分机号", type = 1, align = 2, sort = 5)
-        public String getExtension() {
-                return extension;
+            this.agent = agent;
         }
 
-        public void setExtension(String extension) {
-                this.extension = extension;
+        @ExcelField(title = "花名", type = 1, align = 2, sort = 5)
+        public String getExtension() {
+            return extension;
         }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+
         @ExcelField(title = "机构", type = 1, align = 2, sort = 6)
         public String getDepartment() {
-                return department;
+            return department;
         }
 
         public void setDepartment(String department) {
-                this.department = department;
+            this.department = department;
         }
         @ExcelField(title = "队列", type = 1, align = 2, sort = 7)
         public String getQueue() {
-                return queue;
+            return queue;
         }
 
         public void setQueue(String queue) {
-                this.queue = queue;
+            this.queue = queue;
         }
         @ExcelField(title = "签入时间", type = 1, align = 2, sort = 8)
         public String getFirstCheckIn() {
-                return firstCheckIn;
+            return firstCheckIn;
         }
 
         public void setFirstCheckIn(String firstCheckIn) {
-                this.firstCheckIn = firstCheckIn;
+            this.firstCheckIn = firstCheckIn;
         }
 
         @ExcelField(title = "签出时间", type = 1, align = 2, sort = 9)
         public String getLastCheckOut() {
-                return lastCheckOut;
+            return lastCheckOut;
         }
 
         public void setLastCheckOut(String lastCheckOut) {
-                this.lastCheckOut = lastCheckOut;
+            this.lastCheckOut = lastCheckOut;
         }
         @ExcelField(title = "在线时长", type = 1, align = 2, sort = 10)
         public String getOntime() {
-                return ontime;
+            return ontime;
         }
 
         public void setOntime(String ontime) {
-                this.ontime = ontime;
+            this.ontime = ontime;
         }
         @ExcelField(title = "小休时长", type = 1, align = 2, sort = 11)
         public String getBreaktime() {
-                return breaktime;
+            return breaktime;
         }
 
         public void setBreaktime(String breaktime) {
-                this.breaktime = breaktime;
+            this.breaktime = breaktime;
         }
         @ExcelField(title = "拨打电话量", type = 1, align = 2, sort = 12)
         public String getCallingAmount() {
-                return callingAmount;
+            return callingAmount;
         }
 
         public void setCallingAmount(String callingAmount) {
-                this.callingAmount = callingAmount;
+            this.callingAmount = callingAmount;
         }
         @ExcelField(title = "处理案件量", type = 1, align = 2, sort = 13)
         public String getDealCaseAmount() {
-                return dealCaseAmount;
+            return dealCaseAmount;
         }
 
         public void setDealCaseAmount(String dealCaseAmount) {
-                this.dealCaseAmount = dealCaseAmount;
+            this.dealCaseAmount = dealCaseAmount;
         }
         @ExcelField(title = "接通量", type = 1, align = 2, sort = 14)
         public String getConnectAmout() {
-                return connectAmout;
+            return connectAmout;
         }
 
         public void setConnectAmout(String connectAmout) {
-                this.connectAmout = connectAmout;
+            this.connectAmout = connectAmout;
         }
-        @ExcelField(title = "接通率", type = 1, align = 2, sort = 15)
-        public String getConnectRate() {
-                return connectRate;
-        }
-
-        public void setConnectRate(String connectRate) {
-                this.connectRate = connectRate;
-        }
-        @ExcelField(title = "通话时长", type = 1, align = 2, sort = 16)
+        @ExcelField(title = "通话时长", type = 1, align = 2, sort = 15)
         public String getCallDuration() {
-                return callDuration;
+            return callDuration;
         }
 
         public void setCallDuration(String callDuration) {
-                this.callDuration = callDuration;
-        }
-        @ExcelField(title = "平均每小时拨打量", type = 1, align = 2, sort = 17)
-        public String getCallingAmountOnHour() {
-                return callingAmountOnHour;
-        }
-
-        public void setCallingAmountOnHour(String callingAmountOnHour) {
-                this.callingAmountOnHour = callingAmountOnHour;
-        }
-        @ExcelField(title = "平均每小时接通量", type = 1, align = 2, sort = 18)
-        public String getConnectAmountOnHour() {
-                return connectAmountOnHour;
-        }
-
-        public void setConnectAmountOnHour(String connectAmountOnHour) {
-                this.connectAmountOnHour = connectAmountOnHour;
-        }
-        @ExcelField(title = "平均每小时通话时长", type = 1, align = 2, sort = 19)
-        public String getCallDurationOnHour() {
-                return callDurationOnHour;
-        }
-
-        public void setCallDurationOnHour(String callDurationOnHour) {
-                this.callDurationOnHour = callDurationOnHour;
-        }
-        @ExcelField(title = "平均每小时处理量", type = 1, align = 2, sort = 20)
-        public String getDealCaseAmountOnHour() {
-                return dealCaseAmountOnHour;
-        }
-
-        public void setDealCaseAmountOnHour(String dealCaseAmountOnHour) {
-                this.dealCaseAmountOnHour = dealCaseAmountOnHour;
+            this.callDuration = callDuration;
         }
 
         public Date getDatetimestart() {
-                return datetimestart;
+            return datetimestart;
         }
 
         public void setDatetimestart(Date datetimestart) {
-                this.datetimestart = datetimestart;
+            this.datetimestart = datetimestart;
         }
 
         public Date getDatetimeend() {
-                return datetimeend;
+            return datetimeend;
         }
 
         public void setDatetimeend(Date datetimeend) {
-                this.datetimeend = datetimeend;
+            this.datetimeend = datetimeend;
         }
 
         public TMisDunningGroup getGroup() {
-                return group;
+            return group;
         }
 
         public void setGroup(TMisDunningGroup group) {
-                this.group = group;
+            this.group = group;
         }
 
         public String getOnTimeStart() {
-                return onTimeStart;
+            return onTimeStart;
         }
 
         public void setOnTimeStart(String onTimeStart) {
-                this.onTimeStart = onTimeStart;
+            this.onTimeStart = onTimeStart;
         }
 
         public String getOnTimeEnd() {
-                return onTimeEnd;
+            return onTimeEnd;
         }
 
         public void setOnTimeEnd(String onTimeEnd) {
-                this.onTimeEnd = onTimeEnd;
+            this.onTimeEnd = onTimeEnd;
         }
 
         public String getBreaktimeStart() {
-                return breaktimeStart;
+            return breaktimeStart;
         }
 
         public void setBreaktimeStart(String breaktimeStart) {
-                this.breaktimeStart = breaktimeStart;
+            this.breaktimeStart = breaktimeStart;
         }
 
         public String getBreaktimeEnd() {
-                return breaktimeEnd;
+            return breaktimeEnd;
         }
 
         public void setBreaktimeEnd(String breaktimeEnd) {
-                this.breaktimeEnd = breaktimeEnd;
+            this.breaktimeEnd = breaktimeEnd;
         }
 
         public String getCallDurationStart() {
-                return callDurationStart;
+            return callDurationStart;
         }
 
         public void setCallDurationStart(String callDurationStart) {
-                this.callDurationStart = callDurationStart;
+            this.callDurationStart = callDurationStart;
         }
 
         public String getCallDurationEnd() {
-                return callDurationEnd;
+            return callDurationEnd;
         }
 
         public void setCallDurationEnd(String callDurationEnd) {
-                this.callDurationEnd = callDurationEnd;
+            this.callDurationEnd = callDurationEnd;
         }
 
         public String getLogiName() {
-                return logiName;
+            return logiName;
         }
 
         public void setLogiName(String logiName) {
-                this.logiName = logiName;
+            this.logiName = logiName;
         }
 
         public String getGroupId() {
-                return groupId;
+            return groupId;
         }
 
         public void setGroupId(String groupId) {
-                this.groupId = groupId;
+            this.groupId = groupId;
         }
 
         public List<String> getPeopleIds() {
-                return peopleIds;
+            return peopleIds;
         }
 
         public void setPeopleIds(List<String> peopleIds) {
-                this.peopleIds = peopleIds;
+            this.peopleIds = peopleIds;
         }
 
         public String getPeopleName() {
-                return peopleName;
+            return peopleName;
         }
 
         public void setPeopleName(String peopleName) {
-                this.peopleName = peopleName;
+            this.peopleName = peopleName;
         }
 
         public String getPeopleId() {
-                return peopleId;
+            return peopleId;
         }
 
         public void setPeopleId(String peopleId) {
-                this.peopleId = peopleId;
+            this.peopleId = peopleId;
         }
 
         public String getAuto() {
-                return auto;
+            return auto;
         }
 
         public void setAuto(String auto) {
-                this.auto = auto;
+            this.auto = auto;
         }
+
 }

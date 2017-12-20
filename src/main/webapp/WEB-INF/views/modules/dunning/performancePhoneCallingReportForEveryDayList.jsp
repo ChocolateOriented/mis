@@ -3,7 +3,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title>催收员工日报</title>
+	<title>软电话报表</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -16,7 +16,7 @@
                 $("#isHide").val(isHide);
 		    }
 			$("#btnExport").click(function(){
-				top.$.jBox.confirm("确认要导出软电话通话详单数据吗？","系统提示",function(v,h,f){
+				top.$.jBox.confirm("确认要导出软电话报表数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
 						$("#searchForm").attr("action","${ctx}/dunning/report/softPhoneCommunicateReportExportForEveryDayList");
 						$("#searchForm").submit();
@@ -161,7 +161,7 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay">软电话通话详单(每日)</a></li>
+		<li class="active"><a href="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay">软电话报表</a></li>
 	</ul>
 	<form:form id="searchForm" modelAttribute="dunningPhoneReportFile" action="${ctx}/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDay" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>

@@ -416,10 +416,11 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	public Page<DunningPhoneReportFile> exportStatementFile(Page<DunningPhoneReportFile> page, DunningPhoneReportFile entity) {
 		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
-		page.setCount(dao.countExportStatementFile(entity));
+
 		List<DunningPhoneReportFile> list = exportSoftPhoneReportFile(entity);
 		filterPhoneReportByDepartment(list,entity,page);
 		page.setList(exportSoftPhoneReportFile(entity));
+		page.setCount(page.getList().size());
 		return page;
 	}
 
@@ -461,10 +462,10 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 	public Page<DunningPhoneReportFile> exportStatementFileForEveryDay(Page<DunningPhoneReportFile> page,DunningPhoneReportFile entity){
 		entity.setPage(page);
 		page.setUsePaginationInterceptor(false);
-		page.setCount(dao.countExportStatementFileForEveryDay(entity));
 		List<DunningPhoneReportFile> list = exportSoftPhoneReportFileForEveryDay(entity);
 		filterPhoneReportByDepartment(list,entity,page);
 		page.setList(list);
+		page.setCount(page.getList().size());
 		return page;
 	}
 
