@@ -5,7 +5,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
@@ -111,6 +110,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public String getStatusText() {
         return RESOLVED.equals(this.problemstatus) ?  "已解决" :
                 UNRESOLVED.equals(this.problemstatus) ?  "未解决" : "";
+
     }
 
     public void setProblemstatus(String problemstatus) {

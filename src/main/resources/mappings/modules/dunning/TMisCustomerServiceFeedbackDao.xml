@@ -19,6 +19,7 @@
         a.pushTime AS "pushTime",
         a.readFlag AS "readFlag",
         a.id AS "id"
+
     </sql>
 
     <select id="get" resultType="TMisCustomerServiceFeedback" useCache="false">
@@ -31,9 +32,14 @@
 
     <select id="findList" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
-              <include refid="tMisCustomerServiceFeedbackColumns"/>
+              <include refid="tMisCustomerServiceFeedbackColumns"/>,
+              p.Nickname As "nickname"
         FROM t_mis_customer_service_feedback a
         LEFT JOIN t_risk_order r ON r.dealcode = a.dealcode
+        LEFT JOIN t_mis_dunning_task t ON r.dealcode = t.dealcode
+        LEFT JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
+
+
         <where>
             r.buyer_id = #{buyerId}
         </where>
@@ -66,44 +72,55 @@
 
     <select id="notifyList" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
-             a.`keyword`,
-             a.`uname`,
-             a.`dealcode`,
-             a.`hashtag`,
-             a.`problemStatus`,
-             a.`pushpeople`,
-             a.`pushTime`,
-             a.`updateBy`,
-             a.`id`,
+             a.keyword,
+             a.uname,
+             a.dealcode,
+             a.hashtag,
+             a.problemStatus,
+             a.pushpeople,
+             a.pushTime,
+             a.updateBy,
+             a.id,
              a.readFlag,
              t.DunningPeopleId,
              p.groupId
+
+
+
         FROM t_mis_customer_service_feedback a
         LEFT JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
         LEFT JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
         <where>
 
         <if test="keyword !=null and keyword!=''">
-            AND a.keyword LIKE concat('%',#{keyword},'%')
+            AND (
+                a.keyword LIKE concat('%',#{keyword},'%')
+                OR a.uname LIKE concat('%',#{keyword},'%')
+                OR a.dealcode LIKE concat('%',#{keyword},'%')
+                OR a.problemdescription LIKE concat('%',#{keyword},'%')
+                OR p.Nickname LIKE concat('%',#{keyword},'%')
+                OR a.pushpeople LIKE concat('%',#{keyword},'%')
+            )
         </if>
-        <if test="uname !=null and uname!=''">
-            AND a.uname LIKE concat('%',#{uname},'%')
-        </if>
-        <if test="dealcode !=null and dealcode!=''">
-            AND a.dealcode LIKE concat('%',#{dealcode},'%')
-        </if>
+        <!--<if test="uname !=null and uname!=''">-->
+            <!--AND a.uname LIKE concat('%',#{uname},'%')-->
+        <!--</if>-->
+        <!--<if test="dealcode !=null and dealcode!=''">-->
+            <!--AND a.dealcode LIKE concat('%',#{dealcode},'%')-->
+        <!--</if>-->
         <if test="hashtag !=null and hashtag!=''">
             AND a.hashtag LIKE concat('%',#{hashtag},'%')
         </if>
-        <if test="problemstatus !=null and problemstatus!='' and problemstatus != 'ALL'">
-            AND a.problemStatus LIKE concat('%',#{problemstatus},'%')
+        <if test="problemstatus !=null and problemstatus!='' ">
+            <!--AND a.problemStatus LIKE concat('%',#{problemstatus},'%')-->
+            AND a.problemStatus = #{problemstatus}
         </if>
-        <if test="pushpeople !=null and pushpeople !=''">
-            AND a.pushpeople LIKE  concat ('%',#{pushpeople},'%')
-        </if>
-        <if test="pushTime !=null and pushTime!=''">
-            AND a.pushTime=#{pushTime}
-        </if>
+        <!--<if test="pushpeople !=null and pushpeople !=''">-->
+            <!--AND a.pushpeople LIKE  concat ('%',#{pushpeople},'%')-->
+        <!--</if>-->
+        <!--<if test="pushTime !=null and pushTime!=''">-->
+            <!--AND a.pushTime=#{pushTime}-->
+        <!--</if>-->
         <if test="farPushTime != null and nearPushTime != null and farPushTime != '' and nearPushTime != ''">
             AND a.pushTime BETWEEN #{farPushTime} AND #{nearPushTime}
         </if>
@@ -136,8 +153,12 @@
 
     <select id="findCodeStatusTagDesPeople" resultType="TMisCustomerServiceFeedback" useCache="false">
         SELECT
-             <include refid="tMisCustomerServiceFeedbackColumns"/>
-        FROM t_mis_customer_service_feedback a
+             <include refid="tMisCustomerServiceFeedbackColumns"/>,
+              c.Nickname As "nickname"
+        FROM
+        t_mis_customer_service_feedback a
+        LEFT JOIN t_mis_dunning_task b ON a.dealcode = b.Dealcode
+        LEFT JOIN t_mis_dunning_people c ON b.DunningPeopleId = c.Id
         WHERE a.id = #{id}
     </select>
 

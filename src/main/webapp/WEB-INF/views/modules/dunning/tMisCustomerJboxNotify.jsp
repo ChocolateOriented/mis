@@ -30,14 +30,17 @@
 <form:form id="feedbackForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox" method="post" class="breadcrumb form-search">
     <div id="container" style="width:100%;height: 120px;">
         <div id="feedbackContainer" style="white-space:nowrap;">
-            用户${tMisCustomerServiceFeedback.uname}:订单号{${tMisCustomerServiceFeedback.dealcode}}${tMisCustomerServiceFeedback.tagText}
+            用户${tMisCustomerServiceFeedback.uname}:订单号
+            <%--{${tMisCustomerServiceFeedback.dealcode}}--%>
+            <a href="${ctx}/dunning/tMisCustomerServiceFeedback/gotoTaskOrder?dealcode=${tMisCustomerServiceFeedback.dealcode}" target="_blank"> ${tMisCustomerServiceFeedback.dealcode} </a>
+                ${tMisCustomerServiceFeedback.tagText}
         </div>
         <div id="pictureContainer">
                ${tMisCustomerServiceFeedback.problemdescription}
         </div>
         <div id="peopleContainer" style="margin-top: 70px">
             <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
-                <span>问题已解决</span><span style="margin-left: 200px">解决人:${tMisCustomerServiceFeedback.updateBy.name}</span>
+                <span>问题已解决</span><span style="margin-left: 200px">解决人:${tMisCustomerServiceFeedback.nickname}</span>
             </c:if>
             <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
                 <span style="margin-left: 260px">客服:${fns:abbr(tMisCustomerServiceFeedback.pushpeople,50)}<span/>
