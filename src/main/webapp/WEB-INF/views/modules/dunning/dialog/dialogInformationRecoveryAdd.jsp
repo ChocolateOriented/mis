@@ -95,25 +95,26 @@
 <br/>
 <form:form id="inputForm" modelAttribute="DunningInformationRecovery"  class="form-horizontal">
     <div class="control-group">
-        <div style="width:25%;display:inline-block;text-align:right;">
+        <div style="width:38%;display:inline-block;text-align:left;">
             <select class="input-small" path="contactType" id="contactType" name="contactType" onchange="contactNumberClear()" required>
                 <option value="">类型</option>
                 <option value="PHONE" <c:if test="${'PHONE' eq DunningInformationRecovery.contactType}">selected</c:if>>电话</option>
                 <option value="WECHAT" <c:if test="${'WECHAT' eq DunningInformationRecovery.contactType}">selected</c:if> >微信 </option>
                 <option value="QQ"<c:if test="${'QQ' eq DunningInformationRecovery.contactType}">selected</c:if>>QQ</option>
             </select>
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
-        <span class="help-inline"><font color="red">*</font> </span>
-        <div style="width:25%;display:inline-block;text-align:right;">
+
+        <div style="width:60%;display:inline-block;text-align:left;">
             <label>号码：</label>
-        </div>
-        <div style="width:35%;display:inline-block;">
             <input  value="${DunningInformationRecovery.contactNumber}" path="contactNumber" id="contactNumber" name="contactNumber" htmlEscape="false" maxlength="20"  required class="contactnumber" />
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
-        <span class="help-inline"><font color="red">*</font> </span>
+
+
     </div>
     <div class="control-group">
-        <div style="width:25%;display:inline-block;text-align:right;">
+        <div style="width:38%;display:inline-block;text-align:left;">
             <select class="input-small" path="contactRelationship" id="contactRelationship" name="contactRelationship" onchange="contactNameClear()" required>
                 <option value="">关系</option>
                 <option value="SELF" <c:if test="${'SELF' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>本人</option>
@@ -125,12 +126,11 @@
                 <option value="WORKMATE"<c:if test="${'WORKMATE' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>同事</option>
                 <option value="WORKPHONE"<c:if test="${'WORKPHONE' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>工作电话</option>
             </select>
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
-        <span class="help-inline"><font color="red">*</font> </span>
-        <div style="width:25%;display:inline-block;text-align:right;">
+
+        <div style="width:60%;display:inline-block;text-align:left;">
             <label>姓名：</label>
-        </div>
-        <div style="width:35%;display:inline-block;text-align:left;">
             <input class="input-small" value="${DunningInformationRecovery.contactName}" path="contactName" id="contactName" name="contactName" required htmlEscape="false" maxlength="5"/>
             <span class="help-inline"><font color="red">*</font> </span>
         </div>
