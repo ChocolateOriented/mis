@@ -27,7 +27,6 @@ import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContactsType;
 import com.mo9.risk.modules.dunning.entity.TMisContantRecord.ContantType;
-import com.mo9.risk.modules.dunning.entity.TMisContantRecord.TelStatus;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedHistory;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
@@ -64,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -3431,6 +3431,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 		Map<String, Object> recordTemp=new HashMap<String, Object>();
 		List<String> actions=new ArrayList<String>();
+		Set<String> actionMobile=new HashSet<String>();
 		String decalode=recordList.get(0).getDealcode();
 		String taskId=recordList.get(0).getTaskid();
 		String dunningCycle=recordList.get(0).getDunningCycle();
@@ -3472,10 +3473,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							
 					}
 				}
+				//保存每个订单的电话号码
+				actionMobile.add(recordList.get(i).getContanttarget());
 				//遍历最后一个时保存电催结论
 				if(i==recordList.size()-1){
 					logger.info("最后一个订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
-					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
+					boolean result = saveConclusion(actionMobile.size(),recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
 					if (!result) {
 						logger.info(decalode+"该订单电催结论失败.");
 					}else{
@@ -3487,7 +3490,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}else{
 				logger.info("订单号:"+decalode+",案件队列为:"+dunningCycle+"保存电催结论");
 					//保存电催结论
-					boolean result = saveConclusion(recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
+					boolean result = saveConclusion(actionMobile.size(),recordTemp, actions, decalode, taskId, remark,dunningCycle,dunningPeopleId);
 					if (!result) {
 						logger.info(decalode+"该订单电催结论失败.");
 					}else{
@@ -3496,6 +3499,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					}
 					if(actions!=null)
 						actions.clear();
+					if(actionMobile!=null)
+						actionMobile.clear();
 					if(recordTemp!=null)
 						recordTemp.clear();
 					decalode=recordList.get(i).getDealcode();
@@ -3509,7 +3514,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			
 		}
 	}
-	private boolean saveConclusion(Map<String, Object> recordTemp, List<String> actions, String decalode, String taskId,
+	private boolean saveConclusion(int actionMobile,Map<String, Object> recordTemp, List<String> actions, String decalode, String taskId,
 			StringBuilder remark,String dunningCycle,String dunningPeopleId) {
 		// 就要给前一个用户做电催结论
 		TMisDunnedConclusion tMisDunnedConclusion = new TMisDunnedConclusion();
@@ -3536,10 +3541,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			tMisDunnedConclusion.setIseffective(false);
 		}
 		//下次跟进时间
-		String nextTelDate=DictUtils.getDictValue(recordTemp.get("telStatus").toString(), "dunning_result_code", "");
+		String nextTelDate=DictUtils.getDictValue(statusConclusion, "dunning_result_code", "");
 		if(StringUtils.isEmpty(nextTelDate)){
 			logger.info(new Date()+"该结果码数据字典未配置");
 			return false;
+		}
+		//若结论为完全失联,下次跟进日期根据两次电催结论计算之间催收拨打的电话号码数量确定。小于3个号码则为2天,其他不变
+		if(telconclusion.get(statusConclusion)==5){
+			if(actionMobile<3){
+				nextTelDate="2";
+			}
 		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DATE, Integer.parseInt(nextTelDate));

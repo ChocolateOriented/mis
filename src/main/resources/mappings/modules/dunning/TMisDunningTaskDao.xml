@@ -753,6 +753,7 @@
         t.id AS dunningtaskdbid,
         t.telremark AS telremark,
         o.outerfiletime AS outerfiletime,
+        o.platform_ext AS platformExt,
         t.dunningcycle AS dunningcycle,
         t.nextfollowdate as nextfollowdate,
         t.promisepaydate as promisepaydate,
@@ -875,6 +876,14 @@
             <!-- 			    # 订单状态 payoff 已还清 payment  -->
             AND o.status = #{status}
 				</if>
+        <if test="platformExt != null and platformExt != ''" >
+          <if test="platformExt == 'mo9'">
+            AND o.platform_ext NOT LIKE '%jinRongZhongXin%'
+          </if>
+          <if test="platformExt == 'jinRongZhongXin'">
+            AND o.platform_ext LIKE '%jinRongZhongXin%'
+          </if>
+        </if>
 				<if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
 					AND t.`DunningPeopleId` in
 					<foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">

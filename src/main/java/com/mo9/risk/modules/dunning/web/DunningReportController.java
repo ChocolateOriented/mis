@@ -192,7 +192,7 @@ public class DunningReportController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			List<DunningPhoneReportFile> entityList = tMisCallingRecordService.exportSoftPhoneReportFile(dunningPhoneReportFile);
 			String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
-			new ExportExcel(fileName, DunningPhoneReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
+			new ExportExcel(fileName, DunningPhoneDetailReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
 		} catch (IOException e) {
 			logger.info("软电话通话详单!", e);
 			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
@@ -219,10 +219,10 @@ public class DunningReportController extends BaseController {
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			List<DunningPhoneReportFile> entityList = tMisCallingRecordService.exportSoftPhoneReportFileForEveryDay(dunningPhoneReportFile);
-			String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话通话详单";
+			String fileName = DateUtils.formatDate(dunningPhoneReportFile.getDatetimestart(), "yyyy-MM-dd HH:mm")+"至"+DateUtils.formatDate(dunningPhoneReportFile.getDatetimeend(), "yyyy-MM-dd HH:mm") + "软电话报表";
 			new ExportExcel(fileName, DunningPhoneReportFile.class).setDataList(entityList).write(response,fileName+".xlsx").dispose();
 		} catch (IOException e) {
-			logger.info("软电话通话详单!", e);
+			logger.info("软电话报表详单!", e);
 			addMessage(redirectAttributes, "导出失败！失败信息：" + e.getMessage());
 		}finally {
 			DynamicDataSource.setCurrentLookupKey("dataSource");

@@ -161,7 +161,7 @@ public class ImportExcel {
 	 * @return
 	 */
 	public int getLastDataRowNum(){
-		return this.sheet.getLastRowNum()+headerNum;
+		return this.sheet.getLastRowNum()+1;
 	}
 	
 	/**
