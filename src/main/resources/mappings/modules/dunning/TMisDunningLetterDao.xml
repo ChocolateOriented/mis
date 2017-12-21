@@ -71,17 +71,18 @@
 	 and o.status = #{orderStatus}
 	</if>
 	<if test="payoffBeginDate != null and payoffBeginDate != '' and payoffEndDate != null and payoffEndDate != ''">
-	 and o.payoff_time between #{payoffBeginDate} and #{payoffEndDate}
+	 and date(o.payoff_time) between #{payoffBeginDate} and #{payoffEndDate}
 	</if>
 	<if test="sendBeginDate != null and sendBeginDate != '' and sendEndDate != null and sendEndDate != ''">
-	 and l.sendDate between #{sendBeginDate} and #{sendEndDate}
+	 and date(l.sendDate) between #{sendBeginDate} and #{sendEndDate}
 	</if>
 	<if test="resultBeginDate != null and resultBeginDate != '' and resultEndDate != null and resultEndDate != '' ">
-	 and l.resultDate between #{resultBeginDate} and #{resultEndDate}
+	 and date(l.resultDate) between #{resultBeginDate} and #{resultEndDate}
 	</if>
 	<if test="beginOverduedays != null and beginOverduedays != '' and endOverduedays != null and endOverduedays != ''">
 	 and DATEDIFF(CURDATE(), o.repayment_time) between #{beginOverduedays} and #{endOverduedays}
 	</if>
+	order by o.repayment_time desc
 	</select>
 	
 	<insert id="insert">
@@ -216,23 +217,12 @@
 		AND o.STATUS='payment'
 		AND l.dealcode is null
 		AND c.ocr_addr is not null
+		<if test="historyDays == 'history' ">
 		AND DATEDIFF(CURDATE(), o.repayment_time) &gt;= #{daySyn}
-	
-	</select>
-	
-	<select id="findSynDealcodeToday" resultType="TMisDunningLetter">
-		SELECT
-		o.Dealcode AS "dealcode"
-		FROM
-		t_mis_dunning_task AS t
-		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
-		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
-		WHERE
-		o.type = 'loan'
-		AND o.merchant_id = 7
-		AND o.STATUS='payment'
-		AND c.ocr_addr is not null
+		</if>
+		<if test="historyDays == 'today' ">
 		AND DATEDIFF(CURDATE(), o.repayment_time) = #{daySyn}
+		</if>
 	
 	</select>
 	
@@ -274,6 +264,14 @@
 		t_mis_dunning_letter 
 		where
 		downLoadFlag = #{uuid}
+	</select>
+	<select id="findLetterByDealcode" resultType="TMisDunningLetter">
+		SELECT
+		<include refid="TmisDunningLetterColumns" />
+		FROM
+		t_mis_dunning_letter l
+		where
+		l.dealcode = #{dealcode}
 	</select>
 	
 	

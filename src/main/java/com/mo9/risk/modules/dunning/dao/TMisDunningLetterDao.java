@@ -3,6 +3,8 @@ package com.mo9.risk.modules.dunning.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.mo9.risk.modules.dunning.bean.TMisDunningLetterDownLoad;
 import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
@@ -23,12 +25,7 @@ public interface TMisDunningLetterDao  extends CrudDao<TMisDunningLetter> {
 	 * @param daySyn 
 	 * @return
 	 */
-	public List<TMisDunningLetter> findSynDealcode(Integer daySyn);
-	/**
-	 * 同步逾期60(可配置)当天案件
-	 * @return
-	 */
-	public List<TMisDunningLetter> findSynDealcodeToday(Integer daySyn);
+	public List<TMisDunningLetter> findSynDealcode(@Param("daySyn")Integer daySyn,@Param("historyDays")String historyDays);
 	/**
 	 * 批量保存信函
 	 * @param synDealcodeList
@@ -64,6 +61,12 @@ public interface TMisDunningLetterDao  extends CrudDao<TMisDunningLetter> {
 	 * @return
 	 */
 	public int findcountLetter(String uuid);
+	/**
+	 * 通过订单获取信函
+	 * @param dealcode
+	 * @return
+	 */
+	public TMisDunningLetter findLetterByDealcode(String dealcode);
 	
 
 	
