@@ -33,6 +33,8 @@ public class MailSender {
 
 	private String host;//主机
 
+	private String port;//端口
+
 	private String username;//用户名
 
 	private String password;//密码
@@ -69,6 +71,14 @@ public class MailSender {
 
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
 	}
 
 	public String getUsername() {
@@ -145,7 +155,8 @@ public class MailSender {
 	 */
 	public MailSender(String to) {
 		//使用数据库字典
-		this.host = DictUtils.getDictValue("email_server","sys_email","");
+		this.host = DictUtils.getDictValue("email_server_host","sys_email","");
+		this.port = DictUtils.getDictValue("email_server_port","sys_email","");
 		String userAdress = DictUtils.getDictValue("email_username","sys_email","");
 		this.username = userAdress ;
 		this.from = userAdress ;
@@ -229,6 +240,11 @@ public class MailSender {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", host);
 		props.put("mail.smtp.auth", "true");
+		
+		if (port != null && !"".equals(port)) {
+			props.put("mail.smtp.port", port);
+		}
+		
 		Session session = Session.getInstance(props,
 			new Authenticator() {
 				@Override
