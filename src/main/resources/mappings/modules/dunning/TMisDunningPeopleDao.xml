@@ -489,10 +489,4 @@
 		WHERE dunning_people_id = #{id}
 	</delete>
 
-	<select id="findPeopleBizTypes" resultType="com.mo9.risk.modules.dunning.enums.DebtBizType" useCache="false">
-		SELECT
-			debt_biz_type
-		FROM t_mis_dunning_people_biz
-		WHERE dunning_people_id = #{id}
-	</select>
 </mapper>
