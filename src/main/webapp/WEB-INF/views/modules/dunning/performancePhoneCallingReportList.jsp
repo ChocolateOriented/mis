@@ -280,6 +280,7 @@
 					<th>处理案件量</th>
 					<th>接通量</th>
 					<th>通话时长（秒）</th>
+					<th>自动分配</th>
 				</tr>
 
 			</thead>
@@ -332,6 +333,7 @@
 					<td>
 						${callingReport.callDuration}
 					</td>
+					<td>${'t' eq callingReport.auto ? '启用' : '停止'}</td>
 				</tr>
 			</c:forEach>
 

@@ -120,7 +120,13 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         if (StringUtils.isEmpty(tMisCustomerServiceFeedback.getProblemstatus())){
             tMisCustomerServiceFeedback.setProblemstatus("");
         }
-
+        if("已解决".equals(tMisCustomerServiceFeedback.getKeyword())){
+            tMisCustomerServiceFeedback.setInnerKeyWord("RESOLVED");
+        }else if("未解决".equals(tMisCustomerServiceFeedback.getKeyword())){
+            tMisCustomerServiceFeedback.setInnerKeyWord("UNRESOLVED");
+        }else {
+            tMisCustomerServiceFeedback.setInnerKeyWord("null");
+        }
         Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.notifyList(new Page<TMisCustomerServiceFeedback>(request, response,20), tMisCustomerServiceFeedback);
         model.addAttribute("page", page);
         model.addAttribute("color", colorChoice);

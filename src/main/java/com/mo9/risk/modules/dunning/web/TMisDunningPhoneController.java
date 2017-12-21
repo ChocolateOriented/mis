@@ -6,6 +6,8 @@ package com.mo9.risk.modules.dunning.web;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +33,7 @@ import com.mo9.risk.util.WebSocketSessionUtil;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -198,11 +201,7 @@ public class TMisDunningPhoneController extends BaseController {
 		String agent = agentInfo.getAgent();
 		message.setAgent(agent);
 		
-		String dialTarget = target;
-		if (!phoneService.isLocalMobile(target)) {
-			dialTarget = "0" + dialTarget;
-		}
-		dialTarget = "9" + dialTarget;
+		String dialTarget = dialTargetNumber(target, agent);
 		
 		message.setTarget(dialTarget);
 		message.setPeopleId(peopleId);
@@ -224,5 +223,46 @@ public class TMisDunningPhoneController extends BaseController {
 		Date start = c.getTime();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		return dateFormat.format(start);
+	}
+
+	/**
+	 * 外呼号码加拨
+	 */
+	private String dialTargetNumber(String target, String agent) {
+		List<Dict> dicts = DictUtils.getDictList("callcenter_dial");
+		if (dicts == null || dicts.isEmpty()) {
+			return target;
+		}
+		for (Dict dict : dicts) {
+			String label = dict.getLabel();
+			if (StringUtils.isEmpty(label)) {
+				continue;
+			}
+			
+			if (!Pattern.matches(label, agent)) {
+				continue;
+			}
+			
+			String value = dict.getValue();
+			if (StringUtils.isEmpty(value)) {
+				continue;
+			}
+			
+			if (!value.contains("/")) {
+				return value + target;
+			}
+			
+			String[] preNumbers = value.split("/");
+			if (preNumbers == null || preNumbers.length < 2) {
+				return value + target;
+			}
+			
+			if (!phoneService.isLocalMobile(target)) {
+				target = preNumbers[1] + target;
+			}
+			return preNumbers[0] + target;
+		}
+		
+		return target;
 	}
 }

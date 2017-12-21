@@ -66,7 +66,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 			return;
 		}
 		logger.info("开始同步历史信函的案件");
-		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn);
+		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"history");
 		saveSynDealcode(synDealcodeList);
 	}
 	
@@ -90,7 +90,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 			return;
 		}
 		logger.info("开始同步当天信函的案件");
-		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcodeToday(daySyn);
+		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"today");
 		saveSynDealcode(synDealcodeList);
 	}
 	//保存同步的案件
@@ -116,12 +116,23 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		
 		for (int i = 0; i < list.size(); i++) {
 			TMisDunningLetter tMisDunningLetter = list.get(i);
+			String dealcode = tMisDunningLetter.getDealcode();
+			String postCode = tMisDunningLetter.getPostCode();
+			if(StringUtils.isEmpty(dealcode)||StringUtils.isEmpty(postCode)){
+				message.append("第"+(i+1)+"条内容为空,请检查");
+				return false;
+			}
 			if("寄出".equals(tMisDunningLetter.getSendResultSting())){
 				tMisDunningLetter.setSendResult(SendResult.POSTED);
 			}else if("退回".equals(tMisDunningLetter.getSendResultSting())){
 				tMisDunningLetter.setSendResult(SendResult.BACKED);
 			}else{
 				message.append("第"+(i+1)+"条状态不对,请检查");
+				return false;
+			}
+			TMisDunningLetter letter=dao.findLetterByDealcode(dealcode);
+			if(!"待寄出".equals(letter.getSendResultText())){
+				message.append("第"+(i+1)+"条订单状态不为待寄出不能导入,请检查");
 				return false;
 			}
 			try {
@@ -197,7 +208,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		content.append("</table >");
 		content.append("<table width='600px' border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
 		content.append("<tr ><th height='40px' width='80px'>序号</th><th>信函总量</th><th>时间</th><th>操作</th></tr>");
-		content.append("<tr><td>1</td><td>"+countLetter+"</td><td height='40px'>"+data+"</td><td><a href='http://localhost/mis/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
+		content.append("<tr><td>1</td><td>"+countLetter+"</td><td height='40px'>"+data+"</td><td><a href='"+url+"/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
 		content.append("</table>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>如果对信函数据存疑,可直接回复邮件.</font></p></div>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>顺祝商祺!</font></p></div>");

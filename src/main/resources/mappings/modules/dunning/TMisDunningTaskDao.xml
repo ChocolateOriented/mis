@@ -993,6 +993,7 @@
         t.id AS dunningtaskdbid,
         t.telremark AS telremark,
         o.outerfiletime AS outerfiletime,
+        o.platform_ext AS platformExt,
         t.dunningcycle AS dunningcycle,
         t.outsourcingBeginDate AS outsourcingBeginDate,
         t.outsourcingEndDate AS outsourcingEndDate,
@@ -1077,7 +1078,15 @@
             	</otherwise>
             </choose>
         </if>
-        <!-- 只显示未删除的催收人员  -->
+        <if test="platformExt != null and platformExt != ''" >
+          <if test="platformExt == 'mo9'">
+            AND o.platform_ext NOT LIKE '%jinRongZhongXin%'
+          </if>
+          <if test="platformExt == 'jinRongZhongXin'">
+            AND o.platform_ext LIKE '%jinRongZhongXin%'
+          </if>
+        </if>
+      <!-- 只显示未删除的催收人员  -->
 <!--         AND p.Invalid = 't' -->
         ) AS d
         <where>

@@ -173,7 +173,7 @@
 			
 			<li><label>发函结果</label>
 			<form:select  id="sendResult" path="sendResult" class="input-medium">
-					<form:option value=""></form:option>
+					<form:option value="">全部</form:option>
 				<c:forEach items="${sendResults}" var="result" >
 					<form:option value="${result}">${result.desc}</form:option>
 				</c:forEach>
@@ -181,7 +181,7 @@
 			</li>
 			<li><label>订单状态</label>
 			<form:select  id="orderStatus" path="orderStatus" class="input-medium">
-					<form:option value="">全 部</form:option>
+					<form:option value="">全部</form:option>
 					<form:option value="payment">未还清</form:option>
 					<form:option value="payoff">已还清</form:option>
 			</form:select>

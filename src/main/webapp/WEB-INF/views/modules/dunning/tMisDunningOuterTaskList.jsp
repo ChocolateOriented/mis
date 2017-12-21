@@ -339,6 +339,13 @@ function changeStatus( dealcode) {
 			<li><label>姓名</label> <form:input path="realname" htmlEscape="false" class="input-medium" /></li>
 			<li><label>手机号</label> <form:input path="mobile" htmlEscape="false" maxlength="128" class="input-medium" /></li>
 			<li><label>订单号</label> <form:input path="dealcode" htmlEscape="false" maxlength="128" class="input-medium" /></li>
+			<li><label>产品</label>
+				<form:select id="status" path="platformExt" class="input-medium">
+					<form:option selected="selected" value="" label="全部"/>
+					<form:option value="jinRongZhongXin" label="weixin36"/>
+					<form:option value="mo9" label="mo9"/>
+				</form:select>
+			</li>
 			<li><label>订单状态</label> <form:select id="status" path="status" class="input-medium">
 					<form:option selected="selected" value="" label="全部状态" />
 					<form:option value="payoff" label="已还清" />
@@ -425,6 +432,7 @@ function changeStatus( dealcode) {
 			<tr>
 				<th><input type="checkbox" id="allorder" /></th>
 				<th>序号</th>
+				<th>产品</th>
 				<th>姓名</th>
 				<th>手机号</th>
 				<th>欠款金额</th>
@@ -447,6 +455,16 @@ function changeStatus( dealcode) {
 					<td><input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}"
 						value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}" /></td>
 					<td>${ (vs.index+1) + (page.pageNo-1) * page.pageSize}</td>
+					<td>
+						<c:choose>
+							<c:when test="${fn:contains(dunningOrder.platformExt, 'jinRongZhongXin')}">
+								weixin36
+							</c:when>
+							<c:otherwise>
+								mo9
+							</c:otherwise>
+						</c:choose>
+					</td>
 					<td><a href="${ctx}/dunning/tMisDunningOuterTask/pageFather?buyerId=${dunningOrder.buyerid}&dealcode=${dunningOrder.dealcode}&dunningtaskdbid=${dunningOrder.dunningtaskdbid}" target="_blank"> ${dunningOrder.realname} </a></td>
 
 					<td>${dunningOrder.mobile}</td>

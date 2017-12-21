@@ -554,7 +554,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 			return null;
 		}
 
-		SimpleDateFormat sd=new SimpleDateFormat("YYYYMMdd");
+		SimpleDateFormat sd=new SimpleDateFormat("yyyyMM_dd");
 		//将数据按周期分组
 		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
 		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
@@ -571,7 +571,17 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				chartSeries.setData(data);
 				String start = sd.format(migrationRateReport.getDatetimeStart());
 				String end = sd.format(migrationRateReport.getDatetimeEnd());
-				chartSeries.setName(start+"-"+end);
+
+
+				int day = Integer.parseInt(end.substring(7));
+				if(day > 16){
+					int a = day % 2 == 0 ? day / 2: (day / 2) +1;
+					chartSeries.setName(end.substring(0,7) + a + "+");
+
+				}else {
+					chartSeries.setName(end);
+				}
+				//chartSeries.setName(start+"-"+end);
 
 				migrateCycleMap.put(cycle, chartSeries);
 				migrateCycleData.add(chartSeries);
@@ -705,12 +715,14 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		content.append("<p><font color='#0993FF' size='4'>户数迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("</table>");
 
 		content.append("<p><font color='#0993FF' size='4'>本金迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");

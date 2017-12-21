@@ -94,12 +94,16 @@
 
         <if test="keyword !=null and keyword!=''">
             AND (
-                a.keyword LIKE concat('%',#{keyword},'%')
-                OR a.uname LIKE concat('%',#{keyword},'%')
+                <!--a.keyword LIKE concat('%',#{keyword},'%')-->
+
+                 a.uname LIKE concat('%',#{keyword},'%')
                 OR a.dealcode LIKE concat('%',#{keyword},'%')
                 OR a.problemdescription LIKE concat('%',#{keyword},'%')
                 OR p.Nickname LIKE concat('%',#{keyword},'%')
                 OR a.pushpeople LIKE concat('%',#{keyword},'%')
+                OR p.name LIKE concat('%',#{keyword},'%')
+                OR a.problemStatus =#{innerKeyWord}
+
             )
         </if>
         <!--<if test="uname !=null and uname!=''">-->
