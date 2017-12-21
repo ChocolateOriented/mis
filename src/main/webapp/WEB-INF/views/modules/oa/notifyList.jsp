@@ -144,13 +144,13 @@
 			</tr>
 		</thead>
 		<tbody>
-		<c:set var="flag" value="0" scope="session"></c:set>
+		<c:set var="flag" value="0" ></c:set>
 		<c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
 			<tr class="result">
 				<%--<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(${flag},this);">--%>
 					<c:if test="${!(fns:getUser().name eq '系统管理员')}">
 					<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
-							<c:set var="flag" value="1" scope="session" ></c:set>
+							<c:set var="flag" value="1" ></c:set>
 					<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(${flag},this);">
 							<%--${tMisCustomerServiceFeedback.readFlag }--%>
 						<c:choose>

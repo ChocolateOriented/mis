@@ -57,6 +57,17 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private TMisDunningPeople dunningPeople;
     private List<String> groupIds;
     private String readFlag;	// 本人阅读状态
+
+    private String innerKeyWord;//页面关键词是已解决/未解决的话值转存到此字段
+    public String getInnerKeyWord() {
+        return innerKeyWord;
+    }
+
+    public void setInnerKeyWord(String innerKeyWord) {
+        this.innerKeyWord = innerKeyWord;
+    }
+
+
     @Length(min=1, max=64, message="催收订单号长度必须介于 1 和 64 之间")
     public String getDealcode() {
         return dealcode;
