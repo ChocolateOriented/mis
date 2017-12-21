@@ -3,6 +3,13 @@
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao">
 	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
 
+	<resultMap id="peopleDetail" type="TMisDunningPeople" autoMapping="true">
+		<id column="id" property="id"/>
+		<collection property="bizTypes" ofType="com.mo9.risk.modules.dunning.enums.DebtBizType">
+			<result column="bizTypes"/>
+		</collection>
+	</resultMap>
+
 	<sql id="tMisDunningPeopleColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
@@ -26,14 +33,18 @@
 	<sql id="peopleJoinsColumns">
 		,
 		g.`type` AS "group.type",
-		g.`name` AS "group.name"
+		g.`name` AS "group.name",
+		pb.debt_biz_type AS "bizTypes"
 	</sql>
 
 	<sql id="tMisDunningPeopleJoins">
 		LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
+		<!--pb用于显示, pbq用于查询-->
+		LEFT JOIN t_mis_dunning_people_biz pb ON a.id = pb.dunning_people_id
+		LEFT JOIN t_mis_dunning_people_biz pbq ON a.id = pbq.dunning_people_id
 	</sql>
     
-	<select id="get" resultType="TMisDunningPeople" useCache="false">
+	<select id="get" resultMap="peopleDetail" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
@@ -42,7 +53,7 @@
 		WHERE a.id = #{id}
 	</select>
 	
-	<select id="findList" resultType="TMisDunningPeople" useCache="false">
+	<select id="findList" resultMap="peopleDetail" useCache="false">
 		SELECT 
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
@@ -85,6 +96,12 @@
 				<foreach item="item" index="index" collection="group.queryTypes" open="(" separator="," close=")">
 	                #{item}
 	            </foreach>
+			</if>
+			<if test="bizTypes != null and bizTypes.size != 0 ">
+				AND pbq.debt_biz_type in
+				<foreach item="item" index="index" collection="bizTypes" open="(" separator="," close=")">
+					#{item}
+				</foreach>
 			</if>
 		</where>
 		<choose>
@@ -220,42 +237,20 @@
 			#{extensionNumber}
 		)
 	</insert>
-	<insert id="batchSave">
-		INSERT INTO t_mis_dunning_people(
-			id,
-			name,
-			rate,
-			begin,
-			end,
-			field1,
-			auto,
-			createby,
-			createdate,
-			updateby,
-			updatedate,
-			dunningcycle,
-			nickname,
-			groupId
-		) VALUES 
-		<foreach collection="list"  index="index" item="item" separator=",">
+
+	<insert id="batchInsertPeopleBizTypes">
+		INSERT INTO t_mis_dunning_people_biz(
+			dunning_people_id,
+			debt_biz_type
+		) VALUES
+		<foreach collection="bizTypes"  index="index" item="item" separator=",">
 			(
-			#{item.id},
-			#{item.name},
-			#{item.rate},
-			#{item.begin},
-			#{item.end},
-			'active',
-			#{item.auto},
-			#{item.createBy.id},
-			#{item.createDate},
-			#{item.updateBy.id},
-			#{item.updateDate},
-			#{item.dunningcycle},
-			#{item.nickname},
-			#{item.group.id}
+				#{peopleId},
+				#{item}
 			)
 		</foreach>
 	</insert>
+
 	<update id="update">
 		UPDATE t_mis_dunning_people SET 
 <!-- 			dunningpeopletype = #{dunningpeopletype}, -->
@@ -487,5 +482,17 @@
 		LIMIT 1
 	)as 'validateId'
 	
+	</select>
+
+	<delete id="deleteBizTypeByPeopleId" >
+		DELETE FROM t_mis_dunning_people_biz
+		WHERE dunning_people_id = #{id}
+	</delete>
+
+	<select id="findPeopleBizTypes" resultType="com.mo9.risk.modules.dunning.enums.DebtBizType" useCache="false">
+		SELECT
+			debt_biz_type
+		FROM t_mis_dunning_people_biz
+		WHERE dunning_people_id = #{id}
 	</select>
 </mapper>

@@ -4,19 +4,14 @@
 package com.mo9.risk.modules.dunning.dao;
 
 
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-
-import java.util.Date;
-import java.util.List;
-
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
-import com.thinkgem.jeesite.common.supcan.treelist.cols.Group;
 import com.thinkgem.jeesite.modules.sys.entity.User;
-
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
-
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -120,11 +115,17 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @return
 	 */
 	public TMisDunningPeople validateBatchAccountAndGroup(TMisDunningPeople tMisDunningPeople);
+
 	/**
-	 * 批量插入
-	 * @param listPeople
+	 * 删除催收人关联的产品
+	 * @param id
 	 */
-	public void batchSave(@Param("list") List<TMisDunningPeople> listPeople);
-	
-	
+	void deleteBizTypeByPeopleId(String id);
+
+	/**
+	 * @Description 批量插入催收员关联的产品 
+	 * @param bizTypes
+	 * @return void
+	 */
+	void batchInsertPeopleBizTypes(@Param("bizTypes")List<DebtBizType> bizTypes,@Param("peopleId")String peopleId);
 }
