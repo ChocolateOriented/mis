@@ -50,9 +50,10 @@
     <thead>
     <tr>
         <th>日期</th>
-        <th>姓名</th>
         <th>催收队列</th>
+        <th>姓名</th>
         <th>还款最大户数</th>
+        <th>姓名</th>
         <th>还款最大本金</th>
     </tr>
     </thead>
@@ -63,13 +64,16 @@
                     <fmt:formatDate value="${DunningPersonalMaxRepayNumberAndPrincipal.dateTime}" pattern="yyyy-MM-dd"/>
             </td>
             <td>
-                    ${DunningPersonalMaxRepayNumberAndPrincipal.name}
-            </td>
-            <td>
                     ${DunningPersonalMaxRepayNumberAndPrincipal.cycle}
             </td>
             <td>
+                    ${DunningPersonalMaxRepayNumberAndPrincipal.nameDealcode}
+            </td>
+            <td>
                     ${DunningPersonalMaxRepayNumberAndPrincipal.maxDealcode}
+            </td>
+            <td>
+                    ${DunningPersonalMaxRepayNumberAndPrincipal.namePrincipal}
             </td>
             <td>
                     ${DunningPersonalMaxRepayNumberAndPrincipal.principal}
