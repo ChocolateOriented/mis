@@ -208,7 +208,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		content.append("</table >");
 		content.append("<table width='600px' border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
 		content.append("<tr ><th height='40px' width='80px'>序号</th><th>信函总量</th><th>时间</th><th>操作</th></tr>");
-		content.append("<tr><td>1</td><td>"+countLetter+"</td><td height='40px'>"+data+"</td><td><a href='http://localhost/mis/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
+		content.append("<tr><td>1</td><td>"+countLetter+"</td><td height='40px'>"+data+"</td><td><a href='"+url+"/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
 		content.append("</table>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>如果对信函数据存疑,可直接回复邮件.</font></p></div>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>顺祝商祺!</font></p></div>");
