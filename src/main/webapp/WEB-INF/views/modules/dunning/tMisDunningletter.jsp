@@ -73,7 +73,7 @@
 			 $("#sendLetters").click(function(){
 					var sendLetterDealcodes = new Array();
 					var controls=false;
-					$("[name='letterIds'][control='true']").each(function(){
+					$("[name='letterIds'][control='true'][orderstatus='payment']").each(function(){
 						if($(this).attr('status')=='BESEND'){
 							sendLetterDealcodes.push($(this).attr("orders"));
 						}else{
@@ -82,11 +82,11 @@
 						}
 					});
 					if(controls){
-						$.jBox.tip("请不要勾状态不为待发送的订单!", 'warning');
+						$.jBox.tip("请勾选状态待发送的未还清的订单!", 'warning');
 						return ;
 					}
 					if(sendLetterDealcodes.length==0){
-						$.jBox.tip("请勾选导出订单号", 'warning');
+						$.jBox.tip("请勾选状态待发送的未还清的订单", 'warning');
 						return;
 					}
 					$("#sendLetterDealcodes").val(sendLetterDealcodes);
@@ -250,7 +250,7 @@
 		<tbody>
 		<c:forEach items="${page.list}" var="letters" varStatus="vs">
 			<tr>
-				<td><input type="checkbox" name="letterIds" orders="${letters.dealcode }" value="${letters.id}" status="${letters.sendResult}" control="" /></td>
+				<td><input type="checkbox" name="letterIds" orderstatus="${letters.orderStatus}" orders="${letters.dealcode }" value="${letters.id}" status="${letters.sendResult}" control="" /></td>
 				<td>${ (vs.index+1) + (page.pageNo-1) * page.pageSize}</td>
 				<td>${letters.dealcode }</td>
 				<td>${letters.realname }</td>
