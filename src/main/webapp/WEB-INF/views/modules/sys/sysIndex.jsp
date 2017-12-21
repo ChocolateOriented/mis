@@ -249,18 +249,22 @@
 					</li>
 					<li id="userInfo" class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#" title="个人信息">您好, ${fns:getUser().name}
+							<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
 							<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
 							<span id="notifyNum0" style="color: red;"></span>
 							</shiro:hasPermission>
+							</shiro:lacksPermission>
 							<span id="notifyNum" class="label label-info hide"></span></a>
 						<ul class="dropdown-menu">
 							<li><a href="${ctx}/sys/user/info" target="mainFrame"><i class="icon-user"></i>&nbsp; 个人信息</a></li>
 							<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i class="icon-lock"></i>&nbsp;  修改密码</a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>
 							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  客服通知
+								<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
 								<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
 								<span id="notifyNum1" style="color: red;"></span>
 								</shiro:hasPermission>
+								</shiro:lacksPermission>
 							</a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  催收任务 <span id="notifyNum3" class="label label-info hide"></span></a></li>
 						</ul>
