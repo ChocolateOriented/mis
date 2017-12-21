@@ -17,7 +17,7 @@
 <body>
 
 <div style="margin-bottom: 10px; margin-left: 10px">
-<input id="btnAdd" onclick="window.parent.collectionfunction(this)" class="btn btn-primary" method="InformationAdd" type="button" value="添加" />
+<input id="btnAdd" onclick="window.parent.collectionfunction(this, 650, 340)" class="btn btn-primary" method="InformationAdd" type="button" value="添加" />
 </div>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">
 <thead>
@@ -62,7 +62,7 @@
                 <fmt:formatDate value="${list.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
         </td>
         <td>
-            <input id="btnChange" onclick="window.parent.collectionfunction(this, 540, 340,{id : '${list.id}'});" class="btn btn-primary" method="InformationChange " type="button" value="修改" />
+            <input id="btnChange" onclick="window.parent.collectionfunction(this, 650, 340,{id : '${list.id}'});" class="btn btn-primary" method="InformationChange " type="button" value="修改" />
         </td>
     </tr>
 </c:forEach>

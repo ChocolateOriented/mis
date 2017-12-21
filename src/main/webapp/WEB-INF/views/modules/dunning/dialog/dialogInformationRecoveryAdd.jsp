@@ -95,7 +95,10 @@
 <br/>
 <form:form id="inputForm" modelAttribute="DunningInformationRecovery"  class="form-horizontal">
     <div class="control-group">
-        <div style="width:38%;display:inline-block;text-align:left;">
+        <div style="width:5%;display:inline-block;text-align:left;">
+
+        </div>
+        <div style="width:36%;display:inline-block;text-align:left;">
             <select class="input-small" path="contactType" id="contactType" name="contactType" onchange="contactNumberClear()" required>
                 <option value="">类型</option>
                 <option value="PHONE" <c:if test="${'PHONE' eq DunningInformationRecovery.contactType}">selected</c:if>>电话</option>
@@ -105,7 +108,7 @@
             <span class="help-inline"><font color="red">*</font> </span>
         </div>
 
-        <div style="width:60%;display:inline-block;text-align:left;">
+        <div style="width:55%;display:inline-block;text-align:left;">
             <label>号码：</label>
             <input  value="${DunningInformationRecovery.contactNumber}" path="contactNumber" id="contactNumber" name="contactNumber" htmlEscape="false" maxlength="20"  required class="contactnumber" />
             <span class="help-inline"><font color="red">*</font> </span>
@@ -114,7 +117,10 @@
 
     </div>
     <div class="control-group">
-        <div style="width:38%;display:inline-block;text-align:left;">
+        <div style="width:5%;display:inline-block;text-align:left;">
+
+        </div>
+        <div style="width:36%;display:inline-block;text-align:left;">
             <select class="input-small" path="contactRelationship" id="contactRelationship" name="contactRelationship" onchange="contactNameClear()" required>
                 <option value="">关系</option>
                 <option value="SELF" <c:if test="${'SELF' eq DunningInformationRecovery.contactRelationship}">selected</c:if>>本人</option>
@@ -129,7 +135,7 @@
             <span class="help-inline"><font color="red">*</font> </span>
         </div>
 
-        <div style="width:60%;display:inline-block;text-align:left;">
+        <div style="width:50%;display:inline-block;text-align:left;">
             <label>姓名：</label>
             <input class="input-small" value="${DunningInformationRecovery.contactName}" path="contactName" id="contactName" name="contactName" required htmlEscape="false" maxlength="5"/>
             <span class="help-inline"><font color="red">*</font> </span>
@@ -139,7 +145,7 @@
     <input id="dealCode" type="hidden"  name="dealCode" value="${dealCode}">
     <input id="id" type="hidden"  name="id" value="${id}">
     <a style="display: none" id="refresh" href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/informationRecovery" onclick="childPage(this)"></a>
-    <div style= "padding:19px 180px 20px;" >
+    <div style= "padding:19px 180px 20px; width:25%; text-align:right; " >
         <c:if test="${'add' eq method}">
             <input id="SaveInformationRecovery" class="btn btn-primary" type="button" value="保 存"/>&nbsp;
         </c:if>
