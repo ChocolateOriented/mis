@@ -588,6 +588,10 @@ public class TMisDunningPhoneService {
 		if (target.startsWith("9")) {
 			return target.substring(1);
 		}
+		
+		if (target.startsWith("8")) {
+			return target.substring(1);
+		}
 
 		return target;
 	}

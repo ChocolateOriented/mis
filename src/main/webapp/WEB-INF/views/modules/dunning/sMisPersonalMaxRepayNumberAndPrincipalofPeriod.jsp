@@ -57,9 +57,10 @@
     <thead>
     <tr>
         <th>月份</th>
-        <th>姓名</th>
         <th>催收队列</th>
+        <th>姓名</th>
         <th>还款最大户数</th>
+        <th>姓名</th>
         <th>还款最大本金</th>
     </tr>
     </thead>
@@ -70,13 +71,16 @@
                     <fmt:formatDate value="${dunningMaxRepayNumberAndPrincipal.dateTime}" pattern="yyyy-MM"/>${dunningMaxRepayNumberAndPrincipal.monthdesc}
             </td>
             <td>
-                    ${dunningMaxRepayNumberAndPrincipal.name}
-            </td>
-            <td>
                     ${dunningMaxRepayNumberAndPrincipal.cycle}
             </td>
             <td>
+                    ${dunningMaxRepayNumberAndPrincipal.nameDealcode}
+            </td>
+            <td>
                     ${dunningMaxRepayNumberAndPrincipal.maxDealcode}
+            </td>
+            <td>
+                    ${dunningMaxRepayNumberAndPrincipal.namePrincipal}
             </td>
             <td>
                     ${dunningMaxRepayNumberAndPrincipal.principal}
