@@ -715,12 +715,14 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		content.append("<p><font color='#0993FF' size='4'>户数迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("</table>");
 
 		content.append("<p><font color='#0993FF' size='4'>本金迁徙</font></p>");
 		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");

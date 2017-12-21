@@ -523,7 +523,7 @@ public class ChartUtils {
         //设置横线是是实体线
         plot.setRangeGridlineStroke(new BasicStroke(1));
         // 设置曲线图与xy轴的距离
-        plot.setAxisOffset(new RectangleInsets(30D, 0D, 0D, 70D));
+        plot.setAxisOffset(new RectangleInsets(0D, 0D, 0D, 70D));
     }
 
     /**

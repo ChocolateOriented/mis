@@ -58,7 +58,7 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private List<String> groupIds;
     private String readFlag;	// 本人阅读状态
 
-    private String innerKeyWord;
+    private String innerKeyWord;//页面关键词是已解决/未解决的话值转存到此字段
     public String getInnerKeyWord() {
         return innerKeyWord;
     }
