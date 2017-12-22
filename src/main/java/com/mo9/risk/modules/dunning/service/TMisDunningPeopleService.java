@@ -62,13 +62,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		super.save(tMisDunningPeople);
 
 		//更新关联的产品
-		String peopleId = tMisDunningPeople.getId();
-		dao.deleteBizTypeByPeopleId(peopleId);
-		List<DebtBizType> bizTypes = tMisDunningPeople.getBizTypes();
-		if (bizTypes == null){
-			return;
-		}
-		dao.batchInsertPeopleBizTypes(bizTypes,peopleId);
+		this.updatePeopleBizTypes(tMisDunningPeople.getId(),tMisDunningPeople.getBizTypes());
 	}
 	
 	/**
@@ -332,5 +326,33 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 			this.save(people);
 		}
 		return true;
+	}
+
+	/**
+	 * @Description 更新催收人关联产品
+	 * @param peopleId
+	 * @param bizTypes
+	 * @return void
+	 */
+	@Transactional(readOnly = false)
+	public void updatePeopleBizTypes(String peopleId, List<DebtBizType> bizTypes) {
+		dao.deleteBizTypeByPeopleId(peopleId);
+		if (bizTypes == null || bizTypes.size() == 0){
+			return;
+		}
+		dao.batchInsertPeopleBizTypes(bizTypes,peopleId);
+	}
+
+	/**
+	 * @Description 批量更改催收人关联产品
+	 * @param peopleids
+	 * @param bizTypes
+	 * @return void
+	 */
+	@Transactional(readOnly = false)
+	public void batchUpdatepeopleBizTypes(List<String> peopleids, List<DebtBizType> bizTypes) {
+		for (int i = 0; i < peopleids.size(); i++) {
+			this.updatePeopleBizTypes(peopleids.get(i),bizTypes);
+		}
 	}
 }

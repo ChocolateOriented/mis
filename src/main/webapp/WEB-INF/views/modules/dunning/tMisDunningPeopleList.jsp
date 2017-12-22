@@ -7,26 +7,58 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	//队列分配
-	$("#btnDunningcycle").click(function(){
-		 var peopleids = new Array();
-			$("[name='peopleids']").each(function() {
-				if(this.checked){
-					peopleids.push($(this).val());
-				}
-			});
-			if(peopleids.length==0){
-				$.jBox.tip("请勾选催收人员", 'warning');
-				return;
-			}
+  $("#btnDunningcycle").click(function(){
+    var peopleids = getSelectedPeople();
 
-			var url = "${ctx}/dunning/tMisDunningPeople/dialogDunningcycle?peopleids=" + peopleids ;
-			$.jBox.open("iframe:" + url, "手动分案" , 600, 350, {
-	               buttons: {},
-	               loaded: function (h) {
-	                   $(".jbox-content", document).css("overflow-y", "hidden");
-	               }
-	        });
-	 });
+    if(peopleids.length==0){
+      $.jBox.tip("请勾选催收人员", 'warning');
+      return;
+    }
+
+    var url = "${ctx}/dunning/tMisDunningPeople/dialogDunningcycle?peopleids=" + peopleids ;
+    $.jBox.open("iframe:" + url, "手动分案" , 600, 350, {
+      buttons: {},
+      loaded: function (h) {
+        $(".jbox-content", document).css("overflow-y", "hidden");
+      }
+    });
+  });
+
+
+  //分配产品
+  $("#btnDunningBizTypes").click(function(){
+    var peopleids = getSelectedPeople();
+
+    if(peopleids.length==0){
+      $.jBox.tip("请勾选催收人员", 'warning');
+      return;
+    }
+
+    var url = "${ctx}/dunning/tMisDunningPeople/dialogPeopleBizTypes?peopleids=" + peopleids ;
+    $.jBox.open("iframe:" + url, "分配产品" , 600, 250, {
+      buttons: {},
+      loaded: function (h) {
+        $(".jbox-content", document).css("overflow-y", "hidden");
+      }
+    });
+  });
+
+  $("#btnDunningcycle").click(function(){
+    var peopleids = getSelectedPeople();
+
+    if(peopleids.length==0){
+      $.jBox.tip("请勾选催收人员", 'warning');
+      return;
+    }
+
+    var url = "${ctx}/dunning/tMisDunningPeople/dialogDunningcycle?peopleids=" + peopleids ;
+    $.jBox.open("iframe:" + url, "手动分案" , 600, 350, {
+      buttons: {},
+      loaded: function (h) {
+        $(".jbox-content", document).css("overflow-y", "hidden");
+      }
+    });
+  });
 
 	//列表选择
 	$("#allorder").change(function(){
@@ -84,26 +116,35 @@ function page(n,s){
 	$("#searchForm").submit();
 	return false;
 }
+
 //分配小组和是否自动分配
 function operationPeoPle(obj){
-	 var peopleids = new Array();
-		$("[name='peopleids']").each(function() {
-			if(this.checked){
-				peopleids.push($(this).val());
-			}
-		});
-		if(peopleids.length==0){
-			$.jBox.tip("请勾选催收人员", 'warning');
-			return;
-		}
-		var diaName=($(obj).attr('id')=='btnDunninggroup'?'分配小组':'设置自动分配');
-		var url = "${ctx}/dunning/tMisDunningPeople/dialogOperationPeoPle?peopleids=" + peopleids+"&operateId="+$(obj).attr("id") ;
-		$.jBox.open("iframe:" + url, diaName , 500, 450, {
-               buttons: {},
-               loaded: function (h) {
-                   $(".jbox-content", document).css("overflow-y", "hidden");
-               }
-        });
+  var peopleids = getSelectedPeople();
+
+  if(peopleids.length==0){
+    $.jBox.tip("请勾选催收人员", 'warning');
+    return;
+  }
+
+  var diaName=($(obj).attr('id')=='btnDunninggroup'?'分配小组':'设置自动分配');
+  var url = "${ctx}/dunning/tMisDunningPeople/dialogOperationPeoPle?peopleids=" + peopleids+"&operateId="+$(obj).attr("id") ;
+  $.jBox.open("iframe:" + url, diaName , 500, 450, {
+       buttons: {},
+       loaded: function (h) {
+           $(".jbox-content", document).css("overflow-y", "hidden");
+       }
+  });
+}
+
+//获取选中的催收员
+function getSelectedPeople() {
+  var peopleids = new Array();
+  $("[name='peopleids']").each(function() {
+    if(this.checked){
+      peopleids.push($(this).val());
+    }
+  });
+  return peopleids;
 }
 </script>
 </head>
@@ -154,6 +195,7 @@ function operationPeoPle(obj){
 			<li class="btns">
                 <input id="btnDunningcycle" class="btn btn-primary" type="button" value="分配队列"/>
                 <input id="btnDunninggroup" class="btn btn-primary" type="button" value="分配小组" onclick="operationPeoPle(this)"/>
+				<input id="btnDunningBizTypes" class="btn btn-primary" type="button" value="分配产品"/>
                 <input id="btnDunningauto" class="btn btn-primary" type="button" value="是否自动分配" onclick="operationPeoPle(this)"/></li>
             <li class="clearfix"></li>
         </ul>

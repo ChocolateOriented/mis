@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -276,6 +277,20 @@ public class TMisDunningPeopleController extends BaseController {
 	}
 
 	/**
+	 * 加载分配产品页面
+	 * @param peopleids
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "dialogPeopleBizTypes")
+	public String dialogPeopleBizTypes( Model model,String peopleids) {
+		model.addAttribute("peopleids", peopleids);
+		model.addAttribute("bizTypes",DebtBizType.values());
+		return "modules/dunning/dialog/dialogPeoPleBizTypes";
+	}
+
+	/**
 	 * 批量分配小组和自动分配等
 	 * @param peopleids
 	 * @param redirectAttributes
@@ -296,6 +311,25 @@ public class TMisDunningPeopleController extends BaseController {
 		} catch (Exception e) {
 			logger.info("手动批量分配发生错误",e);
 		}
+		return "OK";
+	}
+
+	/**
+	 * 批量分配产品
+	 * @param peopleids
+	 * @param bizTypes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "batchUpdatepeopleBizTypes")
+	@ResponseBody
+	public String batchUpdatepeopleBizTypes(DebtBizType[] bizTypes, String[] peopleids) {
+		List<String> peopleidList = Arrays.asList(peopleids);
+		if (null == peopleidList || peopleidList.isEmpty()) {
+			String mes = "请选择催收员";
+			return mes;
+		}
+		tMisDunningPeopleService.batchUpdatepeopleBizTypes(peopleidList, Arrays.asList(bizTypes));
 		return "OK";
 	}
 	/**
