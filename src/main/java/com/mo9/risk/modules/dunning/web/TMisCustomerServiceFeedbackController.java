@@ -7,6 +7,7 @@ import com.mo9.risk.modules.dunning.service.FeedbackSendService;
 import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
 import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -186,11 +187,21 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @ResponseBody
     public String custServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
-        tMisCustomerServiceFeedback.setReadFlag("0");
-        String userid=UserUtils.getUser().getId();
-        tMisCustomerServiceFeedback.setDunningpeopleid(userid);
-        return  String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
-
+    	try {
+    		DynamicDataSource.setCurrentLookupKey("dataSource_read");
+    		
+	        tMisCustomerServiceFeedback.setReadFlag("0");
+	        String userid=UserUtils.getUser().getId();
+	        tMisCustomerServiceFeedback.setDunningpeopleid(userid);
+	        return  String.valueOf(tMisCustomerServiceFeedbackService.findCustServiceCount(tMisCustomerServiceFeedback));
+	        
+		} catch (Exception e) {
+			logger.info("切换只读库查询失败", e);
+			return "views/error/500";
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+        
     }
 
     /**
