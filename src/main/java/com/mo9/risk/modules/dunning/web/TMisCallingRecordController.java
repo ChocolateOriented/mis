@@ -265,7 +265,12 @@ public class TMisCallingRecordController extends BaseController {
 			for (TMisDunningGroup group : groups) {
 				stringBuffer.append("," + group.getId());
 			}
-			List<String> groupIds = Arrays.asList(stringBuffer.toString().substring(1).split(","));
+			List<String> groupIds = null;
+			if (stringBuffer.toString().length() == 0){
+				groupIds = new ArrayList<String>();
+			}else {
+				groupIds = Arrays.asList(stringBuffer.toString().substring(1).split(","));
+			}
 			tMisDunningGroup.setGroupIds(groupIds);
 			System.out.println(dunningPhoneReportFile.getPeopleId());
 			if (dunningPhoneReportFile.getGroupId() == null || "".equals(dunningPhoneReportFile.getGroupId())) {
