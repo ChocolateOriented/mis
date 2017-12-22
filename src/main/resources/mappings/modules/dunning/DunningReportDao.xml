@@ -53,6 +53,17 @@
 			<if test="dunningPeopleName != null and dunningPeopleName != ''">
 				AND a.dunningPeopleName LIKE concat('%',#{dunningPeopleName},'%')
 			</if>
+			<if test="pNames != null and pNames != ''">
+				AND a.dunningPeopleName IN
+				<if test="pNames.size ==0">
+					('')
+				</if>
+				<if test="pNames.size > 0">
+					<foreach collection="pNames" item="name" open="(" close=")" separator=",">
+						#{name}
+					</foreach>
+				</if>
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -157,6 +168,17 @@
 		<where>
 			<if test="personnel != null and personnel != ''">
 				AND p.Name LIKE concat('%',#{personnel},'%')
+			</if>
+			<if test="pNames != null and pNames != ''">
+				AND p.NAME IN
+				<if test="pNames.size ==0">
+					('')
+				</if>
+				<if test="pNames.size > 0">
+					<foreach collection="pNames" item="name" open="(" close=")" separator=",">
+						#{name}
+					</foreach>
+				</if>
 			</if>
 			<if test="dunningCycle != null and dunningCycle != ''">
 				AND  p.dunningCycle LIKE concat('%',#{dunningCycle},'%')

@@ -49,6 +49,7 @@ public class SMisDunningProductivePowerDailyReport extends DataEntity<SMisDunnin
 	private Date endCreateTime;		// 结束 日期时间
 	
 	private List<TMisDunningGroup> queryGroups;		//查询的组s
+	private List<String> pNames;
 	
 	public SMisDunningProductivePowerDailyReport() {
 		super();
@@ -292,5 +293,12 @@ public class SMisDunningProductivePowerDailyReport extends DataEntity<SMisDunnin
 		this.queryGroups = queryGroups;
 	}
 
+	public List<String> getpNames() {
+		return pNames;
+	}
+
+	public void setpNames(List<String> pNames) {
+		this.pNames = pNames;
+	}
 }
 
