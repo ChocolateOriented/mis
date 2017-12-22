@@ -47,7 +47,7 @@
             var id = $(obj).attr("feedbackId");
             $(obj).children("span").css("color", "#999999");
             if(flag == 0){
-                $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox2?id=" + id, "" , 480, 180,{
+					$.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/feedbackJbox2?id=" + id, "" , 480, 180,{
                     buttons: {
                     },
                     submit: function (v, h, f) {
@@ -107,7 +107,7 @@
 				<form:select path="hashtag" htmlEscape="false" maxlength="200" class="input-small">
 					<form:option selected="selected" value="" label="不限"/>
 					<form:option  value="ORDER_DEDUCT" label="订单代扣"/>
-					<form:option  value="WRITE_OFF" label="/78"/>
+					<form:option  value="WRITE_OFF" label="催收帐"/>
 					<form:option  value="COMPLAIN_SHAKE" label="投诉催收"/>
 					<form:option  value="CONSULT_REPAY" label="协商还款"/>
 					<form:option  value="CONTACT_REMARK" label="备注联系方式"/>
@@ -144,13 +144,14 @@
 			</tr>
 		</thead>
 		<tbody>
-		<c:set var="flag" value="0" ></c:set>
+		<c:set var="flag" value="0"/>
 		<c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
 			<tr class="result">
 				<%--<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(${flag},this);">--%>
 					<c:if test="${!(fns:getUser().name eq '系统管理员')}">
 					<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
-							<c:set var="flag" value="1" ></c:set>
+					<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
+							<c:set var="flag" value="1"  />
 					<td><a href="javascript: void 0;" feedbackId="${tMisCustomerServiceFeedback.id}" onclick="changeFeedback(${flag},this);">
 							<%--${tMisCustomerServiceFeedback.readFlag }--%>
 						<c:choose>
@@ -178,6 +179,7 @@
 						</span>
 						</c:otherwise>
 					</c:choose>
+					</shiro:lacksPermission>
 					</shiro:hasPermission>
 					</c:if>
 
