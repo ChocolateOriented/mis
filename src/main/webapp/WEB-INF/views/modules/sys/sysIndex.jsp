@@ -171,7 +171,7 @@
                     //setInterval(getCustServiceNotifyNum, 1000);
 				//}
         if(!(${fns:getUser().name eq "系统管理员"})){
-           setInterval(getCustServiceNotifyNum, 120000);
+           setInterval(getCustServiceNotifyNum, 600000);
         }
 
 
