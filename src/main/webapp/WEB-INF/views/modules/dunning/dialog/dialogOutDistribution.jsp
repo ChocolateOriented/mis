@@ -98,7 +98,7 @@
             var dunningpeoplename = $("#searchName").val() || "";
 
             var param = {
-            	bizType: $("input[name='bizType']:checked").val(),
+            	bizType: $("#bizType").val(),
                 dunningcycle: cycles,
                 type: grouptype,
                 auto: status,
@@ -121,48 +121,9 @@
             var templ = $("#template");
             var elem = templ.clone(true);
             elem.attr("peopleId", people.id);
-            elem.attr("bizTypes", people.bizTypesStr);
             elem.children("#peopleName").text(people.name);
             elem.css("display", "block");
             $("#leftContainer").append(elem);
-        }
-
-        //校验选中催收人员是否属于同一产品
-        function checkPeopleBizTyps() {
-        	var typeMap = {};
-        	var peoples = $("#rightContainer div");
-        	if (peoples.length == 0) {
-        		return true;
-        	}
-        	
-        	var cnt = 0;
-        	peoples.each(function (idx) {
-        		var bizTypes = $(this).attr("bizTypes") || "";
-        		var typeArr = bizTypes.split(",");
-        		
-        		if (idx == 0) {
-        			for (var i = 0; i < typeArr.length; i++) {
-            			typeMap[typeArr[i]] = null;
-            			cnt++
-            		}
-        			return;
-        		}
-        		
-        		typeLoop:
-       			for (var k in typeMap) {
-        			for (var i = 0; i < typeArr.length; i++) {
-        				if (k == typeArr[i]) {
-        					continue typeLoop;
-        				}
-        			}
-        			delete typeMap[k];
-        			cnt--
-        		}
-        	});
-        	if (cnt <= 0) {
-        		return false;
-        	}
-        	return true;
         }
         
         $(document).ready(function() {
@@ -177,14 +138,6 @@
             $("#orders").val(check_orders);
             $("#selectedOrders").text(check_orders.length);
 
-            $('#bizTypeCheckable').change(function() {
-                var checked = $('#bizTypeCheckable').prop("checked");
-                $("input[name='bizType']").prop("disabled", !checked);
-                if (!checked) {
-                    $("input[name='bizType']").prop("checked", false);
-                    getPeople();
-				}
-            });
             $('#cyclesCheckable').change(function() {
                 var checked = $('#cyclesCheckable').prop("checked");
                 $("input[name='cycles']").prop("disabled", !checked);
@@ -219,7 +172,6 @@
                     getPeople();
                 }
             });
-            $("input[name='bizType']").change(getPeople);
             $("input[name='cycles']").change(getPeople);
             $("input[name='grouptype']").change(getPeople);
             $("input[name='status']").change(getPeople);
@@ -238,11 +190,6 @@
                 if ($("#inputForm").valid()) {
                     if (!$("#rightContainer div").length) {
                         $.jBox.tip("请选择需要分案的催收人员", "warning");
-                        return;
-                    }
-
-                    if (!checkPeopleBizTyps()) {
-                    	$.jBox.tip("请选择相同产品的催收人员", "warning");
                         return;
                     }
                     
@@ -303,11 +250,11 @@
 			<div class="control-group">
 				<div class="control-group">
 					<div style="width:20%;display:inline-block;">
-						<input id="bizTypeCheckable" type="checkbox"/><label for="bizTypeCheckable">产品</label>
+						<label style="margin-left:18px;">产品</label>
+						<input type="hidden" id="bizType" value="${bizType}"/>
 					</div>
 					<div style="width:40%;display:inline-block;">
-						<input id="mo9" type="radio" name="bizType" value="JHJJ" disabled/><label for="mo9">mo9<label/>&nbsp;
-						<input id="weixin36" type="radio" name="bizType" value="JHJJ_JRZX" disabled/><label for="weixin36">weixin36<label/>
+						<label>${bizType.desc}<label/>
 					</div>
 				</div>
 				<div style="width:20%;display:inline-block;">

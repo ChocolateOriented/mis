@@ -331,11 +331,9 @@
 	
 	<select id="findPeopleByCycleTypeAutoName" resultType="TMisDunningPeople" useCache="false">
 		SELECT
-			<include refid="tMisDunningPeopleColumns"/>,
-			GROUP_CONCAT(b.debt_biz_type SEPARATOR ',') AS "bizTypesStr"
+			<include refid="tMisDunningPeopleColumns"/>
 		FROM t_mis_dunning_people a
 		LEFT JOIN t_mis_dunning_group g ON a.GroupId = g.Id
-		LEFT JOIN t_mis_dunning_people_biz b ON a.id = b.dunning_people_id
 		WHERE
 		    a.Invalid = 't'
 		<if test="dunningcycle != null and dunningcycle.length > 0">
@@ -370,7 +368,6 @@
 				AND pb.debt_biz_type = #{bizType}
 			)
 		</if>
-		GROUP BY a.id
 	</select>
 	 <update id="batchUpdateDunningcycle">
 		UPDATE t_mis_dunning_people SET 	

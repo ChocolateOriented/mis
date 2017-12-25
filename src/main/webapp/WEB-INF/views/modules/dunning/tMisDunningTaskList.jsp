@@ -143,6 +143,7 @@
 			 $("#distribution").click(function(){
 				 var orders = new Array();
 				 var dunningcycle = new Array();
+				 var bizTypes = [];
 					$("[name='orders']").each(function() {
 						if(this.checked){
 							if("" == $(this).attr("orders") || "" == $(this).attr("dunningcycle")){
@@ -151,6 +152,7 @@
 							}
 							orders.push($(this).attr("orders"));
 							dunningcycle.push($(this).attr("dunningcycle"));
+							bizTypes.push($(this).attr("bizType"));
 						}
 					});
 					if(orders.length==0){
@@ -163,7 +165,13 @@
 						$.jBox.tip("请选择同队列的案件", 'warning');
 						return;
 					}
-					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid;
+					var uniqueBizType = unique(bizTypes);
+					if(uniqueBizType.length != 1 ){
+						$.jBox.tip("请选择同产品的案件", 'warning');
+						return;
+					}
+					
+					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid + "&bizType=" + uniqueBizType;
 					$.jBox.open("iframe:" + url, "手动分案" , 600, 650, {
 			               buttons: {},
 			               loaded: function (h) {
@@ -599,7 +607,9 @@
 		<c:forEach items="${page.list}" var="dunningOrder" varStatus="vs">
 			<tr>
 				<td>
-					<input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
+					<input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}"
+						overDuedays="${dunningOrder.overduedays}" bizType="${fn:contains(dunningOrder.platformExt, 'jinRongZhongXin') ? 'JHJJ_JRZX' : 'JHJJ'}"
+						orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}" value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}"/>
 				</td>
 				<td>
 					${ (vs.index+1) + (page.pageNo-1) * page.pageSize} 
