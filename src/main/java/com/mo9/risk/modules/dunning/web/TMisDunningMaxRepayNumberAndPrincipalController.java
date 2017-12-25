@@ -1,8 +1,10 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal;
+import com.mo9.risk.modules.dunning.entity.DunningPhoneReportFile;
 import com.mo9.risk.modules.dunning.entity.SMisDunningTaskMonthReport;
 import com.mo9.risk.modules.dunning.service.TMisDunningMaxRepayNumberAndPrincipalService;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
@@ -43,8 +45,14 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         if (entity.getDateTime() == null){
             return "modules/dunning/sMisPersonalMaxRepayNumberAndPrincipalofDay";
         }
-        Page<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                .getPersonalMaxRepayNumberAndPrincipalPageofDay(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        Page<DunningMaxRepayNumberAndPrincipal> page = null;
+        try {
+            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            page =  tMisDunningMaxRepayNumberAndPrincipalService
+                    .getPersonalMaxRepayNumberAndPrincipalPageofDay(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        }finally {
+            DynamicDataSource.setCurrentLookupKey("dataSource");
+        }
         model.addAttribute("page", page);
         model.addAttribute("datetime", entity.getDateTime());
         return "modules/dunning/sMisPersonalMaxRepayNumberAndPrincipalofDay";
@@ -58,8 +66,15 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         if (entity.getDateTime() == null){
             return "modules/dunning/sMisGroupMaxRepayNumberAndPrincipalofDay";
         }
-        Page<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                .getGroupMaxRepayNumberAndPrincipalPageofDay(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        Page<DunningMaxRepayNumberAndPrincipal> page = null;
+        try {
+            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            page =  tMisDunningMaxRepayNumberAndPrincipalService
+                    .getGroupMaxRepayNumberAndPrincipalPageofDay(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        }finally {
+            DynamicDataSource.setCurrentLookupKey("dataSource");
+        }
+
         model.addAttribute("page", page);
         model.addAttribute("datetime", entity.getDateTime());
         return "modules/dunning/sMisGroupMaxRepayNumberAndPrincipalofDay";
@@ -74,8 +89,14 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
                 new ModelAndView("sMisPersonalMaxRepayNumberAndPrincipalofPeriod").addObject(dunningMaxRepayNumberAndPrincipal);
             return "modules/dunning/sMisPersonalMaxRepayNumberAndPrincipalofPeriod";
         }
-        Page<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                .getPersonalMaxRepayNumberAndPrincipalPageofPeriod(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        Page<DunningMaxRepayNumberAndPrincipal> page = null;
+        try {
+            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            page =   tMisDunningMaxRepayNumberAndPrincipalService
+                    .getPersonalMaxRepayNumberAndPrincipalPageofPeriod(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        }finally {
+            DynamicDataSource.setCurrentLookupKey("dataSource");
+        }
         model.addAttribute("page", page);
         model.addAttribute("datetime",entity.getDateTime());
         model.addAttribute("monthdesc", entity.getMonthdesc());
@@ -91,8 +112,14 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
             new ModelAndView("sMisPersonalMaxRepayNumberAndPrincipalofPeriod").addObject(dunningMaxRepayNumberAndPrincipal);
             return "modules/dunning/sMisGroupMaxRepayNumberAndPrincipalofPeriod";
         }
-        Page<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                .getGroupMaxRepayNumberAndPrincipalPageofPeriod(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        Page<DunningMaxRepayNumberAndPrincipal> page = null;
+        try {
+            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            page =   tMisDunningMaxRepayNumberAndPrincipalService
+                    .getGroupMaxRepayNumberAndPrincipalPageofPeriod(new Page<DunningMaxRepayNumberAndPrincipal>(request,response), entity);
+        }finally {
+            DynamicDataSource.setCurrentLookupKey("dataSource");
+        }
         model.addAttribute("page", page);
         model.addAttribute("datetime",entity.getDateTime());
         model.addAttribute("monthdesc", entity.getMonthdesc());
@@ -109,8 +136,15 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         }
         try {
             String fileName = "个人日还款最大户数&本金.xlsx";
-            List<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                    .exportPersonalMaxRepayNumberAndPrincipalListofDay(entity);
+            List<DunningMaxRepayNumberAndPrincipal> page = null;
+            try {
+                DynamicDataSource.setCurrentLookupKey("dataSource_read");
+                page =  tMisDunningMaxRepayNumberAndPrincipalService
+                        .exportPersonalMaxRepayNumberAndPrincipalListofDay(entity);
+            }finally {
+                DynamicDataSource.setCurrentLookupKey("dataSource");
+            }
+
             new ExportExcel("个人日还款最大户数&本金", DunningMaxRepayNumberAndPrincipal.class).setDataList(page).write(response, fileName).dispose();
             return null;
         } catch (Exception e) {
@@ -128,8 +162,15 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         }
         try {
             String fileName = "组日还款最大户数&本金.xlsx";
-            List<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                    .exportGroupMaxRepayNumberAndPrincipalListofDay(entity);
+            List<DunningMaxRepayNumberAndPrincipal> page = null;
+            try {
+                DynamicDataSource.setCurrentLookupKey("dataSource_read");
+                page =  tMisDunningMaxRepayNumberAndPrincipalService
+                        .exportGroupMaxRepayNumberAndPrincipalListofDay(entity);
+            }finally {
+                DynamicDataSource.setCurrentLookupKey("dataSource");
+            }
+
             new ExportExcel("组日还款最大户数&本金", DunningMaxRepayNumberAndPrincipal.class).setDataList(page).write(response, fileName).dispose();
             return null;
         } catch (Exception e) {
@@ -147,8 +188,15 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         }
         try {
             String fileName = "个人周期还款最大户数&本金.xlsx";
-            List<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                    .exportPersonalMaxRepayNumberAndPrincipalListofPeriod(entity);
+            List<DunningMaxRepayNumberAndPrincipal> page = null;
+            try {
+                DynamicDataSource.setCurrentLookupKey("dataSource_read");
+                page =  tMisDunningMaxRepayNumberAndPrincipalService
+                        .exportPersonalMaxRepayNumberAndPrincipalListofPeriod(entity);
+            }finally {
+                DynamicDataSource.setCurrentLookupKey("dataSource");
+            }
+
             new ExportExcel("个人周期还款最大户数&本金", DunningMaxRepayNumberAndPrincipal.class).setDataList(page).write(response, fileName).dispose();
             return null;
         } catch (Exception e) {
@@ -166,8 +214,15 @@ public class TMisDunningMaxRepayNumberAndPrincipalController extends BaseControl
         }
         try {
             String fileName = "组周期还款最大户数&本金.xlsx";
-            List<DunningMaxRepayNumberAndPrincipal> page = tMisDunningMaxRepayNumberAndPrincipalService
-                    .exportGroupMaxRepayNumberAndPrincipalListofPeriod(entity);
+            List<DunningMaxRepayNumberAndPrincipal> page = null;
+            try {
+                DynamicDataSource.setCurrentLookupKey("dataSource_read");
+                page =  tMisDunningMaxRepayNumberAndPrincipalService
+                        .exportGroupMaxRepayNumberAndPrincipalListofPeriod(entity);
+            }finally {
+                DynamicDataSource.setCurrentLookupKey("dataSource");
+            }
+
             new ExportExcel("组周期还款最大户数&本金", DunningMaxRepayNumberAndPrincipal.class).setDataList(page).write(response, fileName).dispose();
             return null;
         } catch (Exception e) {
