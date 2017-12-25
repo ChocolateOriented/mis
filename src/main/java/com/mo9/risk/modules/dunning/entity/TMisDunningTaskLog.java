@@ -47,6 +47,9 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 //	private Date updatedate;		// 修改时间
 	
 	private String taskid;	 // 任务ID
+	
+	private String platformext; // 渠道
+//	private String debtbiztype; // 产品名
 
 
 	public TMisDunningTaskLog() {
@@ -63,6 +66,7 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 		this.dunningpeoplename = dunningpeoplename;
 		this.dunningcycle = dunningcycle;
 		this.behaviorstatus = behaviorstatus;
+//		this.debtbiztype = debtbiztype;
 	}
 
 	@NotNull(message="dbid不能为空")
@@ -237,5 +241,23 @@ public class TMisDunningTaskLog extends DataEntity<TMisDunningTaskLog> {
 	public void setModifyamount(Integer modifyamount) {
 		this.modifyamount = modifyamount;
 	}
+
+	public String getPlatformext() {
+		return platformext;
+	}
+
+	public void setPlatformext(String platformext) {
+		this.platformext = platformext;
+	}
+
+//	public String getDebtbiztype() {
+//		return debtbiztype;
+//	}
+//
+//	public void setDebtbiztype(String debtbiztype) {
+//		this.debtbiztype = debtbiztype;
+//	}
+
+	
 
 }

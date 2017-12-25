@@ -38,6 +38,7 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MsfClient;
 import com.mo9.risk.util.RegexUtil;
@@ -137,6 +138,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	public static final String  P2_P3 = "Q3";	 
 	public static final String  P3_P4 = "Q4";	 
 	public static final String  P4_P5 = "Q5";	 
+	
+	public static final String DEBTBIZ_TYPE = "DebtBizType";  // 产品类别
 	
 	private static Logger logger = Logger.getLogger(TMisDunningTaskService.class);
 
@@ -1659,142 +1662,148 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 */
 	@Transactional(readOnly = false)
 	public void autoAssignCycle(String dunningtaskstatus, String dunningcycle,String begin,String end ) {
-		try {
-	//		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(C0);
-	// 		 ==========================================提醒队列逾期分配begin ==========================================
-			/** 周期中的过期任务读取出日志  */
-			List<TMisDunningTaskLog>  outDunningTaskLogs = tMisDunningTaskDao.newfindDelayTaskByDunningcycle(dunningtaskstatus,dunningcycle,begin,end);
-			logger.info("newfindDelayTaskByDunningcycle-查询"+dunningcycle+"队列过期任务数" +outDunningTaskLogs.size()  + "条-"  + new Date());
-			if(!outDunningTaskLogs.isEmpty()){
+		List<Dict> debtBizTypes = DictUtils.getDictList(DEBTBIZ_TYPE);
+		for(Dict debtBizType : debtBizTypes){
+			String debtbiztypename = debtBizType.getLabel(); 	// 产品名称
+			
+			try {
+				logger.info("过期分案产品-" + debtbiztypename + "开始过期催收任务"+ new Date());
+		//		List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(C0);
+		// 		 ==========================================提醒队列逾期分配begin ==========================================
+				logger.info("过期分案产品-" + debtbiztypename + "newfindDelayTaskByDunningcycle-dunningtaskstatus"+ dunningtaskstatus+ "-dunningcycle" + dunningcycle + "-begin" + begin+ "-end" + end  + "-debtbiztype" + debtBizType.getValue() + new Date());
+				/** 周期中的过期任务读取出日志  */
+				List<TMisDunningTaskLog>  outDunningTaskLogs = tMisDunningTaskDao.newfindDelayTaskByDunningcycle(dunningtaskstatus,dunningcycle,begin,end,debtBizType.getValue());
+				logger.info("过期分案产品-" + debtbiztypename + "newfindDelayTaskByDunningcycle-查询"+dunningcycle+"队列过期任务数" +outDunningTaskLogs.size()  + "条-"  + new Date());
+				if(!outDunningTaskLogs.isEmpty()){
+			
+					Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
+					/** 需要修改的任务 */
+					Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
 		
-				Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
-				/** 需要修改的任务 */
-				Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
-	
-				for(TMisDunningTaskLog dunningTaskLog : outDunningTaskLogs){
-					/**
-					 * log 催收周期过期移出记录
-					 */
-					dunningTaskLog.setBehaviorstatus("out");
-					dunningTaskLog.setCreateDate(new Date());
-					dunningTaskLog.setCreateBy(new User("auto_admin"));
-		//			dunningTaskLog.setCreateBy(UserUtils.getUser());
-					/**
-					 * 本次迁徙该移入的周期段
-					 */
-					Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
-					if(null == dict){
-						dunningTaskLog.setBehaviorstatus("out_error");
-						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
-						continue;
-					}
-					/**
-					 * 任务task修改
-					 */
-					TMisDunningTask dunningTask = new TMisDunningTask();
-					dunningTask.setId(dunningTaskLog.getTaskid());
-					dunningTask.setDunningcycle(dict.getLabel());
-					dunningTask.setDunningperiodbegin(Integer.parseInt(dict.getValue().split("_")[0]));
-					dunningTask.setDunningperiodend(Integer.parseInt(dict.getValue().split("_")[1]));
-					dunningTask.setUpdateBy(new User("auto_admin"));
-					dunningTask.setCapitalamount(dunningTaskLog.getCorpusamount());
-					/**
-					 * 每个周期的任务集合
-					 */
-					if (mapCycleTaskNum.containsKey(dict.getLabel())) {
-						mapCycleTaskNum.get(dict.getLabel()).add(dunningTask);
-					} else {
-						List<TMisDunningTask> mapTasks = new ArrayList<TMisDunningTask>();
-						mapTasks.add(dunningTask);
-						mapCycleTaskNum.put(dict.getLabel(), mapTasks);
-					}
-					inDunningTaskLogsMap.put(dunningTaskLog.getTaskid(), dunningTaskLog);
-				}
-				/** 
-				 * 保存移出任务Log
-				 */
-				tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
-				
-				/**  移入的任务Log集合   */
-				List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
-				/**
-				 * 循环队列的任务集合
-				 */
-				for (Map.Entry<String, List<TMisDunningTask>> entry : mapCycleTaskNum.entrySet()) {
-					/**
-					 * 根据队列找出催收人员集合
-					 */
-//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
-					
-					/**
-					 * 根据周期查询催收人员按金额排序
-					 */
-					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
-					
-					/**
-					 *  平均分配队列集合的催收人员
-					 */
-					List<TMisDunningTask> tasks = entry.getValue();
-//					int j = 0;
-					for(int i= 0 ; i < tasks.size() ; i++ ){  
-						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						/**  平均分配法    */
-						int j = i % dunningPeoples.size();                            			 // 平均分配法
-						
-						/**  蛇形分配法    */
-//						if (i / dunningPeoples.size() % 2 == 0) {
-//							j = i % dunningPeoples.size();
-//						} else {
-//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-//						}
-						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
-						
-						
-						/**  任务催收人员添加    */
-						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
-						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
-		//				dunningTask.setDunningtaskstatus(dunningtaskstatus);
-						/**  任务log 催收人员添加    */
-						if(inDunningTaskLogsMap.containsKey(dunningTask.getId())){
-							inDunningTaskLogsMap.get(dunningTask.getId()).setBehaviorstatus("in");
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeopleid(dunningTask.getDunningpeopleid());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeoplename(dunningTask.getDunningpeoplename());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningcycle(dunningTask.getDunningcycle());
-						}else{
-							inDunningTaskLogsMap.put(dunningTask.getId(), 
-									new TMisDunningTaskLog(dunningTask.getDealcode(), 
-											dunningTask.getDunningpeopleid(),
-											dunningTask.getDunningpeoplename(),
-											dunningTask.getDunningcycle(),
-											"in_warn"));
-							logger.warn("行为状态in_warn：任务taskID:" +dunningTask.getId() + "移入" + dunningTask.getDunningcycle() + "队列" +dunningTask.getDunningpeoplename() +"数据缺失" );
-		//					continue;
+					for(TMisDunningTaskLog dunningTaskLog : outDunningTaskLogs){
+						/**
+						 * log 催收周期过期移出记录
+						 */
+						dunningTaskLog.setBehaviorstatus("out");
+						dunningTaskLog.setCreateDate(new Date());
+						dunningTaskLog.setCreateBy(new User("auto_admin"));
+			//			dunningTaskLog.setCreateBy(UserUtils.getUser());
+						/**
+						 * 本次迁徙该移入的周期段
+						 */
+						Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
+						if(null == dict){
+							dunningTaskLog.setBehaviorstatus("out_error");
+							logger.warn("过期分案产品-" + debtbiztypename + "行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
+							continue;
 						}
-						
-						inDunningTaskLogs.add(inDunningTaskLogsMap.get(dunningTask.getId()));
+						/**
+						 * 任务task修改
+						 */
+						TMisDunningTask dunningTask = new TMisDunningTask();
+						dunningTask.setId(dunningTaskLog.getTaskid());
+						dunningTask.setDunningcycle(dict.getLabel());
+						dunningTask.setDunningperiodbegin(Integer.parseInt(dict.getValue().split("_")[0]));
+						dunningTask.setDunningperiodend(Integer.parseInt(dict.getValue().split("_")[1]));
+						dunningTask.setUpdateBy(new User("auto_admin"));
+						dunningTask.setCapitalamount(dunningTaskLog.getCorpusamount());
+						/**
+						 * 每个周期的任务集合
+						 */
+						if (mapCycleTaskNum.containsKey(dict.getLabel())) {
+							mapCycleTaskNum.get(dict.getLabel()).add(dunningTask);
+						} else {
+							List<TMisDunningTask> mapTasks = new ArrayList<TMisDunningTask>();
+							mapTasks.add(dunningTask);
+							mapCycleTaskNum.put(dict.getLabel(), mapTasks);
+						}
+						inDunningTaskLogsMap.put(dunningTaskLog.getTaskid(), dunningTaskLog);
 					}
-					/**
-					 * 批量更新每个队列的任务集合
+					/** 
+					 * 保存移出任务Log
 					 */
-					tMisDunningTaskDao.batchUpdateExpiredTask(tasks);
+					tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
+					
+					/**  移入的任务Log集合   */
+					List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+					/**
+					 * 循环队列的任务集合
+					 */
+					for (Map.Entry<String, List<TMisDunningTask>> entry : mapCycleTaskNum.entrySet()) {
+						/**
+						 * 根据队列找出催收人员集合
+						 */
+	//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey());
+						
+						/**
+						 * 根据周期查询催收人员按金额排序
+						 */
+						TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getDescription());
+						
+						/**
+						 *  平均分配队列集合的催收人员
+						 */
+						List<TMisDunningTask> tasks = entry.getValue();
+	//					int j = 0;
+						for(int i= 0 ; i < tasks.size() ; i++ ){  
+							TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
+							/**  平均分配法    */
+							int j = i % dunningPeoples.size();                            			 // 平均分配法
+							
+							/**  蛇形分配法    */
+	//						if (i / dunningPeoples.size() % 2 == 0) {
+	//							j = i % dunningPeoples.size();
+	//						} else {
+	//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+	//						}
+							System.out.println("过期分案产品-" + debtbiztypename + "姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
+							
+							
+							/**  任务催收人员添加    */
+							dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
+							dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
+			//				dunningTask.setDunningtaskstatus(dunningtaskstatus);
+							/**  任务log 催收人员添加    */
+							if(inDunningTaskLogsMap.containsKey(dunningTask.getId())){
+								inDunningTaskLogsMap.get(dunningTask.getId()).setBehaviorstatus("in");
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeopleid(dunningTask.getDunningpeopleid());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeoplename(dunningTask.getDunningpeoplename());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningcycle(dunningTask.getDunningcycle());
+							}else{
+								inDunningTaskLogsMap.put(dunningTask.getId(), 
+										new TMisDunningTaskLog(dunningTask.getDealcode(), 
+												dunningTask.getDunningpeopleid(),
+												dunningTask.getDunningpeoplename(),
+												dunningTask.getDunningcycle(),
+												"in_warn"));
+								logger.warn("过期分案产品-" + debtbiztypename + "行为状态in_warn：任务taskID:" +dunningTask.getId() + "移入" + dunningTask.getDunningcycle() + "队列" +dunningTask.getDunningpeoplename() +"数据缺失" );
+			//					continue;
+							}
+							
+							inDunningTaskLogs.add(inDunningTaskLogsMap.get(dunningTask.getId()));
+						}
+						/**
+						 * 批量更新每个队列的任务集合
+						 */
+						tMisDunningTaskDao.batchUpdateExpiredTask(tasks);
+					}
+					/** 
+					 * 保存移入任务Log
+					 */
+					tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
+		//		=====================================提醒队列逾期分配end===================================================
+				}else{
+					logger.info("过期分案产品-" + debtbiztypename + dunningcycle + "队列没有过期任务！" + new Date());
 				}
-				/** 
-				 * 保存移入任务Log
-				 */
-				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
-	//		=====================================提醒队列逾期分配end===================================================
-			}else{
-				logger.info(dunningcycle + "队列没有过期任务！" + new Date());
+			} catch (Exception e) {
+				logger.error("过期分案产品-" + debtbiztypename + dunningcycle + "队列分配任务失败,全部事务回滚");
+				logger.error("错误信息"+e.getMessage());
+				throw new ServiceException(e);
+			} finally {
+				logger.info("过期分案产品-" + debtbiztypename + dunningcycle + "队列任务结束" + new Date());
 			}
-		} catch (Exception e) {
-			logger.error(dunningcycle + "队列分配任务失败,全部事务回滚");
-			logger.error("错误信息"+e.getMessage());
-			throw new ServiceException(e);
-		} finally {
-			logger.info(dunningcycle + "队列任务结束" + new Date());
 		}
-		
 	}
 	
 	/**
@@ -1803,169 +1812,177 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Transactional(readOnly = false)
 	@Scheduled(cron = "0 22 2 * * ?") 
 	public void autoAssignNewOrder() {
-		try {
-			/**
-			 * 根据逾期天数查询未生成任务task的订单
-			 */
-			String begin_Q0 = this.getCycleDict_Q0().get("begin");
-			logger.info("newfingDelayOrderByNotTask_day:"+begin_Q0  + new Date());
-			List<TMisDunningTaskLog>  newDunningTaskLogs = tMisDunningTaskDao.newfingDelayOrderByNotTask(begin_Q0);
-			logger.info("newfingDelayOrderByNotTask-查询新的逾期周期订单并生成任务" +newDunningTaskLogs.size()  + "条-"  + new Date());
-//			Map<String, List<TMisDunningPeople>> cyclePeoplemMap = this.getDunningcyclePeopleLists();
+		List<Dict> debtBizTypes = DictUtils.getDictList(DEBTBIZ_TYPE);
+		for(Dict debtBizType : debtBizTypes){
+			String debtbiztypename = debtBizType.getLabel(); 	// 产品名称
 			
-			if(!newDunningTaskLogs.isEmpty()){
-				Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
-				Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
+			try {
+				logger.info("产品-" + debtbiztypename + "开始新增催收任务"+ new Date());
+				/**
+				 * 根据逾期天数查询未生成任务task的订单
+				 */
+				String begin_Q0 = this.getCycleDict_Q0().get("begin");
+				logger.info("产品-" + debtbiztypename + "newfingDelayOrderByNotTask_day-begin_Q0"+ begin_Q0 + "-debtbiztype" + debtBizType.getValue() + new Date());
+				List<TMisDunningTaskLog>  newDunningTaskLogs = tMisDunningTaskDao.newfingDelayOrderByNotTask(begin_Q0,debtBizType.getValue());
 				
-				/**  * auto Q0 队列 begin */
-				String autoQ0 = DictUtils.getDictValue("autoQ0","Scheduled","false");
-				String autoQ0Tag = DictUtils.getDictValue("autoQ0Tag","Scheduled","false");
-				Map<String, String> atuoQ0DealcodeMap = new HashMap<String, String>();
-				List<TMisDunningTask> atuoDunningTasks = new ArrayList<TMisDunningTask>();
-				List<TMisDunningTaskLog> atuoQ0DunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
-				if(autoQ0.equals("true") || autoQ0Tag.equals("true")){
-					List<String> atuoQ0Dealcodes = tMisDunningTaskDao.findAtuoQ0Dealcode(begin_Q0,"1");
-					logger.info("findAtuoQ0Dealcode-autoQ0查询历史借款逾期小于1天的用户订单" +atuoQ0Dealcodes.size()  + "条"  + new Date());
-					for(String atuoQ0Dealcode : atuoQ0Dealcodes){
-						atuoQ0DealcodeMap.put(atuoQ0Dealcode, atuoQ0Dealcode);
-					}
-				}
-				/** * auto Q0 队列 end  */
+				logger.info("产品：" + debtbiztypename + "("+debtBizType.getValue()+")" + "newfingDelayOrderByNotTask-查询新的逾期周期订单并生成任务" +newDunningTaskLogs.size()  + "条-"  + new Date());
+	//			Map<String, List<TMisDunningPeople>> cyclePeoplemMap = this.getDunningcyclePeopleLists();
 				
-				for(TMisDunningTaskLog dunningTaskLog : newDunningTaskLogs){
-					/**
-					 * 本次迁徙该移入的周期段
-					 */
-					Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
-					if(null == dict){
-						logger.warn("行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
-						continue;
-					}
-					logger.info("逾期天数:"+dunningTaskLog.getOverduedays()+ "对应队列："+ dict.getLabel()  + new Date());
+				if(!newDunningTaskLogs.isEmpty()){
+					Map<String, List<TMisDunningTask>> mapCycleTaskNum = new HashMap<String, List<TMisDunningTask>>();
+					Map<String, TMisDunningTaskLog> inDunningTaskLogsMap = new HashMap<String, TMisDunningTaskLog>();
 					
-					/**  * auto Q0 队列 begin  */
-					if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
-//						logger.info("autoQ0查询历史借款逾期小于1天的用户订单"  + new Date());
-						TMisDunningTask autoDunningTask = this.autoCreateNewDunningTask(dunningTaskLog, dict);
-						TMisDunningTaskLog autoDunningTaskLog = this.autoCreateNewDunningTaskLog(dunningTaskLog, autoDunningTask);
-						atuoDunningTasks.add(autoDunningTask);
-						atuoQ0DunningTaskLogs.add(autoDunningTaskLog);
-						continue;
+					/**  * auto Q0 队列 begin */
+					String autoQ0 = DictUtils.getDictValue("autoQ0","Scheduled","false");
+					String autoQ0Tag = DictUtils.getDictValue("autoQ0Tag","Scheduled","false");
+					Map<String, String> atuoQ0DealcodeMap = new HashMap<String, String>();
+					List<TMisDunningTask> atuoDunningTasks = new ArrayList<TMisDunningTask>();
+					List<TMisDunningTaskLog> atuoQ0DunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+					if(autoQ0.equals("true") || autoQ0Tag.equals("true")){
+						List<String> atuoQ0Dealcodes = tMisDunningTaskDao.findAtuoQ0Dealcode(begin_Q0,"1");
+						logger.info("产品-" + debtbiztypename + "findAtuoQ0Dealcode-autoQ0查询历史借款逾期小于1天的用户订单" +atuoQ0Dealcodes.size()  + "条"  + new Date());
+						for(String atuoQ0Dealcode : atuoQ0Dealcodes){
+							atuoQ0DealcodeMap.put(atuoQ0Dealcode, atuoQ0Dealcode);
+						}
 					}
 					/** * auto Q0 队列 end  */
 					
-					TMisDunningTask dunningTask = null;
-					
-					/**  * auto Q0 优质用户标记  begin  */
-					if(autoQ0Tag.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+					for(TMisDunningTaskLog dunningTaskLog : newDunningTaskLogs){
 						/**
-						 * 创建任务 (标示优质用户)
+						 * 本次迁徙该移入的周期段
 						 */
-						dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_GOOD);
-						/**  * auto Q0 优质用户标记  end  */
-					} else {
-						/**
-						 * 创建任务  (标示普通用户)
-						 */
-						dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_ORDINARY);
-					}
-					/**
-					 * 每个周期的任务集合
-					 */
-					if (mapCycleTaskNum.containsKey(dict.getLabel())) {
-						mapCycleTaskNum.get(dict.getLabel()).add(dunningTask);
-					} else {
-						List<TMisDunningTask> mapTasks = new ArrayList<TMisDunningTask>();
-						mapTasks.add(dunningTask);
-						mapCycleTaskNum.put(dict.getLabel(), mapTasks);
-					}
-					inDunningTaskLogsMap.put(dunningTask.getId(), dunningTaskLog);
-				}
-				
-				/**  * auto Q0 队列 begin  */
-				if(autoQ0.equals("true") && !atuoDunningTasks.isEmpty() && !atuoQ0DunningTaskLogs.isEmpty()){
-					tMisDunningTaskDao.batchinsertTask(atuoDunningTasks);
-					logger.info("保存autoQ0任务" + atuoDunningTasks.size()  + "条"  + new Date());
-					tMisDunningTaskLogDao.batchInsertTaskLog(atuoQ0DunningTaskLogs);
-					logger.info("保存autoQ0任务log" + atuoQ0DunningTaskLogs.size()  + "条"  + new Date());
-				}
-				/** * auto Q0 队列 end  */
-				
-				/**  新增任务Log集合   */
-				List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
-				/** 
-				 * 循环队列任务
-				 */
-				for (Map.Entry<String, List<TMisDunningTask>> entry : mapCycleTaskNum.entrySet()) {
-					/**
-					 * 根据队列找出催收人员集合
-					 */
-//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
-					/**
-					 * 根据周期查询催收人员按金额排序
-					 */
-					TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
-					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend());
-					
-					/**
-					 * 平均分配队列集合的催收人员
-					 */
-					List<TMisDunningTask> tasks = entry.getValue();
-					logger.info("共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
-					
-//					int j = 0;
-					for(int i= 0 ; i < tasks.size() ; i++ ){  
-						TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
-						int j = i % dunningPeoples.size();
-						/**  蛇形分配法    */
-//						if (i / dunningPeoples.size() % 2 == 0) {
-//							j = i % dunningPeoples.size();
-//						} else {
-//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
-//						}
-						System.out.println("姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
-						
-						/**  任务催收人员添加    */
-						dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
-						dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
-						/**  任务log 催收人员添加    */
-						if(inDunningTaskLogsMap.containsKey(dunningTask.getId())){
-							inDunningTaskLogsMap.get(dunningTask.getId()).setTaskid(dunningTask.getId());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setBehaviorstatus("in");
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeopleid(dunningTask.getDunningpeopleid());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeoplename(dunningTask.getDunningpeoplename());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setDunningcycle(dunningTask.getDunningcycle());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setCreateDate(new Date());
-							inDunningTaskLogsMap.get(dunningTask.getId()).setCreateBy(new User("auto_admin"));
-						}else{
-							inDunningTaskLogsMap.put(dunningTask.getId(), 
-									new TMisDunningTaskLog(dunningTask.getDealcode(), 
-											dunningTask.getDunningpeopleid(),
-											dunningTask.getDunningpeoplename(),
-											dunningTask.getDunningcycle(),
-											"in_warn"));
-							logger.warn("行为状态in_warn：任务taskID:" +dunningTask.getId() + "移入" + dunningTask.getDunningcycle() + "队列" +dunningTask.getDunningpeoplename() +"数据缺失" );
+						Dict dict = this.getCycleDict2(dunningTaskLog.getOverduedays());
+						if(null == dict){
+							logger.warn("产品-" + debtbiztypename + "行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
+							continue;
 						}
-						inDunningTaskLogs.add(inDunningTaskLogsMap.get(dunningTask.getId()));
+						logger.info("产品-" + debtbiztypename + "逾期天数:"+dunningTaskLog.getOverduedays()+ "对应队列："+ dict.getLabel()  + new Date());
+						
+						/**  * auto Q0 队列 begin  */
+						if(autoQ0.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+	//						logger.info("autoQ0查询历史借款逾期小于1天的用户订单"  + new Date());
+							TMisDunningTask autoDunningTask = this.autoCreateNewDunningTask(dunningTaskLog, dict,debtbiztypename);
+							TMisDunningTaskLog autoDunningTaskLog = this.autoCreateNewDunningTaskLog(dunningTaskLog, autoDunningTask);
+							atuoDunningTasks.add(autoDunningTask);
+							atuoQ0DunningTaskLogs.add(autoDunningTaskLog);
+							continue;
+						}
+						/** * auto Q0 队列 end  */
+						
+						TMisDunningTask dunningTask = null;
+						
+						/**  * auto Q0 优质用户标记  begin  */
+						if(autoQ0Tag.equals("true") && C0.equals(dict.getLabel()) && atuoQ0DealcodeMap.containsKey(dunningTaskLog.getDealcode())){
+							/**
+							 * 创建任务 (标示优质用户)
+							 */
+							dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_GOOD,debtbiztypename);
+							/**  * auto Q0 优质用户标记  end  */
+						} else {
+							/**
+							 * 创建任务  (标示普通用户)
+							 */
+							dunningTask = this.createNewDunningTask(dunningTaskLog,dict,QUALITY_ORDINARY,debtbiztypename);
+						}
+						/**
+						 * 每个周期的任务集合
+						 */
+						if (mapCycleTaskNum.containsKey(dict.getLabel())) {
+							mapCycleTaskNum.get(dict.getLabel()).add(dunningTask);
+						} else {
+							List<TMisDunningTask> mapTasks = new ArrayList<TMisDunningTask>();
+							mapTasks.add(dunningTask);
+							mapCycleTaskNum.put(dict.getLabel(), mapTasks);
+						}
+						inDunningTaskLogsMap.put(dunningTask.getId(), dunningTaskLog);
 					}
-					/**  批量保存每个队列的任务集合    */
-					tMisDunningTaskDao.batchinsertTask(tasks);
-					logger.info("分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，平均分配成功" + new Date());
+					
+					/**  * auto Q0 队列 begin  */
+					if(autoQ0.equals("true") && !atuoDunningTasks.isEmpty() && !atuoQ0DunningTaskLogs.isEmpty()){
+						tMisDunningTaskDao.batchinsertTask(atuoDunningTasks);
+						logger.info("产品-" + debtbiztypename + "保存autoQ0任务" + atuoDunningTasks.size()  + "条"  + new Date());
+						tMisDunningTaskLogDao.batchInsertTaskLog(atuoQ0DunningTaskLogs);
+						logger.info("产品-" + debtbiztypename + "保存autoQ0任务log" + atuoQ0DunningTaskLogs.size()  + "条"  + new Date());
+					}
+					/** * auto Q0 队列 end  */
+					
+					/**  新增任务Log集合   */
+					List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
+					/** 
+					 * 循环队列任务
+					 */
+					for (Map.Entry<String, List<TMisDunningTask>> entry : mapCycleTaskNum.entrySet()) {
+						/**
+						 * 根据队列找出催收人员集合
+						 */
+	//					List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleByDunningcycle(entry.getKey().toString());
+						/**
+						 * 根据周期查询催收人员按金额排序
+						 */
+						TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getDescription());
+						
+						/**
+						 * 平均分配队列集合的催收人员
+						 */
+						List<TMisDunningTask> tasks = entry.getValue();
+						logger.info("产品-" + debtbiztypename + "共"+ mapCycleTaskNum.entrySet().size()+"个队列，正在分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，此队列有"+dunningPeoples.size()+"个催收员" + new Date());
+						
+	//					int j = 0;
+						for(int i= 0 ; i < tasks.size() ; i++ ){  
+							TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
+							int j = i % dunningPeoples.size();
+							/**  蛇形分配法    */
+	//						if (i / dunningPeoples.size() % 2 == 0) {
+	//							j = i % dunningPeoples.size();
+	//						} else {
+	//							j = dunningPeoples.size() - 1 - i % dunningPeoples.size();
+	//						}
+							System.out.println("产品-" + debtbiztypename + "姓名"+dunningPeoples.get(j).getName()+ "-周期总金额" + dunningPeoples.get(j).getSumcorpusamount()+"-分配金额"+dunningTask.getCapitalamount());
+							
+							/**  任务催收人员添加    */
+							dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
+							dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
+							/**  任务log 催收人员添加    */
+							if(inDunningTaskLogsMap.containsKey(dunningTask.getId())){
+								inDunningTaskLogsMap.get(dunningTask.getId()).setTaskid(dunningTask.getId());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setBehaviorstatus("in");
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeopleid(dunningTask.getDunningpeopleid());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningpeoplename(dunningTask.getDunningpeoplename());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setDunningcycle(dunningTask.getDunningcycle());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setCreateDate(new Date());
+								inDunningTaskLogsMap.get(dunningTask.getId()).setCreateBy(new User("auto_admin"));
+							}else{
+								inDunningTaskLogsMap.put(dunningTask.getId(), 
+										new TMisDunningTaskLog(dunningTask.getDealcode(), 
+												dunningTask.getDunningpeopleid(),
+												dunningTask.getDunningpeoplename(),
+												dunningTask.getDunningcycle(),
+												"in_warn")
+										);
+								logger.warn("产品-" + debtbiztypename + "行为状态in_warn：任务taskID:" +dunningTask.getId() + "移入" + dunningTask.getDunningcycle() + "队列" +dunningTask.getDunningpeoplename() +"数据缺失" );
+							}
+							inDunningTaskLogs.add(inDunningTaskLogsMap.get(dunningTask.getId()));
+						}
+						/**  批量保存每个队列的任务集合    */
+						tMisDunningTaskDao.batchinsertTask(tasks);
+						logger.info("产品-" + debtbiztypename + "分配"+entry.getKey().toString()+"队列"+tasks.size()+"条，平均分配成功" + new Date());
+					}
+					/** 
+					 * 保存移入任务Log
+					 */
+					tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
+					logger.info("产品-" + debtbiztypename + "任务日志记录完毕" + new Date());
+				}else{
+					logger.info("产品-" + debtbiztypename + "newfingDelayOrderByNotTask-没有新的逾期周期订单任务" + new Date());
 				}
-				/** 
-				 * 保存移入任务Log
-				 */
-				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
-				logger.info("任务日志记录完毕" + new Date());
-			}else{
-				logger.info("newfingDelayOrderByNotTask-没有新的逾期周期订单任务" + new Date());
+			} catch (Exception e) {
+				logger.error("产品-" + debtbiztypename + "新增未生成催收任务(task)的订单失败,全部事务回滚");
+				logger.error("错误信息"+e.getMessage());
+				throw new ServiceException(e);
+			} finally {
+				logger.info("产品-" + debtbiztypename + "新增未生成催收任务(task)的订单任务结束" + new Date());
 			}
-		} catch (Exception e) {
-			logger.error("新增未生成催收任务(task)的订单失败,全部事务回滚");
-			logger.error("错误信息"+e.getMessage());
-			throw new ServiceException(e);
-		} finally {
-			logger.info("新增未生成催收任务(task)的订单任务结束" + new Date());
 		}
 	}
 	
@@ -1973,7 +1990,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * 创建autoQ0任务
 	 * @return TMisDunningTask
 	 */
-	private TMisDunningTask autoCreateNewDunningTask(TMisDunningTaskLog autoTaskLog,Dict dict) throws Exception{
+	private TMisDunningTask autoCreateNewDunningTask(TMisDunningTaskLog autoTaskLog,Dict dict,String debtbiztype) throws Exception{
 		Date now = new Date();
 		TMisDunningTask autoTask = new TMisDunningTask();
 		autoTask.setId(IdGen.uuid());
@@ -1995,6 +2012,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		autoTask.setRepaymentTime(new java.sql.Date(autoTaskLog.getRepaymenttime().getTime()));
 		autoTask.setCreateBy(new User("auto_admin"));
 		autoTask.setCreateDate(new Date());
+		autoTask.setPlatformext(autoTaskLog.getPlatformext());
+		autoTask.setDebtbiztype(debtbiztype);
 		return autoTask;
 	}
 	
@@ -2179,7 +2198,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	 * @param period
 	 * @return
 	 */
-	private TMisDunningTask createNewDunningTask(TMisDunningTaskLog taskLog,Dict dict,String quality) throws Exception{
+	private TMisDunningTask createNewDunningTask(TMisDunningTaskLog taskLog,Dict dict,String quality,String debtbiztype) throws Exception{
 		Date now = new Date();
 		TMisDunningTask task = new TMisDunningTask();
 		task.setId(IdGen.uuid());
@@ -2202,6 +2221,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		task.setCreateBy(new User("auto_admin"));
 		task.setCreateDate(new Date());
 		task.setQuality(quality);
+		task.setPlatformext(taskLog.getPlatformext());
+		task.setDebtbiztype(debtbiztype);
 //		Calendar calendar = Calendar.getInstance();
 //		calendar.setTime(toDate(order.repaymentDate));
 //		calendar.add(Calendar.DAY_OF_YEAR, period.end + 1);
@@ -2490,100 +2511,104 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     
     
 	
-	public static void main(String[] args) {
-//		String type = getDunningCycleType();
-//		List<Dict> dicts = DictUtils.getDictList(type);
-//		List<Dict> list = new ArrayList<Dict>();
-//		Dict dict1 = new Dict();
-//		dict1.setLabel("Q1");
-//		Dict dict2 = new Dict();
-//		dict2.setLabel("Q2");
-//		Dict dict3 = new Dict();
-//		dict3.setLabel("Q3");
-//		Dict dict4 = new Dict();
-//		dict4.setLabel("Q4");
-//		Dict dict5 = new Dict();
-//		dict5.setLabel("Q5");
-//		list.add(dict1);
-//		list.add(dict2);
-//		list.add(dict3);
-//		list.add(dict4);
-//		list.add(dict5);
-//		for(int i= 0 ; i < list.size() ; i++ ){  
-//			Dict dict = (Dict)list.get(i);
-//			System.out.println(dict.getLabel());
-//			dict.setLabel("tt" + i);
-//		}
-//		int day = getDays() % 15 == 0 ? 15 - 1 : getDays()  % 15 - 1;
-//		for(int i = 2; i <= 31 ; i ++){
-//			System.out.print(i+"号");
-//			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
-//			System.out.println(s);
-//		}
-//		for(int i = 1; i <= 30 ; i ++){
-//			System.out.print(i+"号");
-//			int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-//			System.out.println(s);
-//		}
-		
-		
-		Calendar calendar = Calendar.getInstance();  
-        int year = 2018;  
-        int month = 1;  
-        int date = 1;  
-        calendar.set(year, month, date);  
-        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        System.out.println("Max Day: " + maxDay);
-        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-        System.out.println("Min Day: " + minDay);
-//        // 大月
-//        for (int i = minDay +1; i <= maxDay; i++) {  
-//            calendar.set(year, month, i);
-//            System.out.println("Day: " + calendar.getTime().toLocaleString());
-////        	int datenum = calendar.get(Calendar.DATE);
-////        	System.out.println(datenum);
-//            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
+//	public static void main(String[] args) {
+////		String type = getDunningCycleType();
+////		List<Dict> dicts = DictUtils.getDictList(type);
+////		List<Dict> list = new ArrayList<Dict>();
+////		Dict dict1 = new Dict();
+////		dict1.setLabel("Q1");
+////		Dict dict2 = new Dict();
+////		dict2.setLabel("Q2");
+////		Dict dict3 = new Dict();
+////		dict3.setLabel("Q3");
+////		Dict dict4 = new Dict();
+////		dict4.setLabel("Q4");
+////		Dict dict5 = new Dict();
+////		dict5.setLabel("Q5");
+////		list.add(dict1);
+////		list.add(dict2);
+////		list.add(dict3);
+////		list.add(dict4);
+////		list.add(dict5);
+////		for(int i= 0 ; i < list.size() ; i++ ){  
+////			Dict dict = (Dict)list.get(i);
+////			System.out.println(dict.getLabel());
+////			dict.setLabel("tt" + i);
+////		}
+////		int day = getDays() % 15 == 0 ? 15 - 1 : getDays()  % 15 - 1;
+////		for(int i = 2; i <= 31 ; i ++){
+////			System.out.print(i+"号");
+////			int s = (i-1) % 15 == 0 ? 15 - 1 : (i-1)  % 15 - 1;
+////			System.out.println(s);
+////		}
+////		for(int i = 1; i <= 30 ; i ++){
+////			System.out.print(i+"号");
+////			int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+////			System.out.println(s);
+////		}
+//		
+//		
+//		Calendar calendar = Calendar.getInstance();  
+//        int year = 2018;  
+//        int month = 1;  
+//        int date = 1;  
+//        calendar.set(year, month, date);  
+//        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+//        System.out.println("Max Day: " + maxDay);
+//        int minDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//        System.out.println("Min Day: " + minDay);
+////        // 大月
+////        for (int i = minDay +1; i <= maxDay; i++) {  
+////            calendar.set(year, month, i);
+////            System.out.println("Day: " + calendar.getTime().toLocaleString());
+//////        	int datenum = calendar.get(Calendar.DATE);
+//////        	System.out.println(datenum);
+////            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
+//////        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+////            System.out.println(s);
+////        }  
+////        // 小月
+////        for (int i = minDay ; i <= maxDay; i++) {  
+////            calendar.set(year, month, i);
+////            System.out.println("Day: " + calendar.getTime().toLocaleString());
+//////        	int datenum = calendar.get(Calendar.DATE);
+//////        	System.out.println(datenum);
+//////            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
 ////        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
-//            System.out.println(s);
-//        }  
-//        // 小月
+////            System.out.println(s);
+////        }  
+//        // 2月 
 //        for (int i = minDay ; i <= maxDay; i++) {  
 //            calendar.set(year, month, i);
 //            System.out.println("Day: " + calendar.getTime().toLocaleString());
-////        	int datenum = calendar.get(Calendar.DATE);
-////        	System.out.println(datenum);
-////            int s =(i-1) % 15 == 0 ? 15 - 1 : (i-1) % 15 - 1;
-//        	int s = i % 15 == 0 ? 15 - 1 : i  % 15 - 1;
+//            int s =(i+2) % 15 == 0 ? 15 - 1 : (i+2) % 15 - 1;
 //            System.out.println(s);
-//        }  
-        // 2月 
-        for (int i = minDay ; i <= maxDay; i++) {  
-            calendar.set(year, month, i);
-            System.out.println("Day: " + calendar.getTime().toLocaleString());
-            int s =(i+2) % 15 == 0 ? 15 - 1 : (i+2) % 15 - 1;
-            System.out.println(s);
-        } 
-//      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
+//        } 
+////      day = (getDays()-1) % 15 == 0 ? 15 - 1 : (getDays()-1) % 15 - 1;
+//		
+////		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
+////		sortList.sort(list, "label", "desc");  
+////		for(Dict dict : list){
+////			System.out.println(dict.getLabel());
+////		}
+////		if(actinMap.containsKey("UP")){
+//		//	actinMap.get("UP").add(vo);
+//		//}else{
+//		//	List<PlatViewVO> tList = new ArrayList<PlatViewVO>();
+//		//	tList.add(vo);
+//		//	actinMap.put("UP", tList);
+//		//}
+////		 int current = 7;  
+////	        if(rangeInDefined(current, 1, 10))  
+////	            System.out.println(current + "在1——10之间");  
+////		String s = "";
+////		System.out.println(s.split("_")[0] == null);
+//	}
+//	
+	public static void main(String[] args) {
+		System.out.println(DebtBizType.valueOf("JHJJ"));
 		
-//		ListSortUtil<Dict> sortList = new ListSortUtil<Dict>();  
-//		sortList.sort(list, "label", "desc");  
-//		for(Dict dict : list){
-//			System.out.println(dict.getLabel());
-//		}
-//		if(actinMap.containsKey("UP")){
-		//	actinMap.get("UP").add(vo);
-		//}else{
-		//	List<PlatViewVO> tList = new ArrayList<PlatViewVO>();
-		//	tList.add(vo);
-		//	actinMap.put("UP", tList);
-		//}
-//		 int current = 7;  
-//	        if(rangeInDefined(current, 1, 10))  
-//	            System.out.println(current + "在1——10之间");  
-//		String s = "";
-//		System.out.println(s.split("_")[0] == null);
 	}
-	
 	
 //	public static final void main(String[] args)throws Exception
 //	{

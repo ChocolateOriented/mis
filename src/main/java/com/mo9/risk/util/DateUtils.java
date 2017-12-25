@@ -313,7 +313,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws ParseException {
-		System.out.println(getDateOfMonth(27));
+		System.out.println(getDate(1));
 		
 		// System.out.println(formatDate(parseDate("2010/3/6")));
 		// System.out.println(getDate("yyyy年MM月dd日 E"));

@@ -214,14 +214,14 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param dunningcycle
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfindDelayTaskByDunningcycle(@Param("dunningtaskstatus")String dunningtaskstatus,@Param("dunningcycle")String dunningcycle,@Param("begin")String begin,@Param("end")String end );
+	public List<TMisDunningTaskLog> newfindDelayTaskByDunningcycle(@Param("dunningtaskstatus")String dunningtaskstatus,@Param("dunningcycle")String dunningcycle,@Param("begin")String begin,@Param("end")String end,@Param("debtbiztype")String debtbiztype);
 	
 	/**
 	 * 根据逾期天数查询未生成任务task的订单
 	 * @param day
 	 * @return
 	 */
-	public List<TMisDunningTaskLog> newfingDelayOrderByNotTask(@Param("day")String day);
+	public List<TMisDunningTaskLog> newfingDelayOrderByNotTask(@Param("day")String day,@Param("debtbiztype")String debtbiztype);
 	
 	/**
 	 * 根据订单状态和任务状态查询订单任务Log

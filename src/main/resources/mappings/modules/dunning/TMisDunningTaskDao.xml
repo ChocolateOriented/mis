@@ -1450,7 +1450,8 @@
 					t.id as "taskid",
 					t.DunningCycle as "dunningcycle",
 					p.id as "dunningpeopleid",
-					p.Name as "dunningpeoplename"
+					p.Name as "dunningpeoplename",
+					o.platform_ext  as "platformext"
 			FROM t_mis_dunning_task t 
 					LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
 					LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
@@ -1470,6 +1471,14 @@
 						AND DATEDIFF(curdate(), o.repayment_time) NOT BETWEEN #{begin} AND  #{end}
 <!--       			  		]]> -->
 <!-- 			        </if> -->
+			  <choose>
+	            <when test="debtbiztype != null and debtbiztype == 'jinRongZhongXin'">
+	                AND o.platform_ext LIKE concat('%', #{debtbiztype} ,'%')
+	            </when>
+	            <otherwise>
+	            	AND o.platform_ext NOT LIKE concat('%','jinRongZhongXin','%')
+	            </otherwise>
+	          </choose>
 			 </where>
 			ORDER BY corpusAmount DESC
 	</select>
@@ -1495,7 +1504,8 @@
 				IFNULL(o.cost_amount, 0) * 100  as "costamout",
 				IFNULL(o.overdue_amount, 0) * 100 as "overdueamount",
 				CASE WHEN o.modify_flag = 1 THEN IFNULL(o.modify_amount, 0) * 100 ELSE 0 END as "modifyamount",
-				(<include refid="countRemainAmmount"/>) * 100 as "creditamount"
+				(<include refid="countRemainAmmount"/>) * 100 as "creditamount",
+				o.platform_ext  as "platformext"
 		FROM t_risk_order AS o
 			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 			LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
@@ -1510,6 +1520,22 @@
 				AND DATEDIFF(curdate(), o.repayment_time) >= #{day}
 <!-- 				]]> -->
 <!-- 			</if> -->
+<!-- 		<if test="debtbiztype != null and debtbiztype != ''" > -->
+<!--           <if test="debtbiztype == 'mo9_old'"> -->
+<!--             AND o.platform_ext NOT LIKE concat('%','jinRongZhongXin','%') -->
+<!--           </if> -->
+<!--           <if test="debtbiztype == 'jinRongZhongXin'" > -->
+<!--             AND o.platform_ext LIKE concat('%','jinRongZhongXin','%') -->
+<!--           </if> -->
+<!--         </if> -->
+          <choose>
+            <when test="debtbiztype != null and debtbiztype == 'jinRongZhongXin'">
+                AND o.platform_ext LIKE concat('%', #{debtbiztype} ,'%')
+            </when>
+            <otherwise>
+            	AND o.platform_ext NOT LIKE concat('%','jinRongZhongXin','%')
+            </otherwise>
+          </choose>
 		</where>
 		ORDER BY corpusAmount DESC
 	</select>
@@ -1571,7 +1597,9 @@
 			updateby,
 			updatedate,
 			dunningcycle,
-			quality
+			quality,
+			platformext,
+			debtbiztype
 		) VALUES
 		<foreach collection="list" item="item" index="index" separator=",">
 		 (
@@ -1597,7 +1625,9 @@
 			#{item.updateBy.id},
 			#{item.updateDate},
 			#{item.dunningcycle},
-			#{item.quality}
+			#{item.quality},
+			#{item.platformext},
+			#{item.debtbiztype}
 		)
 		</foreach>
 	</insert>
@@ -1631,7 +1661,8 @@
 				t.id as "taskid",
 				t.DunningCycle as "dunningcycle",
 				p.id as "dunningpeopleid",
-				p.Name as "dunningpeoplename"
+				p.Name as "dunningpeoplename",
+				o.platform_ext  as "platformext"
 		FROM t_mis_dunning_task t 
 				LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
 				LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
@@ -1720,7 +1751,8 @@
 					t.DunningCycle as "dunningcycle",
                     t.OutsourcingBeginDate as "outsourcingBeginDate",
 					p.id as "dunningpeopleid",
-					p.Name as "dunningpeoplename" 
+					p.Name as "dunningpeoplename",
+					o.platform_ext  as "platformext"
 			FROM t_mis_dunning_task t   
 					LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
 					LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 

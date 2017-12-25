@@ -307,9 +307,11 @@
 			<include refid="tMisDunningPeopleColumns"/>,
 			SUM(IFNULL(t.corpusamount,0)) AS "sumcorpusamount"
 		FROM t_mis_dunning_people a
+			JOIN t_mis_dunning_people_biz pz on pz.dunning_people_id = a.Id 
 			LEFT JOIN t_mis_dunning_task_log t on t.dunningpeopleid = a.Id 
 <!-- 			AND date(t.createdate)= date(DATE_SUB(curdate(),INTERVAL 1 DAY))  -->
-			AND date(t.createdate) BETWEEN date(#{begindatetime}) AND date(#{enddatetime})
+			AND  pz.debt_biz_type = #{debtbiztype}
+			AND  date(t.createdate) BETWEEN date(#{begindatetime}) AND date(#{enddatetime})
 			AND  t.behaviorstatus = 'in' 
 			AND  t.createby = 'auto_admin'
 			AND  t.DunningCycle = #{dunningcycle}
