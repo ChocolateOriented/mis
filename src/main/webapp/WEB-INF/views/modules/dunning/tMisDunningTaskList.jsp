@@ -164,7 +164,7 @@
 						return;
 					}
 					var url = "${ctx}/dunning/tMisDunningTask/dialogDistribution?dunningcycle=" + uniqueid;
-					$.jBox.open("iframe:" + url, "手动分案" , 600, 450, {
+					$.jBox.open("iframe:" + url, "手动分案" , 600, 650, {
 			               buttons: {},
 			               loaded: function (h) {
 			                   $(".jbox-content", document).css("overflow-y", "hidden");
