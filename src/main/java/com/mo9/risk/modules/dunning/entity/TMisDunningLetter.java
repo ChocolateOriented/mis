@@ -88,6 +88,9 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 		this.postCode = postCode;
 	}
 	@ExcelField(title="订单状态", type=1, align=2, sort=63)
+	public String getOrderStatusText() {
+		return "payoff".equals(orderStatus) ? "已还清" : "未还清";
+	}
 	public String getOrderStatus() {
 		return orderStatus;
 	}

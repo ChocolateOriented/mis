@@ -202,7 +202,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
 		StringBuilder content = new StringBuilder();
 		content.append("<table width='600px'>");
-		content.append("<tr><td ><img height='88px' width='600px' src='"+url+"/static/images/donggangtitle.png'/><p></td></tr>");
+		content.append("<tr><td ><img height='100px' width='600px' src='"+url+"/static/images/donggangtitle.png'/><p></td></tr>");
 		content.append("<tr><td ><p><font style='font-weight:bold;' color='#4D4D4D' size='4'>Dear 东港伙伴 您好:</font></p></td></tr>");
 		content.append("<tr><td ><p><font color='#4D4D4D' size='3'>我司本次发送信函明细如下,请查收:</font></p></td></tr>");
 		content.append("</table >");
@@ -212,7 +212,16 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		content.append("</table>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>如果对信函数据存疑,可直接回复邮件.</font></p></div>");
 		content.append("<div><p><font color='#4D4D4D' size='3'>顺祝商祺!</font></p></div>");
-		content.append("<div><p><img height='100px' width='600px' src='"+url+"/static/images/mo9subjectend.png'/></p></div>");
+		content.append("<div style='width:600px;'><hr/ width='600px'></div>");
+		content.append("<div style='position:absolute; width:600px;'>");
+		content.append("<div style='float:left; width:300px;'>");
+		content.append("<div><p>本邮件由上海佰晟通贷后管理发送</p> </div>");
+		content.append("<div> 合作邮箱:misdata@mo9.com</div>");
+		content.append("<div> 官方网站:www.mo9.com</div>");
+		content.append("<div> 公司地址:上海市黄浦区延安东路618号17层</div>");
+		content.append("</div>");
+		content.append("<div style='float:right; width:200px;'><img height='100px' width='200px' src='"+url+"/static/images/mo9flag.png'/></div>");
+		content.append("</div>");
 		
 		mailSender.setContent(content.toString());
 		//发送
