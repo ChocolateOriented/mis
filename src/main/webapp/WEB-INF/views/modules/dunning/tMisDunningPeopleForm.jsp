@@ -184,6 +184,13 @@ function disableBUtton(){
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">产品：</label>
+			<div class="controls">
+				<form:checkboxes path="bizTypes" items="${bizTypes}" itemLabel="desc" class="input-medium  required" />
+				<span class="help-inline"><font color="red">*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">是否自动分配：</label>
 			<div class="controls">
 				<form:select id="auto" path="auto" class="input-medium">

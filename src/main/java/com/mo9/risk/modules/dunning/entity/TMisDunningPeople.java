@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.entity;
 
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	private TMisDunningGroup group;
 	private String nickname;
 	private User user;
+	private List<DebtBizType> bizTypes;
+	private String bizTypesStr;
 
 	private List<String> queryIds;// 用于催收人查询
 	
@@ -193,6 +196,15 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		return nickname;
 	}
 
+	@ExcelField(title="产品", align=2, sort=60)
+	public String getBizTypesStr() {
+		return bizTypesStr;
+	}
+
+	public void setBizTypesStr(String bizTypesStr) {
+		this.bizTypesStr = bizTypesStr;
+	}
+
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
@@ -237,4 +249,11 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 		this.validateId = validateId;
 	}
 
+	public List<DebtBizType> getBizTypes() {
+		return bizTypes;
+	}
+
+	public void setBizTypes(List<DebtBizType> bizTypes) {
+		this.bizTypes = bizTypes;
+	}
 }

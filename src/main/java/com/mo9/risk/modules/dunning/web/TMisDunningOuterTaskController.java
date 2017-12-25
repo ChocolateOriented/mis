@@ -8,6 +8,7 @@ import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.gamaxpay.commonutil.web.PostRequest;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.modules.dunning.service.*;
 import com.mo9.risk.util.DateUtils;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -112,6 +113,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
+		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningOuterTaskList";
 	}
 

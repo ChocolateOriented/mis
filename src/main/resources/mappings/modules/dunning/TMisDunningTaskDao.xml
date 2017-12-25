@@ -877,10 +877,10 @@
             AND o.status = #{status}
 				</if>
         <if test="platformExt != null and platformExt != ''" >
-          <if test="platformExt == 'mo9'">
+          <if test="platformExt == 'JHJJ'">
             AND o.platform_ext NOT LIKE '%jinRongZhongXin%'
           </if>
-          <if test="platformExt == 'jinRongZhongXin'">
+          <if test="platformExt == 'JHJJ_JRZX'">
             AND o.platform_ext LIKE '%jinRongZhongXin%'
           </if>
         </if>
@@ -1079,10 +1079,10 @@
             </choose>
         </if>
         <if test="platformExt != null and platformExt != ''" >
-          <if test="platformExt == 'mo9'">
+          <if test="platformExt == 'JHJJ'">
             AND o.platform_ext NOT LIKE '%jinRongZhongXin%'
           </if>
-          <if test="platformExt == 'jinRongZhongXin'">
+          <if test="platformExt == 'JHJJ_JRZX'">
             AND o.platform_ext LIKE '%jinRongZhongXin%'
           </if>
         </if>

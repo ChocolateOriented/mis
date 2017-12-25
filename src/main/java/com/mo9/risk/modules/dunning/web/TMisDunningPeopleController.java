@@ -3,6 +3,8 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,6 +95,7 @@ public class TMisDunningPeopleController extends BaseController {
 	public String list(TMisDunningPeople tMisDunningPeople, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<TMisDunningPeople> page = tMisDunningPeopleService.findPage(new Page<TMisDunningPeople>(request, response), tMisDunningPeople); 
 		model.addAttribute("page", page);
+		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningPeopleList";
 	}
 	
@@ -117,22 +120,10 @@ public class TMisDunningPeopleController extends BaseController {
 		List<User> users = tMisDunningPeopleService.findUserList();
 		model.addAttribute("users",users);
 		model.addAttribute("tMisDunningPeople", tMisDunningPeople);
+		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningPeopleForm";
 	}
-	/**
-	 * 重定向
-	 * @param model
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningPeople:view")
-	@RequestMapping(value = "redirectForm")
-	public String redirectForm(Model model , HttpServletRequest request, HttpServletResponse response) {
-		List<User> users = tMisDunningPeopleService.findUserList();
-		model.addAttribute("users",users);
-		return "modules/dunning/tMisDunningPeopleForm";
-	}
-	
-	
+
 	/**
 	 * 保存或编辑催收人员
 	 * @param tMisDunningPeople
@@ -286,6 +277,20 @@ public class TMisDunningPeopleController extends BaseController {
 	}
 
 	/**
+	 * 加载分配产品页面
+	 * @param peopleids
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "dialogPeopleBizTypes")
+	public String dialogPeopleBizTypes( Model model,String peopleids) {
+		model.addAttribute("peopleids", peopleids);
+		model.addAttribute("bizTypes",DebtBizType.values());
+		return "modules/dunning/dialog/dialogPeoPleBizTypes";
+	}
+
+	/**
 	 * 批量分配小组和自动分配等
 	 * @param peopleids
 	 * @param redirectAttributes
@@ -306,6 +311,25 @@ public class TMisDunningPeopleController extends BaseController {
 		} catch (Exception e) {
 			logger.info("手动批量分配发生错误",e);
 		}
+		return "OK";
+	}
+
+	/**
+	 * 批量分配产品
+	 * @param peopleids
+	 * @param bizTypes
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningPeople:edit")
+	@RequestMapping(value = "batchUpdatepeopleBizTypes")
+	@ResponseBody
+	public String batchUpdatepeopleBizTypes(DebtBizType[] bizTypes, String[] peopleids) {
+		List<String> peopleidList = Arrays.asList(peopleids);
+		if (null == peopleidList || peopleidList.isEmpty()) {
+			String mes = "请选择催收员";
+			return mes;
+		}
+		tMisDunningPeopleService.batchUpdatepeopleBizTypes(peopleidList, Arrays.asList(bizTypes));
 		return "OK";
 	}
 	/**
@@ -332,17 +356,17 @@ public class TMisDunningPeopleController extends BaseController {
 		} catch (Exception e) {
 			logger.info("解析式发生错误",e);
 			addMessage(redirectAttributes, "解析文件:" + file.getOriginalFilename() + ",发生失败");
-			return "redirect:redirectForm";
+			return "redirect:form";
 		}
 		if(list==null||list.size()<1){
 			addMessage(redirectAttributes, "解析文件:" + file.getOriginalFilename() + ",发生失败内容为空");
-			return "redirect:redirectForm";
+			return "redirect:form";
 		}
 		StringBuilder message=new StringBuilder();
 		boolean validsInsert=tMisDunningPeopleService.batchInsert(list,message);
 		if(!validsInsert){
 			addMessage(redirectAttributes,  "解析文件:" + file.getOriginalFilename() + ",发生失败."+message.toString());
-			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/redirectForm?repage";
+			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/form?repage";
 		}
 		logger.info("导入成功,文件:" + file.getOriginalFilename());
 		addMessage(redirectAttributes,  "导入成功.");

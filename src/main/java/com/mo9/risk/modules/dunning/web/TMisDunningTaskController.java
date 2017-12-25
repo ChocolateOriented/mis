@@ -39,6 +39,7 @@ import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
 import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.service.RiskQualityInfoService;
@@ -277,6 +278,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("supervisorLimit", supervisorLimit);
 		model.addAttribute("numberList", numberList);
 		model.addAttribute("tmiscycle", tmiscycle);
+		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningTaskList";
 	}
 

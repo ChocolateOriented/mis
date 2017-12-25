@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,24 +55,14 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	
 	@Transactional(readOnly = false)
 	public void save(TMisDunningPeople tMisDunningPeople) {
-		
 		if(null == tMisDunningPeople.getDbid()){
 			//因为要是用User的ID,所以不调用父类save生成新id
-			User user = UserUtils.getUser();
-			if (StringUtils.isNotBlank(user.getId())){
-				tMisDunningPeople.setUpdateBy(user);
-				tMisDunningPeople.setCreateBy(user);
-			}
-			Date now = new Date();
-			tMisDunningPeople.setUpdateDate(now);
-			tMisDunningPeople.setCreateDate(now);
-			
-			dao.insert(tMisDunningPeople);
-		}else{
-			tMisDunningPeople.preUpdate();
-			dao.update(tMisDunningPeople);
-			
+			tMisDunningPeople.setIsNewRecord(true);
 		}
+		super.save(tMisDunningPeople);
+
+		//更新关联的产品
+		this.updatePeopleBizTypes(tMisDunningPeople.getId(),tMisDunningPeople.getBizTypes());
 	}
 	
 	/**
@@ -252,7 +243,6 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	@Transactional(readOnly = false)
 	public boolean batchInsert(List<TMisDunningPeople> list,StringBuilder message) {
 		HashMap<String,String> validateMap=new HashMap<String,String>();
-		List<TMisDunningPeople> listPeople=new ArrayList<TMisDunningPeople>();
 		for (int i = 0; i < list.size(); i++) {
 			//校验不能为空
 			if(StringUtils.isBlank(list.get(i).getName())||StringUtils.isBlank(list.get(i).getNickname())||StringUtils.isBlank(list.get(i).getGroupName())||
@@ -273,6 +263,25 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 				message.append("第"+(i+1)+"条是否自动分配值错误,请检查");
 				return false;
 			}
+
+			//产品名
+			List<DebtBizType> debtBizTypes = new ArrayList<>();
+			String[] bizTypeDescs = list.get(i).getBizTypesStr().split(",");
+			for (int j = 0; j < bizTypeDescs.length; j++) {
+				String bizTypeDesc = bizTypeDescs[j];
+				boolean find = false;
+				for (DebtBizType debtBizType: DebtBizType.values()) {
+					if (debtBizType.getDesc().equals(bizTypeDesc)){
+						debtBizTypes.add(debtBizType);
+						find = true;
+						break;
+					}
+				}
+				if (!find){
+					message.append("第"+(i+1)+"条产品列错误,请检查");
+					return false;
+				}
+			}
 			
 			//校验催收队列
 			String[] cycle = list.get(i).getDunningcycle().split(",");
@@ -286,7 +295,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 			//校验数据库的账号和所属组和花名
 			TMisDunningPeople tPeople= tMisDunningPeopleDao.validateBatchAccountAndGroup(list.get(i));
 			if(tPeople==null){
-				message.append("第"+(i+1)+"条催收队列错误,请检查");
+				message.append("第"+(i+1)+"条账号不存在,请检查");
 				return false;
 			}
 			if(StringUtils.isNotEmpty(tPeople.getValidateId())){
@@ -312,21 +321,38 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 			people.setGroup(tPeople.getGroup());
 			people.setAuto("是".equals(list.get(i).getAuto())?"t":"f");
 			people.setDunningcycle(list.get(i).getDunningcycle());
+			people.setBizTypes(debtBizTypes);
 			//因为要是用User的ID,所以不调用父类save生成新id
-			User user = UserUtils.getUser();
-			if (StringUtils.isNotBlank(user.getId())){
-				people.setUpdateBy(user);
-				people.setCreateBy(user);
-			}else{
-				message.append("该催收员无权限");
-				return false;
-			}
-			Date now = new Date();
-			people.setUpdateDate(now);
-			people.setCreateDate(now);
-			listPeople.add(people);
+			this.save(people);
 		}
-		tMisDunningPeopleDao.batchSave(listPeople);
 		return true;
+	}
+
+	/**
+	 * @Description 更新催收人关联产品
+	 * @param peopleId
+	 * @param bizTypes
+	 * @return void
+	 */
+	@Transactional(readOnly = false)
+	public void updatePeopleBizTypes(String peopleId, List<DebtBizType> bizTypes) {
+		dao.deleteBizTypeByPeopleId(peopleId);
+		if (bizTypes == null || bizTypes.size() == 0){
+			return;
+		}
+		dao.batchInsertPeopleBizTypes(bizTypes,peopleId);
+	}
+
+	/**
+	 * @Description 批量更改催收人关联产品
+	 * @param peopleids
+	 * @param bizTypes
+	 * @return void
+	 */
+	@Transactional(readOnly = false)
+	public void batchUpdatepeopleBizTypes(List<String> peopleids, List<DebtBizType> bizTypes) {
+		for (int i = 0; i < peopleids.size(); i++) {
+			this.updatePeopleBizTypes(peopleids.get(i),bizTypes);
+		}
 	}
 }

@@ -409,8 +409,7 @@
 			<li><label>产品</label>
 				<form:select id="status" path="platformExt" class="input-medium">
 					<form:option selected="selected" value="" label="全部"/>
-					<form:option value="jinRongZhongXin" label="weixin36"/>
-					<form:option value="mo9" label="mo9"/>
+					<form:options items="${bizTypes}" itemLabel="desc"/>
 				</form:select>
 			</li>
 		<%-- 			<c:if test="${tmiscycle eq 'numberClean' }"> --%>
