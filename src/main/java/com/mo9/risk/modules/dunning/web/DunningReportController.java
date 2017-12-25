@@ -107,8 +107,18 @@ public class DunningReportController extends BaseController {
 	public String dunningProductivePowerDailyReportExport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport,
 			HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String fileName = "productivePowerDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
-		//添加默认查询条件
-		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
+        TMisDunningPeople dunningPeople = new TMisDunningPeople();
+        Map<String, Object> map = initQueryAuthority(dunningPeople);
+        List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+        List<TMisDunningGroup> groups = (List<TMisDunningGroup>) map.get("groups");
+        smMisDunningProductivePowerDailyReport.setQueryGroups(groups);
+        if (StringUtils.isEmpty(smMisDunningProductivePowerDailyReport.getDunningPeopleName())){
+            List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+            for (TMisDunningPeople people : dunningPeoples){
+                peopleNames.add(people.getName());
+            }
+            smMisDunningProductivePowerDailyReport.setpNames(peopleNames);
+        }
 		List<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(smMisDunningProductivePowerDailyReport);
 		try {
 			new ExportExcel("催收员案件活动日报", SMisDunningProductivePowerDailyReport.class).setDataList(page).write(response, fileName).dispose();
@@ -183,6 +193,19 @@ public class DunningReportController extends BaseController {
 				performanceDayReport.setDatetimeend( DateUtils.getDateToDay(new Date()));
 			}
 			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+            TMisDunningPeople dunningPeople = new TMisDunningPeople();
+            Map<String, Object> map = initQueryAuthority(dunningPeople);
+            List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+            if (performanceDayReport.getGroup() == null){
+                performanceDayReport.setGroup((TMisDunningGroup) map.get("tMisDunningGroup"));
+            }
+            if (StringUtils.isEmpty(performanceDayReport.getPersonnel())){
+                List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+                for (TMisDunningPeople people : dunningPeoples){
+                    peopleNames.add(people.getName());
+                }
+                performanceDayReport.setpNames(peopleNames);
+            }
 			List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
 			new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
 			return null;
