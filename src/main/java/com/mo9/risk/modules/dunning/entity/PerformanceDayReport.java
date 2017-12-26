@@ -2,6 +2,7 @@ package com.mo9.risk.modules.dunning.entity;
 
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import java.util.Date;
+import java.util.List;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
@@ -26,6 +27,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	private Long telnum;
 	private Long smsnum;
 	private TMisDunningGroup group;
+	private List<String> pNames;
 
 	
 //	@ExcelField(title="日期", type=1, align=2, sort=1)
@@ -110,7 +112,15 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 		this.group = group;
 	}
 
-//	@ExcelField(title="周期begin", type=1, align=2, sort=8)
+	public List<String> getpNames() {
+		return pNames;
+	}
+
+	public void setpNames(List<String> pNames) {
+		this.pNames = pNames;
+	}
+
+	//	@ExcelField(title="周期begin", type=1, align=2, sort=8)
 //	public Integer getBegin() {
 //		return begin;
 //	}
