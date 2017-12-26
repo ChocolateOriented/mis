@@ -314,7 +314,15 @@
 			AND  t.behaviorstatus = 'in' 
 			AND  t.createby = 'auto_admin'
 			AND  t.DunningCycle = #{dunningcycle}
-		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  AND a.Invalid = 't' AND a.auto = 't' AND  pz.debt_biz_type = #{debtbiztype}
+			<choose>
+	            <when test="debtbiztypeValue != null and debtbiztypeValue == 'jinRongZhongXin'">
+	                AND o.platform_ext LIKE concat('%', #{debtbiztypeValue} ,'%')
+	            </when>
+	            <otherwise>
+	            	AND o.platform_ext NOT LIKE concat('%','jinRongZhongXin','%')
+	            </otherwise>
+	        </choose>
+		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  AND a.Invalid = 't' AND a.auto = 't' AND  pz.debt_biz_type = #{debtbiztypeDescription}
 			GROUP BY a.Id
 			ORDER BY sumcorpusamount
 	</select>	

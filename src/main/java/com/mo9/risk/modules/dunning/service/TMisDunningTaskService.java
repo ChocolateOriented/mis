@@ -1663,6 +1663,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Transactional(readOnly = false)
 	public void autoAssignCycle(String dunningtaskstatus, String dunningcycle,String begin,String end ) {
 		List<Dict> debtBizTypes = DictUtils.getDictList(DEBTBIZ_TYPE);
+		logger.info("队列：" + dunningcycle + "过期分案产品" + debtBizTypes + "个"+ new Date());
 		for(Dict debtBizType : debtBizTypes){
 			String debtbiztypename = debtBizType.getLabel(); 	// 产品名称
 			
@@ -1739,7 +1740,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 * 根据周期查询催收人员按金额排序
 						 */
 						TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
-						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getDescription());
+						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getValue(),debtBizType.getDescription());
 						
 						/**
 						 *  平均分配队列集合的催收人员
@@ -1813,6 +1814,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Scheduled(cron = "0 22 2 * * ?") 
 	public void autoAssignNewOrder() {
 		List<Dict> debtBizTypes = DictUtils.getDictList(DEBTBIZ_TYPE);
+		logger.info("产品-" + debtBizTypes + "个,新增案件"+ new Date());
 		for(Dict debtBizType : debtBizTypes){
 			String debtbiztypename = debtBizType.getLabel(); 	// 产品名称
 			
@@ -1920,7 +1922,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 * 根据周期查询催收人员按金额排序
 						 */
 						TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
-						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getDescription());
+						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getValue(),debtBizType.getDescription());
 						
 						/**
 						 * 平均分配队列集合的催收人员
