@@ -316,10 +316,10 @@
 			AND  t.DunningCycle = #{dunningcycle}
 			<choose>
 	            <when test="debtbiztypeValue != null and debtbiztypeValue == 'jinRongZhongXin'">
-	                AND o.platform_ext LIKE concat('%', #{debtbiztypeValue} ,'%')
+	                AND t.platformext LIKE concat('%', #{debtbiztypeValue} ,'%')
 	            </when>
 	            <otherwise>
-	            	AND o.platform_ext NOT LIKE concat('%','jinRongZhongXin','%')
+	            	AND t.platformext NOT LIKE concat('%','jinRongZhongXin','%')
 	            </otherwise>
 	        </choose>
 		WHERE a.DunningCycle LIKE concat('%',#{dunningcycle},'%')  AND a.Invalid = 't' AND a.auto = 't' AND  pz.debt_biz_type = #{debtbiztypeDescription}
