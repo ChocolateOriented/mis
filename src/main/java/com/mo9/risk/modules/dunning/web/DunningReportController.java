@@ -152,6 +152,11 @@ public class DunningReportController extends BaseController {
 			}
 			Map<String, Object> map = initQueryAuthority(dunningPeople);
             List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+			List<TMisDunningGroup> groups = (List<TMisDunningGroup>) map.get("groups");
+			boolean groupLimit = true;
+			if (groups == null) {
+				groupLimit = false;
+			}
 			if (performanceDayReport.getGroup() == null){
 			    performanceDayReport.setGroup((TMisDunningGroup) map.get("tMisDunningGroup"));
             }
@@ -167,6 +172,7 @@ public class DunningReportController extends BaseController {
 			model.addAttribute("groupList", map.get("groups"));
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
+			model.addAttribute("groupLimit", groupLimit);
 		} catch (Exception e) {
 			logger.info("催收绩效日表打开失败",e);
 			return "error";
