@@ -6,6 +6,17 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+            var groups = [];
+            if ("${groupLimit}" == "true") {
+                var groupOptions = $("#groupList")[0].options;
+                for (var i = 0; i < groupOptions.length; i++) {
+                    if (groupOptions[i].value) {
+                        groups.push(groupOptions[i].value);
+                    }
+                }
+            }
+
 			$("#btnExport").click(function(){
 				top.$.jBox.confirm("确认要导出催收员工日报数据吗？","系统提示",function(v,h,f){
 					if(v=="ok"){
@@ -20,37 +31,45 @@
 			$("#groupList").on("change",function(){
 				$("#dunningPeople").select2("val", null);
 			});
-			
-			$("#dunningPeople").select2({//
-			    ajax: {
-			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
-			        dataType: 'json',
-			        quietMillis: 250,
-			        data: function (term, page) {//查询参数 ,term为输入字符
-			        	var groupId=$("#groupList").val(); 
-		            	return {'group.id': groupId , name:term};
-			        },
-			        results: function (data, page) {//选择要显示的数据
-                      var resultsData = [] ;
-                      resultsData[0] = {id:null,name:"全部人员"};
-                      for (var i = 0; i < data.length; i++) {
-                        resultsData[i+1] = {id:data[i].name,name:data[i].name};
-                      }
-                      return { results: resultsData };
-			        },
-			        cache: true
-			    },
-			    formatResult:formatPeopleList, //选择显示字段
-			    formatSelection:formatPeopleList, //选择选中后填写字段
-			    initSelection: function(element, callback) {//回显
-                  var name=$(element).val();
-                  if (name=="") {
-                    return;
-                  }
-                  callback({id:name,name:name})
-			    },
-		        width:170
-			});
+
+            $("#dunningPeople").select2({//
+                ajax: {
+                    url: "${ctx}/dunning/tMisDunningPeople/optionList",
+                    quietMillis: 250,
+                    data: function (term, page) {//查询参数 ,term为输入字符
+                        var groupId=$("#groupList").val();
+                        var param = {};
+                        if ("${groupLimit}" == "true") {
+                            param = {'group.id': groupId,
+                                'group.groupIds': groups.toString(),
+                                name:term};
+                        } else {
+                            param = {'group.id': groupId,
+                                name:term};
+                        }
+                        return param;
+                    },
+                    results: function (data, page) {//选择要显示的数据
+                        var resultsData = [] ;
+                        resultsData[0] = {id:null,name:"全部人员"};
+                        for (var i = 0; i < data.length; i++) {
+                            resultsData[i+1] = {id:data[i].name,name:data[i].name};
+                        }
+                        return { results: resultsData };
+                    },
+                    cache: true,
+                },
+                formatResult:formatPeopleList, //选择显示字段
+                formatSelection:formatPeopleList, //选择选中后填写字段
+                initSelection: function(element, callback) {//回显
+                    var name=$(element).val();
+                    if (name=="") {
+                        return;
+                    }
+                    callback({id:name,name:name})
+                },
+                width:170
+            });
 			
 		});
 		
