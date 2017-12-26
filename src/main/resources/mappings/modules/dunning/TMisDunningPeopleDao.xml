@@ -3,13 +3,6 @@
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao">
 	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
 
-	<resultMap id="peopleDetail" type="TMisDunningPeople" autoMapping="true">
-		<id column="id" property="id"/>
-		<collection property="bizTypes" ofType="com.mo9.risk.modules.dunning.enums.DebtBizType">
-			<result column="bizTypes"/>
-		</collection>
-	</resultMap>
-
 	<sql id="tMisDunningPeopleColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
@@ -34,27 +27,33 @@
 		,
 		g.`type` AS "group.type",
 		g.`name` AS "group.name",
-		pb.debt_biz_type AS "bizTypes"
+		pb.bizTypes AS "bizTypesText"
 	</sql>
 
 	<sql id="tMisDunningPeopleJoins">
 		LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
-		<!--pb用于显示, pbq用于查询-->
-		LEFT JOIN t_mis_dunning_people_biz pb ON a.id = pb.dunning_people_id
-		LEFT JOIN t_mis_dunning_people_biz pbq ON a.id = pbq.dunning_people_id
+		LEFT JOIN (
+		SELECT
+		dunning_people_id,
+		GROUP_CONCAT(debt_biz_type) AS bizTypes
+		FROM
+		t_mis_dunning_people_biz
+		GROUP BY
+		dunning_people_id
+		) AS pb ON pb.dunning_people_id = a.id
 	</sql>
-    
-	<select id="get" resultMap="peopleDetail" useCache="false">
-		SELECT 
+
+	<select id="get" resultType="TMisDunningPeople" useCache="false">
+		SELECT
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
 		FROM t_mis_dunning_people a
 		<include refid="tMisDunningPeopleJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
-	<select id="findList" resultMap="peopleDetail" useCache="false">
-		SELECT 
+
+	<select id="findList" resultType="TMisDunningPeople" useCache="false">
+		SELECT
 			<include refid="tMisDunningPeopleColumns"/>
 			<include refid="peopleJoinsColumns"/>
 			FROM t_mis_dunning_people a
@@ -92,17 +91,17 @@
 				</if>
 			</if>
 			<if test="group != null and group.queryTypes != null and group.queryTypes.size != 0 ">
-				AND g.type in 
+				AND g.type in
 				<foreach item="item" index="index" collection="group.queryTypes" open="(" separator="," close=")">
-	                #{item}
-	            </foreach>
+            #{item}
+        </foreach>
 			</if>
-			<if test="bizTypes != null and bizTypes.size != 0 ">
-				AND pbq.debt_biz_type in
-				<foreach item="item" index="index" collection="bizTypes" open="(" separator="," close=")">
-					#{item}
-				</foreach>
-			</if>
+      <if test="bizTypes != null and bizTypes.size != 0 ">
+				AND pb.bizTypes LIKE concat
+        <foreach item="item" index="index" collection="bizTypes" open="(" separator=", ',' ," close=")">
+          #{item}
+        </foreach>
+      </if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -113,14 +112,14 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
 	<select id="findOptionList" resultType="TMisDunningPeople">
 		SELECT
 			a.`nickname` ,
 			a.`name` ,
 			a.`id`
 		FROM t_mis_dunning_people a
-		WHERE 
+		WHERE
 			a.Invalid = 't'
 		<if test="group != null and group.id != null and group.id !='' ">
 			AND a.`groupId` = #{group.id}

@@ -4,7 +4,9 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -45,19 +47,20 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	private String nickname;
 	private User user;
 	private List<DebtBizType> bizTypes;
+
 	private String bizTypesStr;
 
 	private List<String> queryIds;// 用于催收人查询
-	
+
 	private String extensionNumber;// 催收员分机号
-	
+
 	private	String sumcorpusamount; // 分案金额
-	
-	
+
+
 	private	String groupName; // 所属组中文名.导入用
 	private	String validateId; // 校验是否已经是催收员.导入用
-	
-	
+
+
 	public TMisDunningPeople() {
 		super();
 	}
@@ -78,8 +81,8 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	public void setDbid(Integer dbid) {
 		this.dbid = dbid;
 	}
-	
-	
+
+
 	@Length(min = 1, max = 64, message = "催收人员名称不能为空")
 	@ExcelField(title="催收人员账号", align=2, sort=10)
 	public String getName() {
@@ -255,5 +258,20 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	public void setBizTypes(List<DebtBizType> bizTypes) {
 		this.bizTypes = bizTypes;
+	}
+
+	//列表SQL使用
+	public void setBizTypesText(String bizTypesText) {
+		if (StringUtils.isBlank(bizTypesText)) {
+			return;
+		}
+		String[] bizs = bizTypesText.split(",");
+		if (bizs == null){
+			return;
+		}
+		bizTypes = new ArrayList<>(bizs.length);
+		for (int i = 0; i < bizs.length; i++) {
+			bizTypes.add(DebtBizType.valueOf(bizs[i]));
+		}
 	}
 }
