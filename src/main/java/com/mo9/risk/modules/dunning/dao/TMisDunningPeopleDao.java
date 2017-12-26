@@ -46,7 +46,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @param dunningcycle
 	 * @return
 	 */
-	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(@Param("dunningcycle")String dunningcycle,@Param("begindatetime")Date begindatetime,@Param("enddatetime")Date enddatetime);
+	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(@Param("dunningcycle")String dunningcycle,@Param("begindatetime")Date begindatetime,@Param("enddatetime")Date enddatetime,@Param("debtbiztype")String debtbiztype);
 	
 	/**
 	 * 批量更新完成的任务

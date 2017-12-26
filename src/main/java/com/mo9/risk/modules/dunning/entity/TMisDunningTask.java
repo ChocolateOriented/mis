@@ -76,6 +76,10 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 	private String quality;
 
 	private Date extensionDate;
+	
+	private String platformext; // 渠道
+	private String debtbiztype; // 产品名
+	
 
 	public TMisDunningTask() {
 		super();
@@ -321,6 +325,23 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 		this.extensionDate = extensionDate;
 	}
 
+	public String getPlatformext() {
+		return platformext;
+	}
+
+	public void setPlatformext(String platformext) {
+		this.platformext = platformext;
+	}
+
+	public String getDebtbiztype() {
+		return debtbiztype;
+	}
+
+	public void setDebtbiztype(String debtbiztype) {
+		this.debtbiztype = debtbiztype;
+	}
+	
+
 	//	@Length(min=0, max=64, message="createby长度必须介于 0 和 64 之间")
 //	public String getCreateby() {
 //		return createby;
@@ -376,7 +397,6 @@ public class TMisDunningTask extends DataEntity<TMisDunningTask> {
 		Date now = new Date();
 		return this.getBalance(now);
 	}*/
-
 
 
 	/**
