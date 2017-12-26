@@ -91,10 +91,10 @@ public class DunningReportController extends BaseController {
 		model.addAttribute("groupList", groups);
 		model.addAttribute("groupLimit", groupLimit);
 
-		//若只管理一个小组则默认选中
+/*		//若只管理一个小组则默认选中
 		if (groups.size() == 1) {
 			smMisDunningProductivePowerDailyReport.setGroupId(groups.get(0).getId());
-		}
+		}*/
 		return "modules/dunning/sMisDunningProductivePowerDailyReportList";
 	}
 
