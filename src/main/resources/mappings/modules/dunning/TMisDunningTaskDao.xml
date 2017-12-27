@@ -1706,7 +1706,8 @@
 				t.id as "taskid",
 				t.DunningCycle as "dunningcycle",
 				p.id as "dunningpeopleid",
-				p.Name as "dunningpeoplename"
+				p.Name as "dunningpeoplename",
+				o.platform_ext as "platformext"
 		FROM t_mis_dunning_task t 
 				LEFT JOIN t_mis_dunning_people AS p ON p.id = t.dunningpeopleid 
 				LEFT JOIN t_risk_order AS o  ON o.dealcode = t.dealcode 
