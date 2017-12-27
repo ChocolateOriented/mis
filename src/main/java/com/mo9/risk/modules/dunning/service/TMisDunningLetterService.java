@@ -18,7 +18,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.mo9.risk.modules.dunning.entity.TMisDunningLetter.SendResult;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MailSender;
-import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.service.ServiceException;
@@ -120,7 +119,6 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		for (int i = 0; i < list.size(); i++) {
 			TMisDunningLetter tMisDunningLetter = list.get(i);
 			String dealcode = tMisDunningLetter.getDealcode();
-			String postCode = tMisDunningLetter.getPostCode();
 			if(StringUtils.isEmpty(dealcode)){
 				message.append("第"+(i+1)+"条订单为空,请检查");
 				throw new ServiceException("第"+(i+1)+"条订单为空,请检查");
