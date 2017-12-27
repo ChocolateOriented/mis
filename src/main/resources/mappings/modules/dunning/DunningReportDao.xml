@@ -302,10 +302,6 @@
 		  </if>
 	  </where>
 	  ORDER BY DunningCycle
-
-	  <if test="page!= null and page.pageSize != -1">
-		  LIMIT ${page.firstResult},${page.pageSize}
-	  </if>
 	  ) a
   </select>
 </mapper>
