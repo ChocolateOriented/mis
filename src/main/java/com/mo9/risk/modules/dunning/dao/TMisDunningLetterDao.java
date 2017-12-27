@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.mo9.risk.modules.dunning.bean.TMisDunningLetterDownLoad;
-import com.mo9.risk.modules.dunning.entity.TMisAgentInfo;
 import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
@@ -19,7 +18,6 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 @MyBatisDao
 public interface TMisDunningLetterDao  extends CrudDao<TMisDunningLetter> {
-	public List<TMisAgentInfo> findList(TMisAgentInfo entity);
 	/**
 	 * 同步逾期历史60+(可配置)案件
 	 * @param daySyn 

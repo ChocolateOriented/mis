@@ -12,6 +12,7 @@
 		l.downLoadFlag AS "downLoadFlag",
 		l.ocrAddr AS "ocrAddr",
 		l.realname AS "realname",
+		l.remark AS "remark",
 		l.CreateBy AS "createBy.id",
 		l.CreateDate AS "createDate",
 		l.UpdateBy AS "updateBy.id",
@@ -91,6 +92,7 @@
 			downLoadFlag,
 			ocrAddr,
 			realname,
+			remark,
 			creditamount,
 			createDate,
 			updateDate,
@@ -106,6 +108,7 @@
 			#{downLoadFlag},
 			#{item.ocrAddr},
 			#{item.realname},
+			#{item.remark},
 			#{item.creditamount},
 			#{createDate},
 			#{updateDate},
@@ -125,6 +128,7 @@
 			ocrAddr,
 			realname,
 			creditamount,
+			remark,
 			createDate,
 			updateDate,
 			createBy,
@@ -142,6 +146,7 @@
 			#{item.ocrAddr},
 			#{item.realname},
 			#{item.creditamount},
+			#{item.remark},
 			#{item.createDate},
 			#{item.updateDate},
 			#{item.createBy.name},
@@ -162,6 +167,7 @@
 			ocrAddr,
 			realname,
 			creditamount,
+			remark,
 			createDate,
 			updateDate,
 			createBy,
@@ -179,6 +185,7 @@
 			#{item.ocrAddr},
 			#{item.realname},
 			#{item.creditamount},
+			#{item.remark},
 			#{item.createDate},
 			#{item.updateDate},
 			#{item.createBy.name},
@@ -211,6 +218,9 @@
 		  	</if>
 		  	<if test="creditamount != null and creditamount != '' ">
 		  	creditamount =#{creditamount},	
+		  	</if>
+		  	<if test="remark != null and remark != '' ">
+		  	remark =#{remark},	
 		  	</if>
 		  	sendResult =#{sendResult},
 			resultDate = #{resultDate},
@@ -288,6 +298,5 @@
 		where
 		l.dealcode = #{dealcode}
 	</select>
-	
 	
 </mapper>

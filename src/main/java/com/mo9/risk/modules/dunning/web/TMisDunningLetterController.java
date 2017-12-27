@@ -90,7 +90,10 @@ public class TMisDunningLetterController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "downLoadMail")
 	public void downLoadMail( String identity ,Integer count ,HttpServletRequest request, HttpServletResponse response) {
-		tMisDunningLetterService.sendMail(identity,count);
+		try {
+			tMisDunningLetterService.sendMail(identity,count);
+		} catch (Exception e) {
+		}
 	}
 	/**
 	 * 发送信函
@@ -99,7 +102,12 @@ public class TMisDunningLetterController extends BaseController {
 	@RequestMapping(value = "sendLetterDealcodes")
 	public String sendLetters(@RequestParam("sendLetterDealcodes") List<String> sendLetterDealcodes,HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String redirectUrl = "redirect:" + adminPath + "/dunning/tMisDunningLetter/list?repage";
-		boolean	 sendBol=tMisDunningLetterService.sendLetters(sendLetterDealcodes);
+		boolean sendBol;
+		try {
+			sendBol = tMisDunningLetterService.sendLetters(sendLetterDealcodes);
+		} catch (Exception e) {
+			sendBol=false;
+		}
 		if(sendBol){
 			addMessage(redirectAttributes,"发送信函成功");
 		}else{
@@ -160,7 +168,12 @@ public class TMisDunningLetterController extends BaseController {
 			return redirectUrl;
 		}
 		StringBuilder message=new StringBuilder();
-		boolean validsInsert=tMisDunningLetterService.batchUpdate(list,message);
+		boolean validsInsert;
+		try {
+			validsInsert = tMisDunningLetterService.batchUpdate(list,message);
+		} catch (Exception e) {
+			validsInsert=false;
+		}
 		if(!validsInsert){
 			addMessage(redirectAttributes,  "解析文件:" + file.getOriginalFilename() + ",发生失败."+message.toString());
 			return redirectUrl;

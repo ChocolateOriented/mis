@@ -363,7 +363,12 @@ public class TMisDunningPeopleController extends BaseController {
 			return "redirect:form";
 		}
 		StringBuilder message=new StringBuilder();
-		boolean validsInsert=tMisDunningPeopleService.batchInsert(list,message);
+		boolean validsInsert;
+		try {
+			validsInsert = tMisDunningPeopleService.batchInsert(list,message);
+		} catch (Exception e) {
+			validsInsert=false;
+		}
 		if(!validsInsert){
 			addMessage(redirectAttributes,  "解析文件:" + file.getOriginalFilename() + ",发生失败."+message.toString());
 			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/form?repage";
