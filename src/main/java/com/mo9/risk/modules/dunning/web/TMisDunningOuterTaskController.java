@@ -241,12 +241,13 @@ public class TMisDunningOuterTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
 	@RequestMapping(value = "dialogOutDistribution")
-	public String dialogOutDistribution( Model model,String dunningcycle) {
+	public String dialogOutDistribution(Model model, String dunningcycle, String bizType) {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
+			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
 			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 			model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		} catch (Exception e) {
@@ -282,15 +283,16 @@ public class TMisDunningOuterTaskController extends BaseController {
 		String[] type = request.getParameterValues("type[]");
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
+		String bizType = request.getParameter("bizType");
 
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
-				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name)) {
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
 			return new ArrayList<TMisDunningPeople>();
 		}
 
 		String dunningpeoplename=request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle,type,auto,name,dunningpeoplename);
+			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;

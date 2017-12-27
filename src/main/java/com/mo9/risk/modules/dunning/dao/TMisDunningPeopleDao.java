@@ -46,7 +46,7 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @param dunningcycle
 	 * @return
 	 */
-	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(@Param("dunningcycle")String dunningcycle,@Param("begindatetime")Date begindatetime,@Param("enddatetime")Date enddatetime,@Param("debtbiztype")String debtbiztype);
+	public List<TMisDunningPeople> findPeopleSumcorpusamountByDunningcycle(@Param("dunningcycle")String dunningcycle,@Param("begindatetime")Date begindatetime,@Param("enddatetime")Date enddatetime,@Param("debtbiztypeValue")String debtbiztypeValue,@Param("debtbiztypeDescription")String debtbiztypeDescription);
 	
 	/**
 	 * 批量更新完成的任务
@@ -98,7 +98,8 @@ public interface TMisDunningPeopleDao extends CrudDao<TMisDunningPeople> {
 	 * @param auto
 	 * @param name
 	 */
-	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(@Param("dunningcycle")String[] dunningcycle, @Param("type")String[] type, @Param("auto")String[] auto, @Param("name")String name,@Param("dunningpeoplename")String dunningpeoplename);
+	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(@Param("dunningcycle")String[] dunningcycle, @Param("type")String[] type, @Param("auto")String[] auto,
+			@Param("name")String name ,@Param("dunningpeoplename")String dunningpeoplename, @Param("bizType")String bizType);
 	
 	/**
 	 * 批量更新小组分配,自动分配

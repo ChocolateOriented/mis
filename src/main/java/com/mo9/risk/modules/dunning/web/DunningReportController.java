@@ -4,14 +4,15 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.entity.*;
-import com.mo9.risk.modules.dunning.service.TMisCallingRecordService;
+import com.mo9.risk.modules.dunning.service.*;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,9 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.mo9.risk.modules.dunning.service.DunningReportService;
-import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
@@ -67,26 +65,36 @@ public class DunningReportController extends BaseController {
 	@RequiresPermissions("dunning:sMisDunningProductivePowerDailyReport:view")
 	@RequestMapping(value = {"productivePowerDailyReport"})
 	public String findDunningProductivePowerDailyReport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport, HttpServletRequest request, HttpServletResponse response, Model model) {
-		//添加默认查询条件
+/*		//添加默认查询条件
 		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
+        //催收小组列表,若无限制则查询所有小组
+        List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups();*/
+        TMisDunningPeople dunningPeople = new TMisDunningPeople();
+        Map<String, Object> map = initQueryAuthority(dunningPeople);
+        List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+        List<TMisDunningGroup> groups = (List<TMisDunningGroup>) map.get("groups");
+        smMisDunningProductivePowerDailyReport.setQueryGroups(groups);
+        boolean groupLimit = true;
+        if (groups == null) {
+            groupLimit = false;
+        }
+        if (StringUtils.isEmpty(smMisDunningProductivePowerDailyReport.getDunningPeopleName())){
+            List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+            for (TMisDunningPeople people : dunningPeoples){
+                peopleNames.add(people.getName());
+            }
+            smMisDunningProductivePowerDailyReport.setpNames(peopleNames);
+        }
 		Page<SMisDunningProductivePowerDailyReport> page = reportService
 				.findProductivePowerDailyReport(new Page<SMisDunningProductivePowerDailyReport>(request, response), smMisDunningProductivePowerDailyReport);
 		model.addAttribute("page", page);
-
-		//催收小组列表,若无限制则查询所有小组
-		List<TMisDunningGroup> groups = smMisDunningProductivePowerDailyReport.getQueryGroups();
-		boolean groupLimit = true;
-		if (groups == null) {
-			groups = groupService.findList(new TMisDunningGroup());
-			groupLimit = false;
-		}
 		model.addAttribute("groupList", groups);
 		model.addAttribute("groupLimit", groupLimit);
 
-		//若只管理一个小组则默认选中
+/*		//若只管理一个小组则默认选中
 		if (groups.size() == 1) {
 			smMisDunningProductivePowerDailyReport.setGroupId(groups.get(0).getId());
-		}
+		}*/
 		return "modules/dunning/sMisDunningProductivePowerDailyReportList";
 	}
 
@@ -99,8 +107,18 @@ public class DunningReportController extends BaseController {
 	public String dunningProductivePowerDailyReportExport(SMisDunningProductivePowerDailyReport smMisDunningProductivePowerDailyReport,
 			HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		String fileName = "productivePowerDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
-		//添加默认查询条件
-		reportService.setQueryConditions(smMisDunningProductivePowerDailyReport);
+        TMisDunningPeople dunningPeople = new TMisDunningPeople();
+        Map<String, Object> map = initQueryAuthority(dunningPeople);
+        List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+        List<TMisDunningGroup> groups = (List<TMisDunningGroup>) map.get("groups");
+        smMisDunningProductivePowerDailyReport.setQueryGroups(groups);
+        if (StringUtils.isEmpty(smMisDunningProductivePowerDailyReport.getDunningPeopleName())){
+            List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+            for (TMisDunningPeople people : dunningPeoples){
+                peopleNames.add(people.getName());
+            }
+            smMisDunningProductivePowerDailyReport.setpNames(peopleNames);
+        }
 		List<SMisDunningProductivePowerDailyReport> page = reportService.findProductivePowerDailyReport(smMisDunningProductivePowerDailyReport);
 		try {
 			new ExportExcel("催收员案件活动日报", SMisDunningProductivePowerDailyReport.class).setDataList(page).write(response, fileName).dispose();
@@ -132,11 +150,29 @@ public class DunningReportController extends BaseController {
 			if(null == performanceDayReport.getDatetimeend()){
 				performanceDayReport.setDatetimeend( DateUtils.getDateToDay(new Date()));
 			}
+			Map<String, Object> map = initQueryAuthority(dunningPeople);
+            List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+			List<TMisDunningGroup> groups = (List<TMisDunningGroup>) map.get("groups");
+			boolean groupLimit = true;
+			if (groups == null) {
+				groupLimit = false;
+			}
+			if (performanceDayReport.getGroup() == null){
+			    performanceDayReport.setGroup((TMisDunningGroup) map.get("tMisDunningGroup"));
+            }
+            if (StringUtils.isEmpty(performanceDayReport.getPersonnel())){
+                List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+			    for (TMisDunningPeople people : dunningPeoples){
+			        peopleNames.add(people.getName());
+                }
+                performanceDayReport.setpNames(peopleNames);
+            }
 			Page<PerformanceDayReport> page = reportService.findPerformanceDayReport(new Page<PerformanceDayReport>(request, response), performanceDayReport);
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
-			model.addAttribute("groupList", groupService.findList(new TMisDunningGroup()));
+			//List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
+			model.addAttribute("groupList", map.get("groups"));
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("page", page);
+			model.addAttribute("groupLimit", groupLimit);
 		} catch (Exception e) {
 			logger.info("催收绩效日表打开失败",e);
 			return "error";
@@ -163,6 +199,19 @@ public class DunningReportController extends BaseController {
 				performanceDayReport.setDatetimeend( DateUtils.getDateToDay(new Date()));
 			}
 			String fileName = "performanceDayReport" + DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+            TMisDunningPeople dunningPeople = new TMisDunningPeople();
+            Map<String, Object> map = initQueryAuthority(dunningPeople);
+            List<TMisDunningPeople> dunningPeoples = (List<TMisDunningPeople>) map.get("dunningPeoples");
+            if (performanceDayReport.getGroup() == null){
+                performanceDayReport.setGroup((TMisDunningGroup) map.get("tMisDunningGroup"));
+            }
+            if (StringUtils.isEmpty(performanceDayReport.getPersonnel())){
+                List<String> peopleNames = new ArrayList<String>(dunningPeoples.size());
+                for (TMisDunningPeople people : dunningPeoples){
+                    peopleNames.add(people.getName());
+                }
+                performanceDayReport.setpNames(peopleNames);
+            }
 			List<PerformanceDayReport> page = reportService.findPerformanceDayReport(performanceDayReport);
 			new ExportExcel("导出催收日表", PerformanceDayReport.class).setDataList(page).write(response, fileName).dispose();
 			return null;
@@ -229,4 +278,55 @@ public class DunningReportController extends BaseController {
 		}
 		return "redirect:"+ adminPath + "/dunning/tMisCallingRecord/getPhoneCallingReportForEveryDayList";
 	}
+
+	/**
+	 * 初始化查询权限
+	 * 催收组长权限可看到自己组员的数据
+	 * 催收监理权限可看到自己机构下所有组员的数据
+	 * 催收总监权限可以看到全部数据
+	 * @param dunningPeople
+	 * @return
+	 */
+	private Map<String, Object> initQueryAuthority(TMisDunningPeople dunningPeople){
+		Map<String, Object> restMap = new HashMap<String, Object>();
+		List<TMisDunningPeople> dunningPeoples = null;
+		List<TMisDunningGroup> groups = new ArrayList<TMisDunningGroup>();
+		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
+		int permissions = TMisDunningTaskService.getPermissions();
+		//催收专员
+		if (permissions == TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS){
+/*			TMisDunningPeople dp = new TMisDunningPeople();
+			dunningPeoples = tMisDunningPeopleService.findList(dp);
+			groups.add(dunningPeoples.get(0).getGroup());*/
+		}else {
+			//催收主管
+			if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
+				tMisDunningGroup.setLeader(UserUtils.getUser());
+			}
+			//催收监管
+			if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
+				tMisDunningGroup.setSupervisor(UserUtils.getUser());
+			}
+			groups = groupService.findList(tMisDunningGroup);
+			StringBuffer stringBuffer = new StringBuffer("");
+			for (TMisDunningGroup group : groups) {
+				stringBuffer.append("," + group.getId());
+			}
+			List<String> groupIds = null;
+			if (stringBuffer.toString().length() == 0){
+				groupIds = new ArrayList<String>();
+			}else {
+				groupIds = Arrays.asList(stringBuffer.toString().substring(1).split(","));
+			}
+			tMisDunningGroup.setGroupIds(groupIds);
+
+			dunningPeople.setGroup(tMisDunningGroup);
+			dunningPeoples = tMisDunningPeopleService.findList(dunningPeople);
+		}
+		restMap.put("dunningPeoples", dunningPeoples);
+		restMap.put("tMisDunningGroup", tMisDunningGroup);
+		restMap.put("groups", groups);
+		return restMap;
+	}
+
 }

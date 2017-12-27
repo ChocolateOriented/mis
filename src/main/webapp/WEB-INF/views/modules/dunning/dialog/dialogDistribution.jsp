@@ -18,9 +18,11 @@
                     }
                 }
                 $(obj).css("background-color", "white");
+                $(obj).css("color", "#555");
                 $(obj).attr("selected", false);
 			} else {
                 $(obj).css("background-color", "#2fa4e7");
+                $(obj).css("color", "#fff");
                 $(obj).attr("selected", true);
                 selectedPeoples.push(peopleId);
 			}
@@ -29,6 +31,7 @@
         function moveElement(obj, peopleId) {
             var newElem = obj.clone(true);
             newElem.css("background-color", "white");
+            newElem.css("color", "#555");
             newElem.children("span").css("display", "inline-block");
             newElem.removeAttr("onclick");
             newElem.prop("id", peopleId);
@@ -41,7 +44,6 @@
 
         function leftMoveToRight() {
             for (var i = 0; i < selectedPeoples.length; i++) {
-
                 var selected = $("#leftContainer div[peopleId='" + selectedPeoples[i] + "']");
                 var rightElem = $("#rightContainer div[peopleId='" + selectedPeoples[i] + "']");
                 if (rightElem.length > 0) {
@@ -96,11 +98,12 @@
 			var dunningpeoplename = $("#searchName").val() || "";
 
             var param = {
-                dunningcycle : cycles,
-                type : grouptype,
-				auto : status,
-				name : $("#groupList").val(),
-                dunningpeoplename : dunningpeoplename
+            	bizType: $("#bizType").val(),
+                dunningcycle: cycles,
+                type: grouptype,
+				auto: status,
+				name: $("#groupList").val(),
+                dunningpeoplename: dunningpeoplename
 			};
             $.post("${ctx}/dunning/tMisDunningTask/dialogDistributionPeople", param, function(peopleList) {
                 $("#leftContainer").empty();
@@ -134,7 +137,7 @@
 
             $("#orders").val(check_orders);
             $("#selectedOrders").text(check_orders.length);
-
+            
             $('#cyclesCheckable').change(function() {
                 var checked = $('#cyclesCheckable').prop("checked");
                 $("input[name='cycles']").prop("disabled", !checked);
@@ -185,7 +188,7 @@
 			});
 
 			function saveConfirm() {
-                if($("#inputForm").valid()){
+                if ($("#inputForm").valid()) {
                     if (!$("#rightContainer div").length) {
                         $.jBox.tip("请选择需要分案的催收人员", "warning");
                         return;
@@ -219,7 +222,6 @@
 	</script>
 
 	<style type="text/css">
-		/*div{float:left;}*/
 		input{border:none;}
 		textarea{ resize:none;}
 		.people {
@@ -242,13 +244,20 @@
 	<ul class="nav nav-tabs">
 	</ul>
 	<br/>
-	<form id="inputForm"  class="form-horizontal" style="margin-left: 20px;">
-		<input type="hidden" id="orders" name="orders"/>
-		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
+	<div class="form-horizontal" style="margin-left: 20px;">
 		<div>
 			<p style="font-size: medium;color: #1a1a1a">条件快捷筛选</p>
 		</div>
 		<div id="allpeople">
+			<div class="control-group">
+				<div style="width:20%;display:inline-block;">
+					<label style="margin-left:18px;">产品</label>
+					<input type="hidden" id="bizType" value="${bizType}"/>
+				</div>
+				<div style="width:40%;display:inline-block;">
+					<label>${bizType.desc}<label/>
+				</div>
+			</div>
 			<div class="control-group">
 				<div style="width:20%;display:inline-block;">
 					<input id="cyclesCheckable" type="checkbox"/><label for="cyclesCheckable">队列</label>
@@ -317,7 +326,8 @@
 				<i id="search" class="icon-search" style="position:absolute;top:7px;left:170px;cursor:pointer;"></i>
 			</div>
 		</div>
-
+	</div>
+	<form id="inputForm" class="form-horizontal" style="margin-left: 20px;">
 		<div class="container" style="width:100%;height: 120px;">
 			<div id="template" class="people" peopleId="" style="white-space:nowrap;display:none;" onclick="selectPeople(this);">
 				<span id="peopleName"></span>
@@ -328,8 +338,8 @@
 
 			</div>
 			<div style="width:20%;height:100px;text-align:center;padding:20px 0px 20px 0px;display:inline-block;">
-				<input type="button" value="---->" onclick="leftMoveToRight();"/><br/>
-				<input type="button" value="->>"  onclick="leftAllMoveToRight();"/>
+				<input type="button" value="--->" style="border-radius:4px;" onclick="leftMoveToRight();"/><br/>
+				<input type="button" value="->>" style="border-radius:4px;margin-top:5px;" onclick="leftAllMoveToRight();"/>
 			</div>
 			<div id="rightContainer" class="peoplesContainer">
 
@@ -341,7 +351,10 @@
 		</div>
 		<span>已选案件数:</span><span id="selectedOrders"></span>
 		<span style="margin-left:100px;">已选人员数:</span><span id="selectedDunningPeople">0</span>
-
+		
+		<input type="hidden" id="orders" name="orders"/>
+		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
+		
 		<div class="form-actions">
  			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
 				<input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;

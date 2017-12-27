@@ -1,17 +1,17 @@
 package com.mo9.risk.modules.dunning.service;
 
+import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.dao.TMisDunningMaxRepayNumberAndPrincipalDao;
 import com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * Created by jxguo on 2017/12/12.
@@ -35,7 +35,7 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
         entity.setPage(page);
         page.setUsePaginationInterceptor(false);
         page.setCount(dunningMaxRepayNumberAndPrincipalDao.countGroupMaxRepayNumberAndPrincipalListofDay(entity.getDateTime()));
-        List<DunningMaxRepayNumberAndPrincipal> list = dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofDay(entity.getDateTime());
+        List<DunningMaxRepayNumberAndPrincipal> list = groupMaxRepayperNumberAndperPrincipalList(dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofDay(entity.getDateTime()));
         return page.setList(list);
     }
 
@@ -53,7 +53,7 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
         entity.setPage(page);
         page.setUsePaginationInterceptor(false);
         getHalfMonthOrFullMonth(entity);
-        List<DunningMaxRepayNumberAndPrincipal> list = dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofPeriod(entity.getBegintime(), entity.getEndtime());
+        List<DunningMaxRepayNumberAndPrincipal> list = groupMaxRepayperNumberAndperPrincipalList(dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofPeriod(entity.getBegintime(), entity.getEndtime()));
         page.setCount(dunningMaxRepayNumberAndPrincipalDao.countGroupMaxRepayNumberAndPrincipalListofPeriod(entity.getBegintime(), entity.getEndtime()));
         setHalfMonthOrFullMonth(list, entity);
         return page.setList(list);
@@ -64,7 +64,7 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
     }
 
     public List<DunningMaxRepayNumberAndPrincipal> exportGroupMaxRepayNumberAndPrincipalListofDay(DunningMaxRepayNumberAndPrincipal entity){
-        return dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofDay(entity.getDateTime());
+        return groupMaxRepayperNumberAndperPrincipalList(dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofDay(entity.getDateTime()));
     }
 
     public List<DunningMaxRepayNumberAndPrincipal> exportPersonalMaxRepayNumberAndPrincipalListofPeriod(DunningMaxRepayNumberAndPrincipal entity){
@@ -76,7 +76,7 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
 
     public List<DunningMaxRepayNumberAndPrincipal> exportGroupMaxRepayNumberAndPrincipalListofPeriod(DunningMaxRepayNumberAndPrincipal entity){
         getHalfMonthOrFullMonth(entity);
-        List<DunningMaxRepayNumberAndPrincipal> list = dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofPeriod(entity.getBegintime(), entity.getEndtime());
+        List<DunningMaxRepayNumberAndPrincipal> list = groupMaxRepayperNumberAndperPrincipalList(dunningMaxRepayNumberAndPrincipalDao.getGroupMaxRepayNumberAndPrincipalListofPeriod(entity.getBegintime(), entity.getEndtime()));
         setHalfMonthOrFullMonth(list, entity);
         return list;
     }
@@ -121,5 +121,42 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
         calendar.setTime(date);
         calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)+add);//让日期加1
         return calendar.getTime();
+    }
+
+    /**
+     * 计算每组多少人
+     * key：组名
+     * value：人数
+     * @return
+     */
+    private Map<String, Integer> countPeopleOfGroup(){
+        List<TMisDunningGroup> list = dunningMaxRepayNumberAndPrincipalDao.countPeopleOfGroup();
+        Map<String, Integer> map = new HashMap<String, Integer>(list.size());
+        for (TMisDunningGroup group : list){
+            if (!StringUtils.isEmpty(group.getName())){
+                map.put(group.getName(), group.getNumberOfPeople());
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 计算每组人均最大还款户数和本金
+     * @param list
+     * @return
+     */
+    private  List<DunningMaxRepayNumberAndPrincipal> groupMaxRepayperNumberAndperPrincipalList(List<DunningMaxRepayNumberAndPrincipal> list){
+        Map<String, Integer> map = countPeopleOfGroup();
+        for (DunningMaxRepayNumberAndPrincipal entity : list){
+                //人均
+            if (map.get(entity.getNameDealcode()) != 0){
+                int perMaxDealcode = Integer.valueOf(entity.getMaxDealcode())/map.get(entity.getNameDealcode());
+                entity.setMaxDealcode(perMaxDealcode+"");
+                DecimalFormat df   = new DecimalFormat("#.00");
+                Double perPrincipal = Double.valueOf(entity.getPrincipal())/map.get(entity.getNameDealcode());
+                entity.setPrincipal(df.format(perPrincipal)+"");
+            }
+        }
+        return list;
     }
 }

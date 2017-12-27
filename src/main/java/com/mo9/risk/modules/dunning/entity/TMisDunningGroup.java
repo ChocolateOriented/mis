@@ -35,6 +35,8 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 	
 	private List<String> groupIds;
 
+	private int numberOfPeople = 0;
+
 	public TMisDunningGroup(String id) {
 		super(id);
 	}
@@ -98,6 +100,14 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 
 	public void setGroupIds(List<String> groupIds) {
 		this.groupIds = groupIds;
+	}
+
+	public int getNumberOfPeople() {
+		return numberOfPeople;
+	}
+
+	public void setNumberOfPeople(int numberOfPeople) {
+		this.numberOfPeople = numberOfPeople;
 	}
 
 	@Override

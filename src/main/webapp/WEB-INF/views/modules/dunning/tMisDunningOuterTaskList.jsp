@@ -100,6 +100,7 @@ $(document).ready(function() {
 	$("#distribution").click(function(){
 		 var orders = new Array();
 		 var dunningcycle = new Array();
+		 var bizTypes = [];
 			$("[name='orders']").each(function() {
 				if(this.checked){
 					if("" == $(this).attr("orders") || "" == $(this).attr("dunningcycle")){
@@ -108,6 +109,7 @@ $(document).ready(function() {
 					}
 					orders.push($(this).attr("orders"));
 					dunningcycle.push($(this).attr("dunningcycle"));
+					bizTypes.push($(this).attr("bizType"));
 				}
 			});
 			if(orders.length==0){
@@ -119,7 +121,12 @@ $(document).ready(function() {
 				$.jBox.tip("请选择同队列的案件", 'warning');
 				return;
 			}
-			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid;
+			var uniqueBizType = unique(bizTypes);
+			if(uniqueBizType.length != 1 ){
+				$.jBox.tip("请选择同产品的案件", 'warning');
+				return;
+			}
+			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid + "&bizType=" + uniqueBizType;
 			$.jBox.open("iframe:" + url, "手动分案" , 600, 500, {
 	               buttons: {},
 	               loaded: function (h) {
@@ -451,7 +458,8 @@ function changeStatus( dealcode) {
 		<tbody>
 			<c:forEach items="${page.list}" var="dunningOrder" varStatus="vs">
 				<tr>
-					<td><input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}" overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}"
+					<td><input type="checkbox" id="${dunningOrder.dealcode}#${vs.index}" name="orders" dunningcycle="${dunningOrder.dunningcycle}" title="${dunningOrder.dunningtaskdbid}" repaymenttime="${dunningOrder.repaymenttime}" dunningType="${dunningOrder.dunningpeopletype}"
+						overDuedays="${dunningOrder.overduedays}" orders="${dunningOrder.dealcode}" deadline="${dunningOrder.deadline}"  bizType="${fn:contains(dunningOrder.platformExt, 'jinRongZhongXin') ? 'JHJJ_JRZX' : 'JHJJ'}"
 						value="${dunningOrder.dealcode}#${dunningOrder.creditamount}#${dunningOrder.overduedays}#${dunningOrder.mobile}" /></td>
 					<td>${ (vs.index+1) + (page.pageNo-1) * page.pageSize}</td>
 					<td>
