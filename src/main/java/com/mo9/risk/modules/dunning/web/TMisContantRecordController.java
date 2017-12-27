@@ -4,6 +4,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,8 @@ public class TMisContantRecordController extends BaseController {
 	
 	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoDao;
+	@Autowired
+	private TMisDunningTaskService tMisDunningTaskService;
 	
 	@ModelAttribute
 	public TMisContantRecord get(@RequestParam(required=false) String id) {
@@ -357,8 +360,26 @@ public class TMisContantRecordController extends BaseController {
 //			e.printStackTrace();
 //		}
 //	}
-
-	
+	/**
+	 * 跳转补发电催结论页面
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "reissueCoclusionPage")
+	public String reissueCoclusionPage(  HttpServletRequest request) {
+		return "modules/dunning/TMisDunningReissueConclusion";
+	}
+	/**
+	 * 补发电催结论
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "reissueCoclusion")
+	@ResponseBody
+	public boolean reissueCoclusion( String conclusionType, Date today, HttpServletRequest request) {
+		Boolean isBoolean=tMisDunningTaskService.reissueCoclusion(conclusionType,today);
+		return isBoolean;
+	}
  
 	@RequiresPermissions("dunning:tMisContantRecord:view")
 	@RequestMapping(value = "dialogSmsDetail")
