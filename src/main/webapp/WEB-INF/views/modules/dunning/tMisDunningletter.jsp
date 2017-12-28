@@ -126,6 +126,7 @@
 			if(s)
 			$("#pageSize").val(s);
 			$("#pageSize").val($("#sizes").val());
+			$("#searchForm").attr("action","${ctx}/dunning/tMisDunningLetter/list");
 			$("#searchForm").submit();
 			return false;
 		}

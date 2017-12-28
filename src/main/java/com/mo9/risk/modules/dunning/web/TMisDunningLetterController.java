@@ -130,6 +130,7 @@ public class TMisDunningLetterController extends BaseController {
 		}
 		try {
 			new ExportExcel("信函管理", TMisDunningLetter.class).setDataList(letterList).write(response, fileName).dispose();
+			return null;
 		} catch (Exception e) {
 			logger.warn("导出失败！失败信息："+e);
 			addMessage(redirectAttributes, "导出失败！失败信息："+e);
