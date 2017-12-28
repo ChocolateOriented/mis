@@ -73,8 +73,8 @@
 			 $("#sendLetters").click(function(){
 					var sendLetterDealcodes = new Array();
 					var controls=false;
-					$("[name='letterIds'][control='true'][orderstatus='payment']").each(function(){
-						if($(this).attr('status')=='BESEND'){
+					$("[name='letterIds'][control='true']").each(function(){
+						if($(this).attr('status')=='BESEND' && $(this).attr('orderstatus')=='payment'){
 							sendLetterDealcodes.push($(this).attr("orders"));
 						}else{
 							controls=true;
@@ -86,7 +86,7 @@
 						return ;
 					}
 					if(sendLetterDealcodes.length==0){
-						$.jBox.tip("请勾选状态待发送的未还清的订单", 'warning');
+						$.jBox.tip("请勾选订单", 'warning');
 						return;
 					}
 					$("#sendLetterDealcodes").val(sendLetterDealcodes);
@@ -242,6 +242,7 @@
 				<th>逾期天数</th>
 				<th>户籍地址</th>
 				<th>订单状态</th>
+				<th>备注</th>
 				<th>订单还清日期</th>
 				<th>信函发送时间</th>
 				<th>结果更新时间</th>
@@ -259,14 +260,8 @@
 				<td>${letters.creditamount }</td>
 				<td>${letters.overduedays }</td>
 				<td>${letters.ocrAddr }</td>
-				<td>
-				<c:if test="${letters.orderStatus eq 'payment' }">
-				未还清
-				</c:if>
-				<c:if test="${letters.orderStatus eq 'payoff' }">
-				已还清
-				</c:if>
-				</td>
+				<td>${letters.orderStatusText}</td>
+				<td>${letters.remark}</td>
 				<td><fmt:formatDate value="${letters.payoffDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				<td><fmt:formatDate value="${letters.sendDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				<td><fmt:formatDate value="${letters.resultDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>

@@ -21,6 +21,7 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
@@ -240,14 +241,14 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public boolean batchInsert(List<TMisDunningPeople> list,StringBuilder message) {
+	public boolean batchInsert(List<TMisDunningPeople> list,StringBuilder message)throws Exception {
 		HashMap<String,String> validateMap=new HashMap<String,String>();
 		for (int i = 0; i < list.size(); i++) {
 			//校验不能为空
 			if(StringUtils.isBlank(list.get(i).getName())||StringUtils.isBlank(list.get(i).getNickname())||StringUtils.isBlank(list.get(i).getGroupName())||
 					StringUtils.isBlank(list.get(i).getDunningcycle())||StringUtils.isBlank(list.get(i).getAuto())){
 				message.append("第"+(i+1)+"条必要字段内容为空,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条必要字段内容为空,请检查");
 			}
 			//校验账号和花名在文件中是唯一的
 			if(validateMap==null||(StringUtils.isEmpty(validateMap.get(list.get(i).getName()))&&StringUtils.isEmpty(validateMap.get(list.get(i).getNickname())))){
@@ -255,12 +256,12 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 				validateMap.put(list.get(i).getNickname(),list.get(i).getNickname());
 			}else{
 				message.append("第"+(i+1)+"条账号或者花名与上面数据重复,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条账号或者花名与上面数据重复,请检查");
 			}
 			//自动分配
 			if(!("是".equals(list.get(i).getAuto())||"否".equals(list.get(i).getAuto()))){
 				message.append("第"+(i+1)+"条是否自动分配值错误,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条是否自动分配值错误,请检查");
 			}
 
 			//产品名
@@ -278,7 +279,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 				}
 				if (!find){
 					message.append("第"+(i+1)+"条产品列错误,请检查");
-					return false;
+					throw new ServiceException("第"+(i+1)+"条产品列错误,请检查");
 				}
 			}
 			
@@ -288,30 +289,30 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 				if(!("Q0".equals(cycle[j])||"Q1".equals(cycle[j])||"Q2".equals(cycle[j])||
 						"Q3".equals(cycle[j])||"Q4".equals(cycle[j])||"Q5".equals(cycle[j]))){
 					message.append("第"+(i+1)+"条催收队列错误,请检查");
-					return false;
+					throw new ServiceException("第"+(i+1)+"条催收队列错误,请检查");
 				}
 			}
 			//校验数据库的账号和所属组和花名
 			TMisDunningPeople tPeople= tMisDunningPeopleDao.validateBatchAccountAndGroup(list.get(i));
 			if(tPeople==null){
 				message.append("第"+(i+1)+"条账号不存在,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条账号不存在,请检查");
 			}
 			if(StringUtils.isNotEmpty(tPeople.getValidateId())){
 				message.append("第"+(i+1)+"条已经是催收员了,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条已经是催收员了,请检查");
 			}
 			if(StringUtils.isEmpty(tPeople.getId())){
 				message.append("第"+(i+1)+"条账号不存在,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条账号不存在,请检查");
 			}
 			if(tPeople.getGroup()==null||StringUtils.isEmpty(tPeople.getGroup().getId())){
 				message.append("第"+(i+1)+"条所属组不存在,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条所属组不存在,请检查");
 			}
 			if(StringUtils.isNotEmpty(tPeople.getNickname())){
 				message.append("第"+(i+1)+"条该花名已存在,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条该花名已存在,请检查");
 			}
 			TMisDunningPeople people=new TMisDunningPeople();
 			people.setId(tPeople.getId());

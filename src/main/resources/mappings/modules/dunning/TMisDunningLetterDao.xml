@@ -10,6 +10,9 @@
 		l.sendDate AS "sendDate",
 		l.resultDate AS "resultDate",
 		l.downLoadFlag AS "downLoadFlag",
+		l.ocrAddr AS "ocrAddr",
+		l.realname AS "realname",
+		l.remark AS "remark",
 		l.CreateBy AS "createBy.id",
 		l.CreateDate AS "createDate",
 		l.UpdateBy AS "updateBy.id",
@@ -23,9 +26,6 @@
   	
 	<select id="get" resultType="TMisDunningLetter">
 	SELECT
-	c.real_name AS "realname",
-	o.Dealcode AS "dealcode",
-	c.ocr_addr AS "ocrAddr",
 	o.payoff_time As "payoffDate",
 	o.status AS orderStatus,
 	<include refid="countRemainAmmount" /> AS creditamount,
@@ -34,7 +34,6 @@
 	FROM
 	t_mis_dunning_letter AS l
 	LEFT JOIN t_risk_order AS o ON l.dealcode= o.dealcode
-	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id =c.buyer_id
 	WHERE
 	o.type = 'loan'
 	AND o.merchant_id = 7
@@ -44,8 +43,6 @@
 	
 	<select id="findList" resultType="TMisDunningLetter">
 	SELECT
-	c.real_name AS "realname",
-	c.ocr_addr AS "ocrAddr",
 	o.payoff_time As "payoffDate",
 	o.status AS orderStatus,
 	<include refid="countRemainAmmount" /> AS creditamount,
@@ -54,7 +51,6 @@
 	FROM
 	t_mis_dunning_letter AS l
 	LEFT  JOIN t_risk_order AS o ON l.dealcode = o.dealcode
-	LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
 	WHERE
 	o.type = 'loan'
 	AND o.merchant_id = 7
@@ -94,6 +90,10 @@
 			sendDate,
 			resultDate,
 			downLoadFlag,
+			ocrAddr,
+			realname,
+			remark,
+			creditamount,
 			createDate,
 			updateDate,
 			createBy,
@@ -106,6 +106,10 @@
 			#{sendDate},
 			#{resultDate},
 			#{downLoadFlag},
+			#{item.ocrAddr},
+			#{item.realname},
+			#{item.remark},
+			#{item.creditamount},
 			#{createDate},
 			#{updateDate},
 			#{createBy.name},
@@ -121,6 +125,10 @@
 			sendDate,
 			resultDate,
 			downLoadFlag,
+			ocrAddr,
+			realname,
+			creditamount,
+			remark,
 			createDate,
 			updateDate,
 			createBy,
@@ -135,6 +143,10 @@
 			#{item.sendDate},
 			#{item.resultDate},
 			#{item.downLoadFlag},
+			#{item.ocrAddr},
+			#{item.realname},
+			#{item.creditamount},
+			#{item.remark},
 			#{item.createDate},
 			#{item.updateDate},
 			#{item.createBy.name},
@@ -152,6 +164,10 @@
 			sendDate,
 			resultDate,
 			downLoadFlag,
+			ocrAddr,
+			realname,
+			creditamount,
+			remark,
 			createDate,
 			updateDate,
 			createBy,
@@ -166,6 +182,10 @@
 			#{item.sendDate},
 			#{item.resultDate},
 			#{item.downLoadFlag},
+			#{item.ocrAddr},
+			#{item.realname},
+			#{item.creditamount},
+			#{item.remark},
 			#{item.createDate},
 			#{item.updateDate},
 			#{item.createBy.name},
@@ -187,7 +207,6 @@
 	</update>
 	<update id="updateStatus">
 		UPDATE t_mis_dunning_letter SET 
-		  	sendResult =#{sendResult},
 		  	<if test="sendDate != null and sendDate != '' ">
 		  	sendDate=#{sendDate},
 		  	</if>
@@ -197,6 +216,13 @@
 		  	<if test="downLoadFlag != null and downLoadFlag != '' ">
 		  	downLoadFlag =#{downLoadFlag},	
 		  	</if>
+		  	<if test="creditamount != null and creditamount != '' ">
+		  	creditamount =#{creditamount},	
+		  	</if>
+		  	<if test="remark != null and remark != '' ">
+		  	remark =#{remark},	
+		  	</if>
+		  	sendResult =#{sendResult},
 			resultDate = #{resultDate},
 			updateDate = #{updateDate},
 			updateBy = #{updateBy.name}
@@ -205,7 +231,9 @@
 	
 	<select id="findSynDealcode" resultType="TMisDunningLetter">
 		SELECT
-		o.Dealcode AS "dealcode"
+		o.Dealcode AS "dealcode",
+		c.ocr_addr AS "ocrAddr",
+		c.real_name AS "realname"
 		FROM
 		t_mis_dunning_task AS t
 		LEFT JOIN t_risk_order AS o ON t.dealcode = o.dealcode
@@ -228,9 +256,11 @@
 	
 	<select id="findSendList" resultType="TMisDunningLetter">
 		SELECT
-		l.dealcode AS "dealcode"
+		l.dealcode AS "dealcode",
+		<include refid="countRemainAmmount" /> AS "creditamount"
 		FROM
 		t_mis_dunning_letter AS l
+		LEFT  JOIN t_risk_order AS o ON l.dealcode = o.dealcode
 		where
 		 l.sendResult='BESEND'
 		and l.dealcode in 
@@ -240,19 +270,15 @@
 	</select>
 	<select id="lettersDownLoad" resultType="com.mo9.risk.modules.dunning.bean.TMisDunningLetterDownLoad">
 		SELECT
-		curdate() AS "sendLetterDate",
-		c.ocr_addr AS "ocrAddr",
-		c.real_name AS "realname",
+		l.resultDate AS "sendLetterDate",
+		l.ocrAddr AS "ocrAddr",
+		l.realname AS "realname",
 		l.dealcode AS "dealcode",
-		<include refid="countRemainAmmount" /> AS creditamount
+ 		l.creditamount AS "creditamount"
 		FROM
 		t_mis_dunning_letter AS l
-		LEFT  JOIN t_risk_order AS o ON l.dealcode = o.dealcode
-		LEFT JOIN t_risk_buyer_idcard AS c ON o.buyer_id = c.buyer_id
 		WHERE
-		o.type = 'loan'
-		AND o.merchant_id = 7
-		and l.sendResult = 'BEPOST'
+		 l.sendResult = 'BEPOST'
 		and  l.downLoadFlag = #{downLoadFlag}
 	</select>
 	
@@ -272,6 +298,5 @@
 		where
 		l.dealcode = #{dealcode}
 	</select>
-	
 	
 </mapper>

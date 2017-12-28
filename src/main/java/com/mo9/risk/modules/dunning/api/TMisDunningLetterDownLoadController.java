@@ -17,7 +17,7 @@ import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 
 @Controller
-@RequestMapping(value = "/letter")
+@RequestMapping(value = "letter")
 public class TMisDunningLetterDownLoadController extends BaseController {
 	@Autowired
 	TMisDunningLetterService tMisDunningLetterService;

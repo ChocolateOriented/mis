@@ -46,6 +46,8 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	private String downLoadFlag;
 	//订单状态
 	private String orderStatus;
+	//退回原因
+	private String remark;
 	//订单还清日期
 	private Date payoffDate;
 	private Date payoffBeginDate;
@@ -72,15 +74,14 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	public void setSendResult(SendResult sendResult) {
 		this.sendResult = sendResult;
 	}
-	@ExcelField(title="状态", type=2, align=2, sort=335)
+	@ExcelField(title="状态", type=2, align=2, sort=38)
 	public String getSendResultSting() {
 		return sendResultSting;
 	}
 	public void setSendResultSting(String sendResultSting) {
 		this.sendResultSting = sendResultSting;
 	}
-	@Length(min = 6, max = 6, message = "中国邮编是6位")
-	@ExcelField(title="邮编", type=0, align=2, sort=5)
+	@ExcelField(title="邮编", type=0, align=2, sort=35)
 	public String getPostCode() {
 		return postCode ;
 	}
@@ -88,6 +89,9 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 		this.postCode = postCode;
 	}
 	@ExcelField(title="订单状态", type=1, align=2, sort=63)
+	public String getOrderStatusText() {
+		return "payoff".equals(orderStatus) ? "已还清" : "未还清";
+	}
 	public String getOrderStatus() {
 		return orderStatus;
 	}
@@ -145,6 +149,13 @@ public class TMisDunningLetter extends DataEntity<TMisDunningLetter> {
 	@ExcelField(title="户籍地址", type=1, align=2, sort=60)
 	public String getOcrAddr() {
 		return ocrAddr;
+	}
+	@ExcelField(title="备注", type=0, align=2, sort=64)
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	public void setOcrAddr(String ocrAddr) {
 		this.ocrAddr = ocrAddr;

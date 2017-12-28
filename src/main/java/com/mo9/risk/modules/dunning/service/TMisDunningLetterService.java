@@ -7,6 +7,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +18,9 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.mo9.risk.modules.dunning.entity.TMisDunningLetter.SendResult;
 import com.mo9.risk.util.DateUtils;
 import com.mo9.risk.util.MailSender;
-import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.IdGen;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
@@ -31,6 +32,7 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
  * @version 2017-12-07
  */
 @Service
+@Lazy(false)
 @Transactional(readOnly = true)
 public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, TMisDunningLetter>  {
 	
@@ -112,15 +114,14 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 	 * @return
 	 */
 	@Transactional(readOnly=false)
-	public boolean batchUpdate(List<TMisDunningLetter> list, StringBuilder message) {
+	public boolean batchUpdate(List<TMisDunningLetter> list, StringBuilder message)throws Exception {
 		
 		for (int i = 0; i < list.size(); i++) {
 			TMisDunningLetter tMisDunningLetter = list.get(i);
 			String dealcode = tMisDunningLetter.getDealcode();
-			String postCode = tMisDunningLetter.getPostCode();
-			if(StringUtils.isEmpty(dealcode)||StringUtils.isEmpty(postCode)){
-				message.append("第"+(i+1)+"条内容为空,请检查");
-				return false;
+			if(StringUtils.isEmpty(dealcode)){
+				message.append("第"+(i+1)+"条订单为空,请检查");
+				throw new ServiceException("第"+(i+1)+"条订单为空,请检查");
 			}
 			if("寄出".equals(tMisDunningLetter.getSendResultSting())){
 				tMisDunningLetter.setSendResult(SendResult.POSTED);
@@ -128,18 +129,16 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 				tMisDunningLetter.setSendResult(SendResult.BACKED);
 			}else{
 				message.append("第"+(i+1)+"条状态不对,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条内容为空,请检查");
 			}
 			TMisDunningLetter letter=dao.findLetterByDealcode(dealcode);
+			if(letter ==null){
+				message.append("第"+(i+1)+"订单号不对,请检查");
+				throw new ServiceException("第"+(i+1)+"订单号不对,请检查");
+			}
 			if(!"待寄出".equals(letter.getSendResultText())){
 				message.append("第"+(i+1)+"条订单状态不为待寄出不能导入,请检查");
-				return false;
-			}
-			try {
-				BeanValidators.validateWithException(validator,tMisDunningLetter);
-			} catch (ConstraintViolationException ex) {
-				message.append("第"+(i+1)+"条邮编格式不对,请检查");
-				return false;
+				throw new ServiceException("第"+(i+1)+"条订单状态不为待寄出不能导入,请检查");
 			}
 			tMisDunningLetter.setResultDate(new Date());
 			tMisDunningLetter.preInsert();
@@ -155,18 +154,18 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public boolean sendLetters(List<String> sendLetterDealcodes)  {
+	public boolean sendLetters(List<String> sendLetterDealcodes)throws Exception{
 		List<TMisDunningLetter>  list=dao.findSendList(sendLetterDealcodes);
 		if(list==null||list.isEmpty()){
 			logger.warn("未查到数据");
-			return false;
+			throw new ServiceException("未查到数据");
 		}
 		//要发送信函的邮件
 		String uuid=IdGen.uuid();
 		logger.info("邮件下载内容的标识:"+uuid);
 		boolean sendMailBOl = sendMail(uuid,list.size());
 		if(!sendMailBOl){
-			return false;
+			throw new ServiceException("数据字典为空");
 		}
 		//更新信函状态
 		Date date=new Date();
@@ -182,7 +181,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		return true;
 	}
 	//发送信函
-	public boolean sendMail(String uuid,int countLetter){
+	public boolean sendMail(String uuid,int countLetter)throws Exception{
 		//收件人
 		StringBuilder receiver = new StringBuilder();
 		List<Dict> emails = DictUtils.getDictList("letter_receiver");
@@ -192,7 +191,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		
 		if (StringUtils.isBlank(receiver)){
 			logger.info("信函发送失败, 未配置收件人邮箱");
-			return false; 
+			throw new ServiceException("信函发送失败, 未配置收件人邮箱");
 		}
 		logger.info("信函发送邮件至" + receiver);
 		//发送邮件
@@ -201,18 +200,27 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 		mailSender.setSubject(data+"的信函");
 		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
 		StringBuilder content = new StringBuilder();
-		content.append("<table width='600px'>");
-		content.append("<tr><td ><img height='88px' width='600px' src='"+url+"/static/images/donggangtitle.png'/><p></td></tr>");
-		content.append("<tr><td ><p><font style='font-weight:bold;' color='#4D4D4D' size='4'>Dear 东港伙伴 您好:</font></p></td></tr>");
-		content.append("<tr><td ><p><font color='#4D4D4D' size='3'>我司本次发送信函明细如下,请查收:</font></p></td></tr>");
-		content.append("</table >");
-		content.append("<table width='600px' border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
-		content.append("<tr ><th height='40px' width='80px'>序号</th><th>信函总量</th><th>时间</th><th>操作</th></tr>");
-		content.append("<tr><td>1</td><td>"+countLetter+"</td><td height='40px'>"+data+"</td><td><a href='"+url+"/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
+		content.append("<div style='width:800px;height:580px;font-family: Microsoft YaHei;font-size: 20px;border: 1px solid #f1f1f1;'>");
+		content.append("<div style='background:#2dadff;'><img  src='"+url+"/static/images/baishengtong.png'/></div>");
+		content.append("<div style='margin-top:40px;margin-left:60px;font-size:25px;'>Dear 东港伙伴 您好：</div>");
+		content.append("<div style='margin-top:20px;margin-left:60px;margin-top:20px;'>我司本次发送信函明细如下，请查收：</div>");
+		content.append("<div style='font-size:15px;margin-left:100px;margin-top:20px;'>");
+		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align:center;width:600px;'>");
+		content.append("<tr style='background:#cccccc;'><td style='font-size:15px;' height='40px' width='80px'>序号</td><td style='font-size:15px;' >信函总量</td><td style='font-size:15px;' >时间</td><td style='font-size:15px;' >操作</td></tr>");
+		content.append("<tr><td style='font-size:15px;' >1</td><td style='font-size:15px;' >"+countLetter+"</td><td  style='font-size:15px;' height='40px'>"+data+"</td><td style='font-size:15px;' ><a style='text-decoration:none;color: #008fd0;' href='"+url+"/letter/downLoad?identity="+uuid+"'>下载</a></td></tr>");
 		content.append("</table>");
-		content.append("<div><p><font color='#4D4D4D' size='3'>如果对信函数据存疑,可直接回复邮件.</font></p></div>");
-		content.append("<div><p><font color='#4D4D4D' size='3'>顺祝商祺!</font></p></div>");
-		content.append("<div><p><img height='100px' width='600px' src='"+url+"/static/images/mo9subjectend.png'/></p></div>");
+		content.append("</div>");
+		content.append("<div style='margin-left:60px;margin-top:30px;font-size: 20px;'>如果对信函数据存疑，可直接回复邮件。</div>");
+		content.append("<div style='margin-left:60px;margin-top:10px;font-size: 20px;'>顺祝商祺！</div>");
+		content.append("<div style='width:800px;margin-top:30px;'><hr/ style='height:1px;border:none;border-top:1px dashed #b5b5b5;'></div>");
+		content.append("<div style='float:left; width:300px;margin:10px 0px 30px 15px;font-size:15px;'>");
+		content.append("<div>本邮件由上海佰晟通贷后管理发送</div>");
+		content.append("<div style='margin-top:15px;'> 合作邮箱：misdata@mo9.com</div>");
+		content.append("<div style='margin-top:5px;'> 官方网站：www.mo9.com</div>");
+		content.append("<div style='margin-top:5px;'> 公司地址：上海市黄浦区延安东路618号17层</div>");
+		content.append("</div>");
+		content.append("<div style='float:right; width:200px;margin-right:20px;'><img height='100px' width='200px' src='"+url+"/static/images/mo9flag.png'/></div>");
+		content.append("</div>");
 		
 		mailSender.setContent(content.toString());
 		//发送
@@ -220,7 +228,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 			mailSender.sendMail();
 		} catch (Exception e) {
 			logger.warn("信函邮件发送失败!", e);
-			return false; 
+			throw new ServiceException("信函邮件发送失败!", e);
 		}
 		logger.info("信函邮件发送成功");
 		return true;
