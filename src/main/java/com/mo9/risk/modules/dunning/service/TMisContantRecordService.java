@@ -411,7 +411,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 			}
 		} catch (Exception e) {
 //			throw new ServiceException(e);
-			logger.warn("订单号为:"+order.getDealcode()+",保存到催收历史失败");
+			logger.warn("订单号为:"+order.getDealcode()+",保存到催收历史失败",e);
 		}
 		//----------------做自动电催结论-------------
 		if(tMisContantRecord.getContanttype() == TMisContantRecord.ContantType.tel){
@@ -441,7 +441,7 @@ public class TMisContantRecordService extends CrudService<TMisContantRecordDao, 
 					}
 				 	//从这次下的以及之前的action
 					List<TMisContantRecord> dirTelConsuion=	tMisContantRecordDao.findDirTelConculsion(task.getDunningpeopleid(),order.getDealcode(),task.getDunningcycle(),findActionTime);
-					if(dirTelConsuion==null){
+					if(dirTelConsuion==null || dirTelConsuion.size()==0){
 						return;
 					}
 					SimpleDateFormat sd1=new SimpleDateFormat("yyyy-MM-dd");
