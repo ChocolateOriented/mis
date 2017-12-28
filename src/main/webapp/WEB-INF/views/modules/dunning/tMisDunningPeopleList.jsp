@@ -186,6 +186,20 @@ function getSelectedPeople() {
                 </form:select>
 			</li>
 			<li>
+				<label>催收队列：</label>
+				<form:select path="dunningcycle" class="input-medium" multiple="true">
+					<c:forEach items="${fns:getDictList('dunningCycle1')}" var="item" >
+						<option value="${item.label}"
+							<c:forEach items="${fn:split(TMisDunningPeople.dunningcycle,',')}" var="dunningcycle" >
+								<c:if test="${fn:contains(dunningcycle ,item.label) }">
+									selected="selected"
+								</c:if>
+							</c:forEach>
+						>${item.label}</option>
+					</c:forEach>
+				</form:select>
+			</li>
+			<li>
 				<label>产品：</label>
                 <form:select path="bizTypes" class="input-medium" items="${bizTypes}" itemLabel="desc" multiple="true" />
 			</li>
