@@ -14,7 +14,7 @@
 			if("${ispayoff}" == "true"){
 				$('#btnSms').attr("disabled","disabled");
 				$('#btnTel').attr("disabled","disabled");
-				$('#btnAmount').attr("disabled","disabled");
+				//$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
 				$('#btnDeduct').attr("disabled","disabled");
@@ -36,7 +36,7 @@
 				var method = $(obj).attr("method");
 				var contactstype = $(obj).attr("contactstype");
 	// 			var aid = $(obj).attr("aid");
-				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactstype=" + contactstype ;
+				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?mobileSelf=${mobileSelf}&thisCreditAmount=${thisCreditAmount}&ispayoff=${ispayoff}&buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactstype=" + contactstype ;
 				if (param) {
 					for (var name in param) {
 						if (typeof param[name] != "function") {

@@ -6,6 +6,9 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
+            if("${ispayoff}" == "true"){
+                $("#inputForm,#history").hide();
+            }
 			$('#savefreeCreditAmount').click(function() { 
 				if($("#inputForm").valid()){
 					$("#savefreeCreditAmount").attr('disabled',"true");
@@ -35,38 +38,49 @@
 			$('#esc').click(function() {
 				window.parent.window.jBox.close();    
 			});
+
 		});
+        function showMessenger() {
+
+            //alert(${thisCreditAmount});
+            var v= $("#amount").val();
+            var v2 =${thisCreditAmount};
+            $("#showContent").text("减免后应还金额:" +(v2-v));
+        }
 	</script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
 	</ul>
-	<br/>
+	<%--<br/>--%>
 	<form id="inputForm"  class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label">减免金额：</label>
 			<div class="controls">
 <%-- 				<form:input path="" htmlEscape="false" maxlength="10" class="input-xlarge required digits"/>元 --%>
 <!-- onkeyup="value=value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')" -->
-				<input id="amount" name="amount"  maxlength="10" class="input-xlarge required number"/>&nbsp;&nbsp;元
+				<input id="amount" name="amount"  maxlength="10" class="input-xlarge required number" onchange="showMessenger()"/>&nbsp;&nbsp;元
 				<span class="help-inline"><font color="red">*</font> </span>
+				<div id="showContent"></div>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">减免原因：</label>
 			<div class="controls">
-			<select class="input-medium required" id="derateReason" name="derateReason">
-					<option value="">选择</option>
-					<c:forEach  items="${derateReasonList}" var="drList" >
-					<option value="${drList}">${drList.derateReasonName}</option>
-					</c:forEach>
-			</select>
+				<select class="input-medium required" id="derateReason" name="derateReason">
+						<option value="">选择</option>
+						<c:forEach  items="${derateReasonList}" var="drList" >
+						<option value="${drList}">${drList.derateReasonName}</option>
+						</c:forEach>
+				</select>
+			</div>
 		</div>
 		<br/>
 		<div class="control-group">
 			<label class="control-label">备注：</label>
 			<div class="controls">
 			<textarea id="remarks" rows="4" name="remarks"  maxlength="500"  ></textarea>
+			</div>
 		</div>
 		<div style= "padding:19px 180px 20px;" >
 			<input id="savefreeCreditAmount" class="btn btn-primary" type="button" value="减免"/>&nbsp;
@@ -76,7 +90,7 @@
 		<input type="hidden" id="dealcode" name="dealcode" value="${dealcode}" />
 		<input type="hidden" id="id" name="id" value="${dunningtaskdbid}" />
 	</form>
-		<label class="control-group">&nbsp;<font color="red">*历史记录(金额不累加,只作为历史减免记录)</font></label>
+		<label id="history" class="control-group">&nbsp;<font color="red">*历史记录(金额不累加,只作为历史减免记录)</font></label>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>

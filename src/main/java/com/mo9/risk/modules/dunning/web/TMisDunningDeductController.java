@@ -49,6 +49,7 @@ public class TMisDunningDeductController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningDeduct:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TMisDunningDeduct tMisDunningDeduct, HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
+		String thisCreditAmount =request.getParameter("thisCreditAmount");
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -77,6 +78,7 @@ public class TMisDunningDeductController extends BaseController {
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);
+		model.addAttribute("thisCreditAmount",thisCreditAmount);
 		return "modules/dunning/tMisDunningTaskDeductList";
 	}
 

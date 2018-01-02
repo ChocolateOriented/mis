@@ -34,7 +34,7 @@
 				var contactMobile = $(obj).attr("contactMobile");
 				var contactstype = $(obj).attr("contactstype");
 				var contactsname = $(obj).attr("contactsname") || "未知";
-				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?mobileSelf=${mobileSelf}&buyerId=${buyerId}&dealcode=${dealcode}&mobileSelf=${mobileSelf}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + encodeURIComponent(contactMobile) + "&contactstype=" + contactstype ;
+				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?mobileSelf=${mobileSelf}&thisCreditAmount=${thisCreditAmount}&buyerId=${buyerId}&dealcode=${dealcode}&mobileSelf=${mobileSelf}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + encodeURIComponent(contactMobile) + "&contactstype=" + contactstype ;
 				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {
 				   top: '0%',
 	               buttons: {
