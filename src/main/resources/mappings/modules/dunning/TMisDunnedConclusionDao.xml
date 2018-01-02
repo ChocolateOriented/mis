@@ -19,6 +19,7 @@
 		a.dunningpeopleid AS "dunningpeopleid",
 		a.dunningcycle AS "dunningcycle",
 		a.conclusionType AS "conclusionType",
+		a.dunningMobileCount AS "dunningMobileCount",
 		a.createby AS "createBy.name",
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.name",
@@ -44,6 +45,7 @@
 			a.overduereason AS "overduereason",
 			a.resultcode AS "resultcode",
 			a.promisepaydate AS "promisepaydate",
+			a.dunningMobileCount AS "dunningMobileCount",
 			CASE 
 				WHEN a.dunningpeopleid = t.dunningpeopleid AND a.dunningcycle = t.dunningcycle THEN a.nextfollowdate 
 				ELSE NULL
@@ -102,6 +104,7 @@
 			dunningpeopleid,
 			dunningcycle,
 			conclusionType,
+			dunningMobileCount,
 			createby,
 			createdate,
 			updateby,
@@ -122,6 +125,7 @@
 			#{dunningpeopleid},
 			#{dunningcycle},
 			#{conclusionType},
+			#{dunningMobileCount},
 			#{createBy.name},
 			#{createDate},
 			#{updateBy.name},
