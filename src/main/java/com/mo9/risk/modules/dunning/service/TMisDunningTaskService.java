@@ -3624,6 +3624,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		tMisDunnedConclusion.setDealcode(decalode);
 		tMisDunnedConclusion.setTaskid(taskId);
 		tMisDunnedConclusion.setConclusionType("auto");
+		//该订单所属周期内所属催收员联系过的个数
+		int mobileCount=tcontDao.findCountMobile(decalode,dunningCycle,dunningPeopleId);
+		tMisDunnedConclusion.setDunningMobileCount(mobileCount);
 		boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, decalode, taskId);
 		return result;
 	}
