@@ -27,9 +27,7 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	private Long telnum;
 	private Long smsnum;
 	private TMisDunningGroup group;
-	private List<String> pNames;
 
-	
 //	@ExcelField(title="日期", type=1, align=2, sort=1)
 //	public Date getDatetime() {
 //		return datetime;
@@ -110,14 +108,6 @@ public class PerformanceDayReport extends DataEntity<PerformanceDayReport> {
 	}
 	public void setGroup(TMisDunningGroup group) {
 		this.group = group;
-	}
-
-	public List<String> getpNames() {
-		return pNames;
-	}
-
-	public void setpNames(List<String> pNames) {
-		this.pNames = pNames;
 	}
 
 	//	@ExcelField(title="周期begin", type=1, align=2, sort=8)
