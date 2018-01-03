@@ -59,7 +59,8 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 public class TMisDunningOuterTaskController extends BaseController {
 
 	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-
+	@Autowired
+	private MemberInfoService memberInfoService;
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
 
@@ -227,7 +228,8 @@ public class TMisDunningOuterTaskController extends BaseController {
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("buyerId", buyerId);
 		//model.addAttribute("isDelayable", isDelayable);
-		
+		MemberInfo memberInfo = memberInfoService.getMemberInfo(dealcode);
+		model.addAttribute("memberInfo",memberInfo);
 		
 		return "modules/dunning/tMisDunningTaskFather";
 	}

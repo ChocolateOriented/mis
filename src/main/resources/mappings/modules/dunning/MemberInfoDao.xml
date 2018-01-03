@@ -4,17 +4,27 @@
 	<select id="getMemberInfo" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
 
 		SELECT
-			numberOfTime AS "numberOfTime",
-			mobile AS "mobile",
-			memberType AS "memberType",
-			useType AS "useType",
-			startTime AS "startTime",
-			overdueTime AS "overdueTime"
+			b.mobile AS 'mobile',
+			b.memberType AS 'memberType',
+			b.rechargeAmonut AS 'rechargeAmonut',
+			b.createTime AS 'startTime'
 		FROM
-			t_risk_member
+			`t_risk_member_log` a INNER JOIN`t_risk_member_log` b ON a.memberRechargeId=b.id
 		WHERE
-			mobile= #{mobile};
+			a.riskDealcode=#{dealcode};
 
 	</select>
-	
+	<select id="getNumberOfTime" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
+
+		SELECT
+		  useType AS 'useType'
+		FROM
+		`t_risk_member`
+		WHERE
+		mobile=#{mobile};
+
+	</select>
+
+
+
 </mapper>
