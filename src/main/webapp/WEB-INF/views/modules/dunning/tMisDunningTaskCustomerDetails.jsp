@@ -22,10 +22,11 @@
 		});
 		
 		function collectionfunction(obj, width, height){
+		    //alert(${thisCreditAmount});
 				var method = $(obj).attr("method");
 				var contactMobile = $(obj).attr("contactMobile");
 				var contactstype = $(obj).attr("contactstype");
-				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&mobileSelf=${mobileSelf}&contactMobile=" + encodeURIComponent(contactMobile) + "&contactstype=" + contactstype;
+				var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&thisCreditAmount=${thisCreditAmount}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&mobileSelf=${mobileSelf}&contactMobile=" + encodeURIComponent(contactMobile) + "&contactstype=" + contactstype;
 // 				alert(url);
 				$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {
 		           top: '0%',

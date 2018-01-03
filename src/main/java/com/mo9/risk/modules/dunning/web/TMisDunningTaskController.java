@@ -11,57 +11,11 @@ import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.entity.AppLoginLog;
-import com.mo9.risk.modules.dunning.entity.DerateReason;
-import com.mo9.risk.modules.dunning.entity.DunningInformationRecovery;
-import com.mo9.risk.modules.dunning.entity.DunningInformationRecoveryHistoryRecord;
-import com.mo9.risk.modules.dunning.entity.DunningOrder;
-import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
-import com.mo9.risk.modules.dunning.entity.DunningSmsTemplate;
-import com.mo9.risk.modules.dunning.entity.MobileResult;
-import com.mo9.risk.modules.dunning.entity.NumberCleanResult;
-import com.mo9.risk.modules.dunning.entity.OrderHistory;
-import com.mo9.risk.modules.dunning.entity.PerformanceMonthReport;
-import com.mo9.risk.modules.dunning.entity.TBuyerContact;
-import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
-import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
-import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
-import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
-import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
-import com.mo9.risk.modules.dunning.entity.TMisPaid;
-import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyer2contacts;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerContactRecords;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
-import com.mo9.risk.modules.dunning.entity.TRiskBuyerWorkinfo;
-import com.mo9.risk.modules.dunning.entity.TRiskOrder;
-import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
+import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
-import com.mo9.risk.modules.dunning.service.RiskQualityInfoService;
-import com.mo9.risk.modules.dunning.service.TBuyerContactService;
-import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
-import com.mo9.risk.modules.dunning.service.TMisContantRecordService;
-import com.mo9.risk.modules.dunning.service.TMisDunnedHistoryService;
-import com.mo9.risk.modules.dunning.service.TMisDunningConfigureService;
-import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
-import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
-import com.mo9.risk.modules.dunning.service.TMisDunningInformationRecoveryService;
-import com.mo9.risk.modules.dunning.service.TMisDunningOrderService;
-import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
-import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
-import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
-import com.mo9.risk.modules.dunning.service.TMisRemittanceConfirmService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyer2contactsService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerContactRecordsService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
-import com.mo9.risk.modules.dunning.service.TRiskBuyerWorkinfoService;
-import com.mo9.risk.modules.dunning.service.TmisDunningSmsTemplateService;
+import com.mo9.risk.modules.dunning.service.*;
 import com.mo9.risk.util.PostRequest;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
@@ -189,6 +143,9 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private RiskQualityInfoService riskQualityInfoService;
+
+	@Autowired
+	private MemberInfoService memberInfoService;
 
 	@Autowired
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
@@ -821,7 +778,9 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("dunningCycle", task.getDunningcycle());
 
 			personalInfo = personalInfoDao.getNewBuyerInfoByDealcode(dealcode);
-			model.addAttribute("personalInfo", personalInfo);
+
+
+            model.addAttribute("personalInfo", personalInfo);
 			if (personalInfo.getOverdueDays() != null){
 				model.addAttribute("overdueDays",Integer.parseInt(personalInfo.getOverdueDays()));
 			}
@@ -843,7 +802,7 @@ public class TMisDunningTaskController extends BaseController {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
-		
+        String mobile = personalInfo.getMobile();
 		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
 		
 		if (tMisChangeCardRecord == null) {
@@ -875,6 +834,9 @@ public class TMisDunningTaskController extends BaseController {
 		
 		User user = UserUtils.getUser();
 		model.addAttribute("userId", user.getId());
+
+		MemberInfo memberInfo = memberInfoService.getMemberInfo(mobile);
+		model.addAttribute("memberInfo",memberInfo);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	
@@ -938,7 +900,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "customerDetails")
-	public String customerDetails(String overdueDays,String buyerId, String dealcode,String dunningtaskdbid,String dunningCycle,String  mobileSelf,Model model) {
+	public String customerDetails(String overdueDays,String buyerId, String dealcode,String thisCreditAmount,String dunningtaskdbid,String dunningCycle,String  mobileSelf,Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -975,6 +937,7 @@ public class TMisDunningTaskController extends BaseController {
 
 			model.addAttribute("dunningCycle", dunningCycle);
 			model.addAttribute("overdueDays", overdueDays);
+			model.addAttribute("thisCreditAmount",thisCreditAmount);
 		} catch (Exception e) {
 			logger.info("",e);
 			return "error";
@@ -993,6 +956,7 @@ public class TMisDunningTaskController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "communicationDetails")
 	public String communicationDetails(HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
+	    String thisCreditAmount = request.getParameter("thisCreditAmount");
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -1046,6 +1010,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
+		model.addAttribute("thisCreditAmount",thisCreditAmount);
 		return "modules/dunning/tMisDunningTaskCommunication";
 	}
 	
@@ -1057,7 +1022,8 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "communicationRecord")
-	public String communicationRecord(HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {		
+	public String communicationRecord(HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
+	    String thisCreditAmount = request.getParameter("thisCreditAmount");
 		String dealcode = request.getParameter("dealcode");
 		String buyerId = request.getParameter("buyerId");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
@@ -1097,6 +1063,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("ispayoff", ispayoff);
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
+		model.addAttribute("thisCreditAmount",thisCreditAmount);
 		return "modules/dunning/tMisDunningTaskCommunicationRecord";
 	}
 	
@@ -1108,7 +1075,7 @@ public class TMisDunningTaskController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "orderHistoryList")
-	public String orderHistoryList( String buyerId,String dealcode,String dunningCycle,String overdueDays,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
+	public String orderHistoryList( String buyerId,String dealcode,String dunningCycle,String thisCreditAmount, String overdueDays,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
 			return "views/error/500";
 		}
@@ -1138,6 +1105,7 @@ public class TMisDunningTaskController extends BaseController {
 		model.addAttribute("dunningCycle", dunningCycle);
 		model.addAttribute("overdueDays", overdueDays);
 		model.addAttribute("mobileSelf", mobileSelf);
+		model.addAttribute("thisCreditAmount",thisCreditAmount);
 		return "modules/dunning/tMisDunningOrderHistoryList";
 	}
 
@@ -1227,7 +1195,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "apploginlogList")
-	public String apploginlogList(String buyerId,String dealcode,String dunningCycle,String overdueDays,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
+	public String apploginlogList(String buyerId,String thisCreditAmount,String dealcode,String dunningCycle,String overdueDays,String dunningtaskdbid,HttpServletRequest request, HttpServletResponse response,String mobileSelf, Model model) {
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||mobileSelf==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)||"".equals(mobileSelf)){
 			return "views/error/500";
 		}
@@ -1259,6 +1227,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 			model.addAttribute("ispayoff", ispayoff);
 			model.addAttribute("dunningCycle", dunningCycle);
 			model.addAttribute("overdueDays", overdueDays);
+			model.addAttribute("thisCreditAmount",thisCreditAmount);
 		} catch (Exception e) {
 			logger.info("",e);
 		}
@@ -1447,7 +1416,9 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "collectionAmount")
 	public String collectionAmount(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
-		String buyerId = request.getParameter("buyerId");
+	    String thisCreditAmount = request.getParameter("thisCreditAmount");
+        String ispayoff = request.getParameter("ispayoff");
+        String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
 		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
@@ -1462,6 +1433,8 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
+		model.addAttribute("ispayoff",ispayoff);
+		model.addAttribute("thisCreditAmount",thisCreditAmount);
 		return "modules/dunning/dialog/dialogCollectionAmount";
 	}
 

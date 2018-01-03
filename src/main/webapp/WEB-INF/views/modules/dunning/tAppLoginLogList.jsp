@@ -11,7 +11,7 @@
 			if("${ispayoff}" == "true"){
 				$('#btnSms').attr("disabled","disabled");
 				$('#btnTel').attr("disabled","disabled");
-				$('#btnAmount').attr("disabled","disabled");
+				//$('#btnAmount').attr("disabled","disabled");
 				$('#btnPaid').attr("disabled","disabled");
 				$('#btnConfirm').attr("disabled","disabled");
 				$('#btnDeduct').attr("disabled","disabled");
@@ -22,11 +22,10 @@
 				$("#btnDeduct").attr("disabled",true);
 			}
 		});
-		
 		function collectionfunction(obj, width, height){
 			var method = $(obj).attr("method");
 			var contactstype = $(obj).attr("contactstype");
-			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactstype=" + contactstype ;
+			var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&thisCreditAmount=${thisCreditAmount}&ispayoff=${ispayoff}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactstype=" + contactstype ;
 			$.jBox.open("iframe:" + url, $(obj).attr("value") , width || 600, height || 430, {
 			   top: '0%',
                buttons: {
