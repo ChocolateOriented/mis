@@ -362,9 +362,9 @@
 	<tr>
 		<td>会员类型：${memberInfo.memberTypeText}</td>
 		<td>会费标准：${memberInfo.memberStandard}</td>
-		<td>会员费：${memberInfo.memberStandardRate}</td>
-		<td>会员费会员卡状态：${memberInfo.useTypeText}</td>
-		<td>会员有效期：${memberInfo.validDate}</td>
+		<td>会员费：${memberInfo.memberStandardRate}元</td>
+		<td>会员卡状态：${memberInfo.useTypeText}</td>
+		<td>会员有效期：${memberInfo.validDate}天</td>
 	</tr>
 
 	<tr>
