@@ -135,11 +135,14 @@ public class TRiskBuyerContactRecordsService {
 				if(contantNumberMap.containsKey(value.getTel())){
 					int smsNum = contantNumberMap.get(value.getTel()).getSmsNum();
 					int telNum = contantNumberMap.get(value.getTel()).getTelNum();
+					int effectiveActionNum = contantNumberMap.get(value.getTel()).getEffectiveActionNum();
 					value.setSmsNum(smsNum);
 					value.setTelNum(telNum);
+					value.setEffectiveActionNum(effectiveActionNum);
 				}else{
 					value.setSmsNum(0);
 					value.setTelNum(0);
+					value.setEffectiveActionNum(0);
 				}
 				list.add(value);
 //				list.add(Integer.parseInt(entry.getKey()), value);

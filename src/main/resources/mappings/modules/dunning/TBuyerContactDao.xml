@@ -24,7 +24,8 @@
 				b.family_relation AS "familyrelation",
 				IFNULL(d.smsNum, 0) AS "smsNum",
 				IFNULL(d.telNum, 0) AS "telNum",
-				c.name AS rcname
+				c.name AS rcname,
+				IFNULL(d.effectiveActionNum, 0) AS "effectiveActionNum"
 		FROM t_buyer_contact a
 			LEFT JOIN t_risk_contact AS c on a.contact_mobile = c.tel
 			LEFT JOIN t_risk_buyer2contacts AS b 
@@ -33,7 +34,8 @@
 				SELECT
 					ContantTarget AS tel,
 					SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum,
-					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+					SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum,
+					COUNT(IF(IsEffective = 1, 1, NULL)) AS effectiveActionNum
 				FROM t_mis_contant_record
 				WHERE Dealcode = #{dealcode}
 				GROUP BY ContantTarget
@@ -48,6 +50,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
+				ORDER BY effectiveActionNum DESC
 			</otherwise>
 		</choose>
 	</select>
@@ -56,7 +59,8 @@
 		SELECT 
 			a.contanttarget AS "contactMobile",
 			SUM(CASE WHEN a.ContantType = 'sms' THEN 1 ELSE 0 END) AS "smsNum",
-			SUM(CASE WHEN a.ContantType = 'tel' THEN 1 ELSE 0 END) AS "telNum"
+			SUM(CASE WHEN a.ContantType = 'tel' THEN 1 ELSE 0 END) AS "telNum",
+			COUNT(IF(a.IsEffective = 1, 1, NULL)) AS "effectiveActionNum"
 		FROM t_mis_contant_record a
  		WHERE a.dealcode = #{dealcode}
  		<if test="contacts != null and contacts.size > 0">
