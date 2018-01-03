@@ -9,5 +9,7 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
  */
 @MyBatisDao
 public interface MemberInfoDao {
-    MemberInfo getMemberInfo(String mobile);
+    MemberInfo getMemberInfo(String dealcode);
+
+    MemberInfo getNumberOfTime(String mobile);
 }

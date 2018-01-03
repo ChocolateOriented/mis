@@ -802,7 +802,7 @@ public class TMisDunningTaskController extends BaseController {
 			ispayoff = true;
 		}
 		model.addAttribute("ispayoff", ispayoff);
-        String mobile = personalInfo.getMobile();
+        //String mobile = personalInfo.getMobile();
 		TMisChangeCardRecord tMisChangeCardRecord = tMisChangeCardRecordService.getCurrentBankCard(dealcode);
 		
 		if (tMisChangeCardRecord == null) {
@@ -835,7 +835,7 @@ public class TMisDunningTaskController extends BaseController {
 		User user = UserUtils.getUser();
 		model.addAttribute("userId", user.getId());
 
-		MemberInfo memberInfo = memberInfoService.getMemberInfo(mobile);
+		MemberInfo memberInfo = memberInfoService.getMemberInfo(dealcode);
 		model.addAttribute("memberInfo",memberInfo);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
