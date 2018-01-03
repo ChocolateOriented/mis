@@ -21,17 +21,28 @@ public class MemberInfoService {
         if(memberInfo == null){
             return null;
         }
-        Integer numberOfTime = memberInfo.getNumberOfTime();
-        long time = memberInfo.getOverdueTime().getTime();
-        long time1 = new Date().getTime();
-        if(time<time1){
-            //说明过期了
-            memberInfo.setRemark("超过有效期，借款次数已使用");
-        }else{
-            if(numberOfTime ==0){
+        String useType = memberInfo.getUseType();
+        if("used".equals(useType)){
+            //说明已用完
             memberInfo.setRemark("会员有效期内，次数用完");
-            }
+        }else if("overdue".equals(useType)){
+            //说明已过期
+            memberInfo.setRemark("超过有效期，借款次数已使用");
+        }else {
+            //说明使用中
+            memberInfo.setRemark("");
         }
+//        Integer numberOfTime = memberInfo.getNumberOfTime();
+//        long time = memberInfo.getOverdueTime().getTime();
+//        long time1 = new Date().getTime();
+//        if(time<time1){
+//            //说明过期了
+//            memberInfo.setRemark("超过有效期，借款次数已使用");
+//        }else{
+//            if(numberOfTime ==0){
+//            memberInfo.setRemark("会员有效期内，次数用完");
+//            }
+//        }
         return memberInfo;
     }
 }

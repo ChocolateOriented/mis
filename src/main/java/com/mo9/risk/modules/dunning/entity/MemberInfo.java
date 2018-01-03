@@ -38,7 +38,8 @@ public class MemberInfo implements Serializable {
     }
     //会员状态文本
     public String getUseTypeText(){
-        return "used".equals(this.useType) ? "使用中" : "已失效";
+        return "notUsed".equals(this.useType) ? "使用中" :"已失效";
+
     }
     public String getUseType() {
         return useType;
