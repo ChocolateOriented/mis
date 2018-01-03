@@ -43,9 +43,13 @@
         function showMessenger() {
 
             //alert(${thisCreditAmount});
-            var v= $("#amount").val();
-            var v2 =${thisCreditAmount};
-            $("#showContent").text("减免后应还金额:" +(v2-v));
+            //var v= $("#amount").val();
+            //var v2 =;
+			var v = ${thisCreditAmount} - $("#amount").val();
+            if(v){
+                $("#showContent").text("减免后应还金额:" +v);
+            }
+
         }
 	</script>
 </head>
