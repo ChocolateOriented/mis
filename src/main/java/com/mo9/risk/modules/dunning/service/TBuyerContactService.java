@@ -4,6 +4,8 @@
 package com.mo9.risk.modules.dunning.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,22 +134,49 @@ public class TBuyerContactService {
 			return;
 		}
 		
+		Map<String, TBuyerContact> numMap = new HashMap<String, TBuyerContact>();
+		for (TBuyerContact recordCnt : contactRecordCnts) {
+			if (recordCnt.getContactMobile() != null) {
+				numMap.put(recordCnt.getContactMobile(), recordCnt);
+			}
+		}
+		
+		
 		for (TBuyerContact contact : tBuyerContacts) {
-			if (contact.getContactMobile() == null) {
+			String tel = contact.getContactMobile();
+			if (tel == null) {
 				continue;
 			}
 			
 			contact.setSmsNum(0);
 			contact.setTelNum(0);
+			contact.setEffectiveActionNum(0);
 			
-			for (TBuyerContact recordCnt : contactRecordCnts) {
-				if (contact.getContactMobile().equals(recordCnt.getContactMobile())) {
-					contact.setSmsNum(recordCnt.getSmsNum());
-					contact.setTelNum(recordCnt.getTelNum());
-					break;
-				}
+			TBuyerContact recordCnt = numMap.get(tel);
+			
+			if (recordCnt != null) {
+				contact.setSmsNum(recordCnt.getSmsNum());
+				contact.setTelNum(recordCnt.getTelNum());
+				contact.setEffectiveActionNum(recordCnt.getEffectiveActionNum());
 			}
 		}
+		
+		Collections.sort(tBuyerContacts, new Comparator<TBuyerContact>() {
+
+			@Override
+			public int compare(TBuyerContact o1, TBuyerContact o2) {
+				if (o2.getEffectiveActionNum() == null) {
+					return -1;
+				}
+				
+				if (o1.getEffectiveActionNum() == null) {
+					return 1;
+				}
+				
+				return o2.getEffectiveActionNum() - o1.getEffectiveActionNum();
+			}
+			
+		});
 	}
 	
 	/**
