@@ -11,6 +11,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,24 +76,48 @@ public class DunningReportService extends BaseService {
 	
 	/**
 	 * 催收日报表
-	 * @param performanceMonthReport
+	 * @param performanceDayReport
+	 * @param allowedGroups
 	 * @return
 	 */
-	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceMonthReport){
-		return dunningReportDao.findPerformanceDayReport(performanceMonthReport);
+	public List<PerformanceDayReport> findPerformanceDayReport(PerformanceDayReport performanceDayReport, List<TMisDunningGroup> allowedGroups){
+		//添加限制组ID
+		List<String> allowedGroupIds = new ArrayList<>(allowedGroups.size());
+		if (performanceDayReport.getGroup() == null){
+			TMisDunningGroup group = new TMisDunningGroup();
+			performanceDayReport.setGroup(group);
+		}
+		for (TMisDunningGroup allowedGroup: allowedGroups) {
+			allowedGroupIds.add(allowedGroup.getId());
+		}
+		performanceDayReport.getGroup().setGroupIds(allowedGroupIds);
+
+		return dunningReportDao.findPerformanceDayReport(performanceDayReport);
 	}
 
 	/**
 	 * @Description  催收日报表-分页
 	 * @param page
-	 * @param entity
+	 * @param performanceDayReport
 	 * @return com.thinkgem.jeesite.common.persistence.Page<com.mo9.risk.modules.dunning.entity.PerformanceDayReport>
 	 */
-	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport entity) {
-		entity.setPage(page);
+	public Page<PerformanceDayReport> findPerformanceDayReport(Page<PerformanceDayReport> page, PerformanceDayReport performanceDayReport, List<TMisDunningGroup> allowedGroups) {
+		performanceDayReport.setPage(page);
 		page.setUsePaginationInterceptor(false);
-		page.setCount(dunningReportDao.findPerformanceDayReportCount(entity));
-		page.setList(dunningReportDao.findPerformanceDayReport(entity));
+
+		//添加限制组ID
+		List<String> allowedGroupIds = new ArrayList<>(allowedGroups.size());
+		if (performanceDayReport.getGroup() == null){
+			TMisDunningGroup group = new TMisDunningGroup();
+			performanceDayReport.setGroup(group);
+		}
+		for (TMisDunningGroup allowedGroup: allowedGroups) {
+			allowedGroupIds.add(allowedGroup.getId());
+		}
+
+		performanceDayReport.getGroup().setGroupIds(allowedGroupIds);
+		page.setCount(dunningReportDao.findPerformanceDayReportCount(performanceDayReport));
+		page.setList(dunningReportDao.findPerformanceDayReport(performanceDayReport));
 		return page;
 	}
 	
