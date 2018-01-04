@@ -31,7 +31,7 @@ public class MemberInfoService {
         int i = Integer.parseInt(validDate);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(memberInfo.getStartTime());
-        calendar.add(calendar.DATE,30);
+        calendar.add(calendar.DATE,i);
         memberInfo.setOverdueTime(calendar.getTime());
         //会员卡状态
         Calendar now= Calendar.getInstance();
