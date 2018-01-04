@@ -11,5 +11,5 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 public interface MemberInfoDao {
     MemberInfo getMemberInfo(String dealcode);
 
-    MemberInfo getNumberOfTime(String mobile);
+    MemberInfo getNumberOfTime(String logId);
 }
