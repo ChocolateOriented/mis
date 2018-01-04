@@ -4,6 +4,7 @@
 	<select id="getMemberInfo" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
 
 		SELECT
+			b.id AS 'logId',
 			b.mobile AS 'mobile',
 			b.memberType AS 'memberType',
 			b.rechargeAmonut AS 'rechargeAmonut',
@@ -17,11 +18,11 @@
 	<select id="getNumberOfTime" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
 
 		SELECT
-		  useType AS 'useType'
+			count(*) AS 'numberOfTime'
 		FROM
-		`t_risk_member`
+			`t_risk_member_log`
 		WHERE
-		mobile=#{mobile};
+			memberRechargeId = #{logId};
 
 	</select>
 

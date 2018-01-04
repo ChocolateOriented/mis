@@ -33,57 +33,54 @@ public class MemberInfoService {
         calendar.setTime(memberInfo.getStartTime());
         calendar.add(calendar.DATE,30);
         memberInfo.setOverdueTime(calendar.getTime());
-//        long time = i * 24*60*60*1000;
-//        long l = memberInfo.getStartTime().getTime() + time;
-//        memberInfo.setOverdueTime(date=calendar.getTime());
         //会员卡状态
         Calendar now= Calendar.getInstance();
         now.setTime(new Date());
         if(now.compareTo(calendar)== -1){
             //说明未过期
-            MemberInfo memberInfo2 = memberInfoDao.getNumberOfTime(memberInfo.getMobile());
-            String useType2 = memberInfo2.getUseType();
-            if("used".equals(useType2)){
-                //说明已经用完
+            if("bronze".equals(memberType.split("_")[1])){
+                //说明是单次卡
                 memberInfo.setUseTypeText("已失效");
                 memberInfo.setRemark("会员有效期内，次数用完");
-            }else if("overdue".equals(useType2)){
-                //说明已过期
-                memberInfo.setUseTypeText("已失效");
-                memberInfo.setRemark("超过有效期，借款次数已使用");
+            }else if("silver".equals(memberType.split("_")[1])){
+                //说明是双次卡
+                MemberInfo memberInfo2 = memberInfoDao.getNumberOfTime(memberInfo.getLogId());
+
+                if(memberInfo2.getNumberOfTime()<2){
+                    //说明次数没有用完
+                    memberInfo.setUseTypeText("使用中");
+                    memberInfo.setRemark("");
+                }else {
+                    //说明次数用完
+                    memberInfo.setUseTypeText("已失效");
+                    memberInfo.setRemark("会员有效期内，次数用完");
+                }
             }else {
-                //说明使用中
+                //说明是月卡
                 memberInfo.setUseTypeText("使用中");
                 memberInfo.setRemark("");
             }
+//            MemberInfo memberInfo2 = memberInfoDao.getNumberOfTime(memberInfo.getMobile());
+//            String useType2 = memberInfo2.getUseType();
+//            if("used".equals(useType2)){
+//                //说明已经用完
+//                memberInfo.setUseTypeText("已失效");
+//                memberInfo.setRemark("会员有效期内，次数用完");
+//            }else if("overdue".equals(useType2)){
+//                //说明已过期
+//                memberInfo.setUseTypeText("已失效");
+//                memberInfo.setRemark("超过有效期，借款次数已使用");
+//            }else {
+//                //说明使用中
+//                memberInfo.setUseTypeText("使用中");
+//                memberInfo.setRemark("");
+//            }
         }else{
             //说明已过期
             memberInfo.setUseTypeText("已失效");
             memberInfo.setRemark("超过有效期，借款次数已使用");
         }
 
-//        String useType = memberInfo.getUseType();
-//        if("used".equals(useType)){
-//            //说明已用完
-//            memberInfo.setRemark("会员有效期内，次数用完");
-//        }else if("overdue".equals(useType)){
-//            //说明已过期
-//            memberInfo.setRemark("超过有效期，借款次数已使用");
-//        }else {
-//            //说明使用中
-//            memberInfo.setRemark("");
-//        }
-//        Integer numberOfTime = memberInfo.getNumberOfTime();
-//        long time = memberInfo.getOverdueTime().getTime();
-//        long time1 = new Date().getTime();
-//        if(time<time1){
-//            //说明过期了
-//            memberInfo.setRemark("超过有效期，借款次数已使用");
-//        }else{
-//            if(numberOfTime ==0){
-//            memberInfo.setRemark("会员有效期内，次数用完");
-//            }
-//        }
         return memberInfo;
     }
 }

@@ -14,7 +14,7 @@ public class MemberInfo implements Serializable {
     private String mobile;//用户手机号
 
 
-
+    private String logId;
     private String useTypeText;//使用状态
     private Integer numberOfTime;//剩余使用次数
     private String memberType; //会员类型
@@ -123,5 +123,14 @@ public class MemberInfo implements Serializable {
 
     public void setUseTypeText(String useTypeText) {
         this.useTypeText = useTypeText;
+    }
+
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 }
