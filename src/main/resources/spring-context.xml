@@ -165,8 +165,8 @@
     <property name="defaultTargetDataSource" ref="dataSource_read_1"/>
     <property name="weightDataSource">
       <map>
-        <entry key-ref="dataSource_read_1" value="1"/>
-        <entry key-ref="dataSource_read_2" value="1"/>
+        <entry key-ref="dataSource_read_1" value="100"/>
+        <entry key-ref="dataSource_read_2" value="100"/>
         <entry key-ref="dataSource_read_3" value="1"/>
       </map>
     </property>
