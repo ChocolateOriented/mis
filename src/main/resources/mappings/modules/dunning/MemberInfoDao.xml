@@ -12,7 +12,7 @@
 		FROM
 			`t_risk_member_log` a INNER JOIN`t_risk_member_log` b ON a.memberRechargeId=b.id
 		WHERE
-			a.riskDealcode=#{dealcode};
+			a.riskDealcode=#{dealcode} limit 1;
 
 	</select>
 	<select id="getNumberOfTime" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
@@ -20,9 +20,16 @@
 		SELECT
 			count(*) AS 'numberOfTime'
 		FROM
-			`t_risk_member_log`
-		WHERE
-			memberRechargeId = #{logId};
+			(
+                SELECT
+                    memberRechargeId
+                FROM
+                    `t_risk_member_log`
+                GROUP BY
+                    riskDealcode
+            ) t
+       WHERE
+			t.memberRechargeId = #{logId};
 
 	</select>
 
