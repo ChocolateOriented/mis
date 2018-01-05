@@ -18,18 +18,11 @@
 	<select id="getNumberOfTime" resultType="com.mo9.risk.modules.dunning.entity.MemberInfo" parameterType="String" >
 
 		SELECT
-			count(*) AS 'numberOfTime'
-		FROM
-			(
-                SELECT
-                    memberRechargeId
-                FROM
-                    `t_risk_member_log`
-                GROUP BY
-                    riskDealcode
-            ) t
-       WHERE
-			t.memberRechargeId = #{logId};
+          count(DISTINCT riskDealcode) AS 'numberOfTime'
+        FROM
+            `t_risk_member_log`
+        WHERE
+            memberRechargeId = #{logId};
 
 	</select>
 
