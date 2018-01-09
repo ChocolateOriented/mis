@@ -21,7 +21,6 @@ import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
 import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
-import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
@@ -53,11 +52,6 @@ public class TmisDunningSmsTemplateController extends BaseController{
 	TMisDunningPeopleDao tmisPeopleDao;
 	@Autowired
 	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
-	
-	
-	
-	
-	
 	
 	/**
 	 * 显示所有的模板

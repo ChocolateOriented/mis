@@ -14,6 +14,7 @@
 		s.AcceptType AS "acceptType",
 		s.SmsCotent AS "smsCotent",
 		s.sendReason AS "sendReason",
+		s.bizTypes AS "bizTypes",
 		s.invalid AS "invalid"
 	
 	</sql>
@@ -58,24 +59,23 @@
 	
 	
 	<select id="findListSMSTemplate" resultType="TmisDunningSmsTemplate">
-	   
 	SELECT 
 		s.id  AS "id",
 		s.TemplateName AS "templateName",
 		s.SmsType AS "smsType",
 		s.AcceptType AS "acceptType",
+		s.bizTypes AS "bizTypes",
 		s.SmsCotent AS "smsCotent"
 		FROM t_mis_dunning_sms_template s
 		WHERE
-	s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend" and s.invalid="t"
-	
-
-	<if test=" acceptType =='self'">
-	and s.AcceptType in("self","all")
-	</if>
-	<if test=" acceptType == 'others'">
-	and s.AcceptType in("others","all")
-	</if>
+		s.numbefore &lt;= #{overdays} and s.numafter &gt;= #{overdays}  and s.SendMethod="labourSend" and s.invalid="t"
+		and s.bizTypes like #{platformExt}
+		<if test=" acceptType =='self'">
+		and s.AcceptType in("self","all")
+		</if>
+		<if test=" acceptType == 'others'">
+		and s.AcceptType in("others","all")
+		</if>
 	</select>
 	
 	<select id="findByAutoSend" resultType="TmisDunningSmsTemplate">
@@ -88,12 +88,6 @@
 	AND s.invalid="t"
 	
 	</select>
-	
-	
-	
-	
-	
-	
 	
 	<insert id="insert">
 		INSERT INTO t_mis_dunning_sms_template(
@@ -112,6 +106,7 @@
 			createBy,
 			updateBy,
 			sendReason,
+			bizTypes,
 			invalid
 		) VALUES (
 			#{id},
@@ -129,6 +124,7 @@
 			#{createBy.name},
 			#{updateBy.name},
 			#{sendReason},
+			#{bizTypes},
 			't'
 		)
 	</insert>
@@ -147,6 +143,7 @@
 			updateDate = #{updateDate},
 			updateBy = #{updateBy.name},
 			sendReason = #{sendReason},
+			bizTypes = #{bizTypes},
 			invalid="t"
 		WHERE id = #{id} AND invalid="t"
 	</update>
@@ -157,14 +154,6 @@
 	   updateDate = #{updateDate},
 	   updateBy = #{updateBy.name}
 	   where id=#{id}
-	  
-	   
-	
-	
 	</delete>
-	
-	
-	
-	
 
 </mapper>
