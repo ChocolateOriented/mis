@@ -25,7 +25,7 @@ public class JFreeChartLabelGenerator extends AbstractXYItemLabelGenerator imple
     public String generateLabel(XYDataset dataset, int series, int item) {
         int maxX = (int)collection.getSeries(0).getMaxX();
         Number x = dataset.getX(series, item);
-        if ("C-P1".equals(title) && series == 0 && x.intValue() == maxX ) {
+        if (title.contains("C-P1") && series == 0 && x.intValue() == maxX) {
             Number value = dataset.getY(series, item);
 
             return value.toString();
