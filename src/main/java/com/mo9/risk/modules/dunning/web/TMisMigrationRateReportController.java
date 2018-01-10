@@ -19,10 +19,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -600,6 +597,7 @@ public class TMisMigrationRateReportController extends BaseController {
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(yesterday);
+			//tMisMigrationRateReportService.autoInsertMigrationRateMemberReportDB(yesterday);
 		} catch (Exception e) {
 			logger.info("",e);
 		} finally {
@@ -611,9 +609,9 @@ public class TMisMigrationRateReportController extends BaseController {
 	 * 获取计算后的迁徙率数据
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@RequestMapping(value = "autoInsertHistoryMigrationRateReportDB")
+	@RequestMapping(value = "autoInsertHistoryMigrationRateReportDB/{flag}")
 	@ResponseBody
-	public void autoInsertHistoryMigrationRateReportDB() {
+	public void autoInsertHistoryMigrationRateReportDB(@PathVariable("flag") String flag) {
 		Calendar c = Calendar.getInstance();
 		DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 		try {
@@ -631,7 +629,11 @@ public class TMisMigrationRateReportController extends BaseController {
 			Date date = beginDate;
 			while (!date.equals(endDate)) {
 				System.out.println(dateFormat1.format(date));
-				tMisMigrationRateReportService.autoInsertMigrationRateReportDB(date);
+				if(flag.equals("1")){
+					tMisMigrationRateReportService.autoInsertMigrationRateReportDB(date);
+				}else {
+					tMisMigrationRateReportService.autoInsertMigrationRateMemberReportDB(date);
+				}
 				c.setTime(date);
 				c.add(Calendar.DATE, 1); // 日期加1天
 				date = c.getTime();
@@ -689,11 +691,16 @@ public class TMisMigrationRateReportController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@ResponseBody
-	@RequestMapping(value = "migrationDelete")
-	public String migrationDelete(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "migrationDelete/{flag}")
+	public String migrationDelete(HttpServletRequest request, HttpServletResponse response,@PathVariable("flag") String flag) {
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
-			tMisMigrationRateReportService.deleteAll();
+			if (flag.equals("1")){
+				tMisMigrationRateReportService.deleteAll();
+			}else {
+				tMisMigrationRateReportService.deleteMemberAll();
+			}
+
 		} catch (Exception e) {
 			logger.info("",e);
 		} finally {
@@ -706,12 +713,14 @@ public class TMisMigrationRateReportController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:adminview")
 	@ResponseBody
-	@RequestMapping(value = "migration5")
-	public String migration5(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "migration5/{flag}")
+	public String migration5(HttpServletRequest request, HttpServletResponse response,@PathVariable("flag") String flag) {
 
+		if(flag.equals("1")){
 			tMisMigrationRateReportService.autoSendMail();
-
-
+		}else {
+			tMisMigrationRateReportService.autoSendMemberMail();
+		}
 		return "Ok";
 	}
 

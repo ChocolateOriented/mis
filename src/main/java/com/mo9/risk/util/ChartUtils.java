@@ -1,7 +1,9 @@
 package com.mo9.risk.util;
 
 import com.mo9.risk.modules.dunning.entity.SeriesPic;
+import com.sun.javafx.binding.StringFormatter;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.*;
@@ -15,6 +17,7 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.time.Day;
@@ -49,9 +52,10 @@ public class ChartUtils {
             new Color(31,129,188), new Color(92,92,97), new Color(144,237,125), new Color(255,188,117),
             new Color(153,158,255), new Color(255,117,153), new Color(253,236,109), new Color(128,133,232),
             new Color(158,90,102),new Color(255, 204, 102) };//颜色
-    public static Color[] CHART_XYCOLORS={new Color(81,107,255),new Color(255,234,137), new Color(255,130,130),
-            new Color(8,255,26),new Color(94,94,94),
-            new Color(255,156,173),new Color(255, 204, 102)};
+    public static Color[] CHART_XYCOLORS={
+            new Color(255,93,188),new Color(249,255,76),new Color(81,107,255),
+            new Color(255,234,137),new Color(90,203,90),
+            new Color(255,156,173),new Color(255, 204, 102),new Color(232,160,52)};
 
     static {
         setChartTheme();
@@ -498,12 +502,14 @@ public class ChartUtils {
 
     public static void setFont(JFreeChart jfreechart,XYPlot plot){
         // 设置配置字体（解决中文乱码的通用方法）
-        Font xfont = new Font("宋体", Font.PLAIN, 12); // X轴
-        Font yfont = new Font("宋体", Font.PLAIN, 12); // Y轴
-        Font kfont = new Font("宋体", Font.PLAIN, 12); // 底部
-        Font titleFont = new Font("宋体", Font.PLAIN, 20); // 图片标题
+        Font xfont = new Font("黑体", Font.PLAIN, 12); // X轴
+        Font yfont = new Font("黑体", Font.PLAIN, 12); // Y轴
+        Font kfont = new Font("黑体", Font.PLAIN, 12); // 底部
+        TextTitle title = jfreechart.getTitle();
+        String text = title.getText();
+        Font titleFont = new Font("黑体",  Font.PLAIN, 20); // 图片标题
         //设置背景颜色
-
+        jfreechart.getRenderingHints().put(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
         plot.setOutlinePaint(Color.white);//设置外框颜色
         plot.setOutlineVisible(false);//设置外框是否可见
         plot.getDomainAxis().setLabelFont(xfont);
@@ -511,6 +517,10 @@ public class ChartUtils {
         plot.getRangeAxis().setLabelPaint(new Color(162,162,162));
         jfreechart.getLegend().setItemFont(kfont);
         jfreechart.getTitle().setFont(titleFont);
+        if(text.contains("会员卡")){
+            jfreechart.getTitle().setPaint(new Color(63,204,178));
+        }
+
 
 
 
@@ -539,6 +549,9 @@ public class ChartUtils {
         domainAxis.setTickLabelPaint(new Color(162,162,162));
         domainAxis.setUpperBound(16.9);
         domainAxis.setRange(-0.9,16.9);
+        //设置x轴之间的空隙是否自动适应
+        domainAxis.setAutoTickUnitSelection(false);
+
 
 
         //设置y
@@ -551,6 +564,7 @@ public class ChartUtils {
         numberaxis.setAutoRangeIncludesZero(false);
         numberaxis.setUpperMargin(0.3);//设置y轴距离图片顶端的距离
         numberaxis.setLowerMargin(0.15);//设置y轴距离图片底端的距离
+        //numberaxis.setTickUnit(new NumberTickUnit(1));
 
 
     }
@@ -569,10 +583,18 @@ public class ChartUtils {
         //设置线条的颜色
         List series = x.getSeries();
         for (int i = 0;i<series.size();i++){
-            //设置线条颜色
-            xylineandshaperenderer.setSeriesPaint(i,ChartUtils.CHART_XYCOLORS[i]);
-            //设置标签颜色
-            xylineandshaperenderer.setSeriesItemLabelPaint(i,ChartUtils.CHART_XYCOLORS[i]);
+//            if(title.contains("会员卡")){
+//                //设置线条颜色
+//                xylineandshaperenderer.setSeriesPaint(i,ChartUtils.CHART_XYCOLORS[i+4]);
+//                //设置标签颜色
+//                xylineandshaperenderer.setSeriesItemLabelPaint(i,ChartUtils.CHART_XYCOLORS[i+4]);
+            //}else {
+                //设置线条颜色
+                xylineandshaperenderer.setSeriesPaint(i,ChartUtils.CHART_XYCOLORS[i]);
+                //设置标签颜色
+                xylineandshaperenderer.setSeriesItemLabelPaint(i,ChartUtils.CHART_XYCOLORS[i]);
+//            }
+
         }
         //设置线条的粗细
         xylineandshaperenderer.setStroke(new BasicStroke(1.5f));
@@ -591,7 +613,7 @@ public class ChartUtils {
     public static BufferedImage getSmall(Color color,String  content){
         //public static BufferedImage getSmall(){
         //设置画布
-        BufferedImage bufferedImage = new BufferedImage(35, 15, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImage = new BufferedImage(31, 15, BufferedImage.TYPE_INT_RGB);
         //设置画笔
         Graphics2D g = bufferedImage.createGraphics();
         //设置背景颜色
@@ -601,9 +623,11 @@ public class ChartUtils {
         //画笔的颜色
         g.setColor(Color.black);
         //画笔的字体
-        g.setFont(new Font("宋体",Font.TRUETYPE_FONT,12));
+        g.setFont(new Font("仿宋体",Font.TRUETYPE_FONT,10));
         //写的内容
-        g.drawString(content,6,11);
+        int i = g.getFontMetrics().stringWidth(content);
+        int width = bufferedImage.getWidth();
+        g.drawString(content,(width-i)/2,12);
         g.dispose();
 
         return bufferedImage;
@@ -617,8 +641,13 @@ public class ChartUtils {
     public static BufferedImage getJfreechartimage(JFreeChart jfreechart,String title,XYSeriesCollection c){
 
         java.util.List series = c.getSeries();
+        BufferedImage big = null;
+        if(title.contains("会员卡")){
+             big = jfreechart.createBufferedImage(550, 350);
+        }else {
+             big = jfreechart.createBufferedImage(470, 350);
+        }
 
-        BufferedImage big = jfreechart.createBufferedImage(530, 350);
 
         List<SeriesPic> seriesPicsMax = new ArrayList<>();
         List<SeriesPic> seriesPicsMin = new ArrayList<>();
@@ -628,24 +657,23 @@ public class ChartUtils {
         for (int i = 0;i<series.size();i++){
 
             int maxX = (int)c.getSeries(i).getMaxX()-1;
-            seriesPicsMax.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX).doubleValue()));
-
+            if(c.getSeries(i).getY(maxX) != null){
+                seriesPicsMax.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX).doubleValue()));
+            }
         }
 
         for (int i = 0;i<series.size();i++){
-
-
             int minX = (int)c.getSeries(i).getMinX()-1;
-            seriesPicsMin.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(minX).doubleValue()));
-
+            if(c.getSeries(i).getY(minX) != null){
+                seriesPicsMin.add(new SeriesPic(CHART_XYCOLORS[i],c.getSeries(i).getY(minX).doubleValue()));
+            }
         }
         Collections.sort(seriesPicsMax);
         Collections.sort(seriesPicsMin);
 
-        if("C-P1".equals(title)){
-            for(int i = 0;i<series.size();i++){
+        if(title.contains("C-P1")){
+            for(int i = 0;i<seriesPicsMax.size();i++){
                 int maxX = (int)c.getSeries(i).getMaxX()-1;
-
                 //BufferedImage small = ChartUtils.getSmall(CHART_XYCOLORS[i],c.getSeries(i).getY(maxX)+"");
                 BufferedImage small = ChartUtils.getSmall(seriesPicsMax.get(i).getColor(),seriesPicsMax.get(i).getValue()+"");
                 //BufferedImage small = ChartUtils.getSmall();
@@ -653,13 +681,11 @@ public class ChartUtils {
                 int x = big.getWidth() - 2*small.getWidth()-5;
                 int y = big.getHeight() - (18-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
-
-
                 g.dispose();
             }
 
         }else {
-            for(int i = 0;i<series.size();i++){
+            for(int i = 0;i<seriesPicsMax.size();i++){
 
                 int maxX = (int)c.getSeries(i).getMaxX()-1;
 
@@ -668,7 +694,7 @@ public class ChartUtils {
                 BufferedImage small = ChartUtils.getSmall(seriesPicsMax.get(i).getColor(),seriesPicsMax.get(i).getValue()+"");
                 //BufferedImage small = ChartUtils.getSmall();
                 Graphics2D g = big.createGraphics();
-                int x = big.getWidth() - 2*small.getWidth()-5;
+                int x = big.getWidth() - 2*small.getWidth()-14;
                 int y = big.getHeight() - (9-i)*small.getHeight();
                 g.drawImage(small, x, y, small.getWidth(), small.getHeight(), null);
 
@@ -678,7 +704,17 @@ public class ChartUtils {
                 BufferedImage small2 = ChartUtils.getSmall(seriesPicsMin.get(i).getColor(),seriesPicsMin.get(i).getValue()+"");
                 //BufferedImage small2 = ChartUtils.getSmall();
                 //Graphics2D g = big.createGraphics();
-                int x2 = big.getWidth() - 14*small2.getWidth()+13;
+                int x2 = 0;
+                if("C-P2".equals(title)){
+                    x2 = big.getWidth() - 13*small2.getWidth()-19;
+                }else if("C-P3".equals(title)){
+                    x2 = big.getWidth() - 13*small2.getWidth()-15;
+                }else if("C-P4".equals(title)){
+                    x2 = big.getWidth() - 13*small2.getWidth()-5;
+                }else if(title.contains("会员卡")){
+                    x2=big.getWidth() - 15*small2.getWidth()-26;
+                }
+
                 int y2 = big.getHeight() - (9-i)*small2.getHeight();
                 g.drawImage(small2, x2, y2, small2.getWidth(), small2.getHeight(), null);
                 g.dispose();

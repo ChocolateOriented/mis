@@ -225,9 +225,66 @@ public interface TMisMigrationRateReportDao extends CrudDao<TMisMigrationRateRep
 	 * @return
 	 */
 	List<TMisMigrationRateReport> newfindMigrateChartList(@Param("migrate")Migrate migrate,@Param("cycleNum")Integer cycleNum);
+
+	/**
+	 * 查询会员卡图表数据新方法
+	 * @return
+	 */
+	List<TMisMigrationRateReport> newfindMigrateChartListMember(@Param("migrate")Migrate migrate,@Param("cycleNum")Integer cycleNum);
 	/**
 	 * 删除所有迁徙率的数据
 	 */
 	public void deleteAll();
+	/**
+	 * 删除所有会员迁徙率的数据
+	 */
+	public void deleteMemberAll();
+	/**
+	 * 根据周期时间段查询会员卡Q1户数总和 2
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvNew getSumQ1QianxilvNewByYesterdayMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend,@Param("yesterday")Date yesterday);
+	/**
+	 * 根据周期时间段查询会员卡Q1户数总和
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvNew getSumQ1QianxilvNewByCycleDatetimeMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
+	/**
+	 * 根据周期时间段查询会员卡Q2户数总和
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvNew getSumQ2QianxilvNewByCycleDatetimeMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
+	/**
+	 * 根据周期时间段查询会员卡Q1本金总和 2
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvCorpu getSumQ1QianxilvCorpuByYesterdayMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend,@Param("yesterday")Date yesterday);
+	/**
+	 * 根据周期时间段查询会员卡Q1本金总和
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvCorpu getSumQ1QianxilvCorpuByCycleDatetimeMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
+	/**
+	 * 根据周期时间段查询会员卡Q2本金总和
+	 * @param datetimestart
+	 * @param datetimeend
+	 * @return
+	 */
+	public QianxilvCorpu getSumQ2QianxilvCorpuByCycleDatetimeMember(@Param("datetimestart")Date datetimestart,@Param("datetimeend")Date datetimeend);
 
+	/**
+	 * 把会员卡数据插入到数据库
+	 * @param migrationRateReport
+	 */
+	public void insertMember(TMisMigrationRateReport migrationRateReport);
 }

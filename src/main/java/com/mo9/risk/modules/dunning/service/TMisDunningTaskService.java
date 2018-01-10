@@ -3396,6 +3396,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 			Date Yesterday = TMisMigrationRateReportService.getDate(-1);
 			tMisMigrationRateReportService.autoInsertMigrationRateReportDB(Yesterday);
+			tMisMigrationRateReportService.autoInsertMigrationRateMemberReportDB(Yesterday);
 			logger.info("迁徙计算结束");
 		} catch (Exception e) {
 			logger.info(e);
