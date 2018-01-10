@@ -778,7 +778,7 @@
 			IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
 		FROM
 		t_mis_dunning_qianxilv_new
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ1QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
@@ -786,7 +786,7 @@
 			IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
 		FROM
 		t_mis_dunning_qianxilv_corpus
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ2QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
@@ -794,7 +794,7 @@
 			IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
 		FROM
 		t_mis_dunning_qianxilv_new
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ2QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
@@ -802,7 +802,7 @@
 			IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
 		FROM
 		t_mis_dunning_qianxilv_corpus
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ3QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
@@ -810,7 +810,7 @@
 			IFNULL(sum(q3), 0) AS q3 ,IFNULL(sum(payoffq3), 0) AS payoffq3
 		FROM
 		t_mis_dunning_qianxilv_new
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ3QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
@@ -818,7 +818,7 @@
 			IFNULL(sum(q3), 0) AS q3 ,IFNULL(sum(payoffq3), 0) AS payoffq3
 		FROM
 		t_mis_dunning_qianxilv_corpus
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ4QianxilvNewByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
@@ -826,7 +826,7 @@
 			IFNULL(sum(q4), 0) AS q4 ,IFNULL(sum(payoffq4), 0) AS payoffq4
 		FROM
 		t_mis_dunning_qianxilv_new
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ4QianxilvCorpuByCycleDatetime" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
@@ -834,7 +834,7 @@
 			IFNULL(sum(q4), 0) AS q4 ,IFNULL(sum(payoffq4), 0) AS payoffq4
 		FROM
 		t_mis_dunning_qianxilv_corpus
-		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND (product IS NULL OR product = '江湖救急')
 	</select>
 	
 	<select id="getSumQ1QianxilvNewByYesterday" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
@@ -843,17 +843,17 @@
 					IFNULL(sum(q1), 0) AS q1 
 				FROM
 				t_mis_dunning_qianxilv_new
-				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t1,
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND (product IS NULL OR product = '江湖救急')) t1,
 		(SELECT 
 					IFNULL(sum(payoffq1), 0) AS payoffq1
 				FROM
 				t_mis_dunning_qianxilv_new
-				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t2,
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND (product IS NULL OR product = '江湖救急')) t2,
 		(SELECT 
 		 			IFNULL(sum(orderduedate), 0) AS orderduedate
 		 		FROM
 		 		t_mis_dunning_qianxilv_new
-		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})) t3
+		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})AND (product IS NULL OR product = '江湖救急')) t3
 	</select>
 	
 	<select id="getSumQ1QianxilvCorpuByYesterday" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
@@ -862,17 +862,17 @@
 					IFNULL(sum(q1), 0) AS q1 
 				FROM
 				t_mis_dunning_qianxilv_corpus
-				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t1,
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND (product IS NULL OR product = '江湖救急')) t1,
 		(SELECT 
 					IFNULL(sum(payoffq1), 0) AS payoffq1
 				FROM
 				t_mis_dunning_qianxilv_corpus
-				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})) t2,
+				WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND (product IS NULL OR product = '江湖救急')) t2,
 		(SELECT 
 		 			IFNULL(sum(orderduedate), 0) AS orderduedate
 		 		FROM
 		 		t_mis_dunning_qianxilv_corpus
-		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})) t3
+		 		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})AND (product IS NULL OR product = '江湖救急')) t3
 	</select>
 	
 <!-- 	<select id="ss" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" > -->
@@ -948,7 +948,131 @@
 	ORDER BY  a.cycle desc,a.DateTime ASC
 
 	</select>
+
+	<!-- 新图表的数据查询	 -->
+	<select id="newfindMigrateChartListMember" resultType="TMisMigrationRateReport">
+		SELECT
+		a.datetime AS "datetime",
+		a.${migrate}*100 AS "cpvalue",
+		a.cycle AS "cycle",
+		c.datetime_start AS "datetimeStart",
+		c.datetime_end AS "datetimeEnd"
+		FROM
+		tmp_move_cycle c
+		inner JOIN `t_mis_migration_rate_member_report` a ON a.Cycle = c.cycle  INNER
+		join (
+		SELECT
+		cycle
+		FROM
+		`tmp_move_cycle`
+		ORDER BY
+		cycle DESC
+		LIMIT #{cycleNum}
+		) t on t.cycle = a.cycle
+		ORDER BY  a.cycle desc,a.DateTime ASC
+
+	</select>
 	<delete id="deleteAll">
 	delete from t_mis_migration_rate_report
 	</delete>
+	<delete id="deleteMemberAll">
+	delete from t_mis_migration_rate_member_report
+	</delete>
+	<select id="getSumQ1QianxilvNewByYesterdayMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		select * from
+		(SELECT
+		IFNULL(sum(q1), 0) AS q1
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND  product = '会员卡') t1,
+		(SELECT
+		IFNULL(sum(payoffq1), 0) AS payoffq1
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND product = '会员卡') t2,
+		(SELECT
+		IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})AND product = '会员卡') t3
+	</select>
+
+	<select id="getSumQ1QianxilvNewByCycleDatetimeMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT
+		IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND  product = '会员卡'
+	</select>
+
+	<select id="getSumQ2QianxilvNewByCycleDatetimeMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvNew" >
+		SELECT
+		IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
+		FROM
+		t_mis_dunning_qianxilv_new
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND product = '会员卡'
+	</select>
+
+	<select id="getSumQ1QianxilvCorpuByYesterdayMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		select * from
+		(SELECT
+		IFNULL(sum(q1), 0) AS q1
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND product = '会员卡') t1,
+		(SELECT
+		IFNULL(sum(payoffq1), 0) AS payoffq1
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{yesterday})AND product = '会员卡') t2,
+		(SELECT
+		IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend})AND product = '会员卡') t3
+	</select>
+
+	<select id="getSumQ1QianxilvCorpuByCycleDatetimeMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT
+		IFNULL(sum(q1), 0) AS q1 ,IFNULL(sum(payoffq1), 0) AS payoffq1,IFNULL(sum(orderduedate), 0) AS orderduedate
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND product = '会员卡'
+	</select>
+	<select id="getSumQ2QianxilvCorpuByCycleDatetimeMember" resultType="com.mo9.risk.modules.dunning.bean.QianxilvCorpu" >
+		SELECT
+		IFNULL(sum(q2), 0) AS q2 ,IFNULL(sum(payoffq2), 0) AS payoffq2
+		FROM
+		t_mis_dunning_qianxilv_corpus
+		WHERE CreateTime BETWEEN  date(#{datetimestart}) AND  date(#{datetimeend}) AND product = '会员卡'
+	</select>
+
+	<insert id="insertMember">
+		INSERT INTO t_mis_migration_rate_member_report(
+		datetime,
+		cp1new,
+		cp2new,
+		cp3new,
+		cp4new,
+		cp1corpus,
+		cp2corpus,
+		cp3corpus,
+		cp4corpus,
+		cycle,
+		CreateDate
+		) VALUES (
+		#{datetime},
+		#{cp1new},
+		#{cp2new},
+		#{cp3new},
+		#{cp4new},
+		#{cp1corpus},
+		#{cp2corpus},
+		#{cp3corpus},
+		#{cp4corpus},
+		#{cycle},
+		#{createDate}
+		)
+	</insert>
+
 </mapper>

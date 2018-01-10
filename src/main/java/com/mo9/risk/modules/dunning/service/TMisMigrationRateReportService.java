@@ -400,7 +400,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	
 	
 	/**
-     * 迁徙率计算insertDB
+     * 江湖救急迁徙率计算insertDB
      */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void autoInsertMigrationRateReportDB(Date Yesterday) {
@@ -513,6 +513,144 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 		
 	}
+	/**
+	 * 会员卡迁徙率计算insertDB
+	 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void autoInsertMigrationRateMemberReportDB(Date Yesterday) {
+		try {
+//			if(null == Yesterday){
+//				Yesterday = getDate(-1);
+//			}
+			TMisMigrationRateReport migrationRateReport = new TMisMigrationRateReport();
+			TmpMoveCycle tmpMoveCycle = tMisMigrationRateReportDao.getTmpMoveCycleByDatetime(Yesterday);
+//			new BigDecimal(12).subtract(new BigDecimal(9)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP);
+
+			if( null != tmpMoveCycle ){
+
+				migrationRateReport.setCycle(String.valueOf(tmpMoveCycle.getCycle()));
+				migrationRateReport.setDatetime(Yesterday);
+				migrationRateReport.setCreateDate(new Date());
+
+				TmpMoveCycle tmpMoveCycleBefore1 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 1);  // 前一个周期
+				//TmpMoveCycle tmpMoveCycleBefore2 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 2);  // 前二个周期
+				//TmpMoveCycle tmpMoveCycleBefore3 = tMisMigrationRateReportDao.getTmpMoveCycleByCycle(tmpMoveCycle.getCycle() - 3);  // 前三个周期
+
+				// C-P1  会员卡户数迁徙  C-P1（每日）= 期末余额/期初余额  (Q1-payoffq1)/orderduedate
+				QianxilvNew qianxilvnew1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByYesterdayMember(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend(),Yesterday);
+				BigDecimal cp1new =null;
+				if(qianxilvnew1.getOrderduedate().compareTo(BigDecimal.ZERO) != 0){
+					 cp1new = calculate(qianxilvnew1.getQ1(), qianxilvnew1.getPayoffq1(), qianxilvnew1.getOrderduedate(), 4);
+				}
+				migrationRateReport.setCp1new(cp1new);
+
+				// C-P2  会员卡户数迁徙   C-P2（每日）=（C-P1）*（P1-P2）
+				QianxilvNew qianxilvnew1Before1 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetimeMember(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+				BigDecimal cp1newBefore1=null;
+				if(qianxilvnew1Before1.getOrderduedate().compareTo(BigDecimal.ZERO) != 0){
+					cp1newBefore1 = calculate(qianxilvnew1Before1.getQ1(), qianxilvnew1Before1.getPayoffq1(), qianxilvnew1Before1.getOrderduedate(), 4);
+				}
+
+				QianxilvNew qianxilvnew2 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetimeMember(tmpMoveCycle.getDatetimestart(), Yesterday);
+				BigDecimal p1p2new =null;
+				if(qianxilvnew2.getQ2().compareTo(BigDecimal.ZERO) != 0){
+					p1p2new = calculate(qianxilvnew2.getQ2(), qianxilvnew2.getPayoffq2(), qianxilvnew2.getQ2(), 4);
+				}
+				BigDecimal cp2new =null;
+				if(cp1newBefore1!=null && p1p2new !=null){
+					cp2new = cp1newBefore1.multiply(p1p2new);
+				}
+
+				migrationRateReport.setCp2new(cp2new);
+
+				// C-P3  户数迁徙 C-P3（每日）=（C-P1）*（P1-P2）*（P2-P3）
+//				QianxilvNew qianxilvnew1Before2 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetime(tmpMoveCycleBefore2.getDatetimestart(), tmpMoveCycleBefore2.getDatetimeend());
+//				BigDecimal cp1newBefore2 = calculate(qianxilvnew1Before2.getQ1(), qianxilvnew1Before2.getPayoffq1(), qianxilvnew1Before2.getOrderduedate(), 4);
+//				QianxilvNew qianxilvnew2Before1 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+//				BigDecimal p1p2newBefore1 = calculate(qianxilvnew2Before1.getQ2(), qianxilvnew2Before1.getPayoffq2(), qianxilvnew2Before1.getQ2(), 4);
+//				QianxilvNew qianxilvnew3 = tMisMigrationRateReportDao.getSumQ3QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
+//				BigDecimal p2p3new = calculate(qianxilvnew3.getQ3(), qianxilvnew3.getPayoffq3(), qianxilvnew3.getQ3(), 4);
+//
+//				BigDecimal cp3new = cp1newBefore2.multiply(p1p2newBefore1).multiply(p2p3new);
+//				migrationRateReport.setCp3new(cp3new);
+
+				// C-P4 户数迁徙 C-P4（每日）=（C-P1）*（P1-P2）*（P2-P3）*（P3-P4）
+//				QianxilvNew qianxilvnew1Before3 = tMisMigrationRateReportDao.getSumQ1QianxilvNewByCycleDatetime(tmpMoveCycleBefore3.getDatetimestart(), tmpMoveCycleBefore3.getDatetimeend());
+//				BigDecimal cp1newBefore3 = calculate(qianxilvnew1Before3.getQ1(), qianxilvnew1Before3.getPayoffq1(), qianxilvnew1Before3.getOrderduedate(), 4);
+//				QianxilvNew qianxilvnew2Before2 = tMisMigrationRateReportDao.getSumQ2QianxilvNewByCycleDatetime(tmpMoveCycleBefore2.getDatetimestart(), tmpMoveCycleBefore2.getDatetimeend());
+//				BigDecimal p1p2newBefore2 = calculate(qianxilvnew2Before2.getQ2(), qianxilvnew2Before2.getPayoffq2(), qianxilvnew2Before2.getQ2(), 4);
+//				QianxilvNew qianxilvnew3Before1 = tMisMigrationRateReportDao.getSumQ3QianxilvNewByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+//				BigDecimal p2p3newBefore1 = calculate(qianxilvnew3Before1.getQ3(), qianxilvnew3Before1.getPayoffq3(), qianxilvnew3Before1.getQ3(), 4);
+//				QianxilvNew qianxilvnew4 = tMisMigrationRateReportDao.getSumQ4QianxilvNewByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
+//				BigDecimal p3p4new = calculate(qianxilvnew4.getQ4(), qianxilvnew4.getPayoffq4(), qianxilvnew4.getQ4(), 4);
+//
+//				BigDecimal cp4new = cp1newBefore3.multiply(p1p2newBefore2).multiply(p2p3newBefore1).multiply(p3p4new);
+//				migrationRateReport.setCp4new(cp4new);
+
+
+				// C-P1  会员卡本金迁徙 C-P1（每日）= 期末余额/期初余额
+				QianxilvCorpu qianxilvcorpu1 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByYesterdayMember(tmpMoveCycle.getDatetimestart(), tmpMoveCycle.getDatetimeend(),Yesterday);
+				BigDecimal cp1corpu =null;
+				if(qianxilvcorpu1.getOrderduedate().compareTo(BigDecimal.ZERO)!=0){
+					cp1corpu = calculate(qianxilvcorpu1.getQ1(), qianxilvcorpu1.getPayoffq1(), qianxilvcorpu1.getOrderduedate(), 4);
+				}
+				migrationRateReport.setCp1corpus(cp1corpu);
+
+				// C-P2  会员卡本金迁徙
+				QianxilvCorpu qianxilvcorpu1Before1 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByCycleDatetimeMember(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+				BigDecimal cp1corpuBefore1 =null;
+				if(qianxilvcorpu1Before1.getOrderduedate().compareTo(BigDecimal.ZERO)!=0){
+					 cp1corpuBefore1 = calculate(qianxilvcorpu1Before1.getQ1(), qianxilvcorpu1Before1.getPayoffq1(), qianxilvcorpu1Before1.getOrderduedate(), 4);
+				}
+				QianxilvCorpu qianxilvcorpu2 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetimeMember(tmpMoveCycle.getDatetimestart(), Yesterday);
+				BigDecimal p1p2corpu =null;
+				if(qianxilvcorpu2.getQ2().compareTo(BigDecimal.ZERO)!=0){
+					p1p2corpu = calculate(qianxilvcorpu2.getQ2(), qianxilvcorpu2.getPayoffq2(), qianxilvcorpu2.getQ2(), 4);
+				}
+				BigDecimal cp2corpu =null;
+				if(cp1corpuBefore1 != null && p1p2corpu != null){
+					 cp2corpu = cp1corpuBefore1.multiply(p1p2corpu);
+				}
+
+				migrationRateReport.setCp2corpus(cp2corpu);
+
+				// C-P3  本金迁徙
+//				QianxilvCorpu qianxilvcorpu1Before2 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore2.getDatetimestart(), tmpMoveCycleBefore2.getDatetimeend());
+//				BigDecimal cp1corpuBefore2 = calculate(qianxilvcorpu1Before2.getQ1(), qianxilvcorpu1Before2.getPayoffq1(), qianxilvcorpu1Before2.getOrderduedate(), 4);
+//				QianxilvCorpu qianxilvcorpu2Before1 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+//				BigDecimal p1p2corpuBefore1 = calculate(qianxilvcorpu2Before1.getQ2(), qianxilvcorpu2Before1.getPayoffq2(), qianxilvcorpu2Before1.getQ2(), 4);
+//				QianxilvCorpu qianxilvcorpu3 = tMisMigrationRateReportDao.getSumQ3QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
+//				BigDecimal p2p3corpus = calculate(qianxilvcorpu3.getQ3(), qianxilvcorpu3.getPayoffq3(), qianxilvcorpu3.getQ3(), 4);
+//
+//				BigDecimal cp3corpu = cp1corpuBefore2.multiply(p1p2corpuBefore1).multiply(p2p3corpus);
+//				migrationRateReport.setCp3corpus(cp3corpu);
+
+				// C-P4  本金迁徙
+//				QianxilvCorpu qianxilvcorpu1Before3 = tMisMigrationRateReportDao.getSumQ1QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore3.getDatetimestart(), tmpMoveCycleBefore3.getDatetimeend());
+//				BigDecimal cp1corpuBefore3 = calculate(qianxilvcorpu1Before3.getQ1(), qianxilvcorpu1Before3.getPayoffq1(), qianxilvcorpu1Before3.getOrderduedate(), 4);
+//
+//				QianxilvCorpu qianxilvcorpu2Before2 = tMisMigrationRateReportDao.getSumQ2QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore2.getDatetimestart(), tmpMoveCycleBefore2.getDatetimeend());
+//				BigDecimal p1p2corpuBefore2 = calculate(qianxilvcorpu2Before2.getQ2(), qianxilvcorpu2Before2.getPayoffq2(), qianxilvcorpu2Before2.getQ2(), 4);
+//
+//				QianxilvCorpu qianxilvcorpu3Before1 = tMisMigrationRateReportDao.getSumQ3QianxilvCorpuByCycleDatetime(tmpMoveCycleBefore1.getDatetimestart(), tmpMoveCycleBefore1.getDatetimeend());
+//				BigDecimal p2p3corpuBefore1 = calculate(qianxilvcorpu3Before1.getQ3(), qianxilvcorpu3Before1.getPayoffq3(), qianxilvcorpu3Before1.getQ3(), 4);
+//
+//				QianxilvCorpu qianxilvcorpu4 = tMisMigrationRateReportDao.getSumQ4QianxilvCorpuByCycleDatetime(tmpMoveCycle.getDatetimestart(), Yesterday);
+//				BigDecimal p3p4corpu = calculate(qianxilvcorpu4.getQ4(), qianxilvcorpu4.getPayoffq4(), qianxilvcorpu4.getQ4(), 4);
+//
+//				BigDecimal cp4corpu = cp1corpuBefore3.multiply(p1p2corpuBefore2).multiply(p2p3corpuBefore1).multiply(p3p4corpu);
+//				migrationRateReport.setCp4corpus(cp4corpu);
+
+				tMisMigrationRateReportDao.insertMember(migrationRateReport);
+			}
+
+		} catch (Exception e) {
+			logger.warn("迁徙率计算insertDB失败"+ new Date());
+			logger.error("错误信息"+e.getMessage());
+			throw new ServiceException(e);
+		}
+
+	}
 	
 	public List<TMisMigrationRateReport> findMigrateChartList(TMisMigrationRateReport tMisMigrationRateReport){
 		
@@ -529,6 +667,21 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
 		try{
 			return forRiskService.newfindMigrateChartList(migrate,cycleNum);
+		}finally{
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
+	}
+
+	/**
+	 * @Description  会员卡查询最近几个周期的迁徙率
+	 * @param migrate 迁徙率类型
+	 * @param cycleNum 周期数量
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport>
+	 */
+	public List<TMisMigrationRateReport> newfindMigrateChartListFromRiskMember(Migrate migrate,Integer cycleNum){
+		DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+		try{
+			return forRiskService.newfindMigrateChartListMember(migrate,cycleNum);
 		}finally{
 			DynamicDataSource.setCurrentLookupKey("dataSource");
 		}
@@ -593,6 +746,69 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		return migrateCycleData;
 	}
+
+	/**
+	 * @Description  会员卡查询最近几个周期的迁徙率, 按周期分组,按周期降序
+	 * @param migrate 迁徙率类型
+	 * @param cycleNum 周期数量
+	 * @return java.util.Collection<com.mo9.risk.modules.dunning.bean.ChartSeries>
+	 */
+	public List<ChartSeries> getCycleDataMember(Migrate migrate,Integer cycleNum){
+
+		if(cycleNum>5 || cycleNum<2){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+
+		List<TMisMigrationRateReport> migrateList = this.newfindMigrateChartListFromRiskMember(migrate, cycleNum);
+
+		if(null==migrateList){
+			logger.warn("迁徙为查到数据,请传合理的参数");
+			return null;
+		}
+
+		SimpleDateFormat sd=new SimpleDateFormat("yyyyMM_dd");
+		//将数据按周期分组
+		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
+		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
+
+		for (int i = 0; i < migrateList.size(); i++) {
+			TMisMigrationRateReport migrationRateReport = migrateList.get(i);
+			String cycle = migrationRateReport.getCycle();
+
+			//获取对应周期的数据集合
+			List<Object> data;
+			if (!migrateCycleMap.containsKey(cycle)){//若不存在则新建一个MigrateChart
+				if(migrationRateReport.getCpvalue() == null){
+					//如果值为空的话就不创建MigrateChart
+					continue;
+				}
+				data = new ArrayList<Object>();
+				ChartSeries chartSeries = new ChartSeries();
+				chartSeries.setData(data);
+				String start = sd.format(migrationRateReport.getDatetimeStart());
+				String end = sd.format(migrationRateReport.getDatetimeEnd());
+
+
+				int day = Integer.parseInt(end.substring(7));
+				if(day > 16){
+					int a = day % 2 == 0 ? day / 2: (day / 2) +1;
+					chartSeries.setName(end.substring(0,7) + a + "+");
+
+				}else {
+					chartSeries.setName(end);
+				}
+				//chartSeries.setName(start+"-"+end);
+
+				migrateCycleMap.put(cycle, chartSeries);
+				migrateCycleData.add(chartSeries);
+			}else {
+				data = migrateCycleMap.get(cycle).getData();
+			}
+				data.add(migrationRateReport.getCpvalue());
+		}
+		return migrateCycleData;
+	}
 	
 	//迁徙报表优化
 	public  Collection<TMisMigrationData>  getDataList(Migrate migrate,Integer cycleNum) {
@@ -630,7 +846,136 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		return    migrateCycleData.values();
 	}
+	/**
+	 * @return void
+	 * @Description 自动发送会员迁徙邮件
+	 */
+	@Scheduled(cron = "0 20 8 * * ?")
+	public void autoSendMemberMail() {
+		StringBuilder receiver = new StringBuilder();
+		List<Dict> emails = DictUtils.getDictList("migration_rate_report_email");
+		for (Dict email: emails) {
+			receiver.append(email.getValue()+",");
+		}
 
+		if (StringUtils.isBlank(receiver)){
+			logger.info("自动发送会员迁徙率报表失败, 未配置收件人邮箱");
+			return;
+		}
+
+		logger.info("自动发送会员迁徙率报表邮件至" + receiver);
+		DataSource cp1newChart;
+		DataSource cp2newChart;
+		//DataSource cp3newChart;
+		//DataSource cp4newChart;
+		//DataSource imge = this.getImageSource();
+
+		DataSource cp1corpusChart;
+		DataSource cp2corpusChart;
+		//DataSource cp3corpusChart;
+		//DataSource cp4corpusChart;
+
+		List<ChartSeries> cp1newSeries = this.getCycleDataMember(Migrate.cp1new, 5);
+		List<ChartSeries> cp2newSeries = this.getCycleDataMember(Migrate.cp2new, 4);
+		//List<ChartSeries> cp3newSeries = this.getCycleData(Migrate.cp3new, 3);
+		//List<ChartSeries> cp4newSeries = this.getCycleData(Migrate.cp4new, 2);
+
+		List<ChartSeries> cp1corpusSeries = this.getCycleDataMember(Migrate.cp1corpus, 5);
+		List<ChartSeries> cp2corpusSeries = this.getCycleDataMember(Migrate.cp2corpus, 4);
+		//List<ChartSeries> cp3corpusSeries = this.getCycleData(Migrate.cp3corpus, 3);
+		//List<ChartSeries> cp4corpusSeries = this.getCycleData(Migrate.cp4corpus, 2);
+		try {
+			//获取户数迁徙率
+			cp1newChart = this.createChart2(cp1newSeries, "会员卡户数迁徙_C-P1");
+			cp2newChart = this.createChart2(cp2newSeries, "会员卡户数迁徙_C-P2");
+			//cp3newChart = this.createChart2(cp3newSeries, "C-P3");
+			//cp4newChart = this.createChart2(cp4newSeries, "C-P4");
+
+			//获取本金迁徙率
+			cp1corpusChart = this.createChart2(cp1corpusSeries, "会员卡本金迁徙_C-P1");
+			cp2corpusChart = this.createChart2(cp2corpusSeries, "会员卡本金迁徙_C-P2");
+			//cp3corpusChart = this.createChart2(cp3corpusSeries, "C-P3");
+			//cp4corpusChart = this.createChart2(cp4corpusSeries, "C-P4");
+
+		} catch (Exception e) {
+			logger.warn("月报表自动会员邮件添加附件失败", e);
+			return;
+		}
+
+		//获取最新的一天迁徙率及上一周期同天迁徙率, 计算同比
+		//MigrateChange cp1newChange = this.computeMigrateChange(cp1newSeries);
+		//MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
+
+		//发送邮件
+		MailSender mailSender = new MailSender(receiver.toString());
+		String date = DateUtils.getDate("yyyy年MM月dd日");
+		Date beforeDay = DateUtils.getBeforeDay();
+		String yesterday = DateUtils.formatDate(beforeDay,"MM月dd日");
+
+		mailSender.setSubject("截止"+yesterday+"会员卡迁徙率");
+
+		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
+		//String url = "http://localhost/";
+		StringBuilder content = new StringBuilder();
+		content.append("<table>");
+		content.append("<tr><td colspan='2'><img src='"+url+"static/images/mo9imagegreen2.png'/></td></tr>");
+		content.append("<tr><td>&emsp;</td></tr>");
+		content.append("<tr><td><font color='#858585' size='4' >Dear all:</font></td></tr>");
+		content.append("<tr><td colspan='2'><p><font color='#858585' size='4' font_family='黑体'>&emsp;&emsp;&emsp;下图为截止"+yesterday+"会员卡迁徙数据,烦请查阅,谢谢</font></p></td></tr>");
+		content.append("</table>");
+		//content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
+		//content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
+		//content.append("<tr><td height='40px'  bgcolor='#EAEAEA'><font color='#858585'>户数迁徙</font></td><td><font color='#858585'>"+cp1newChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getChange()+"</font></td></tr>");
+		//content.append("<tr><td height='40px' bgcolor='#EAEAEA' ><font color='#858585'>本金迁徙</font></td><td><font color='#858585'>"+cp1corpusChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getChange()+"</font></td></tr>");
+		//content.append("</table>");
+
+
+		//content.append("<p><font color='#3fccb2' size='4' font_family='黑体'>户数迁徙</font></p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		//content.append("<tr><td><img src='cid:cp2newChart'></td><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		content.append("</table>");
+
+		//content.append("<p><font color='#3fccb2' size='4'>本金迁徙</font></p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		//content.append("<tr><td><img src='cid:cp2corpusChart'></td><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='3'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='3'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
+		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("<tr><td colspan='3'><div align ='right'><font color='#858585	' size='4'>"+date+"</font></div></td></tr>");
+		content.append("</table>");
+
+
+
+		mailSender.setContent(content.toString());
+		//添加图片
+
+		mailSender.addImage(cp1newChart,"cp1newChart");
+		mailSender.addImage(cp2newChart,"cp2newChart");
+		//mailSender.addImage(cp3newChart,"cp3newChart");
+		//mailSender.addImage(cp4newChart,"cp4newChart");
+		//mailSender.addImage(imge,"imge");
+
+		mailSender.addImage(cp1corpusChart,"cp1corpusChart");
+		mailSender.addImage(cp2corpusChart,"cp2corpusChart");
+		//mailSender.addImage(cp3corpusChart,"cp3corpusChart");
+		//mailSender.addImage(cp4corpusChart,"cp4corpusChart");
+
+		//发送
+		try {
+			mailSender.sendMail();
+			logger.debug("会员卡迁徙率报表邮件发送成功");
+		} catch (Exception e) {
+			logger.warn("会员卡迁徙率报表自动邮件发送失败", e);
+		}
+	}
 	/**
 	 * @return void
 	 * @Description 自动邮件
@@ -649,13 +994,13 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		logger.info("自动发送迁徙率报表邮件至" + receiver);
-		DataSource cp1newChart;
+		//DataSource cp1newChart;
 		DataSource cp2newChart;
 		DataSource cp3newChart;
 		DataSource cp4newChart;
 		//DataSource imge = this.getImageSource();
 
-		DataSource cp1corpusChart;
+		//DataSource cp1corpusChart;
 		DataSource cp2corpusChart;
 		DataSource cp3corpusChart;
 		DataSource cp4corpusChart;
@@ -671,13 +1016,13 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		List<ChartSeries> cp4corpusSeries = this.getCycleData(Migrate.cp4corpus, 2);
 		try {
 			//获取户数迁徙率
-			cp1newChart = this.createChart2(cp1newSeries, "C-P1");
+			//cp1newChart = this.createChart2(cp1newSeries, "C-P1");
 			cp2newChart = this.createChart2(cp2newSeries, "C-P2");
 			cp3newChart = this.createChart2(cp3newSeries, "C-P3");
 			cp4newChart = this.createChart2(cp4newSeries, "C-P4");
 
 			//获取本金迁徙率
-			cp1corpusChart = this.createChart2(cp1corpusSeries, "C-P1");
+			//cp1corpusChart = this.createChart2(cp1corpusSeries, "C-P1");
 			cp2corpusChart = this.createChart2(cp2corpusSeries, "C-P2");
 			cp3corpusChart = this.createChart2(cp3corpusSeries, "C-P3");
 			cp4corpusChart = this.createChart2(cp4corpusSeries, "C-P4");
@@ -700,10 +1045,11 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		mailSender.setSubject("截止"+yesterday+"迁徙率");
 
 		String url = DictUtils.getDictValue("misUrl", "orderUrl", "");
+		//String url = "http://localhost/";
 		StringBuilder content = new StringBuilder();
 		content.append("<table>");
-		content.append("<tr><td colspan='2'><img src='"+url+"static/images/mo9image.png'/><p></td></tr>");
-		content.append("<tr><td colspan='2'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
+		content.append("<tr><td colspan='2'><img src='"+url+"static/images/mo9image1.png'/></td></tr>");
+		content.append("<tr><td colspan='3'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
 		content.append("</table>");
 		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
 		content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
@@ -714,22 +1060,24 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		content.append("<p><font color='#0993FF' size='4'>户数迁徙</font></p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
-		content.append("<tr><td> &nbsp;</td></tr>");
-		content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		//content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp2newChart'></td><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("</table>");
 
 		content.append("<p><font color='#0993FF' size='4'>本金迁徙</font></p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		//content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp2corpusChart'></td><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
-		content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("<tr><td colspan='3'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
-		content.append("<tr><td colspan='2'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
+		content.append("<tr><td colspan='3'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
-		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
-		content.append("<tr><td> &nbsp;</td></tr>");
-		content.append("<tr><td colspan='2'><div align ='right'><font color='#858585	' size='4'>"+date+"</font></div></td></tr>");
+		content.append("<tr><td colspan='3'><div align ='right'><font color='#858585	' size='4'>"+date+"</font></div></td></tr>");
 		content.append("</table>");
 
 
@@ -737,13 +1085,13 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		mailSender.setContent(content.toString());
 		//添加图片
 
-		mailSender.addImage(cp1newChart,"cp1newChart");
+		//mailSender.addImage(cp1newChart,"cp1newChart");
 		mailSender.addImage(cp2newChart,"cp2newChart");
 		mailSender.addImage(cp3newChart,"cp3newChart");
 		mailSender.addImage(cp4newChart,"cp4newChart");
 		//mailSender.addImage(imge,"imge");
 
-		mailSender.addImage(cp1corpusChart,"cp1corpusChart");
+		//mailSender.addImage(cp1corpusChart,"cp1corpusChart");
 		mailSender.addImage(cp2corpusChart,"cp2corpusChart");
 		mailSender.addImage(cp3corpusChart,"cp3corpusChart");
 		mailSender.addImage(cp4corpusChart,"cp4corpusChart");
@@ -930,5 +1278,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	public void deleteAll() {
 		tMisMigrationRateReportDao.deleteAll();
 	}
-
+	@Transactional(readOnly= false)
+	public void deleteMemberAll() {
+		tMisMigrationRateReportDao.deleteMemberAll();
+	}
 }

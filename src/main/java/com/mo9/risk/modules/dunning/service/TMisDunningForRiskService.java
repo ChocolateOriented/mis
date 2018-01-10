@@ -63,4 +63,15 @@ public class TMisDunningForRiskService extends BaseService{
 	public List<TMisMigrationRateReport> newfindMigrateChartList(Migrate migrate, Integer cycleNum) {
 		return tMisMigrationRateReportDao.newfindMigrateChartList(migrate,cycleNum);
 	}
+
+	/**
+	 * @Description 会员卡使用新事务(必须使用不同service), 查询迁徙率
+	 * @param migrate
+	 * @param cycleNum
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisMigrationRateReport>
+	 */
+	@Transactional(readOnly = true,propagation = Propagation.REQUIRES_NEW)
+	public List<TMisMigrationRateReport> newfindMigrateChartListMember(Migrate migrate, Integer cycleNum) {
+		return tMisMigrationRateReportDao.newfindMigrateChartListMember(migrate,cycleNum);
+	}
 }
