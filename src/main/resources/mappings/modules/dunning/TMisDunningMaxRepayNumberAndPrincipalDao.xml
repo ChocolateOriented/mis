@@ -26,7 +26,7 @@
         group by t.DunningPeopleId, t.DunningCycle, date_format(o.payoff_time, '%Y-%m-%d')
         order by day, sum_corpus desc
         ) dp group by dp.day,dp.DunningCycle ORDER BY dp.day,DunningCycle) as b ON a.cycle = b.cycle AND a.day = b.day
-    </select>
+  </select>
 
     <select id="countPersonalMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="int">
         SELECT count(*) FROM (
@@ -58,7 +58,7 @@
     
     <select id="getGroupMaxRepayNumberAndPrincipalListofDay" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
         SELECT a.day as dateTime,a.cycle as cycle,a.name as nameDealcode,b.name as namePrincipal,a.maxDealcode as maxDealcode, b.maxSumCorpus as principal FROM (select
-        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, sum(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
         from (
         select p.GroupId as groupid, date_format(o.payoff_time, '%Y-%m-%d') as day, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
         from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
@@ -72,7 +72,7 @@
         group by p.GroupId, t.DunningCycle, date_format(o.payoff_time, '%Y-%m-%d')
         order by day, cnt_dealcode desc
         ) dg group by dg.day,dg.DunningCycle ORDER BY dg.day,DunningCycle) a join (select
-        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name,  max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        dg.day, (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name,  sum(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
         from (
         SELECT
         p.GroupId                                           AS groupid,
@@ -190,7 +190,7 @@
 
     <select id="getGroupMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal">
         SELECT a.cycle as cycle,a.name as nameDealcode,a.maxDealcode as maxDealcode,b.name as namePrincipal,b.maxSumCorpus as principal FROM (select
-         (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+         (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, sum(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
         from (
         select p.GroupId as groupid, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
         from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
@@ -204,7 +204,7 @@
         group by p.GroupId, t.DunningCycle
         order by cnt_dealcode desc
         ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) a join ( select
-        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, sum(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
         from (
         select p.GroupId as groupid, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
         from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
@@ -224,7 +224,7 @@
 
     <select id="countGroupMaxRepayNumberAndPrincipalListofPeriod" parameterType="Date" resultType="int">
         SELECT count(1) FROM (SELECT a.cycle as cycle,a.name as nameDealcode,a.maxDealcode as maxDealcode,b.name as namePrincipal,b.maxSumCorpus as principal FROM (select
-        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, sum(dg.cnt_dealcode) as maxDealcode,DunningCycle as cycle
         from (
         select p.GroupId as groupid, count(o.dealcode) as cnt_dealcode,t.DunningCycle as DunningCycle
         from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p
@@ -238,7 +238,7 @@
         group by p.GroupId, t.DunningCycle
         order by cnt_dealcode desc
         ) dg group by dg.DunningCycle ORDER BY dg.DunningCycle) a join ( select
-        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, max(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
+        (select g.name from t_mis_dunning_group g where g.id = dg.groupid) as name, sum(dg.sum_corpus) as maxSumCorpus,DunningCycle as cycle
         from (
         select p.GroupId as groupid, sum(IFNULL(o.amount, 0) - IFNULL(o.cost_amount, 0)) as sum_corpus,t.DunningCycle as DunningCycle
         from t_mis_dunning_task t, t_risk_order o, t_mis_dunning_people p

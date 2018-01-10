@@ -438,6 +438,14 @@
 				AND  callDuration >= #{callDurationStart} AND callDuration <![CDATA[ <= ]]> #{callDurationEnd}
 			</if>
 		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+		</choose>
+		<if test="page != null">
+			LIMIT ${page.firstResult}, ${page.pageSize}
+		</if>
 	</select>
 
 	<select id="countExportStatementFile" resultType="int">
@@ -658,7 +666,7 @@
 								</choose>
 							</where>
 							) t group by Agent, time) t1 on a.Agent = t1.Agent
-		RIGHT join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time,
+		LEFT join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time,
 							sum(if(t.breakoff is null, 0, unix_timestamp(t.breakoff) - unix_timestamp(t.CreateDate))) as break
 					from
 						(select l1.Agent, l1.CreateDate,
@@ -746,6 +754,15 @@
 			</if>
 		</where>
 
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+		</choose>
+		<if test="page != null">
+			LIMIT ${page.firstResult}, ${page.pageSize}
+		</if>
+
 	</select>
 
 
@@ -809,7 +826,7 @@
 			</choose>
 		</where>
 		) t group by Agent, time) t1 on a.Agent = t1.Agent
-		RIGHT join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time,
+		LEFT join (select Agent, DATE_FORMAT(t.CreateDate,'%Y-%m-%d') AS time,
 		sum(if(t.breakoff is null, 0, unix_timestamp(t.breakoff) - unix_timestamp(t.CreateDate))) as break
 		from
 		(select l1.Agent, l1.CreateDate,
