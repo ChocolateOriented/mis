@@ -149,7 +149,8 @@
 						(${cp.smsNum}) 
 					</a>
 					通话
-					<a href="javascript:void(0)" title="通话记录" onclick="onClickMonthDetails(this)" mobile="${cp.contactMobile}" method="dialogTelDetail" type="tel">
+					<a href="javascript:void(0)" title="通话记录" onclick="onClickMonthDetails(this)" mobile="${cp.contactMobile}" method="dialogTelDetail" type="tel"
+						style="${cp.effectiveActionNum > 0 ? 'color:red;' : ''}">
 						(${cp.telNum})
 					</a>
 				</td>

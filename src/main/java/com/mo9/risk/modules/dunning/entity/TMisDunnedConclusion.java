@@ -37,6 +37,7 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 	private String dunningpeoplename;  //催收人员
 	private String dunningcycle;		// 催收周期(队列)
 	private List<String> actions;		//关联的actionId
+	private Integer dunningMobileCount;		//催收人催收周期内联系的人数
 	
 	private String conclusionType;		// 时定时任务还是n:3:2 ,dir是n:3:2 auto是定时任务
 	private Integer buyerid;
@@ -213,6 +214,14 @@ public class TMisDunnedConclusion extends DataEntity<TMisDunnedConclusion> {
 
 	public void setConclusionType(String conclusionType) {
 		this.conclusionType = conclusionType;
+	}
+
+	public Integer getDunningMobileCount() {
+		return dunningMobileCount;
+	}
+
+	public void setDunningMobileCount(Integer dunningMobileCount) {
+		this.dunningMobileCount = dunningMobileCount;
 	}
 
 }

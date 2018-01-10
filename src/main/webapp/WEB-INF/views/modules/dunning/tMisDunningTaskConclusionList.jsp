@@ -82,6 +82,7 @@
 				<th>下次跟进日期</th>
 				<th>备注</th>
 				<th>催收人</th>
+				<th>累计号码数量</th>
 				<th>操作时间</th>
 			</tr>
 		</thead>
@@ -136,6 +137,9 @@
 				</td>
 				<td>
 					${tMisDunnedConclusion.dunningpeoplename}
+				</td>
+				<td>
+					${tMisDunnedConclusion.dunningMobileCount}
 				</td>
 				<td>
 					<fmt:formatDate value="${tMisDunnedConclusion.dunningtime}" pattern="yyyy-MM-dd HH:mm:ss"/>

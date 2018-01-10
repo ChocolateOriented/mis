@@ -94,6 +94,7 @@
 				<th>短信类型</th>
 				<th>接收号码类型</th>
 				<th>可发送逻辑</th>
+				<th>发送产品</th>
 				<th>模板内容</th>
 				<th>操作</th>	
 			</tr>
@@ -150,7 +151,9 @@
 					</c:if>
                       
 				</td>
-				
+				<td>
+				 	${smsTemplate.bizTypes}
+				</td>
 				<td style="max-width:300px;line-height:30px">
 				${smsTemplate.smsCotent}
 				</td>

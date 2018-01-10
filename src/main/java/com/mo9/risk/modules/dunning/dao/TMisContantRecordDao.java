@@ -83,4 +83,13 @@ public interface TMisContantRecordDao extends CrudDao<TMisContantRecord> {
 	 * @return
 	 */
 	public int findCountSmsSend(TMisContantRecord tContantRecord);
+
+	/**
+	 * 催收人周期内联系过的人的数量
+	 * @param decalode
+	 * @param dunningCycle
+	 * @param dunningPeopleId
+	 * @return
+	 */
+	public int findCountMobile(@Param("decalode")String decalode,@Param("dunningCycle") String dunningCycle, @Param("dunningPeopleId")String dunningPeopleId);
 }

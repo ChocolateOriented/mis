@@ -134,7 +134,8 @@
 		SELECT 
 			ContantTarget AS tel,
 			SUM(CASE WHEN ContantType = 'sms' THEN 1 ELSE 0 END) AS smsNum,
-			SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum
+			SUM(CASE WHEN ContantType = 'tel' THEN 1 ELSE 0 END) AS telNum,
+			COUNT(IF(IsEffective = 1, 1, NULL)) AS effectiveActionNum
 		FROM t_mis_contant_record WHERE dealcode = #{dealcode}
 		GROUP by ContantTarget
 	</select>

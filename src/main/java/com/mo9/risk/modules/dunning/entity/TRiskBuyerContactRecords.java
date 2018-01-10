@@ -33,6 +33,8 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 	private Integer inCnt;//被叫次数
 	private Integer inDuration;//被呼叫时长(秒)
 	
+	private Integer effectiveActionNum;		//有效action次数
+	
 	public TRiskBuyerContactRecords() {
 		super();
 	}
@@ -208,6 +210,14 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 		return hour + "小时" + minute + "分" + second + "秒";
 	}
 
+	public Integer getEffectiveActionNum() {
+		return effectiveActionNum;
+	}
+
+	public void setEffectiveActionNum(Integer effectiveActionNum) {
+		this.effectiveActionNum = effectiveActionNum;
+	}
+
 	@Override
 	public String toString() {
 		return "TRiskBuyerContactRecords{" +
@@ -226,6 +236,7 @@ public class TRiskBuyerContactRecords extends DataEntity<TRiskBuyerContactRecord
 				", sumtime=" + sumtime +
 				", inCnt=" + inCnt +
 				", inDuration=" + inDuration +
+				", effectiveActionNum=" + effectiveActionNum +
 				'}';
 	}
 }

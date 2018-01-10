@@ -284,7 +284,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @param numbefore 
 	 * @return
 	 */
-	public List<DunningOrder> findallAtuoSms(@Param("numbefore")Integer numbefore,@Param("numafter") Integer numafter);
+	public List<DunningOrder> findallAtuoSms(@Param("numbefore")Integer numbefore,@Param("numafter") Integer numafter,@Param("bizTypes") String bizTypes);
 	
 	/**
 	 * 查询预提醒新进入正在催收案件buyerid

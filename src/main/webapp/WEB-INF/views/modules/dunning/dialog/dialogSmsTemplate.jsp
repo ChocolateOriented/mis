@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title>添加修改短信模板的页面</title>
+	<title>修改短信模板的页面</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -159,7 +159,18 @@
 			
 			//保存
 		$('#smsSave').click(function() {
-			
+			var controls=false;
+			$("[name='bizTypes']").each(function(){
+				if(this.checked){
+					controls=true;
+		        	return false;
+		        }
+		    });
+			if(!controls){
+				$("#bizTip").html("必选信息 ");
+				 $("#smsSave").attr('disabled',"true");
+				return;
+			}
 			//判断选择的逾期天数是否正确
 			 
 			if($("#numbefore").val()){
@@ -306,6 +317,15 @@
 				<span class="help-inline" ><font color="red" id="tipnum"></font> </span>
 		</div>
 		
+		<div class="control-group">
+			<label class="control-label ">发送产品：</label>
+			<div class="controls ">
+				<input type="checkbox" name="bizTypes" id="bizTypes1" value="mo9" <c:if test="${fn:contains(tSTemplate.bizTypes,'mo9')}">checked</c:if> />mo9
+				<input type="checkbox" name="bizTypes" id="bizTypes2" value="weixin36" <c:if test="${fn:contains(tSTemplate.bizTypes,'weixin36')}">checked</c:if> />weixin36
+				<span class="help-inline"><font color="red">*</font> </span>
+				<span ><font color="red" id="bizTip"></font></span>
+			</div>
+		</div>
 		
 		<div class="control-group">
 			<label class="control-label">模板内容：</label>

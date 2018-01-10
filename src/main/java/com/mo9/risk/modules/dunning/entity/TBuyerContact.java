@@ -29,6 +29,7 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 	private String dealcode;
 	private String rcname;
 	private boolean relativeMatch;		//是否匹配亲戚关键字
+	private Integer effectiveActionNum;		//有效action次数
 	
 	public TBuyerContact() {
 		super();
@@ -122,6 +123,14 @@ public class TBuyerContact extends DataEntity<TBuyerContact> {
 
 	public void setRelativeMatch(boolean relativeMatch) {
 		this.relativeMatch = relativeMatch;
+	}
+
+	public Integer getEffectiveActionNum() {
+		return effectiveActionNum;
+	}
+
+	public void setEffectiveActionNum(Integer effectiveActionNum) {
+		this.effectiveActionNum = effectiveActionNum;
 	}
 
 }

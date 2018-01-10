@@ -2852,7 +2852,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				public void run() {
 					Integer numafter = smsTemplate.getNumafter();
 					Integer numbefore = smsTemplate.getNumbefore();
-					List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms(numbefore, numafter);// 查询所有需要催收的订单
+					String bizTypes=smsTemplate.getBizTypes();
+					List<DunningOrder> findallAtuoSms = tMisDunningTaskDao.findallAtuoSms(numbefore, numafter,bizTypes);// 查询所有需要催收的订单
 					logger.info("系统发送,查询时间为" + sb2.format(new Date()) + ",查询催收任务通过条件逾期天数为" + numbefore + "天到" + numafter
 							+ "天,短信模板为:" + smsTemplate.getTemplateName() + ",查询到的总条数为" + findallAtuoSms.size() + "条");
 					// 跟踪短信发送的条数
@@ -3625,6 +3626,9 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		tMisDunnedConclusion.setDealcode(decalode);
 		tMisDunnedConclusion.setTaskid(taskId);
 		tMisDunnedConclusion.setConclusionType("auto");
+		//该订单所属周期内所属催收员联系过的个数
+		int mobileCount=tcontDao.findCountMobile(decalode,dunningCycle,dunningPeopleId);
+		tMisDunnedConclusion.setDunningMobileCount(mobileCount);
 		boolean result = tMisDunnedConclusionService.saveRecord(tMisDunnedConclusion, decalode, taskId);
 		return result;
 	}

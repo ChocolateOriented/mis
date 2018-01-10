@@ -216,173 +216,185 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 			logger.info("同步坐席" + agent.getAgent());
 			action.setQueue(null);
 			action.setAgent(agent.getAgent());
-			syncCalloutInfo(action);
+			List<CallCenterCalloutInfo> calloutInfos = queryCalloutInfo(action);
+			saveAgentCalloutResults(calloutInfos, agent);
+			
 			action.setAgent(null);
 			action.setQueue(agent.getQueue());
-			syncCallinInfo(action);
+			List<CallCenterCallinInfo> callinInfos = queryCallinInfo(action);
+			saveAgentCallinResults(callinInfos, agent);
 		}
 	}
 	
 	/**
-	 * 同步呼出信息
+	 * 获取呼出信息
 	 * @param action
 	 * @return
 	 */
-	@Transactional(readOnly = false)
-	public void syncCalloutInfo(CallCenterQueryCallInfo action) {
+	public List<CallCenterCalloutInfo> queryCalloutInfo(CallCenterQueryCallInfo action) {
 		action.setPage(null);
+		List<CallCenterCalloutInfo> calloutInfos = new ArrayList<CallCenterCalloutInfo>();
 		try {
 			CallCenterPageResponse<CallCenterCalloutInfo> result = callCenterManager.calloutInfo(action);
 			if (result == null) {
-				logger.info("同步呼出通话信息失败");
-				return;
+				logger.info("获取呼出通话信息失败");
+				return calloutInfos;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCalloutInfo> page = result.getData();
 			if (page == null || page.isEmpty()) {
-				return;
+				return calloutInfos;
 			}
 			
-			saveCalloutResults(page.getResults());
+			calloutInfos.addAll(page.getResults());
 			
 			int total = page.getTotal();
 			int totalPage = total / 10;
 			if (total % 10 > 0) {
 				totalPage++;
 			}
-			logger.info("同步呼出通话信息页数" + totalPage);
+			logger.info("获取呼出通话信息页数" + totalPage);
 			
 			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
 				CallCenterPageResponse<CallCenterCalloutInfo> next = callCenterManager.calloutInfo(action);
-				if (result == null || !"0".equals(result.getErrorCode())) {
-					throw new ServiceException(result.getErrorMsg());
+				if (result == null) {
+					continue;
 				}
 				
 				CallCenterPageResponse.CallCenterPageData<CallCenterCalloutInfo> nextPage = next.getData();
 				if (nextPage == null || nextPage.isEmpty()) {
-					return;
+					return calloutInfos;
 				}
 				
-				saveCalloutResults(nextPage.getResults());
+				calloutInfos.addAll(page.getResults());
 			}
 		} catch (Exception e) {
-			logger.info("同步呼出通话信息失败,失败信息:" + e);
+			logger.info("获取呼出通话信息失败,失败信息:" + e);
 		}
+		return calloutInfos;
 	}
 	
 	/**
-	 * 同步呼入信息
+	 * 获取呼入信息
 	 * @param action
 	 * @return
 	 */
-	@Transactional(readOnly = false)
-	public void syncCallinInfo(CallCenterQueryCallInfo action) {
+	public List<CallCenterCallinInfo> queryCallinInfo(CallCenterQueryCallInfo action) {
 		action.setPage(null);
+		List<CallCenterCallinInfo> callinInfos = new ArrayList<CallCenterCallinInfo>();
 		try {
 			CallCenterPageResponse<CallCenterCallinInfo> result = callCenterManager.callinInfo(action);
 			if (result == null) {
-				logger.info("同步呼入通话信息失败");
-				return;
+				logger.info("获取呼入通话信息失败");
+				return callinInfos;
 			}
 			
 			CallCenterPageResponse.CallCenterPageData<CallCenterCallinInfo> page = result.getData();
 			if (page == null || page.isEmpty()) {
-				return;
+				return callinInfos;
 			}
 			
-			saveCallinResults(page.getResults());
+			callinInfos.addAll(page.getResults());
 			
 			int total = page.getTotal();
 			int totalPage = total / 10;
 			if (total % 10 > 0) {
 				totalPage++;
 			}
-			logger.info("同步呼入通话信息页数" + totalPage);
+			logger.info("获取呼入通话信息页数" + totalPage);
 			
 			for (int i = 2; i <= totalPage; i++) {
 				action.setPage(String.valueOf(i));
 				CallCenterPageResponse<CallCenterCallinInfo> next = callCenterManager.callinInfo(action);
-				if (result == null || !"0".equals(result.getErrorCode())) {
-					throw new ServiceException(result.getErrorMsg());
+				if (result == null) {
+					continue;
 				}
 				
 				CallCenterPageResponse.CallCenterPageData<CallCenterCallinInfo> nextPage = next.getData();
 				if (nextPage == null || nextPage.isEmpty()) {
-					return;
+					return callinInfos;
 				}
 				
-				saveCallinResults(nextPage.getResults());
+				callinInfos.addAll(page.getResults());
 			}
 		} catch (Exception e) {
-			logger.info("同步呼入通话信息失败,失败信息:" + e);
+			logger.info("获取呼入通话信息失败,失败信息:" + e);
 		}
+		return callinInfos;
 	}
 	
 	/**
-	 * 保存呼出信息数据
+	 * 保存坐席呼出信息数据
 	 * @param calloutInfos
+	 * @param agentInfo
 	 * @return
 	 */
-	private void saveCalloutResults(List<CallCenterCalloutInfo> calloutInfos) {
-		for (CallCenterCalloutInfo callInfo : calloutInfos) {
-			TMisCallingRecord entity = new TMisCallingRecord();
-			entity.setCallType(CallType.out);
-			entity.setUuid(callInfo.getEuuid());
-			TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
-			if (current != null) {
-				continue;
+	private void saveAgentCalloutResults(List<CallCenterCalloutInfo> calloutInfos, TMisAgentInfo agentInfo) {
+		if (agentInfo == null) {
+			return;
+		}
+		
+		try {
+			for (CallCenterCalloutInfo callInfo : calloutInfos) {
+				TMisCallingRecord entity = new TMisCallingRecord();
+				entity.setCallType(CallType.out);
+				entity.setUuid(callInfo.getEuuid());
+				TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
+				if (current != null) {
+					continue;
+				}
+				
+				TMisCallingRecord record = new TMisCallingRecord(callInfo);
+				String target = record.getTargetNumber();
+				target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+				record.setTargetNumber(target);
+				record.setPeopleId(agentInfo.getPeopleId());
+				record.setAgentState(getAgentStateOnMoment(record));
+				save(record);
 			}
-			
-			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByExtension(callInfo.getExtension());
-
-			if (agentInfo == null) {
-				continue;
-			}
-			
-			TMisCallingRecord record = new TMisCallingRecord(callInfo);
-			String target = record.getTargetNumber();
-			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
-			record.setTargetNumber(target);
-			record.setPeopleId(agentInfo.getPeopleId());
-			record.setAgentState(getAgentStateOnMoment(record));
-			save(record);
+		} catch (Exception e) {
+			logger.info("保存同步呼出通话信息失败,失败信息:" + e);
 		}
 	}
 	
 	/**
-	 * 保存呼入信息数据
+	 * 保存坐席呼入信息数据
 	 * @param callinInfos
+	 * @param agentInfo
 	 * @return
 	 */
-	private void saveCallinResults(List<CallCenterCallinInfo> callinInfos) {
-		for (CallCenterCallinInfo callInfo : callinInfos) {
-			TMisCallingRecord entity = new TMisCallingRecord();
-			entity.setCallType(CallType.in);
-			entity.setUuid(callInfo.getSessionid());
-			TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
-			if (current != null) {
-				continue;
+	private void saveAgentCallinResults(List<CallCenterCallinInfo> callinInfos, TMisAgentInfo agentInfo) {
+		if (agentInfo == null) {
+			return;
+		}
+		
+		try {
+			for (CallCenterCallinInfo callInfo : callinInfos) {
+				TMisCallingRecord entity = new TMisCallingRecord();
+				entity.setCallType(CallType.in);
+				entity.setUuid(callInfo.getSessionid());
+				TMisCallingRecord current = dao.getRecordByInOutUuid(entity);
+				if (current != null) {
+					continue;
+				}
+				
+				TMisCallingRecord record = new TMisCallingRecord(callInfo);
+				record.setPeopleId(agentInfo.getPeopleId());
+				if (StringUtils.isEmpty(record.getAgent())) {
+					record.setAgent(agentInfo.getAgent());
+				}
+				if (StringUtils.isEmpty(record.getExtensionNumber())) {
+					record.setExtensionNumber(agentInfo.getExtension());
+				}
+				String target = record.getTargetNumber();
+				target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
+				record.setTargetNumber(target);
+				record.setAgentState(getAgentStateOnMoment(record));
+				save(record);
 			}
-			TMisAgentInfo agentInfo = tMisAgentInfoService.getInfoByQueue(callInfo.getQueue());
-			
-			if (agentInfo == null) {
-				continue;
-			}
-			
-			TMisCallingRecord record = new TMisCallingRecord(callInfo);
-			record.setPeopleId(agentInfo.getPeopleId());
-			if (StringUtils.isEmpty(record.getAgent())) {
-				record.setAgent(agentInfo.getAgent());
-			}
-			if (StringUtils.isEmpty(record.getExtensionNumber())) {
-				record.setExtensionNumber(agentInfo.getExtension());
-			}
-			String target = record.getTargetNumber();
-			target = TMisDunningPhoneService.filterCtiCallInfoNumber(target);
-			record.setTargetNumber(target);
-			record.setAgentState(getAgentStateOnMoment(record));
-			save(record);
+		} catch (Exception e) {
+			logger.info("保存同步呼入通话信息失败,失败信息:" + e);
 		}
 	}
 
@@ -420,7 +432,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		List<DunningPhoneReportFile> list = exportSoftPhoneReportFile(entity);
 		filterPhoneReportByDepartment(list,entity,page);
 		page.setList(exportSoftPhoneReportFile(entity));
-		page.setCount(page.getList().size());
+		page.setCount(dao.countExportStatementFile(entity));
 		return page;
 	}
 
@@ -465,7 +477,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 		List<DunningPhoneReportFile> list = exportSoftPhoneReportFileForEveryDay(entity);
 		filterPhoneReportByDepartment(list,entity,page);
 		page.setList(list);
-		page.setCount(page.getList().size());
+		page.setCount(dao.countExportStatementFileForEveryDay(entity));
 		return page;
 	}
 

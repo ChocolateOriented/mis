@@ -5,7 +5,6 @@ package com.mo9.risk.modules.dunning.entity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 
@@ -45,6 +44,8 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	private Integer  numafter;   //可逾期天数设定参数
 	
 	private String  sendReason;   //可逾期天数设定参数
+	
+	private String  bizTypes;   //发送产品
 	
 	//用来做软删
 	private String invalid ;
@@ -186,8 +187,13 @@ public class TmisDunningSmsTemplate  extends DataEntity<TmisDunningSmsTemplate> 
 	}
 
 
+	public String getBizTypes() {
+		return bizTypes;
+	}
 
 
+	public void setBizTypes(String bizTypes) {
+		this.bizTypes = bizTypes;
+	}
 
-	
 }

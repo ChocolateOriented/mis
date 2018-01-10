@@ -86,7 +86,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-			    ORDER BY a.dbid
+			    ORDER BY a.agent
 			</otherwise>
 		</choose>
 	</select>

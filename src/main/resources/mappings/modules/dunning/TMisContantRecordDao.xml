@@ -437,6 +437,23 @@
 			CreateDate 
 		LIMIT 1;
 	</select>
+	
+	<select id="findCountMobile" resultType="int">
+		SELECT
+			COUNT(DISTINCT(ContantTarget))
+		FROM
+			`t_mis_contant_record`
+		WHERE
+		
+			ContantType='tel'
+		and
+			dealcode=#{decalode}
+		and
+			dunningpeoplename=#{dunningPeopleId}
+		and
+			dunningCycle=#{dunningCycle}
+	</select>
+	
 	<!-- 自动电催结论结束-->
 	<select id="findCountSmsSend" resultType="int">
 	SELECT
