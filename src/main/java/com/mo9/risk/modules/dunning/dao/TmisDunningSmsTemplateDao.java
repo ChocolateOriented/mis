@@ -29,7 +29,7 @@ public interface TmisDunningSmsTemplateDao  extends CrudDao<TmisDunningSmsTempla
 	 * @param acceptType
 	 * @return
 	 */
-	public List<TmisDunningSmsTemplate> findListSMSTemplate(@Param(value="overdays")Integer overdays,@Param(value="acceptType")String acceptType);
+	public List<TmisDunningSmsTemplate> findListSMSTemplate(@Param(value="overdays")Integer overdays,@Param(value="acceptType")String acceptType,@Param(value="platformExt")String platformExt);
     
 	
 	/**

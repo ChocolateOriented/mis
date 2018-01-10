@@ -147,9 +147,18 @@
 			
 			//添加
 		$('#smsSave').click(function() {
-			
-			
-			 
+			var controls=false;
+			$("[name='bizTypes']").each(function(){
+				if(this.checked){
+					controls=true;
+		        	return false;
+		        }
+		    });
+			if(!controls){
+				$("#bizTip").html("必选信息 ");
+				 $("#smsSave").attr('disabled',"true");
+				return;
+			}
 			//判断选择的逾期天数是否正确
 			
 			if($("#numbefore").val()){
@@ -218,7 +227,7 @@
 <ul class="nav nav-tabs">
 
 	</ul>
-	<form:form id="inputForm"   class="form-horizontal">
+	<form:form id="inputForm" class="form-horizontal">
 		
 		<div class="control-group">
 			<label class="control-label">英文模板名称：</label>
@@ -296,6 +305,16 @@
 				<input id="numafter" name="numafter" type="text" value=""  placeholder="不写默认为9999"/>
 			</div>
 				<span class="help-inline" ><font color="red" id="tipnum"></font> </span>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label ">发送产品：</label>
+			<div class="controls ">
+				<input type="checkbox" name="bizTypes" id="bizTypes1" value="mo9"  />mo9
+				<input type="checkbox" name="bizTypes" id="bizTypes2" value="weixin36"  />weixin36
+				<span class="help-inline"><font color="red">*</font> </span>
+				<span ><font color="red" id="bizTip"></font></span>
+			</div>
 		</div>
 		
 		

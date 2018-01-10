@@ -80,11 +80,11 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 	}
     
 	  //根据逾期天数对应的模板
-	   public List<TmisDunningSmsTemplate> findSmsTemplate(String contactType,Date repaymentDate,TMisDunningOrder order,TMisDunningTask task){
+	   public List<TmisDunningSmsTemplate> findSmsTemplate(String contactType,TMisDunningOrder order,TMisDunningTask task){
 		try{   
 			  TmisDunningSmsTemplate template=new TmisDunningSmsTemplate();
 			  
-			  int overdayas =  (int) TMisDunningTaskService.GetOverdueDay(repaymentDate);
+			  int overdayas =  (int) TMisDunningTaskService.GetOverdueDay(order.getRepaymentDate());
 			  String acceptType=""; 
 			  if("".equals(contactType)){
 				  
@@ -97,7 +97,14 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 					  acceptType="others";
 				  }
 			  }
-			  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType);
+			  String platformExt=order.getPlatformExt();
+			  if(StringUtils.isNotEmpty(platformExt) && platformExt.contains("jinRongZhongXin")){
+				  platformExt="%weixin3%";
+			  }else{
+				  platformExt="%mo9%";
+				  
+			  }
+			  List<TmisDunningSmsTemplate> findList = tsTemplateDao.findListSMSTemplate(overdayas,acceptType,platformExt);
 			  
 			 if(null!=findList&&findList.size()!=0){
 			  TmisDunningSmsTemplate tSmsTemplate=findList.get(0);
@@ -110,7 +117,7 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 			 return findList;
 		}catch(Exception e){
 			e.getMessage();
-			logger.warn("根据逾期天数找对应的模板失败");
+			logger.warn("根据逾期天数找对应的模板失败",e);
 		}
 		return null;
 	}
@@ -123,11 +130,6 @@ public class TmisDunningSmsTemplateService extends CrudService<TmisDunningSmsTem
 		   * @return
 		   */
         public String cousmscotent(String smsCotent,TRiskBuyerPersonalInfo buyerInfeo,String platformExt,String dunningpeopleid) {
-        	
-//        	TMisDunningPeople tMisDunningPeople = tmisPeopleDao.get(dunningpeopleid);
-        	
-//        	TRiskBuyerPersonalInfo buyerInfeo= tbuyerDao.getbuyerIfo(dealcode);
-        	
         	SimpleDateFormat ss=new SimpleDateFormat("yyyy-MM-dd ");
         	
         	Map<String, Object> map = new HashMap<String, Object>();

@@ -1283,19 +1283,14 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 				contatType ="self";
 			}
 		}
-		
 		//获取相对应的 短信模板
-		List<TmisDunningSmsTemplate> smsTemplateList = tstService.findSmsTemplate(contactstype,order.getRepaymentDate(),order,task);
-		model.addAttribute("smsTeplateList", smsTemplateList);
+		List<TmisDunningSmsTemplate> smsTemplateList = tstService.findSmsTemplate(contactstype,order,task);
 		if(null!=smsTemplateList&&smsTemplateList.size()!=0)
 		model.addAttribute("tSTemplate", smsTemplateList.get(0));
-//		model.addAttribute("contactstype", null != contactstype && !"undefined".equals(contactMobile) ? contactstype.toUpperCase() : chooseSelf ? "SELF" : "" );
+		model.addAttribute("smsTeplateList", smsTemplateList);
 		model.addAttribute("contactstype", contactstype);
 		model.addAttribute("selfMobile", null != contactMobile && !"undefined".equals(contactMobile) ? contactMobile:"" );
-		
-//		model.addAttribute("smsContext", smsContext);
 		model.addAttribute("mobileSelf", mobileSelf);
-//		model.addAttribute("smsT", smsT);
 		model.addAttribute("buyerId", buyerId);
 		model.addAttribute("dealcode", dealcode);
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
