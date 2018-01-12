@@ -502,12 +502,12 @@ public class ChartUtils {
 
     public static void setFont(JFreeChart jfreechart,XYPlot plot){
         // 设置配置字体（解决中文乱码的通用方法）
-        Font xfont = new Font("黑体", Font.PLAIN, 12); // X轴
-        Font yfont = new Font("黑体", Font.PLAIN, 12); // Y轴
-        Font kfont = new Font("黑体", Font.PLAIN, 12); // 底部
+        Font xfont = new Font("宋体", Font.PLAIN, 12); // X轴
+        Font yfont = new Font("宋体", Font.PLAIN, 12); // Y轴
+        Font kfont = new Font("宋体", Font.PLAIN, 12); // 底部
         TextTitle title = jfreechart.getTitle();
         String text = title.getText();
-        Font titleFont = new Font("黑体",  Font.PLAIN, 20); // 图片标题
+        Font titleFont = new Font("宋体",  Font.PLAIN, 20); // 图片标题
         //设置背景颜色
         jfreechart.getRenderingHints().put(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
         plot.setOutlinePaint(Color.white);//设置外框颜色
