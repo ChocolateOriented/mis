@@ -761,7 +761,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	}
 
     private TmpMoveCycle getTmpMoveCycleByCycle(Integer cycleInt) {
-        DynamicDataSource.setCurrentLookupKey("temporaryDataSource");
+        DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
         try{
             return tMisMigrationRateReportDao.getTmpMoveCycleByCycle(cycleInt);
         }finally{
