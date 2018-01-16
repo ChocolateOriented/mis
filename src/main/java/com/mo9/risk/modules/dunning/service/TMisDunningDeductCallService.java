@@ -9,11 +9,8 @@ import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.bean.Mo9ResponseData;
 import com.mo9.risk.modules.dunning.bean.dto.Mo9DeductOrder;
-import com.mo9.risk.modules.dunning.dao.TMisDunningConfigureDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningDeductDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningDeductLogDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
+import com.mo9.risk.modules.dunning.dao.*;
+import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TMisDunningDeduct;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTaskLog;
 import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
@@ -30,6 +27,8 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +62,12 @@ public class TMisDunningDeductCallService {
 
 	@Autowired
 	private TMisDunningOrderService orderService ;
+
+	@Autowired
+	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
+
+	@Autowired
+	private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
 
 	private static Logger logger = LoggerFactory.getLogger(TMisDunningDeductCallService.class);
 	
@@ -101,6 +106,31 @@ public class TMisDunningDeductCallService {
 			
 			sendFailRemindSMS(buyerInfo, tMisDunningDeduct);
 		}
+		try{
+			if(tMisDunningDeduct.getStatus()==PayStatus.succeeded){
+				//说明扣款成功
+				String dealcode = tMisDunningDeduct.getDealcode();
+                TMisCustomerServiceFeedback ni= tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
+                String nickName = null;
+                if(ni != null){
+                    nickName = ni.getNickname();
+                }
+                TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+				tMisCustomerServiceFeedback.setDealcode(dealcode);
+				tMisCustomerServiceFeedback.setHandlingresult("代扣"+tMisDunningDeduct.getPayamount()+"元成功,");
+				tMisCustomerServiceFeedback.setHashtag("ORDER_DEDUCT");
+                tMisCustomerServiceFeedback.setNickname(nickName);
+				tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+				String ids = tMisCustomerServiceFeedback.getIds();
+				if(ids!=null){
+					tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+				}
+			}
+		}catch (Exception e){
+
+				logger.info("代扣成功后,更新通知状态错误",e);
+		}
+
 		return true;
 	}
 	

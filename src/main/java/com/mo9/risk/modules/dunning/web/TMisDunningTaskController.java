@@ -9,6 +9,7 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
+import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.*;
@@ -83,7 +84,10 @@ public class TMisDunningTaskController extends BaseController {
 	private static final Logger actionlog = Logger.getLogger("com.mo9.cuishou.liulan");
 	
  	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
- 
+	@Autowired
+	private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
+	@Autowired
+	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
  	@Autowired
  	private TMisDunningConfigureService tMisDunningConfigureService;
 	
@@ -2101,6 +2105,27 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
  			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
  			if(("payoff").equals(riskOrder.getStatus())){
  				tMisDunningOrderDao.orderSynUpdate(riskOrder);
+				try{
+
+                    TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
+
+                    String nickname=UserUtils.getUser().getName();
+                    if(tf != null){
+                        nickname=tf.getNickname();
+                    }
+                    TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+                    tMisCustomerServiceFeedback.setDealcode(dealcode);
+                    tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
+                    tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
+                    tMisCustomerServiceFeedback.setNickname(nickname);
+                    tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+                    String ids = tMisCustomerServiceFeedback.getIds();
+                    if(ids!=null){
+                        tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+                    }
+				}catch (Exception e){
+					logger.info("订单已经还清,更新通知状态错误",e);
+				}
  				return "OK";
  			}
  			if(("payment").equals(riskOrder.getStatus())){
