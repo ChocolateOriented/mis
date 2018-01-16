@@ -44,21 +44,25 @@
 		}
 	</style>
 	<script type="text/javascript">
-        $(document).ready(function() {
-            if(${memberInfo eq null}){
-                $("#customerTable5,#memberTitle").hide();
-            }
-            if("${ispayoff}" == "true"){
-                disableBtn();
-            }
-            var obj=null;
-            if(parseInt("${overdueDays}")>parseInt("${controlDay}")){
-                obj=document.getElementById("customerDetails");
-            }else{
-                obj=document.getElementById("conclusion");
-            }
-            childPage(obj);
-        });
+      $(document).ready(function () {
+        if (${memberInfo eq null}) {
+          $("#customerTable5,#memberTitle").hide();
+        }
+        if ("${ispayoff}" == "true") {
+          disableBtn();
+        }
+        if ("false" == $("#daikouStatus").val()) {
+          $("#btnDeduct").attr("disabled", true);
+        }
+
+        var obj = null;
+        if (parseInt("${overdueDays}") > parseInt("${controlDay}")) {
+          obj = document.getElementById("customerDetails");
+        } else {
+          obj = document.getElementById("conclusion");
+        }
+        childPage(obj);
+      });
 
         function collectionfunction(obj, width, height, param){
             var method = $(obj).attr("method");
@@ -86,6 +90,22 @@
                     iframeHtml.$("#contactsname").val(contactsname);
                 }
             });
+        }
+
+        //减免窗口
+        function reliefamount() {
+          var url = "${ctx}/dunning/reliefamount/reliefamountDialog?dealcode=${dealcode}";
+          $.jBox.open("iframe:" + url, null, 600, 430, {
+            buttons: {},
+            submit: function (v, h, f) {
+            },
+            loaded: function (h) {
+              $(".jbox-content", document).css("overflow-y", "hidden");
+              var iframeName = h.children(0).attr("name");
+              var iframeHtml = window.frames[iframeName];               //获取子窗口的句柄
+              iframeHtml.$("#contactsname").val(contactsname);
+            }
+          });
         }
 
         function changeCard(obj, width, height){
@@ -140,12 +160,17 @@
         }
 
         function disableBtn() {
-            $("#btnTelTaskFather").prop("disabled", true);
-            $("#changeIdcard").prop("disabled", true);
-            $("#changeMobile").prop("disabled", true);
-            $("#changeBankcard").prop("disabled", true);
-            $("#butnSms").prop("disabled", true);
-            $("#butnIdCardImg").prop("disabled", true);
+          $("#btnTelTaskFather").prop("disabled", true);
+          $("#changeIdcard").prop("disabled", true);
+          $("#changeMobile").prop("disabled", true);
+          $("#changeBankcard").prop("disabled", true);
+          $("#butnSms").prop("disabled", true);
+          $("#butnIdCardImg").prop("disabled", true);
+
+          $('#btnSms').attr("disabled", "disabled");
+          $('#btnTel').attr("disabled", "disabled");
+          $('#btnConfirm').attr("disabled", "disabled");
+          $('#btnDeduct').attr("disabled", "disabled");
         }
 
         function getBuyerIdCardImg() {
@@ -453,6 +478,32 @@
 		<li><a href="javascript:void 0;" url="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList" onclick="childPage(this)">问题反馈</a></li>
 	</shiro:hasPermission>
 </ul>
+
 <iframe id="ifm" name="ifm" frameborder="0" style="width:100%;height: 500px;"></iframe>
+
+<div style="position: fixed; bottom: 0px; padding: 5px; background-color: #fff">
+    <shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
+        <input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactstype="${overdueDays<=1? 'SELF' : ''}" method="Sms" type="button" value="催收短信" />
+    </shiro:hasPermission>
+	<input id="btnAmount" name="btnCollection" onclick="reliefamount()" class="btn btn-primary" type="button" value="调整金额"
+		   <%--已有申请, 催收员按钮置灰--%>
+		<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
+			<c:if test="${hasReliefApply == true}">
+		   		disabled="disabled"
+			</c:if>
+		</shiro:lacksPermission>
+	/>
+    <shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
+        <input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 475), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
+    </shiro:hasPermission>
+    <shiro:hasPermission name="dunning:tMisDunningTag:edit">
+        <input id="btnTag" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
+    </shiro:hasPermission>
+    <shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
+        <input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />
+    </shiro:hasPermission>
+</div>
+<%--为悬浮按钮预留, 以免遮挡子页面 --%>
+<div style="height: 40px"></div>
 </body>
 </html>

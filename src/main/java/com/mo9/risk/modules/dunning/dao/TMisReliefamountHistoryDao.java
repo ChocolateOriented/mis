@@ -17,5 +17,5 @@ import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory;
 @MyBatisDao
 public interface TMisReliefamountHistoryDao extends CrudDao<TMisReliefamountHistory> {
 	
-	public List<TMisReliefamountHistory> findListByDealcode(String code);
+	List<TMisReliefamountHistory> findPageListByDealcode(String code);
 }

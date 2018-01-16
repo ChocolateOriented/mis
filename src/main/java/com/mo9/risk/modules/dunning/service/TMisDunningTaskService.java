@@ -258,39 +258,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}
 	}
 	
-	
-	@Transactional(readOnly = false)
-	public boolean savefreeCreditAmount(String dealcode,TMisDunningTask task,String amount
-			,TMisReliefamountHistory tfHistory) {
-		try {
-			/**
-			 *  根据订单号保存订单减免金额
-			 */
-//			TMisDunningOrder order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
-//			order.setReliefamount(new BigDecimal(amount));
-//			tMisDunningTaskDao.updateOrder(order);
-//			tMisDunningTaskDao.updateOrderPartial(new BigDecimal(amount), order.getId());
-			/**
-			 *  保存此订单当前任务的减免金额
-			 */
-			task.setReliefamount((int)(Double.parseDouble(amount) * 100));
-			tMisDunningTaskDao.update(task);
-			/**
-			 *  保存减免记录
-			 */
-			TMisReliefamountHistory reliefamountHistory = new TMisReliefamountHistory();
-			reliefamountHistory.preInsert();
-			reliefamountHistory.setDealcode(dealcode);
-			reliefamountHistory.setReliefamount(amount);
-			reliefamountHistory.setDerateReason(tfHistory.getDerateReason());
-			reliefamountHistory.setRemarks(tfHistory.getRemarks());
-			tMisReliefamountHistoryDao.insert(reliefamountHistory);
-			return true;
-		} catch (Exception e) {
-			throw new ServiceException(e);
-		}
-	}
-	
+
 	/**
 	 * 自动分配催收任务
 	 * 业务流程：

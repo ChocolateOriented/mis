@@ -89,13 +89,7 @@ public class TMisDunningTaskController extends BaseController {
 	
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
-	
-	@Autowired
-	private TMisDunnedHistoryService tMisDunnedHistoryService;
-	
-	@Autowired
-	private TMisReliefamountHistoryService tMisReliefamountHistoryService;
-	
+
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 	
@@ -151,10 +145,10 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	@Autowired
 	private RiskOrderManager orderManager;
-
-
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
+	@Autowired
+	private TMisReliefamountHistoryService tMisReliefamountHistoryService;
 
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -756,6 +750,7 @@ public class TMisDunningTaskController extends BaseController {
 		tBuyerContact.setBuyerId(buyerId);
 		tBuyerContact.setDealcode(dealcode);
 		TMisDunningOrder order=null;
+		TMisDunningTask task = null;
 		try {
 			DynamicDataSource.setCurrentLookupKey("dataSource_read");
 			order = tMisDunningTaskDao.findOrderByDealcode(dealcode);
@@ -770,7 +765,7 @@ public class TMisDunningTaskController extends BaseController {
 			model.addAttribute("ispayoff", ispayoff);
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("DEALCODE", dealcode);
-			TMisDunningTask task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
+			task = tMisDunningTaskDao.findDunningTaskByDealcode(params);
 			if (task == null) {
 				logger.warn("任务不存在，订单号：" + dealcode);
 				return "views/error/500";
@@ -837,6 +832,13 @@ public class TMisDunningTaskController extends BaseController {
 
 		MemberInfo memberInfo = memberInfoService.getMemberInfo(dealcode);
 		model.addAttribute("memberInfo",memberInfo);
+
+		boolean hasReliefApply = false;
+		TMisReliefamountHistory reliefamountHistory = tMisReliefamountHistoryService.getValidApply(dealcode ,task.getDunningpeopleid());
+		if (reliefamountHistory != null){
+			hasReliefApply = true;
+		}
+		model.addAttribute("hasReliefApply",hasReliefApply);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	
@@ -1401,38 +1403,6 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		model.addAttribute("tagOpr", tagOpr);
 		return "modules/dunning/dialog/dialogCollectionTag";
 	}
-	
-	/**
-	 * 加载催收调整金额页面
-	 * @param tMisDunningTask
-	 * @param model
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "collectionAmount")
-	public String collectionAmount(TMisDunningTask tMisDunningTask, Model model,HttpServletRequest request, HttpServletResponse response) {
-	    String thisCreditAmount = request.getParameter("thisCreditAmount");
-        String ispayoff = request.getParameter("ispayoff");
-        String buyerId = request.getParameter("buyerId");
-		String dealcode = request.getParameter("dealcode");
-		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
-		if(buyerId==null||dealcode==null||dunningtaskdbid==null||"".equals(buyerId)||"".equals(dealcode)||"".equals(dunningtaskdbid)){
-			return "views/error/500";
-		}
-		List<TMisReliefamountHistory> list = tMisReliefamountHistoryService.findListByDealcode(dealcode);
-		//获取所有的减免原因
-		DerateReason[] derateReasons = DerateReason.values();
-		List<DerateReason> derateReasonList = Arrays.asList(derateReasons);
-		model.addAttribute("derateReasonList", derateReasonList);
-		model.addAttribute("list", list);
-		model.addAttribute("buyerId", buyerId);
-		model.addAttribute("dealcode", dealcode);
-		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
-		model.addAttribute("ispayoff",ispayoff);
-		model.addAttribute("thisCreditAmount",thisCreditAmount);
-		return "modules/dunning/dialog/dialogCollectionAmount";
-	}
-
 
 	/**
 	 * 加载信息修复新增页面
@@ -1575,8 +1545,6 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		return "modules/dunning/dialog/dialogInformationRecoveryRecordAdd";
 	}
 
-
-
 	/**
 	 * 信息修复-保存历史记录新增
 
@@ -1603,55 +1571,6 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		return "OK";
 	}
 
-
-
-
-
-
-	/**
-	 * 保存减免金额
-	 * @param task
-	 * @param model
-	 * @param redirectAttributes
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "savefreeCreditAmount")
-	@ResponseBody
-	public String savefreeCreditAmount(TMisReliefamountHistory tfHistory,TMisDunningTask task,Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-//		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
-		String amount = request.getParameter("amount");
-		Integer freeCreditAmount = 0;
-		for (Role r : UserUtils.getUser().getRoleList()){
-			if(("减免无上限").equals(r.getName())){
-				freeCreditAmount = 1;
-				break;
-			}
-		}
-		if(freeCreditAmount != 1 && Double.parseDouble(amount) > 50){
-			return "减免金额不能大于50元";
-		}
-		String dealcode = request.getParameter("dealcode");
-		try {
-			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
-//			List<AppLoginLog> appLoginLogs = tMisDunningTaskDao.findApploginlog("18616297272");
-//			System.out.println(appLoginLogs.size());
-			tMisDunningTaskService.updateOrderModifyAmount(dealcode, amount);
-		} catch (Exception e) {
-			logger.info("",e);
-			return "error";
-			
-		} finally {
-			DynamicDataSource.setCurrentLookupKey("dataSource");  
-		}
-
-		tMisDunningTaskService.savefreeCreditAmount(dealcode, task, amount,tfHistory);
-		return "OK";
-	}
-	
-	
 	/**
 	 * 加载催收代付页面
 	 * @param tMisDunningTask
