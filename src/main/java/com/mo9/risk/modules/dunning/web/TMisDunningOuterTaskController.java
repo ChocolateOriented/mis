@@ -6,6 +6,7 @@ package com.mo9.risk.modules.dunning.web;
 import com.alibaba.fastjson.JSON;
 import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.gamaxpay.commonutil.web.PostRequest;
+import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
@@ -25,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,10 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 public class TMisDunningOuterTaskController extends BaseController {
 
 	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
+	@Autowired
+	private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
+	@Autowired
+	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 	@Autowired
 	private MemberInfoService memberInfoService;
 	@Autowired
@@ -471,6 +477,29 @@ public class TMisDunningOuterTaskController extends BaseController {
 			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
 			if(("payoff").equals(riskOrder.getStatus())){
 				tMisDunningOrderDao.orderSynUpdate(riskOrder);
+				try{
+					//点击同步订单状态,说明订单已还清,更新通知
+					TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
+					String nickname= UserUtils.getUser().getName();
+					if(tf != null){
+						nickname=tf.getNickname();
+					}
+					TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+					tMisCustomerServiceFeedback.setDealcode(dealcode);
+					tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
+					tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
+					tMisCustomerServiceFeedback.setNickname(nickname);
+					while (true){
+						tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+						String ids = tMisCustomerServiceFeedback.getIds();
+						if(ids==null){
+							break;
+						}
+						tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+					}
+				}catch (Exception e){
+					logger.info("订单已经还清,更新通知状态错误",e);
+				}
 				return "OK";
 			}
 			if(("payment").equals(riskOrder.getStatus())){

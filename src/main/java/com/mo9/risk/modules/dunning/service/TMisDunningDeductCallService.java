@@ -120,11 +120,14 @@ public class TMisDunningDeductCallService {
 				tMisCustomerServiceFeedback.setHandlingresult("代扣"+tMisDunningDeduct.getPayamount()+"元成功,");
 				tMisCustomerServiceFeedback.setHashtag("ORDER_DEDUCT");
                 tMisCustomerServiceFeedback.setNickname(nickName);
-				tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-				String ids = tMisCustomerServiceFeedback.getIds();
-				if(ids!=null){
-					tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
-				}
+                while (true){
+                    tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+                    String ids = tMisCustomerServiceFeedback.getIds();
+                    if(ids==null){
+                        break;
+                    }
+                    tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+                }
 			}
 		}catch (Exception e){
 

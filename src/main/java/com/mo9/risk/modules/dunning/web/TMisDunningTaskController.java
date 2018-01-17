@@ -2106,7 +2106,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
  			if(("payoff").equals(riskOrder.getStatus())){
  				tMisDunningOrderDao.orderSynUpdate(riskOrder);
 				try{
-
+                    //点击同步订单状态,说明订单已还清,更新通知
                     TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
 
                     String nickname=UserUtils.getUser().getName();
@@ -2118,9 +2118,12 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
                     tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
                     tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
                     tMisCustomerServiceFeedback.setNickname(nickname);
-                    tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-                    String ids = tMisCustomerServiceFeedback.getIds();
-                    if(ids!=null){
+                    while (true){
+                        tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+                        String ids = tMisCustomerServiceFeedback.getIds();
+                        if(ids==null){
+                            break;
+                        }
                         tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
                     }
 				}catch (Exception e){

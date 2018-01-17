@@ -56,6 +56,7 @@ public class RiskOrderListener implements IMqMsgListener {
 			order.setUpdateTime(new Date());
 			orderDao.orderSynUpdate(order);
 			try{
+			    //消息队列过来,说明订单已还清,同步通知表格
 				TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
                 String nickname = null;
                 if(tf != null){
@@ -67,11 +68,16 @@ public class RiskOrderListener implements IMqMsgListener {
 				tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
 				tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
 				tMisCustomerServiceFeedback.setNickname(nickname);
-				tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-				String ids = tMisCustomerServiceFeedback.getIds();
-				if(ids!=null){
-					tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
-				}
+				while (true){
+                    tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+                    String ids = tMisCustomerServiceFeedback.getIds();
+                    if(ids==null){
+                        break;
+                    }
+                    tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+                }
+
+
 			}catch (Exception e){
 				logger.info("消息队列过来数据订单已经还清,更新通知状态错误",e);
 			}
