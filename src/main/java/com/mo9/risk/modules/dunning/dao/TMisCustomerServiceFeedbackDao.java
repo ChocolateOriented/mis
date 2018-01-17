@@ -39,4 +39,15 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
      * @param tMisCustomerServiceFeedback
      */
     public Integer findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
+
+
+    public void updateFlagByDealCode(List<String> dealcodes);
+
+    public int updateHandlingResult(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
+
+    public String getNameById(String id);
+
+    public void updateProblemStatus(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
+
+    public TMisCustomerServiceFeedback findNickNameByDealcode(String dealcode);
 }
