@@ -723,21 +723,26 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				ChartSeries chartSeries = new ChartSeries();
 				chartSeries.setData(data);
 				//String start = sd.format(migrationRateReport.getDatetimeStart());
-				//String end = sd.format(migrationRateReport.getDatetimeEnd());
+				String end = sd.format(migrationRateReport.getDatetimeEnd());
+//                Integer cycleInt =null;
+//                if(migrate.name().contains("2")){
+//                    cycleInt = Integer.parseInt(cycle) - 1;
+//                }else if (migrate.name().contains("3")){
+//                    cycleInt = Integer.parseInt(cycle) - 2;
+//                }else if (migrate.name().contains("4")){
+//                    cycleInt = Integer.parseInt(cycle) - 3;
+//                }else {
+//                    cycleInt = Integer.parseInt(cycle);
+//                    //end = sd.format(migrationRateReport.getDatetimeEnd());
+//                }
+//                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(cycleInt);
+//                if(tmpMoveCycleByCycle == null){
+//                    logger.info("没有从迁徙周期表中查到数据");
+//                    continue;
+//                }
+//                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
 
-                Integer CycleInt =null;
-                if(migrate.name().contains("2")){
-                    CycleInt = Integer.parseInt(cycle) - 1;
-                }else if (migrate.name().contains("3")){
-                    CycleInt = Integer.parseInt(cycle) - 2;
-                }else if (migrate.name().contains("4")){
-                    CycleInt = Integer.parseInt(cycle) - 3;
-                }else {
-                    CycleInt = Integer.parseInt(cycle);
-                    //end = sd.format(migrationRateReport.getDatetimeEnd());
-                }
-                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(CycleInt);
-                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
+
 
 				int day = Integer.parseInt(end.substring(7));
 				if(day > 16){
@@ -790,7 +795,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		SimpleDateFormat sd=new SimpleDateFormat("yyyyMM_dd");
-		//将数据按周期分组
+		//将数据按周期分组0
 		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
 		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
 
@@ -808,20 +813,24 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				data = new ArrayList<Object>();
 				ChartSeries chartSeries = new ChartSeries();
 				chartSeries.setData(data);
-
-                Integer CycleInt =null;
-				if(migrate.name().contains("2")){
-				     CycleInt = Integer.parseInt(cycle) - 1;
-                }else if (migrate.name().contains("3")){
-                     CycleInt = Integer.parseInt(cycle) - 2;
-                }else if (migrate.name().contains("4")){
-                     CycleInt = Integer.parseInt(cycle) - 3;
-                }else {
-                     CycleInt = Integer.parseInt(cycle);
-                    //end = sd.format(migrationRateReport.getDatetimeEnd());
-                }
-                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(CycleInt);
-                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
+                String end = sd.format(migrationRateReport.getDatetimeEnd());
+//                Integer cycleInt =null;
+//				if(migrate.name().contains("2")){
+//                    cycleInt = Integer.parseInt(cycle) - 1;
+//                }else if (migrate.name().contains("3")){
+//                    cycleInt = Integer.parseInt(cycle) - 2;
+//                }else if (migrate.name().contains("4")){
+//                    cycleInt = Integer.parseInt(cycle) - 3;
+//                }else {
+//                    cycleInt = Integer.parseInt(cycle);
+//
+//                }
+//                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(cycleInt);
+//                if(tmpMoveCycleByCycle == null){
+//                    logger.info("从周期类表中没有查到数据,检查周期列表");
+//                    continue;
+//                }
+//                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
 				int day = Integer.parseInt(end.substring(7));
 				if(day > 16){
 					int a = day % 2 == 0 ? day / 2: (day / 2) +1;
@@ -834,6 +843,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 				migrateCycleMap.put(cycle, chartSeries);
 				migrateCycleData.add(chartSeries);
+
 			}else {
 				data = migrateCycleMap.get(cycle).getData();
 			}
