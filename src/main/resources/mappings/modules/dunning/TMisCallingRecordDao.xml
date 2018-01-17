@@ -32,7 +32,18 @@
 	</select>
 	
 	<select id="findList" resultType="TMisCallingRecord">
-		SELECT 
+		SELECT
+			i.*,
+			(
+				SELECT o.dealcode FROM t_risk_buyer b
+                INNER JOIN t_risk_order o ON b.id = o.buyer_id
+                INNER JOIN t_mis_dunning_task t ON o.dealcode = t.dealcode
+				WHERE b.mobile = i.TargetNumber
+				ORDER BY o.id DESC
+				LIMIT 1
+			) as "dealcode"
+		FROM
+		(SELECT 
 			a.dbid as "dbid",
 			a.id as "id",
 			a.agent as "agent",
@@ -48,14 +59,6 @@
 			a.EndTime as "endTime",
 			a.FinishTime as "finishTime",
 			a.DurationTime as "durationTime",
-			(
-				SELECT o.dealcode FROM t_risk_buyer b
-                INNER JOIN t_risk_order o ON b.id = o.buyer_id
-                INNER JOIN t_mis_dunning_task t ON o.dealcode = t.dealcode
-				WHERE b.mobile = a.TargetNumber
-				ORDER BY o.id DESC
-				LIMIT 1
-			) as "dealcode",
 			a.Uuid as "uuid",
 			a.createby as "createBy.name",
 			a.createdate as "createDate",
@@ -75,7 +78,7 @@
 		</choose>
 		<if test="page != null">
 			LIMIT ${page.firstResult}, ${page.pageSize}
-		</if>
+		</if>) i
 	</select>
 	
 	<select id="listCount" resultType="int">
