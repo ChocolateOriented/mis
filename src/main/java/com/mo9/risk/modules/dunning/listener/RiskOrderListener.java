@@ -68,14 +68,7 @@ public class RiskOrderListener implements IMqMsgListener {
 				tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
 				tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
 				tMisCustomerServiceFeedback.setNickname(nickname);
-				while (true){
-                    tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-                    String ids = tMisCustomerServiceFeedback.getIds();
-                    if(ids==null){
-                        break;
-                    }
-                    tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
-                }
+                tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
 
 
 			}catch (Exception e){

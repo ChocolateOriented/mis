@@ -2118,14 +2118,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
                     tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
                     tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
                     tMisCustomerServiceFeedback.setNickname(nickname);
-                    while (true){
-                        tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-                        String ids = tMisCustomerServiceFeedback.getIds();
-                        if(ids==null){
-                            break;
-                        }
-                        tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
-                    }
+                    tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
 				}catch (Exception e){
 					logger.info("订单已经还清,更新通知状态错误",e);
 				}
