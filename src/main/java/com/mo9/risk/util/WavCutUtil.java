@@ -6,7 +6,6 @@ import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -127,7 +126,7 @@ public class WavCutUtil {
             timeLen = clip.getMicrosecondLength() / 1000000D;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("获取音频时长失败",e);
+            logger.info("获取音频时长失败",e);
         }
         return timeLen;
     }
@@ -162,7 +161,7 @@ public class WavCutUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("音频切片失败", e);
+            logger.info("音频切片失败", e);
         }
         return list;
     }
