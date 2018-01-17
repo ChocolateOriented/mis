@@ -443,7 +443,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 		</choose>
-		<if test="page != null">
+		<if test="page != null and page.pageSize != -1">
 			LIMIT ${page.firstResult}, ${page.pageSize}
 		</if>
 	</select>
@@ -759,7 +759,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 		</choose>
-		<if test="page != null">
+		<if test="page != null and page.pageSize != -1">
 			LIMIT ${page.firstResult}, ${page.pageSize}
 		</if>
 
