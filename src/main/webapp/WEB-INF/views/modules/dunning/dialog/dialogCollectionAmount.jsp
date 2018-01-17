@@ -45,7 +45,7 @@
             //alert(${thisCreditAmount});
             //var v= $("#amount").val();
             //var v2 =;
-			var v = ${thisCreditAmount} - $("#amount").val();
+			var v = ${showAmount} - $("#amount").val();
             if(v){
                 $("#showContent").text("减免后应还金额:" +v);
             }

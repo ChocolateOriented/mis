@@ -1420,6 +1420,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 			return "views/error/500";
 		}
 		List<TMisReliefamountHistory> list = tMisReliefamountHistoryService.findListByDealcode(dealcode);
+		double showAmount=	tMisDunningTaskDao.findShowAmount(dealcode);
 		//获取所有的减免原因
 		DerateReason[] derateReasons = DerateReason.values();
 		List<DerateReason> derateReasonList = Arrays.asList(derateReasons);
@@ -1430,6 +1431,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("ispayoff",ispayoff);
 		model.addAttribute("thisCreditAmount",thisCreditAmount);
+		model.addAttribute("showAmount",showAmount);
 		return "modules/dunning/dialog/dialogCollectionAmount";
 	}
 
@@ -1621,8 +1623,8 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	@RequestMapping(value = "savefreeCreditAmount")
 	@ResponseBody
 	public String savefreeCreditAmount(TMisReliefamountHistory tfHistory,TMisDunningTask task,Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-//		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String amount = request.getParameter("amount");
+		String dealcode = request.getParameter("dealcode");
 		Integer freeCreditAmount = 0;
 		for (Role r : UserUtils.getUser().getRoleList()){
 			if(("减免无上限").equals(r.getName())){
@@ -1630,10 +1632,10 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 				break;
 			}
 		}
-		if(freeCreditAmount != 1 && Double.parseDouble(amount) > 50){
-			return "减免金额不能大于50元";
+		double maxModifyAmount = tMisDunningTaskDao.findMaxModifyAmount(dealcode);
+		if(freeCreditAmount != 1 && Double.parseDouble(amount) > maxModifyAmount){
+			return "减免金额过大,请检查!";
 		}
-		String dealcode = request.getParameter("dealcode");
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 //			List<AppLoginLog> appLoginLogs = tMisDunningTaskDao.findApploginlog("18616297272");
