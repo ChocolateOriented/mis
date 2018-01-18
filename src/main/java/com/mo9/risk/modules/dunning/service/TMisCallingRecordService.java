@@ -30,7 +30,6 @@ import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
 import com.mo9.risk.modules.dunning.manager.CallCenterManager;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 @Service
@@ -267,7 +266,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 					return calloutInfos;
 				}
 				
-				calloutInfos.addAll(page.getResults());
+				calloutInfos.addAll(nextPage.getResults());
 			}
 		} catch (Exception e) {
 			logger.info("获取呼出通话信息失败,失败信息:" + e);
@@ -316,7 +315,7 @@ public class TMisCallingRecordService extends CrudService<TMisCallingRecordDao, 
 					return callinInfos;
 				}
 				
-				callinInfos.addAll(page.getResults());
+				callinInfos.addAll(nextPage.getResults());
 			}
 		} catch (Exception e) {
 			logger.info("获取呼入通话信息失败,失败信息:" + e);
