@@ -54,6 +54,9 @@
             <if test="dealcode != null and dealcode != ''">
                 AND a.Dealcode LIKE CONCAT('%', #{dealcode}, '%')
             </if>
+            <if test="peopleName != null and peopleName != ''">
+                AND p.Name LIKE CONCAT('%', #{peopleName}, '%')
+            </if>
             <if test="groupId != null and groupId != ''">
                 AND p.groupId = #{groupId}
             </if>

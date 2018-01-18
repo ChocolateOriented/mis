@@ -92,8 +92,13 @@
         </li>
         <li>
             <label>客户电话：</label>
-                <form:input id="targetNumber" path="targetNumber"/>
+            <form:input id="targetNumber" path="targetNumber"/>
         </li>
+        <li class="btns">
+            <input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/>
+            <input id="btnExport" class="btn btn-primary" type="button" value="导出" />
+        </li>
+        <li class="clearfix"></li>
         <li>
             <label>催收小组：</label>
             <form:select id="groupList" path="groupId" class="input-medium">
@@ -111,9 +116,9 @@
                 </c:forEach>
             </form:select></li>
         <li>
-        <li class="btns">
-            <input id="btnSubmit" class="btn btn-primary" type="submit" value="查询" onclick="return page();"/>
-            <input id="btnExport" class="btn btn-primary" type="button" value="导出" />
+        <li>
+            <label>通话人：</label>
+            <form:input id="peopleName" path="peopleName"/>
         </li>
         <li class="clearfix"></li>
     </ul>
@@ -127,7 +132,7 @@
         <th>客户电话</th>
         <th>通话类型</th>
         <th>通话人</th>
-        <th>通话时间</th>
+        <th>通话时间(单位:秒)</th>
         <th>订单编号</th>
         <th>录音</th>
         <th>敏感词</th>

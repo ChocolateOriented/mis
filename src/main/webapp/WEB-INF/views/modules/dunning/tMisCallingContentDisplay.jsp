@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="control-group">
-        <label class="control-label">通话内容：</label>
+        <label class="control-label">质检内容：</label>
         <div class="controls">
             ${callingCotent}
         </div>

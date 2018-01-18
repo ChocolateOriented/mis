@@ -87,8 +87,8 @@ public class TMisCallingAutomaticSpeechRecognitionController extends BaseControl
             Date date = null;
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_MONTH, day);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
-/*            calendar.set(Calendar.HOUR_OF_DAY, 00);
-            calendar.set(Calendar.MINUTE, 00);*/
+            calendar.set(Calendar.HOUR_OF_DAY, 00);
+            calendar.set(Calendar.MINUTE, 00);
             date = calendar.getTime();
             calendar.setTime(date);
             tMisCallingQualityTest.setStartTime(date);
@@ -97,8 +97,8 @@ public class TMisCallingAutomaticSpeechRecognitionController extends BaseControl
             Date date = null;
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_MONTH, day+1);//正数可以得到当前时间+n天，负数可以得到当前时间-n天
-/*            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);*/
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
             date = calendar.getTime();
             calendar.setTime(date);
             tMisCallingQualityTest.setEndTime(date);
