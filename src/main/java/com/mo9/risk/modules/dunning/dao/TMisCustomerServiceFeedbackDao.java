@@ -50,4 +50,6 @@ public interface TMisCustomerServiceFeedbackDao extends CrudDao<TMisCustomerServ
     public void updateProblemStatus(TMisCustomerServiceFeedback tMisCustomerServiceFeedback);
 
     public TMisCustomerServiceFeedback findNickNameByDealcode(String dealcode);
+
+    public List<TMisCustomerServiceFeedback> getFeedback(TMisCustomerServiceFeedback tf);
 }

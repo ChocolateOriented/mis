@@ -54,14 +54,15 @@ public class TMisDunningInformationRecoveryService extends CrudService<TMisDunni
             tMisCustomerServiceFeedback.setHashtag("CONTACT_REMARK");
             tMisCustomerServiceFeedback.setNickname(name);
             tMisCustomerServiceFeedback.setContactNumber(contactNumber);
-            while (true){
-                tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
-                String ids = tMisCustomerServiceFeedback.getIds();
-                if(ids==null){
-                    break;
-                }
-                tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
-            }
+            tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
+//            while (true){
+//                tMisCustomerServiceFeedbackDao.updateHandlingResult(tMisCustomerServiceFeedback);
+//                String ids = tMisCustomerServiceFeedback.getIds();
+//                if(ids==null){
+//                    break;
+//                }
+//                tMisCustomerServiceFeedbackService.changeProblemStatus(ids);
+//            }
         }catch (Exception e){
             logger.info("修改通知备注联系方式错误",e);
         }
