@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -12,6 +13,7 @@ import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,8 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @Autowired
     private FeedbackSendService feedbackSendService;
 
-
+    @Autowired
+    private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
     @Autowired
     private TMisDunningOrderService tMisDunningOrderService;
 
@@ -111,7 +114,13 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback feedback=null;
         try{
-            tMisCustomerServiceFeedbackService.updateFeedback(tMisCustomerServiceFeedback);
+            User user = UserUtils.getUser();
+            String name = tMisCustomerServiceFeedbackDao.getNameById(user.getId());;
+            if(name == null){
+                name = user.getName();
+            }
+            tMisCustomerServiceFeedback.setNickname(name);
+            tMisCustomerServiceFeedbackDao.updateProblemStatus(tMisCustomerServiceFeedback);
             /**
              * 消息发送，数据库更新失败时不会发送
              */
