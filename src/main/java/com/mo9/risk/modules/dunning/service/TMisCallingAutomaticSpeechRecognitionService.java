@@ -37,6 +37,10 @@ public class TMisCallingAutomaticSpeechRecognitionService extends CrudService<TM
         return page;
     }
 
+    public List<TMisCallingQualityTest> findList(TMisCallingQualityTest entity){
+        return dao.findList(entity);
+    }
+
     public String getCallingContent(TMisCallingQualityTest entity){
         String content = dao.findCallingContentById(entity);
         //敏感词标红

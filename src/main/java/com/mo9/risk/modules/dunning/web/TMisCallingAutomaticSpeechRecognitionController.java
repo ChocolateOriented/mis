@@ -14,6 +14,7 @@ import com.mo9.risk.util.sensitive.KWSeekerProcessor;
 import com.mo9.risk.util.sensitive.entity.KWSeeker;
 import com.mo9.risk.util.sensitive.entity.KWSeekerManage;
 import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,6 +65,18 @@ public class TMisCallingAutomaticSpeechRecognitionController extends BaseControl
         String callingcontent = tMisCallingAutomaticSpeechRecognitionService.getCallingContent(tMisCallingQualityTest);
         model.addAttribute("callingCotent", callingcontent);
         return "modules/dunning/tMisCallingContentDisplay";
+    }
+    @RequestMapping(value = "getAsrExcel")
+    public void getAsrExcel(TMisCallingQualityTest entity, HttpServletRequest request, HttpServletResponse response){
+        String fileName = "质检服务支持语音识别" + com.thinkgem.jeesite.common.utils.DateUtils.getDate("yyyy-MM-dd HHmmss") + ".xlsx";
+        try {
+            new ExportExcel("质检服务支持语音识别", TMisCallingQualityTest.class).
+                    setDataList(tMisCallingAutomaticSpeechRecognitionService.findList(entity)).
+                    write(response, fileName).dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.info("质检服务支持语音识别报表导出失败", e);
+        }
     }
 
     private Map<String, Object> initGetPhoneCallingReport(TMisCallingQualityTest tMisCallingQualityTest, TMisDunningPeople dunningPeople, int day){
