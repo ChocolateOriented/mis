@@ -30,10 +30,15 @@ public class TMisCallingAutomaticSpeechRecognitionService extends CrudService<TM
 
     public Page<TMisCallingQualityTest> findPage(Page<TMisCallingQualityTest> page, TMisCallingQualityTest entity){
         page.setUsePaginationInterceptor(false);
+        page.setOrderBy("StartTime desc");
         entity.setPage(page);
         page.setCount(dao.listCount(entity));
         page.setList(dao.findList(entity));
         return page;
+    }
+
+    public List<TMisCallingQualityTest> findList(TMisCallingQualityTest entity){
+        return dao.findList(entity);
     }
 
     public String getCallingContent(TMisCallingQualityTest entity){

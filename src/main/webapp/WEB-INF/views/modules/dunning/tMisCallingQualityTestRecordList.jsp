@@ -18,9 +18,9 @@
             }
 
             $("#btnExport").click(function(){
-                top.$.jBox.confirm("确认要导出催收员案件活动日报数据吗？","系统提示",function(v,h,f){
+                top.$.jBox.confirm("确认要导出质检服务支持-语音识别数据吗？","系统提示",function(v,h,f){
                     if(v=="ok"){
-                        $("#searchForm").attr("action","${ctx}/dunning/report/productivePowerDailyReportExport");
+                        $("#searchForm").attr("action","${ctx}/dunning/tMisCallingASR/getAsrExcel");
                         $("#searchForm").submit();
                     }
                 },{buttonsFocus:1});

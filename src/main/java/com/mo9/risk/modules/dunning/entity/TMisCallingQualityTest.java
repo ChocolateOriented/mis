@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.entity;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -72,7 +73,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
 
     }
 
-
+    @ExcelField(title="呼叫时间",  type=1, align=2, sort=1)
     public Date getStartTime() {
         return startTime;
     }
@@ -97,6 +98,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
         this.finishTime = finishTime;
     }
 
+    @ExcelField(title="通话时长",  type=1, align=2, sort=5)
     public Integer getDurationTime() {
         return durationTime;
     }
@@ -104,7 +106,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setDurationTime(Integer durationTime) {
         this.durationTime = durationTime;
     }
-
+    @ExcelField(title="订单编号",  type=1, align=2, sort=6)
     public String getDealcode() {
         return dealcode;
     }
@@ -120,7 +122,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setPeopleId(String peopleId) {
         this.peopleId = peopleId;
     }
-
+    @ExcelField(title="通话人",  type=1, align=2, sort=4)
     public String getPeopleName() {
         return peopleName;
     }
@@ -128,7 +130,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setPeopleName(String peopleName) {
         this.peopleName = peopleName;
     }
-
+    @ExcelField(title="敏感词个数",  type=1, align=2, sort=6)
     public String getSensitiveWordNumber() {
         return sensitiveWordNumber;
     }
@@ -136,7 +138,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setSensitiveWordNumber(String sensitiveWordNumber) {
         this.sensitiveWordNumber = sensitiveWordNumber;
     }
-
+    @ExcelField(title="客户电话",  type=1, align=2, sort=2)
     public String getTargetNumber() {
         return targetNumber;
     }
@@ -209,7 +211,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setProductCategory(String productCategory) {
         this.productCategory = productCategory;
     }
-
+    @ExcelField(title="质检分数",  type=1, align=2, sort=7)
     public int getScore() {
         return score;
     }
@@ -233,7 +235,7 @@ public class TMisCallingQualityTest extends DataEntity<TMisCallingQualityTest> {
     public void setCallContent(String callContent) {
         this.callContent = callContent;
     }
-
+    @ExcelField(title="呼出类型",  type=1, align=2, sort=3)
     public TMisCallingRecord.CallType getCallType() {
         return callType;
     }
