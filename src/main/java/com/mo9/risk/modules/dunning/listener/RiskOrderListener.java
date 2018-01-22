@@ -55,24 +55,27 @@ public class RiskOrderListener implements IMqMsgListener {
 		if (orderDao.findOrderByDealcode(dealcode) != null ){
 			order.setUpdateTime(new Date());
 			orderDao.orderSynUpdate(order);
-			try{
-			    //消息队列过来,说明订单已还清,同步通知表格
-				TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
-                String nickname = null;
-                if(tf != null){
-                    nickname = tf.getNickname();
-                }
-
-                TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
-				tMisCustomerServiceFeedback.setDealcode(dealcode);
-				tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
-				tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
-				tMisCustomerServiceFeedback.setNickname(nickname);
-                tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
+			if("payoff".equals(order.getStatus())){
+				try{
+					//消息队列过来,说明订单已还清,同步通知表格
+					TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
+					String nickname = null;
+					if(tf != null){
+						nickname = tf.getNickname();
+					}
 
 
-			}catch (Exception e){
-				logger.info("消息队列过来数据订单已经还清,更新通知状态错误",e);
+					TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+					tMisCustomerServiceFeedback.setDealcode(dealcode);
+					tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
+					tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
+					tMisCustomerServiceFeedback.setNickname(nickname);
+					tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
+
+
+				}catch (Exception e){
+					logger.info("消息队列过来数据订单已经还清,更新通知状态错误",e);
+				}
 			}
 			return MqAction.CommitMessage;
 		}

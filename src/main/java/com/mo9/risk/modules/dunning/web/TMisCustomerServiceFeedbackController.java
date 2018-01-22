@@ -65,17 +65,18 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         }
 
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.feedbackList(new Page<TMisCustomerServiceFeedback>(request, response), tMisCustomerServiceFeedback);
             model.addAttribute("page", page);
             model.addAttribute("buyerId", buyerId);
             return "modules/dunning/tMisCustomerServiceFeedbackList";
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败,或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+        //finally {
+        //    DynamicDataSource.setCurrentLookupKey("dataSource");
+       // }
 
 
     }
@@ -176,7 +177,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
             if("0".equals(tMisCustomerServiceFeedback.getReadFlag())){
                 tMisCustomerServiceFeedback.setReadFlag("1");
@@ -184,11 +185,12 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
                 model.addAttribute("custNotify", "desc");
             }
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+//        finally {
+//            DynamicDataSource.setCurrentLookupKey("dataSource");
+//        }
         model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
         return "modules/dunning/tMisCustomerJboxNotify";
     }
@@ -206,14 +208,15 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败,或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+//        finally {
+//            DynamicDataSource.setCurrentLookupKey("dataSource");
+//        }
         model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
         return "modules/dunning/tMisCustomerJboxNotify";
     }
