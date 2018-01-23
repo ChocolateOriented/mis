@@ -23,6 +23,11 @@ $(document).ready(function() {
 			}
 		}
 	});
+	
+	$('#orgnizationId').change(function() {
+		var option = $(this).children(":selected");
+		$('#supervisor').text(option.attr('supervisor') || '');
+	});
 });
 </script>
 </head>
@@ -34,6 +39,9 @@ $(document).ready(function() {
 			${not empty TMisDunningGroup.id? 'edit?id=${TMisDunningGroup.id}">催收小组修改' : 'form">催收小组添加'}
 		</a>
 		</li>
+		<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
+			<li><a href="${ctx}/dunning/tMisDunningOrganization/form?opr=add">催收机构添加</a></li>
+		</shiro:hasPermission>
 	</ul>
 	<br/>
 	<form:form id="inputForm" modelAttribute="TMisDunningGroup" action="${ctx}/dunning/tMisDunningGroup/save" method="post" class="form-horizontal">
@@ -63,6 +71,24 @@ $(document).ready(function() {
 						<form:options items="${groupTypes}" htmlEscape="false"/>
 					</form:select>
 				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">所属机构：</label>
+			<div class="controls">
+				<form:select id="orgnizationId" path="organization.id" class="input-medium required">
+					<form:option value=""></form:option>
+					<c:forEach items="${organizations}" var="organization">
+						<form:option value="${organization.id}" supervisor="${organization.supervisor.name}">${organization.name}</form:option>
+					</c:forEach>
+				</form:select>
+				<span class="help-inline"><font color="red">*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">监理：</label>
+			<div class="controls">
+				<label id="supervisor" style="padding:3px;">${TMisDunningGroup.organization.supervisor.name}&nbsp;</label>
 			</div>
 		</div>
 		<div class="form-actions">

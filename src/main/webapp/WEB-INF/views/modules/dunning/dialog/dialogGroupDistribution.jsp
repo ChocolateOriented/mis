@@ -34,7 +34,12 @@
 			
 		$('#esc').click(function() {
 			window.parent.window.jBox.close();    
-		}); 
+		});
+		
+		$('#orgnizationId').change(function() {
+			var option = $(this).children(":selected");
+			$('#supervisor').text(option.attr('supervisor') || '');
+		});
 	});
 </script>
 </head>
@@ -44,14 +49,18 @@
 	<br/>
 	<form:form id="inputForm" class="form-horizontal" modelAttribute="TMisDunningGroup">
 		<div class="control-group">
-			<label class="control-label">催收人：</label>
-			<select id="supervisorId" path="" name="supervisor.id" class="input-medium required">
+			<label class="control-label">所属机构：</label>
+			<select id="orgnizationId" name="organization.id" class="input-medium required">
 				<option value=""></option>
-				<c:forEach items="${users}" var="user">
-					<option value="${user.id}">${user.name}</option>
+				<c:forEach items="${organizations}" var="organization">
+					<option value="${organization.id}" supervisor="${organization.supervisor.name}">${organization.name}</option>
 				</c:forEach>
 			</select>
 			<span class="help-inline"><font color="red">*</font></span>
+		</div>
+		<div class="control-group">
+			<label class="control-label">监理：</label>
+			<label id="supervisor" style="padding:3px;">&nbsp;</label>
 		</div>
 		<c:forEach items="${groups}" var="group" varStatus="vs">
  			<input style="display:none;" name="groupIds" value="${group}"/>
