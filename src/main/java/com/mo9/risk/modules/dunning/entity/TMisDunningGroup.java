@@ -29,7 +29,7 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 	private String name; // 组名
 	private GroupType type; // 组类型
 	private User leader; // 组长
-	private User supervisor; //监理
+	private TMisDunningOrganization organization; // 机构
 
 	private List<GroupType> queryTypes;
 	
@@ -87,11 +87,22 @@ public class TMisDunningGroup extends DataEntity<TMisDunningGroup> {
 	}
 
 	public User getSupervisor() {
-		return supervisor;
+		return organization == null ? null : organization.getSupervisor();
 	}
 
 	public void setSupervisor(User supervisor) {
-		this.supervisor = supervisor;
+		if (this.organization == null) {
+			this.organization = new TMisDunningOrganization();
+		}
+		this.organization.setSupervisor(supervisor);
+	}
+
+	public TMisDunningOrganization getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(TMisDunningOrganization organization) {
+		this.organization = organization;
 	}
 
 	public List<String> getGroupIds() {

@@ -34,11 +34,5 @@ public interface TMisDunningGroupDao extends CrudDao<TMisDunningGroup> {
 	 */
 	List<String> findSupervisorGroupList(TMisDunningGroup tMisDunningGroup);
 
-	/**
-	 * @Description: 删除监理小组关系
-	 * @return
-	 */
-	int deleteSupervisorGroup(TMisDunningGroup tMisDunningGroup);
-
 	List<String> findIdsByLeader(User user);
 }

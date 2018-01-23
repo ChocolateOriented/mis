@@ -9,6 +9,7 @@
 		a.name AS "name",
 		a.type AS "type",
 		a.leaderId AS "leader.id",
+		a.organizationId AS "organization.id",
 		a.createby AS "createBy.id",
 		a.createdate AS "createDate",
 		a.updateby AS "updateBy.id",
@@ -19,12 +20,14 @@
 	<sql id="tMisDunningGroupJoinsColumns">
 		,
 		u.name AS "leader.name",
-		(SELECT group_concat(distinct su.name) from sys_user su
-			JOIN t_mis_dunning_data_auth sg ON su.id = sg.peopleid
-			WHERE sg.groupid = a.id) AS "supervisor.name"
+		o.name AS "organization.name",
+		o.supervisorId AS "organization.supervisor.id",
+		p.name AS "organization.supervisor.name"
 	</sql>
 	<sql id="tMisDunningGroupJoins">
 		LEFT JOIN sys_user u on u.id = a.leaderId
+		LEFT JOIN t_mis_dunning_organization o on o.id = a.organizationId
+		LEFT JOIN t_mis_dunning_people p on p.id = o.supervisorId
 	</sql>
 
 	<select id="get" resultType="TMisDunningGroup" useCache="false">
@@ -36,7 +39,7 @@
 		WHERE a.id = #{id}
 	</select>
 
-	<select id="findList" resultType="TMisDunningGroup">
+	<select id="findList" resultType="TMisDunningGroup" useCache="false">
 		SELECT
 		<include refid="tMisDunningGroupColumns" />
 		<include refid="tMisDunningGroupJoinsColumns" />
@@ -55,13 +58,13 @@
 			<if test="leader != null and leader.id != null and leader.Id != ''">
 				AND a.leaderId = #{leader.id}
 			</if>
-			<if test="supervisor != null and supervisor.id != null and supervisor.Id != ''">
-				AND EXISTS (
-					SELECT 1
-					FROM t_mis_dunning_data_auth g
-					WHERE g.peopleid = #{supervisor.id}
-					AND g.groupid = a.id
-				)
+			<if test="organization != null">
+				<if test="organization.id != null and organization.id != ''">
+					AND a.organizationId = #{organization.id}
+				</if>
+				<if test="organization.supervisor != null and organization.supervisor.id != null and organization.supervisor.id != ''">
+					AND o.supervisorId = #{organization.supervisor.id}
+				</if>
 			</if>
 			<if test="leader != null and leader.name != null and leader.name != ''">
 				AND u.name LIKE concat('%', #{leader.name},'%')
@@ -88,9 +91,8 @@
 		SELECT
 		a.id AS "id"
 		FROM t_mis_dunning_group a
-		<where>
-			 a.LeaderId = #{id}
-		</where>
+		WHERE a.delflag = '0'
+		AND a.LeaderId = #{id}
 	</select>
 
     <insert id="insert">
@@ -122,6 +124,7 @@
 			name = #{name},
 			type = #{type},
 			leaderId = #{leader.id},
+			organizationId = #{organization.id},
 			updateby = #{updateBy.id},
 			updatedate = #{updateDate},
 			delFlag = #{delFlag}
@@ -137,50 +140,30 @@
 	</update>
 	
     <insert id="saveDistribution">
-		INSERT INTO t_mis_dunning_data_auth(
-			groupid,
-			peopleid,
-			createby,
-			createDate,
-			updateBy,
-			updateDate
-			)
-		<foreach item="groupId" collection="groupIds" separator=" union all ">
-			SELECT
-				#{groupId},
-				#{supervisor.id},
-				#{createBy.name},
-				#{createDate},
-				#{updateBy.name},
-				#{updateDate}
-		</foreach>
+		UPDATE t_mis_dunning_group SET
+			organizationId = #{organization.id},
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+		WHERE id IN
+		<choose>
+			<when test="test=groupIds == null || groupIds.size == 0">
+				('')
+			</when>
+			<otherwise>
+				<foreach item="groupId" collection="groupIds" open="(" close=")" separator=",">
+					#{groupId}
+				</foreach>
+			</otherwise>
+		</choose>
 	</insert>
 
-	<select id="findSupervisorGroupList" resultType="String">
+	<select id="findSupervisorGroupList" resultType="String" useCache="false">
 		SELECT
-			distinct groupid
-		FROM t_mis_dunning_data_auth g
-		WHERE g.peopleid = #{supervisor.id}
+			distinct g.id
+		FROM t_mis_dunning_group g
+		LEFT JOIN t_mis_dunning_organization o ON g.organizationId = o.id
+		WHERE o.supervisorId = #{supervisor.id}
+		AND g.delflag = '0'
+		AND o.delflag = '0'
 	</select>
-
-	<delete id="deleteSupervisorGroup">
-		DELETE
-		FROM t_mis_dunning_data_auth
-		<where>
-			<if test="id != null and id != ''">
-				AND groupid = #{id}
-			</if>
-			<if test="groupIds != null">
-				AND groupid IN
-				<if test="groupIds.size == 0">
-					('')
-				</if>
-				<if test="groupIds.size > 0">
-					<foreach item="groupId" collection="groupIds" open="(" close=")" separator=",">
-						#{groupId}
-					</foreach>
-				</if>
-			</if>
-		</where>
-	</delete>
 </mapper>

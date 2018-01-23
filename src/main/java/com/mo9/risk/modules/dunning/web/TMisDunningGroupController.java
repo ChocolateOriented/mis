@@ -1,6 +1,7 @@
 package com.mo9.risk.modules.dunning.web;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrganizationService;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -30,8 +34,12 @@ import com.thinkgem.jeesite.common.web.BaseController;
 @Controller
 @RequestMapping(value="${adminPath}/dunning/tMisDunningGroup")
 public class TMisDunningGroupController extends BaseController {
+
 	@Autowired
-	private TMisDunningGroupService tMisDunningGroupService ;
+	private TMisDunningGroupService tMisDunningGroupService;
+	
+	@Autowired
+	private TMisDunningOrganizationService tMisDunningOrganizationService;
 	
 	/**
 	 * @Description: 催收小组集合
@@ -47,8 +55,14 @@ public class TMisDunningGroupController extends BaseController {
 	@RequiresPermissions("dunning:TMisDunningGroup:view")
 	@RequestMapping(value={"list",""})
 	public String list(TMisDunningGroup tMisDunningGroup ,HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TMisDunningGroup> page = tMisDunningGroupService.findPage(new Page<TMisDunningGroup>(request, response), tMisDunningGroup);
+		Page<TMisDunningGroup> query = new Page<TMisDunningGroup>(request, response);
+		query.setOrderBy("a.dbid desc");
+		Page<TMisDunningGroup> page = tMisDunningGroupService.findPage(query, tMisDunningGroup);
+		List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
+		List<TMisDunningPeople> supervisors = tMisDunningOrganizationService.findOrganizationSupervisorList(null);
 		model.addAttribute("page", page);
+		model.addAttribute("organizations", organizations);
+		model.addAttribute("supervisors", supervisors);
 		return "modules/dunning/tMisDunningGroupList";
 	}
 	
@@ -76,7 +90,8 @@ public class TMisDunningGroupController extends BaseController {
 	@RequestMapping(value = "form")
 	public String form(TMisDunningGroup tMisDunningGroup , Model model) {
 		logger.debug("加载编辑催收小组页面");
-		model.addAttribute("users", tMisDunningGroupService.findUserList()) ;
+		model.addAttribute("users", tMisDunningGroupService.findUserList());
+		model.addAttribute("organizations", tMisDunningOrganizationService.findList(null));
 		return "modules/dunning/tMisDunningGroupForm";
 	}
 	
@@ -120,7 +135,7 @@ public class TMisDunningGroupController extends BaseController {
 			String[] groupsArr = groups.split(",");
 			model.addAttribute("groups", groupsArr);
 		}
-		model.addAttribute("users", tMisDunningGroupService.findUserList());
+		model.addAttribute("organizations", tMisDunningOrganizationService.findList(null));
 		return "modules/dunning/dialog/dialogGroupDistribution";
 	}
 	
@@ -140,17 +155,17 @@ public class TMisDunningGroupController extends BaseController {
 	 * @Description: 重置催收小组监理
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
-	@RequestMapping(value = "resetSupervisor")
-	public String resetSupervisor(TMisDunningGroup tMisDunningGroup, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
+	@RequestMapping(value = "resetDistribution")
+	public String resetDistribution(TMisDunningGroup tMisDunningGroup, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
 		String groups = request.getParameter("groups");
 		if (groups == null) {
-			addMessage(redirectAttributes, "重置催收小组监理失败");
+			addMessage(redirectAttributes, "重置催收机构失败");
 			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
 		}
 		
 		String[] groupsArr = groups.split(",");
 		tMisDunningGroup.setGroupIds(Arrays.asList(groupsArr));
-		tMisDunningGroupService.resetSupervisorGroup(tMisDunningGroup);
+		tMisDunningGroupService.resetGroupOrganization(tMisDunningGroup);
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
 	}
 }

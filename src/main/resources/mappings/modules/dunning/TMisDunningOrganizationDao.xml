@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisDunningOrganizationDao">
+
+	<sql id="tMisDunningOrganizationColumns">
+		a.dbid AS "dbid",
+		a.id AS "id",
+		a.name AS "name",
+		a.supervisorId AS "supervisor.id",
+		a.delFlag AS "delFlag",
+		a.createby AS "createBy.id",
+		a.createdate AS "createDate",
+		a.updateby AS "updateBy.id",
+		a.updatedate AS "updateDate"
+	</sql>
+
+	<sql id="tMisDunningOrganizationJoinsColumns">
+		,
+		p.name AS "supervisor.name"
+	</sql>
+	<sql id="tMisDunningOrganizationJoins">
+		LEFT JOIN t_mis_dunning_people p on p.id = a.supervisorId
+	</sql>
+
+	<select id="get" resultType="TMisDunningOrganization">
+		SELECT
+		<include refid="tMisDunningOrganizationColumns"/>
+		<include refid="tMisDunningOrganizationJoinsColumns"/>
+		FROM t_mis_dunning_organization a
+		<include refid="tMisDunningOrganizationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="TMisDunningOrganization">
+		SELECT
+		<include refid="tMisDunningOrganizationColumns"/>
+		<include refid="tMisDunningOrganizationJoinsColumns"/>
+		FROM t_mis_dunning_organization a
+		<include refid="tMisDunningOrganizationJoins"/>
+		WHERE a.delFlag = '0'
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+    <insert id="insert">
+		INSERT INTO t_mis_dunning_organization(
+			id,
+			name,
+			supervisorId,
+			createby,
+			createdate,
+			updateby,
+			updatedate
+		) VALUES (
+			#{id},
+			#{name},
+			#{supervisor.id},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+    <update id="update">
+		UPDATE t_mis_dunning_organization SET
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="supervisor != null and supervisor.id != null and supervisor.id != ''">
+				supervisorId = #{supervisor.id},
+			</if>
+			updateby = #{updateBy.id},
+			updatedate = #{updateDate}
+		WHERE id = #{id}
+	</update>	
+	
+    <update id="delete">
+		UPDATE t_mis_dunning_organization SET 	
+			updateby = #{updateBy.name},
+			updatedate = #{updateDate},
+			delFlag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findOrganizationSupervisorList" resultType="TMisDunningPeople">
+		SELECT
+			p.id,
+			p.name,
+			p.nickname
+		FROM t_mis_dunning_people p
+		JOIN t_mis_dunning_organization o ON p.id = o.supervisorId
+		WHERE p.invalid = 't'
+		AND o.delflag = '0'
+	</select>
+
+</mapper>
