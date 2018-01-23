@@ -970,7 +970,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
 				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
 				//添加黑名单关系
-				this.appendBlackNodeNum(order);
+//				this.appendBlackNodeNum(order);
 			}
 		}
 		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
@@ -2350,7 +2350,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     public String outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newOutfingTasksByDealcodes(dealcodes);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
 			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
 			
@@ -2382,7 +2382,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
 					dunningTask.setUpdateBy(UserUtils.getUser());
-					dunningTask.setDunningcycle(dunningcycle);
+					dunningTask.setDunningcycle(assignDunningTaskLogs.get(i).getDunningcycle());
 					dunningTask.setOutsourcingbegindate(new Date());
 					dunningTask.setOutsourcingenddate(outsourcingenddate);
 					tasks.add(dunningTask);

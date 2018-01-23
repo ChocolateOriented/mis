@@ -313,6 +313,19 @@
 			</div>
 		</div>
 		</shiro:hasPermission>
+		<div class="control-group" style="height: 40px;">
+			<div style="width:20%;display:inline-block;">
+				<input id="organization" type="checkbox"/><label for="groupCheckable">催收机构</label>
+			</div>
+			<div style="width:40%;display:inline-block;">
+				<select id="organizationName" disabled class="input-medium">
+					<option value="" >选择</option>
+					<c:forEach items="${groupList}" var="item">
+						<option value="${item.id}" >${item.name}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</div>
 
 		<div>
 			<p style="font-size: medium;color: #1a1a1a">人员筛选</p>

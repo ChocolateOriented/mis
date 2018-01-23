@@ -68,6 +68,7 @@
 				<form:select id="auto" path="auto" class="input-medium">
 					<form:option value="t" label="是" />
 					<form:option value="f" label="否" />
+					<form:option value="c" label="关闭" />
 				</form:select>
 			</div>
 		</div>

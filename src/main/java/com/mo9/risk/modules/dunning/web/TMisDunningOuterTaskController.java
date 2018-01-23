@@ -252,8 +252,8 @@ public class TMisDunningOuterTaskController extends BaseController {
 	public String dialogOutDistribution(Model model, String dunningcycle, String bizType) {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
-			model.addAttribute("dunningPeoples", dunningPeoples);
+//			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+//			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
 			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
