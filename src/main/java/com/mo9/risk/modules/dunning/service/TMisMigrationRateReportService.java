@@ -1074,8 +1074,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		//获取最新的一天迁徙率及上一周期同天迁徙率, 计算同比
-		MigrateChange cp1newChange = this.computeMigrateChange(cp1newSeries);
-		MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
+		//MigrateChange  cp1newChange = this.computeMigrateChange(cp1newSeries);
+		//MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
 
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver.toString());
@@ -1161,7 +1161,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		String change = "";
 		List<Object> lastCycleData = nearSeries.get(1).getData();
 		//若有对应的上一周期天数, 则计算同比
-		if (lastCycleData.size() >= index) {
+		//if (lastCycleData.size() >= index) {
+		if (lastCycleData.size() > index) {
 			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
 			last = lastValue + "%";
 			DecimalFormat df = new DecimalFormat("#.00");
