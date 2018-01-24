@@ -1,12 +1,11 @@
 package com.mo9.risk.modules.dunning.dao;
 
 import com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal;
-import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by jxguo on 2017/12/12.
@@ -30,5 +29,5 @@ public interface TMisDunningMaxRepayNumberAndPrincipalDao {
 
     public int countGroupMaxRepayNumberAndPrincipalListofPeriod(Date begintime, Date endtime);
 
-    public List<TMisDunningGroup> countPeopleOfGroup();
+    public List<TMisDunningPeople> findPeopleOfGroup();
 }
