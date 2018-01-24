@@ -155,8 +155,8 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	@Autowired
 	private RiskOrderManager orderManager;
-
-
+	@Autowired
+	private TMisDunningOrganizationService tMisDunningOrganizationService;
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
 
@@ -541,6 +541,8 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+			List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
+			model.addAttribute("organizations", organizations);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
@@ -567,7 +569,7 @@ public class TMisDunningTaskController extends BaseController {
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
 		String bizType = request.getParameter("bizType");
-		
+		String organizationName = request.getParameter("organizationName");
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
 				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
 			return new ArrayList<TMisDunningPeople>();
@@ -575,7 +577,7 @@ public class TMisDunningTaskController extends BaseController {
 
 		String dunningpeoplename = request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
+			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;

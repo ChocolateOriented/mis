@@ -220,9 +220,10 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 * @param type
 	 * @param auto
 	 * @param name
+	 * @param organizationName 
 	 */
-	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(String[] dunningcycle, String[] type, String[] auto, String name, String dunningpeoplename, String bizType) {
-		return tMisDunningPeopleDao.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
+	public List<TMisDunningPeople> findPeopleByCycleTypeAutoName(String[] dunningcycle, String[] type, String[] auto, String name, String dunningpeoplename, String bizType, String organizationName) {
+		return tMisDunningPeopleDao.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
 	}
 	/**
 	 * 批量更新小组分配,自动分配
