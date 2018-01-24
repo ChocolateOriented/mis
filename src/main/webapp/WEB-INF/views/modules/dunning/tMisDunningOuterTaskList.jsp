@@ -117,16 +117,24 @@ $(document).ready(function() {
 				return;
 			}
 			var uniqueid = unique(dunningcycle);
-			if(uniqueid.length != 1 ){
-				$.jBox.tip("请选择同队列的案件", 'warning');
-				return;
-			}
+// 			var cycleCompare = {"Q0":0,"Q1":1,"Q2":2,"Q3":3,"Q4":4,"Q5":5};
+// 			if(uniqueid.length != 1 ){
+// 				for(var i=0;i<uniqueid.length-1;i++){
+// 					for(var y=i+1;y<uniqueid.length;y++){
+// 						if((cycleCompare[uniqueid[i]])>(cycleCompare[uniqueid[y]])){
+// 							var temp=uniqueid[i];
+// 							uniqueid[i]=uniqueid[y];
+// 							uniqueid[y]=temp;
+// 						}
+// 					}
+// 				}
+// 			}
 			var uniqueBizType = unique(bizTypes);
 			if(uniqueBizType.length != 1 ){
 				$.jBox.tip("请选择同产品的案件", 'warning');
 				return;
 			}
-			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=" + uniqueid + "&bizType=" + uniqueBizType;
+			var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutDistribution?dunningcycle=Q4&bizType=" + uniqueBizType;
 			$.jBox.open("iframe:" + url, "手动分案" , 600, 500, {
 	               buttons: {},
 	               loaded: function (h) {
@@ -156,11 +164,11 @@ $(document).ready(function() {
             return;
         }
         var uniqueid = unique(dunningcycle);
-        if(uniqueid.length != 1 ){
-            $.jBox.tip("请选择同队列的案件", 'warning');
-            return;
-        }
-        var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutExtension?dunningcycle=" + uniqueid;
+//         if(uniqueid.length != 1 ){
+//             $.jBox.tip("请选择同队列的案件", 'warning');
+//             return;
+//         }
+        var url = "${ctx}/dunning/tMisDunningOuterTask/dialogOutExtension?dunningcycle=Q4";
         $.jBox.open("iframe:" + url, "手动留案" , 490, 250, {
             buttons: {},
             loaded: function (h) {

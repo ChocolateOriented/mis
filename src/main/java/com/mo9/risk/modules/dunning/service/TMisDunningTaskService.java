@@ -2350,7 +2350,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     public String outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newOutfingTasksByDealcodes(dealcodes);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
 			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
 			
@@ -2382,7 +2382,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
 					dunningTask.setUpdateBy(UserUtils.getUser());
-					dunningTask.setDunningcycle(dunningcycle);
+					dunningTask.setDunningcycle(assignDunningTaskLogs.get(i).getDunningcycle());
 					dunningTask.setOutsourcingbegindate(new Date());
 					dunningTask.setOutsourcingenddate(outsourcingenddate);
 					tasks.add(dunningTask);
