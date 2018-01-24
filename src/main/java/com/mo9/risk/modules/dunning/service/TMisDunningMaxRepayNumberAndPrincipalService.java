@@ -139,7 +139,7 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
                 if ((!"Q4".equals(cyclelist[i]) && ("t".equals(people.getAuto())))){
                     String key = people.getGroupName()+"_"+cyclelist[i];
                     map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
-                }else if ("Q4".equals(cyclelist[i]) && "c".equals(people.getAuto())){
+                }else if ("Q4".equals(cyclelist[i]) && (!"c".equals(people.getAuto()))){
                     String key = people.getGroupName()+"_"+cyclelist[i];
                     map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
                 }
