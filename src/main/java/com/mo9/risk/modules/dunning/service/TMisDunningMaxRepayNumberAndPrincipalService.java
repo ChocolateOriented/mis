@@ -4,6 +4,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.mo9.risk.modules.dunning.dao.TMisDunningMaxRepayNumberAndPrincipalDao;
 import com.mo9.risk.modules.dunning.entity.DunningMaxRepayNumberAndPrincipal;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,24 +125,32 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
     }
 
     /**
-     * 计算每组多少人
+     * 计算每组每队列多少人
      * key：组名
      * value：人数
      * @return
      */
     private Map<String, Integer> countPeopleOfGroup(){
-        List<TMisDunningGroup> list = dunningMaxRepayNumberAndPrincipalDao.countPeopleOfGroup();
-        Map<String, Integer> map = new HashMap<String, Integer>(list.size());
-        for (TMisDunningGroup group : list){
-            if (!StringUtils.isEmpty(group.getName())){
-                map.put(group.getName(), group.getNumberOfPeople());
+        List<TMisDunningPeople> list = dunningMaxRepayNumberAndPrincipalDao.findPeopleOfGroup();
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        for (TMisDunningPeople people : list){
+            String[] cyclelist = people.getDunningcycle().split(",");
+            for (int i = 0; i < cyclelist.length; i++){
+                if ((!"Q4".equals(cyclelist[i]) && ("t".equals(people.getAuto())))){
+                    String key = people.getGroupName()+"_"+cyclelist[i];
+                    map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
+                }else {
+                    String key = people.getGroupName()+"_"+cyclelist[i];
+                    map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
+                }
             }
+
         }
         return map;
     }
 
     /**
-     * 计算每组人均最大还款户数和本金
+     * 计算每组每队列人均最大还款户数和本金
      * @param list
      * @return
      */
@@ -149,11 +158,12 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
         Map<String, Integer> map = countPeopleOfGroup();
         for (DunningMaxRepayNumberAndPrincipal entity : list){
                 //人均
-            if (map.get(entity.getNameDealcode()) != 0){
+            String key = entity.getNameDealcode()+"_"+entity.getCycle();
+            if (map.get(key) != 0 && map.get(key) != null){
             	DecimalFormat df   = new DecimalFormat("0.00");
-            	Double perMaxDealcode = Double.valueOf(entity.getMaxDealcode())/(map.get(entity.getNameDealcode() == null ?1 :entity.getNameDealcode()));
+            	Double perMaxDealcode = Double.valueOf(entity.getMaxDealcode())/map.get(key);
                 entity.setMaxDealcode(df.format(perMaxDealcode)+"");
-                Double perPrincipal = Double.valueOf(entity.getPrincipal())/(map.get(entity.getNameDealcode() == null ?1 :entity.getNameDealcode()));
+                Double perPrincipal = Double.valueOf(entity.getPrincipal())/map.get(key);
                 entity.setPrincipal(df.format(perPrincipal)+"");
             }
         }
