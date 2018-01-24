@@ -37,17 +37,19 @@ public class TMisDunningGroupService extends CrudService<TMisDunningGroupDao,TMi
 	 */
 	@Transactional(readOnly = false)
 	public int saveDistribution(TMisDunningGroup tMisDunningGroup) {
-		tMisDunningGroup.preInsert();
+		tMisDunningGroup.preUpdate();
 		return dao.saveDistribution(tMisDunningGroup);
 	}
 
 	/**
-	 * @Description: 重置已分配小组监理
+	 * @Description: 重置已分配小组
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public int resetSupervisorGroup(TMisDunningGroup tMisDunningGroup) {
-		return dao.deleteSupervisorGroup(tMisDunningGroup);
+	public int resetGroupOrganization(TMisDunningGroup tMisDunningGroup) {
+		tMisDunningGroup.preUpdate();
+		tMisDunningGroup.setOrganization(null);
+		return dao.saveDistribution(tMisDunningGroup);
 	}
 
 	/**

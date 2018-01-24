@@ -12,7 +12,7 @@
 		return false;
 	}
 	
-	function distributionGroup() {
+	function distributeGroup() {
 		var groups = [];
 		$("input[name='groups']:checked").each(function() {
 			groups.push($(this).attr('value'));
@@ -23,7 +23,7 @@
 			return;
 		}
 		
-		$.jBox.open("iframe:${ctx}/dunning/tMisDunningGroup/distribution?groups=" + groups, "分配监理" , 500, 350, {            
+		$.jBox.open("iframe:${ctx}/dunning/tMisDunningGroup/distribution?groups=" + groups, "分配机构" , 500, 350, {            
             buttons: {},
             loaded: function (h) {
                 $(".jbox-content", document).css("overflow-y", "hidden");
@@ -38,7 +38,7 @@
 		});
 	}
 	
-	function resetSupervisor() {
+	function resetDistribution() {
 		var groups = [];
 		$("input[name='groups']:checked").each(function() {
 			groups.push($(this).attr('value'));
@@ -48,14 +48,26 @@
 			$.jBox.tip("请勾选需重置的小组", "warning");
 			return;
 		}
-		confirmx('确定要重置已分配的监理吗？', "${ctx}/dunning/tMisDunningGroup/resetSupervisor?groups=" + groups);
+		confirmx('确定要重置已分配的机构吗？', "${ctx}/dunning/tMisDunningGroup/resetDistribution?groups=" + groups);
+	}
+	
+	function modifyOrganization() {
+		$.jBox.open("iframe:${ctx}/dunning/tMisDunningOrganization/form?opr=edit", "重配机构" , 500, 350, {            
+            buttons: {},
+            loaded: function (h) {
+                $(".jbox-content", document).css("overflow-y", "hidden");
+            }
+     	});
 	}
 </script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisDunningGroup/">催收小组列表</a></li>
-		<li><a href="${ctx}/dunning/tMisDunningGroup/form">催收小组编辑</a></li>		
+		<li><a href="${ctx}/dunning/tMisDunningGroup/form">催收小组编辑</a></li>
+		<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
+			<li><a href="${ctx}/dunning/tMisDunningOrganization/form?opr=add">催收机构添加</a></li>
+		</shiro:hasPermission>
 	</ul>
 	
 	<form:form id="searchForm" modelAttribute="TMisDunningGroup" action="${ctx}/dunning/tMisDunningGroup/" method="post" class="breadcrumb form-search">
@@ -77,10 +89,29 @@
 					<form:options items="${groupTypes}" htmlEscape="false"/>
 				</form:select>
 			</li>
+			<li>
+				<label>所属机构：</label>
+				<form:select id="organization" path="organization.id" class="input-medium">
+					<form:option value="">全部</form:option>
+					<form:options items="${organizations}" itemLabel="name" itemValue="id"/>
+				</form:select>
+			</li>
+			<li>
+				<label>监理：</label>
+				<form:select id="supervisor" path="organization.supervisor.id" class="input-medium">
+					<form:option value="">全部</form:option>
+					<form:options items="${supervisors}" itemLabel="name" itemValue="id"/>
+				</form:select>
+			</li>
+		</ul>
+		<ul class="ul-form">
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
-				<li class="btns"><input id="distribution" class="btn btn-primary" type="button" value="分配监理" onclick="distributionGroup();"/></li>
-				<li class="btns"><input id="reset" class="btn btn-primary" type="button" value="重置监理" onclick="resetSupervisor();"/></li>
+				<li class="btns"><input class="btn btn-primary" type="button" value="分配机构" onclick="distributeGroup();"/></li>
+				<li class="btns"><input class="btn btn-primary" type="button" value="重置机构" onclick="resetDistribution();"/></li>
+				<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
+					<li class="btns"><input class="btn btn-primary" type="button" value="重配机构" onclick="modifyOrganization();"/></li>
+				</shiro:hasPermission>
 			</shiro:hasPermission>
 			<li class="clearfix"></li>
 		</ul>
@@ -95,6 +126,7 @@
 				<th>组名</th>
 				<th>组长名</th>
 				<th>组类型</th>
+				<th>机构</th>
 				<th>监理</th>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<th>操作</th>
@@ -118,15 +150,11 @@
 				<td>
 					${groupTypes[tMisDunningGroup.type]}
 				</td>
-				<td title="${tMisDunningGroup.supervisor.name}">
-					<c:choose>  
-						<c:when test="${fn:length(tMisDunningGroup.supervisor.name) > 15}">  
-							<c:out value="${fn:substring(tMisDunningGroup.supervisor.name, 0, 15)}..." />
-						</c:when>
-						<c:otherwise>
-							<c:out value="${tMisDunningGroup.supervisor.name}" />
-						</c:otherwise>  
-					</c:choose>
+				<td>
+					${tMisDunningGroup.organization.name}
+				</td>
+				<td>
+					${tMisDunningGroup.organization.supervisor.name}
 				</td>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<td>

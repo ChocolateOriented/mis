@@ -3,6 +3,7 @@ package com.mo9.risk.modules.dunning.service;
 import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -108,5 +109,85 @@ public class TMisCustomerServiceFeedbackService extends CrudService<TMisCustomer
     public int findCustServiceCount(TMisCustomerServiceFeedback tMisCustomerServiceFeedback){
 
         return tMisCustomerServiceFeedbackDao.findCustServiceCount(tMisCustomerServiceFeedback);
+    }
+
+    /**
+     * 判断是否需要改变状态
+     */
+    @Transactional(readOnly = false)
+    public  void changeProblemStatus(TMisCustomerServiceFeedback tf){
+        List<TMisCustomerServiceFeedback> tm = tMisCustomerServiceFeedbackDao.getFeedback(tf);
+        if (tm == null){
+            return;
+        }
+        for (TMisCustomerServiceFeedback t : tm){
+            tf.setId(t.getId());
+            String hashtag = t.getHashtag();
+            String handlingresult = t.getHandlingresult();
+            Boolean flag=true;
+            if(!hashtag.contains("COMPLAIN_SHAKE") && !hashtag.contains("CONSULT_REPAY")) {
+                //备注联系方式
+                if (hashtag.contains("CONTACT_REMARK") && !hashtag.contains(tf.getHashtag())) {
+                    //说明包含备注联系方式,判断是否有
+                    if (!handlingresult.contains("已添加,")) {
+                        flag = false;
+                    }
+                }
+                //判断订单代扣
+                if (hashtag.contains("ORDER_DEDUCT") && !hashtag.contains(tf.getHashtag())) {
+                    //说明包含订单代扣,判断是否有
+                    if (!handlingresult.contains("代扣") || handlingresult.contains("无")) {
+                        flag = false;
+                    }
+                }
+                //催销账
+                if (hashtag.contains("WRITE_OFF") && !hashtag.contains(tf.getHashtag())) {
+                    //说明包含订单代扣,判断是否有
+                    if (!handlingresult.contains("订单已还清,")) {
+                        flag = false;
+                    }
+                }
+
+                if (flag) {
+                    tf.setProblemstatus("RESOLVED");
+                }
+            }
+            tMisCustomerServiceFeedbackDao.updateProblemStatus(tf);
+        }
+
+//        TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+//        tMisCustomerServiceFeedback.setId(id);
+//        TMisCustomerServiceFeedback codeStatusTagDesPeople = this.findCodeStatusTagDesPeople(tMisCustomerServiceFeedback);
+//        String hashtag = codeStatusTagDesPeople.getHashtag();
+//        String handlingresult = codeStatusTagDesPeople.getHandlingresult();
+//        Boolean flag=true;
+//        if(!hashtag.contains("COMPLAIN_SHAKE") && !hashtag.contains("CONSULT_REPAY")){
+//            //备注联系方式
+//            if(hashtag.contains("CONTACT_REMARK")){
+//                //说明包含备注联系方式,判断是否有
+//                if(!handlingresult.contains("已添加,")){
+//                    flag=false;
+//                }
+//            }
+//            //判断订单代扣
+//            if(hashtag.contains("ORDER_DEDUCT")){
+//                //说明包含订单代扣,判断是否有
+//                if(!handlingresult.contains("代扣")||handlingresult.contains("无")){
+//                    flag=false;
+//                }
+//            }
+//                //催销账
+//            if(hashtag.contains("WRITE_OFF")){
+//                //说明包含订单代扣,判断是否有
+//                if(!handlingresult.contains("订单已还清,")){
+//                    flag=false;
+//                }
+//            }
+//
+//            if(flag){
+//                tMisCustomerServiceFeedbackDao.updateProblemStatus(tMisCustomerServiceFeedback);
+//            }
+//
+//        }
     }
 }

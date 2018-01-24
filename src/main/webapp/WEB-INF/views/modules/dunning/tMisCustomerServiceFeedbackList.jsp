@@ -96,7 +96,7 @@
                     </c:if>
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.nickname}
+                    ${tMisCustomerServiceFeedback.updateBy.name}
                 </td>
                 <td>
                     ${tMisCustomerServiceFeedback.pushpeople}

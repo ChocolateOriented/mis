@@ -722,8 +722,26 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				data = new ArrayList<Object>();
 				ChartSeries chartSeries = new ChartSeries();
 				chartSeries.setData(data);
-				String start = sd.format(migrationRateReport.getDatetimeStart());
+				//String start = sd.format(migrationRateReport.getDatetimeStart());
 				String end = sd.format(migrationRateReport.getDatetimeEnd());
+//                Integer cycleInt =null;
+//                if(migrate.name().contains("2")){
+//                    cycleInt = Integer.parseInt(cycle) - 1;
+//                }else if (migrate.name().contains("3")){
+//                    cycleInt = Integer.parseInt(cycle) - 2;
+//                }else if (migrate.name().contains("4")){
+//                    cycleInt = Integer.parseInt(cycle) - 3;
+//                }else {
+//                    cycleInt = Integer.parseInt(cycle);
+//                    //end = sd.format(migrationRateReport.getDatetimeEnd());
+//                }
+//                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(cycleInt);
+//                if(tmpMoveCycleByCycle == null){
+//                    logger.info("没有从迁徙周期表中查到数据");
+//                    continue;
+//                }
+//                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
+
 
 
 				int day = Integer.parseInt(end.substring(7));
@@ -747,7 +765,16 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		return migrateCycleData;
 	}
 
-	/**
+    private TmpMoveCycle getTmpMoveCycleByCycle(Integer cycleInt) {
+        DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
+        try{
+            return tMisMigrationRateReportDao.getTmpMoveCycleByCycle(cycleInt);
+        }finally{
+            DynamicDataSource.setCurrentLookupKey("dataSource");
+        }
+    }
+
+    /**
 	 * @Description  会员卡查询最近几个周期的迁徙率, 按周期分组,按周期降序
 	 * @param migrate 迁徙率类型
 	 * @param cycleNum 周期数量
@@ -755,7 +782,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 	 */
 	public List<ChartSeries> getCycleDataMember(Migrate migrate,Integer cycleNum){
 
-		if(cycleNum>5 || cycleNum<2){
+        if(cycleNum>5 || cycleNum<2){
 			logger.warn("迁徙为查到数据,请传合理的参数");
 			return null;
 		}
@@ -768,7 +795,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		SimpleDateFormat sd=new SimpleDateFormat("yyyyMM_dd");
-		//将数据按周期分组
+		//将数据按周期分组0
 		Map<String, ChartSeries> migrateCycleMap = new HashMap<String, ChartSeries>();
 		List<ChartSeries> migrateCycleData = new ArrayList<ChartSeries>();
 
@@ -786,10 +813,24 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 				data = new ArrayList<Object>();
 				ChartSeries chartSeries = new ChartSeries();
 				chartSeries.setData(data);
-				String start = sd.format(migrationRateReport.getDatetimeStart());
-				String end = sd.format(migrationRateReport.getDatetimeEnd());
-
-
+                String end = sd.format(migrationRateReport.getDatetimeEnd());
+//                Integer cycleInt =null;
+//				if(migrate.name().contains("2")){
+//                    cycleInt = Integer.parseInt(cycle) - 1;
+//                }else if (migrate.name().contains("3")){
+//                    cycleInt = Integer.parseInt(cycle) - 2;
+//                }else if (migrate.name().contains("4")){
+//                    cycleInt = Integer.parseInt(cycle) - 3;
+//                }else {
+//                    cycleInt = Integer.parseInt(cycle);
+//
+//                }
+//                TmpMoveCycle tmpMoveCycleByCycle = this.getTmpMoveCycleByCycle(cycleInt);
+//                if(tmpMoveCycleByCycle == null){
+//                    logger.info("从周期类表中没有查到数据,检查周期列表");
+//                    continue;
+//                }
+//                String end = sd.format(tmpMoveCycleByCycle.getDatetimeend());
 				int day = Integer.parseInt(end.substring(7));
 				if(day > 16){
 					int a = day % 2 == 0 ? day / 2: (day / 2) +1;
@@ -802,6 +843,7 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 				migrateCycleMap.put(cycle, chartSeries);
 				migrateCycleData.add(chartSeries);
+
 			}else {
 				data = migrateCycleMap.get(cycle).getData();
 			}
@@ -932,19 +974,18 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 
 		//content.append("<p><font color='#3fccb2' size='4' font_family='黑体'>户数迁徙</font></p>");
 		content.append("<table>");
-		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
-		//content.append("<tr><td> &nbsp;</td></tr>");
-		//content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
-		//content.append("<tr><td><img src='cid:cp2newChart'></td><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
-		content.append("</table>");
-
-		//content.append("<p><font color='#3fccb2' size='4'>本金迁徙</font></p>");
-		content.append("<table>");
 		content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
 		//content.append("<tr><td> &nbsp;</td></tr>");
 		//content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		//content.append("<tr><td><img src='cid:cp2corpusChart'></td><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
-		content.append("<tr><td> &nbsp;</td></tr>");
+		content.append("</table>");
+
+		//content.append("<p><font color='#3fccb2' size='4'>本金迁徙</font></p>");
+		content.append("<table>");
+		content.append("<tr><td><img src='cid:cp1newChart'></td><td><img src='cid:cp2newChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
+		//content.append("<tr><td><img src='cid:cp2newChart'></td><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td colspan='3'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td colspan='3'><div align ='right'><font color='#858585' size='4'>本邮件由上海佰晟通贷后管理发送</font></div></tr>");
@@ -1033,8 +1074,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		}
 
 		//获取最新的一天迁徙率及上一周期同天迁徙率, 计算同比
-		MigrateChange cp1newChange = this.computeMigrateChange(cp1newSeries);
-		MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
+		//MigrateChange  cp1newChange = this.computeMigrateChange(cp1newSeries);
+		//MigrateChange cp1corpusChange = this.computeMigrateChange(cp1corpusSeries);
 
 		//发送邮件
 		MailSender mailSender = new MailSender(receiver.toString());
@@ -1049,14 +1090,22 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		StringBuilder content = new StringBuilder();
 		content.append("<table>");
 		content.append("<tr><td colspan='2'><img src='"+url+"static/images/mo9image1.png'/></td></tr>");
-		content.append("<tr><td colspan='3'><p><font color='#4D4D4D' size='4'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
+		content.append("<tr><td colspan='3'><p><font color='#858585' size='4' font_family='黑体'>下图为截止"+yesterday+"迁徙数据，烦请查阅</font></p></td></tr>");
 		content.append("</table>");
-		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
-		content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
-		content.append("<tr><td height='40px'  bgcolor='#EAEAEA'><font color='#858585'>户数迁徙</font></td><td><font color='#858585'>"+cp1newChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getChange()+"</font></td></tr>");
-		content.append("<tr><td height='40px' bgcolor='#EAEAEA' ><font color='#858585'>本金迁徙</font></td><td><font color='#858585'>"+cp1corpusChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getChange()+"</font></td></tr>");
-		content.append("</table>");
+//		content.append("<table  border='1' cellspacing='0' bordercolor='#b0b0b0' style='text-align: center'>");
+//		content.append("<tr bgcolor='#EAEAEA'><th height='40px'><font color='#858585'>C-P1</font></th><th><font color='#858585'>"+cp1newSeries.get(0).getName()+"</font></th><th><font color='#858585'>"+cp1newSeries.get(1).getName()+"</font></th><th><font color='#858585'>同比</font></th></tr>");
+//		content.append("<tr><td height='40px'  bgcolor='#EAEAEA'><font color='#858585'>户数迁徙</font></td><td><font color='#858585'>"+cp1newChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1newChange.getChange()+"</font></td></tr>");
+//		content.append("<tr><td height='40px' bgcolor='#EAEAEA' ><font color='#858585'>本金迁徙</font></td><td><font color='#858585'>"+cp1corpusChange.getCurrentVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getLastVlue()+"</font></td><td><font color='#858585'>"+cp1corpusChange.getChange()+"</font></td></tr>");
+//		content.append("</table>");
 
+
+		content.append("<p><font color='#0993FF' size='4'>金额迁徙</font></p>");
+		content.append("<table>");
+		//content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
+		//content.append("<tr><td> &nbsp;</td></tr>");
+		//content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("<tr><td><img src='cid:cp2corpusChart'></td><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
+		content.append("</table>");
 
 		content.append("<p><font color='#0993FF' size='4'>户数迁徙</font></p>");
 		content.append("<table>");
@@ -1064,14 +1113,6 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		//content.append("<tr><td> &nbsp;</td></tr>");
 		//content.append("<tr><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
 		content.append("<tr><td><img src='cid:cp2newChart'></td><td><img src='cid:cp3newChart'></td><td><img src='cid:cp4newChart'></td></tr>");
-		content.append("</table>");
-
-		content.append("<p><font color='#0993FF' size='4'>本金迁徙</font></p>");
-		content.append("<table>");
-		//content.append("<tr><td><img src='cid:cp1corpusChart'></td><td><img src='cid:cp2corpusChart'></td></tr>");
-		//content.append("<tr><td> &nbsp;</td></tr>");
-		//content.append("<tr><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
-		content.append("<tr><td><img src='cid:cp2corpusChart'></td><td><img src='cid:cp3corpusChart'></td><td><img src='cid:cp4corpusChart'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
 		content.append("<tr><td colspan='3'><div style='border-bottom:1px dashed #A2A2A2'></td></tr>");
 		content.append("<tr><td> &nbsp;</td></tr>");
@@ -1120,7 +1161,8 @@ public class TMisMigrationRateReportService extends CrudService<TMisMigrationRat
 		String change = "";
 		List<Object> lastCycleData = nearSeries.get(1).getData();
 		//若有对应的上一周期天数, 则计算同比
-		if (lastCycleData.size() >= index) {
+		//if (lastCycleData.size() >= index) {
+		if (lastCycleData.size() > index) {
 			Double lastValue = Double.parseDouble(lastCycleData.get(index).toString());
 			last = lastValue + "%";
 			DecimalFormat df = new DecimalFormat("#.00");

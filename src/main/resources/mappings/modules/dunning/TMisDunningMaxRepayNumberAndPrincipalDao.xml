@@ -256,7 +256,7 @@
     </select>
 
     <select id="countPeopleOfGroup" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningGroup">
-        SELECT g.Name as name, count(a.Id) AS numberOfPeople  FROM t_mis_dunning_people a LEFT JOIN t_mis_dunning_group g on g.id = a.groupId WHERE  a.Invalid = 't' AND g.DelFlag = '0' GROUP BY g.Id
+        SELECT g.Name as name, count(a.Id) AS numberOfPeople  FROM t_mis_dunning_people a LEFT JOIN t_mis_dunning_group g on g.id = a.groupId WHERE  a.Invalid = 't' AND g.DelFlag = '0' AND a.Auto = 't' GROUP BY g.Id
     </select>
 
 </mapper>

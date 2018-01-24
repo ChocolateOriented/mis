@@ -2128,6 +2128,18 @@
         	AND status = #{status}
         </if>
     </select>
+	<select id="findMaxModifyAmount" resultType="double">
+        SELECT
+	    IFNULL(o.credit_amount, 0) - IFNULL(o.amount, 0) + IFNULL(o.overdue_amount, 0) + IFNULL(o.cost_amount, 0)
+        FROM t_risk_order o
+        WHERE  o.dealcode = #{dealcode}
+    </select>
+	<select id="findShowAmount" resultType="double">
+        SELECT
+	    IFNULL(o.credit_amount, 0)+ IFNULL(o.overdue_amount, 0) - IFNULL(o.balance, 0)
+        FROM t_risk_order o
+        WHERE  o.dealcode = #{dealcode}
+    </select>
 
 	<update id="updateLatestLoginTime">
 		UPDATE t_mis_dunning_task

@@ -628,12 +628,13 @@ public class TMisMigrationRateReportController extends BaseController {
 			Date endDate = dateFormat1.parse(end);
 			Date date = beginDate;
 			while (!date.equals(endDate)) {
-				System.out.println(dateFormat1.format(date));
+				//System.out.println(dateFormat1.format(date));
 				if(flag.equals("1")){
 					tMisMigrationRateReportService.autoInsertMigrationRateReportDB(date);
 				}else {
 					tMisMigrationRateReportService.autoInsertMigrationRateMemberReportDB(date);
 				}
+				logger.info("插入时间:"+dateFormat1.format(date));
 				c.setTime(date);
 				c.add(Calendar.DATE, 1); // 日期加1天
 				date = c.getTime();
