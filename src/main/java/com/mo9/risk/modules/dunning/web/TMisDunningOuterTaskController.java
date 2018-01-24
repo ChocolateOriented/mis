@@ -93,6 +93,8 @@ public class TMisDunningOuterTaskController extends BaseController {
 	private TMisDunningTagService tMisDunningTagService;
 	@Autowired
 	private RiskQualityInfoService tMisDunningScoreCardService;
+	@Autowired
+	private TMisDunningOrganizationService tMisDunningOrganizationService;
 	
 	@ModelAttribute("dunningOrder")
 	public DunningOrder getDunningOrder(@RequestParam(required=false) String id) {
@@ -252,8 +254,10 @@ public class TMisDunningOuterTaskController extends BaseController {
 	public String dialogOutDistribution(Model model, String dunningcycle, String bizType) {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
-			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
-			model.addAttribute("dunningPeoples", dunningPeoples);
+//			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+//			model.addAttribute("dunningPeoples", dunningPeoples);
+			List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
+			model.addAttribute("organizations", organizations);
 			model.addAttribute("dunningcycle", dunningcycle);
 			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
 			model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
@@ -292,6 +296,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
 		String bizType = request.getParameter("bizType");
+		String organizationName = request.getParameter("organizationName");
 
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
 				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
@@ -300,7 +305,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 
 		String dunningpeoplename=request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
+			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;

@@ -366,6 +366,9 @@
 		<if test="name != null and name != ''">
 			AND a.groupId = #{name}
 		</if>
+		<if test="organizationName != null and organizationName != ''">
+			AND g.OrganizationId = #{organizationName}
+		</if>
 		<if test="dunningpeoplename != null and dunningpeoplename != ''">
 			AND a.name LIKE concat('%',#{dunningpeoplename},'%')
 		</if>
