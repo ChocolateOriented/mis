@@ -46,18 +46,24 @@ public class BaiduAutomaticSpeechRecognitionUtil {
         return client;
     }
 
-    public static String asr(List<byte[]> list) {
+    public static String asr(List<byte[]> list, String id) {
         if (list == null){
             return "";
         }
         StringBuffer result  = new StringBuffer();
+        JSONObject asrRes = new JSONObject();
         for (byte[] data : list){
             if (data != null){
-                JSONObject asrRes = getClient().asr(data, "pcm", 8000, null);
-                if (asrRes.get("err_msg").equals("success.")){
-                    result.append(((JSONArray)asrRes.get("result")).get(0));
-                }else {
-                    logger.info("百度语音识别失败，错误码："+asrRes.get("err_no"));
+                try {
+                    asrRes = getClient().asr(data, "pcm", 8000, null);
+                    //logger.info("百度识别结果："+ asrRes.toString());
+                    if (asrRes.get("err_msg").equals("success.")){
+                        result.append(((JSONArray)asrRes.get("result")).get(0));
+                    }else {
+                        logger.info("百度语音识别失败，id："+ id +",错误码："+asrRes.get("err_no"));
+                    }
+                }catch (Exception e){
+                    logger.info("百度返回结果格式错误,id:"+ id +",识别结果："+ asrRes.toString());
                 }
             }
         }

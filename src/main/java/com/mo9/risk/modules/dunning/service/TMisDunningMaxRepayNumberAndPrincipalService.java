@@ -151,9 +151,9 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
                 //人均
             if (map.get(entity.getNameDealcode()) != 0){
             	DecimalFormat df   = new DecimalFormat("0.00");
-            	Double perMaxDealcode = Double.valueOf(entity.getMaxDealcode())/map.get(entity.getNameDealcode());
+            	Double perMaxDealcode = Double.valueOf(entity.getMaxDealcode())/(map.get(entity.getNameDealcode() == null ?1 :entity.getNameDealcode()));
                 entity.setMaxDealcode(df.format(perMaxDealcode)+"");
-                Double perPrincipal = Double.valueOf(entity.getPrincipal())/map.get(entity.getNameDealcode());
+                Double perPrincipal = Double.valueOf(entity.getPrincipal())/(map.get(entity.getNameDealcode() == null ?1 :entity.getNameDealcode()));
                 entity.setPrincipal(df.format(perPrincipal)+"");
             }
         }

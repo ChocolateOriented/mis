@@ -65,8 +65,8 @@ public class TMisCallingAutomaticSpeechRecognitionService extends CrudService<TM
             entity.setTargetNumber(StringUtils.isEmpty(callingQualityTest.getTargetNumber())? "" : callingQualityTest.getTargetNumber());
             entity.setStartTime(callingQualityTest.getStartTime());
             String url = DictUtils.getDictValue("ctiUrl", "callcenter", "") + "audio/";
-            List<byte[]> dataList = WavCutUtil.cutWavforPeriod(url+callingQualityTest.getAudioUrl() ,59);
-            entity.setCallContent(BaiduAutomaticSpeechRecognitionUtil.asr(dataList));
+            List<byte[]> dataList = WavCutUtil.cutWavforPeriod(url+callingQualityTest.getAudioUrl() ,58);
+            entity.setCallContent(BaiduAutomaticSpeechRecognitionUtil.asr(dataList , callingQualityTest.getId()));
             entity.setSensitiveWordNumber(String.valueOf(KWSeekerProcessor.newInstance().getKWSeeker("sensitive-word").findWords(entity.getCallContent()).size()));
             dao.insert(entity);
         }
