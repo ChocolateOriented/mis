@@ -196,6 +196,9 @@ function disableBUtton(){
 				<form:select id="auto" path="auto" class="input-medium">
 					<form:option value="t" label="是" />
 					<form:option value="f" label="否" />
+					<c:if test="${not empty tMisDunningPeople.dbid}">
+					 <form:option value="c" label="关闭" />
+					</c:if>
 				</form:select>
 			</div>
 		</div>
