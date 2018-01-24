@@ -34,6 +34,7 @@
 			margin-bottom: 5px;
 			background-color: #f0f8fd;
 			/*background-color: #e2ffd6;*/
+			padding: 3px 10px 3px 10px;
 		}
 
 		.colorfalse {
@@ -41,6 +42,7 @@
 			border-radius: 5px;
 			margin-bottom: 5px;
 			background-color: #f0f8fd;
+			padding: 3px 10px 3px 10px;
 			/*background-color: #dbf8ff;*/
 		}
 
@@ -389,7 +391,7 @@
 					<c:if test="${not empty tag.occupation.desc}">
 						<div id="occupation" style="white-space:nowrap;">职业类型: <span>${tag.occupation.desc}</span></div>
 					</c:if>
-					<div id="remark" style="white-space:nowrap;">备注: <span>${tag.remark}</span></div>
+					<div id="remark" ><div style='display:inline-block;vertical-align: top;'>备注: </div><span style='width: 130px;display:inline-block;word-break: break-all;'>${tag.remark}</span></div>
 					<div id="peoplename" style="white-space:nowrap;">标记人: <span>${tag.peoplename}</span></div>
 					<div id="updateDate" style="white-space:nowrap;">标记时间: <span><fmt:formatDate
 							value="${tag.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/></span></div>
@@ -415,7 +417,7 @@
 				</shiro:hasPermission>
 				<%--<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>--%>
 				<div id="occupation" style="white-space:nowrap;">职业类型: <span></span></div>
-				<div id="remark" style="white-space:nowrap;">备注: <span></span></div>
+				<div id="remark" ><div style='display:inline-block;vertical-align: top;'>备注: </div><span style='width: 130px;display:inline-block;word-break: break-all;'></span></div>
 				<div id="peoplename" style="white-space:nowrap;">标记人: <span></span></div>
 				<div id="updateDate" style="white-space:nowrap;">标记时间: <span></span></div>
 			</div>
