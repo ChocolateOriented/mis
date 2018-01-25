@@ -244,6 +244,7 @@
                 elem.children(".suspense").attr("name",data.tagtype);
                 elem.prop("id", data.tagtype);
                 elem.attr("tagName", data.tagtype);
+                elem.find("#remarkId").attr("tagId", data.id);
                 elem.find("#tagtype span").text(data.tagtypeDesc);
                 if (!data.occupation) {
                     elem.find("#occupation").remove();
