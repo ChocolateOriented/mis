@@ -264,7 +264,7 @@
             $.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
                 var templ = $("#remarkId");
                 var elem = templ.clone(true);
-                elem.prop("tagId",data.id);
+                elem.attr("tagId",data.id);
                 if (!data.occupation) {
                     elem.find("#occupation").remove();
                 } else {
