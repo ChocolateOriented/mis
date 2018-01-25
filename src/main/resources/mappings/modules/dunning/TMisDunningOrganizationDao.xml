@@ -94,9 +94,13 @@
 			p.name,
 			p.nickname
 		FROM t_mis_dunning_people p
-		JOIN t_mis_dunning_organization o ON p.id = o.supervisorId
 		WHERE p.invalid = 't'
-		AND o.delflag = '0'
+		AND EXISTS (
+			SELECT 1
+			FROM t_mis_dunning_organization o
+			WHERE p.id = o.supervisorId
+			AND o.delFlag = '0'
+		)
 	</select>
 
 </mapper>
