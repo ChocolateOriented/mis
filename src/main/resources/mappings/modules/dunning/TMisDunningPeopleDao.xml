@@ -357,6 +357,9 @@
 				#{item}
 			</foreach>
 		</if>
+		<if test="auto == null">
+			AND a.auto !='c'
+		</if>
 		<if test="auto != null and auto.length > 0">
 			AND a.auto IN
 			<foreach item="item" collection="auto" open="(" separator="," close=")">
