@@ -5,26 +5,25 @@ import com.mo9.mqclient.IMqMsgListener;
 import com.mo9.mqclient.MqAction;
 import com.mo9.mqclient.MqMessage;
 import com.mo9.risk.modules.dunning.bean.dto.TMisCustomerServicefeedbackDto;
-import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
-import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
-import com.mo9.risk.modules.dunning.service.TMisCustomerServiceFeedbackService;
+import com.mo9.risk.modules.dunning.entity.TaskIssue;
+import com.mo9.risk.modules.dunning.entity.TaskIssue.IssueChannel;
+import com.mo9.risk.modules.dunning.entity.TaskIssue.IssueStatus;
+import com.mo9.risk.modules.dunning.entity.TaskIssue.RemindingType;
+import com.mo9.risk.modules.dunning.service.TaskIssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 客服后台数据接收
  * Created by qtzhou on 2017/10/30.
  */
+@Service
 public class CustomerServiceFeedbackListener implements IMqMsgListener {
-
     private static final Logger logger = LoggerFactory.getLogger(CustomerServiceFeedbackListener.class);
-
     @Autowired
-    TMisCustomerServiceFeedbackDao feedbackDao;
-
-    @Autowired
-    private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
+    TaskIssueService taskIssueService;
 
     @Override
     public MqAction consume(MqMessage msg, Object consumeContext) {
@@ -47,35 +46,21 @@ public class CustomerServiceFeedbackListener implements IMqMsgListener {
         String json = msg.getBody();
         logger.info(json);
         TMisCustomerServicefeedbackDto feedback = JSON.parseObject(json, TMisCustomerServicefeedbackDto.class );
-        TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
-        tMisCustomerServiceFeedback.setDealcode(feedback.getLoanDealCode());
-        tMisCustomerServiceFeedback.setType(feedback.getLoanOrderType());
-        tMisCustomerServiceFeedback.setStatus(feedback.getLoanStatus());
-        tMisCustomerServiceFeedback.setProblemdescription(feedback.getDescription());
-        tMisCustomerServiceFeedback.setId(feedback.getFeedbackRecordId());
-        tMisCustomerServiceFeedback.setProblemstatus(feedback.getFeedbackStatus());
-        tMisCustomerServiceFeedback.setHashtag(feedback.getLabels());
-        tMisCustomerServiceFeedback.setPushpeople(feedback.getRecorderName());
-        tMisCustomerServiceFeedback.setUname(feedback.getUserName());
-        tMisCustomerServiceFeedback.setPushTime(feedback.getEventId());
-        tMisCustomerServiceFeedback.setReadFlag("0");
+        TaskIssue taskIssue = new TaskIssue();
+        taskIssue.setStatus(IssueStatus.UNRESOLVED);
+        taskIssue.setIssueChannel(IssueChannel.CUSTOMER_SERVICE);
+        taskIssue.setRemindingType(RemindingType.DUNNING_PEOPLE);
+        //使用客服反馈的ID,以便于回调
+        taskIssue.setId(feedback.getFeedbackRecordId());
+        taskIssue.setDealcode(feedback.getLoanDealCode());
+        taskIssue.setDescription(feedback.getDescription());
+        taskIssue.setIssueTypesByJson(feedback.getLabels());
+        taskIssue.setRecorderName(feedback.getRecorderName());
+        taskIssue.setUserName(feedback.getUserName());
+        taskIssue.setCreateDate(feedback.getEventId());
+        taskIssue.setUpdateRole("客服");
 
-        if(("partial").equals(feedback.getLoanOrderType())){
-            tMisCustomerServiceFeedback.setRootorderid(Integer.valueOf(feedback.getLoanDealCode()));
-        }
-        tMisCustomerServiceFeedback.setKeywordText(tMisCustomerServiceFeedback.getUname(),tMisCustomerServiceFeedback.getDealcode(),
-                tMisCustomerServiceFeedback.getTagText(),tMisCustomerServiceFeedback.getStatusText(),tMisCustomerServiceFeedback.getPushpeople());
-
-        if(feedbackDao.get(tMisCustomerServiceFeedback)==null){
-            logger.info(tMisCustomerServiceFeedback.getId() + ": insert");
-            feedbackDao.insert(tMisCustomerServiceFeedback);
-        } else{
-            logger.info(tMisCustomerServiceFeedback.getId() + ": update");
-            feedbackDao.updateFeedback(tMisCustomerServiceFeedback);
-
-        }
-
-        logger.info(tMisCustomerServiceFeedback.getId() + ": consume complete");
+        taskIssueService.save(taskIssue);
         return MqAction.CommitMessage;
     }
 }

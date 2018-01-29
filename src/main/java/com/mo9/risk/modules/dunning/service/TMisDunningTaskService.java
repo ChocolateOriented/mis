@@ -148,16 +148,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	private TMisDunningGroupService tMisDunningGroupService;
 	@Autowired
 	private TMisDunnedHistoryDao tMisDunnedHistoryDao;
-	
 	@Autowired
 	private TRiskBuyerPersonalInfoService personalInfoDao;
-	
-	@Autowired
-	private TMisReliefamountHistoryDao tMisReliefamountHistoryDao;
-
 	@Autowired
 	private TRiskBuyerPersonalInfoDao tpersonalInfoDao;
-	
 	@Autowired
 	private TMisContantRecordDao tcontDao;
 	@Autowired
@@ -166,16 +160,12 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	private TmisDunningSmsTemplateService tdstService;
 	@Autowired
 	private TaskScheduler scheduler;
-	
 	@Autowired
 	private TMisDunningTaskSupportService tMisDunningTaskSupportService;
 	@Autowired
 	private TMisDunnedConclusionService tMisDunnedConclusionService;
 	@Autowired
 	private RiskQualityInfoService riskQualityInfoService;
-
-	@Autowired
-	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 
 	public TMisDunningTask get(String id) {
 		return super.get(id);
@@ -231,6 +221,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	}
 	
 	public TMisDunningTask findDunningTaskByDealcode(Map<String,Object> params) {
+		return tMisDunningTaskDao.findDunningTaskByDealcode(params);
+	}
+	public TMisDunningTask findDunningTaskByDealcode(String dealcode) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("DEALCODE", dealcode);
 		return tMisDunningTaskDao.findDunningTaskByDealcode(params);
 	}
 	
@@ -938,7 +933,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				creditamount += order.getCreditamount() == null ? 0 : order.getCreditamount();
 				corpusamount += order.getCorpusamount() == null ? 0 : order.getCorpusamount();
 				//添加黑名单关系
-				this.appendBlackNodeNum(order);
+				//this.appendBlackNodeNum(order);
 			}
 		}
 		String message = "，本金 " + NumberUtil.formatTosepara(corpusamount) + " 元，金额 " + NumberUtil.formatTosepara(creditamount) + " 元";
@@ -1753,11 +1748,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 * 批量更新每个队列的任务集合
 						 */
 						tMisDunningTaskDao.batchUpdateExpiredTask(tasks);
-						/**
-						 * 当催收人员改变是修改对应通知为未读
-						 */
-						tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
-
 					}
 					/** 
 					 * 保存移入任务Log
@@ -2286,11 +2276,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				tMisDunningTaskDao.batchUpdateDistributionTask(tasks);
 				/**
 				 *
-				 * 根据订单号的催收人改变修改是否已读
-				 */
-					tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
-				/**
-				 *
 				 * 保存移入任务Log
 				 */
 				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
@@ -2367,11 +2352,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				 */
 				tMisDunningTaskDao.batchUpdateOutDistributionTask(tasks);
 				/**
-				 *
-				 * 根据订单号的催收人改变修改是否已读
-				 */
-					tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
-				/** 
 				 * 保存移入任务Log
 				 */
 				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
@@ -3614,4 +3594,16 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		return result;
 	}
 
+	/**
+	 * @Description 查询不包含减免的应催金额
+	 * @param dealcode
+	 * @return double
+	 */
+	public double findShowAmount(String dealcode) {
+		return dao.findShowAmount(dealcode);
+	}
+
+	public double findMaxModifyAmount(String dealcode) {
+		return dao.findMaxModifyAmount(dealcode);
+	}
 }

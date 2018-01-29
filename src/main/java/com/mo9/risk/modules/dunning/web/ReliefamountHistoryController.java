@@ -40,13 +40,15 @@ public class ReliefamountHistoryController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "reliefamountDialog")
-	public String collectionAmount(String dealcode, Model model) {
+	public String reliefamountDialog(String dealcode, Model model) {
 		//获取所有的减免原因
 		TMisReliefamountHistory tfHistory = tMisReliefamountHistoryService.getValidApply(dealcode);
 		if (tfHistory == null){
 			tfHistory = new TMisReliefamountHistory();
 			tfHistory.setDealcode(dealcode);
 		}
+		double showAmount=	tMisDunningTaskService.findShowAmount(dealcode);
+		model.addAttribute("showAmount",showAmount);
 		model.addAttribute("tfHistory", tfHistory);
 		model.addAttribute("derateReasonList", DerateReason.values());
 		List<TMisReliefamountHistory> list = tMisReliefamountHistoryService.findPageListByDealcode(dealcode);
@@ -78,6 +80,7 @@ public class ReliefamountHistoryController extends BaseController {
 			return "已存在减免申请, 请等待处理";
 		}
 		tMisReliefamountHistoryService.applyfreeCreditAmount(tfHistory,userId);
+		tMisReliefamountHistoryService.creatTaskIssue(tfHistory,UserUtils.getUser());
 		return "OK";
 	}
 
@@ -96,6 +99,7 @@ public class ReliefamountHistoryController extends BaseController {
 			return "无减免申请";
 		}
 		tMisReliefamountHistoryService.refuseFreeCreditAmount(tfHistory,userId);
+		tMisReliefamountHistoryService.taskIssueResolution(tfHistory,UserUtils.getUser(),"拒绝减免");
 		return "OK";
 	}
 
@@ -116,10 +120,11 @@ public class ReliefamountHistoryController extends BaseController {
 				break;
 			}
 		}
-		if(freeCreditAmount != 1 && Double.parseDouble(amount) > 50){
-			return "减免金额不能大于50元";
-		}
 		String dealcode = tfHistory.getDealcode();
+		double maxModifyAmount = tMisDunningTaskService.findMaxModifyAmount(dealcode);
+		if(freeCreditAmount != 1 && Double.parseDouble(amount) > maxModifyAmount){
+			return "减免金额过大,请检查!";
+		}
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");
 			tMisDunningTaskService.updateOrderModifyAmount(dealcode, amount);
@@ -138,6 +143,7 @@ public class ReliefamountHistoryController extends BaseController {
 		}
 
 		tMisReliefamountHistoryService.savefreeCreditAmount(tfHistory,UserUtils.getUser().getId() ,task.getId());
+		tMisReliefamountHistoryService.taskIssueResolution(tfHistory,UserUtils.getUser(),"同意减免");
 		return "OK";
 	}
 

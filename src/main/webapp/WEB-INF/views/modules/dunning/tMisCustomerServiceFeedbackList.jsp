@@ -19,14 +19,14 @@
     function page(n,s){
         $("#pageNo").val(n);
         $("#pageSize").val(s);
-        $("#searchForm").attr("action","${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList");
+        $("#searchForm").attr("action","${ctx}/dunning/taskIssue/feedbackList?dealcode=${dealcode}");
         $("#searchForm").submit();
         return false;
     }
 
     function changeResult(obj){
         var id = $(obj).attr("feedbackId");
-        $.jBox.open("iframe:" + "${ctx}/dunning/tMisCustomerServiceFeedback/jboxResult?id=" + id, "处理结果" , 220, 260, {
+        $.jBox.open("iframe:" + "${ctx}/dunning/taskIssue/manualResolutionDialog?id=" + id, "处理结果" , 220, 260, {
             buttons: {
             },
             submit: function (v, h, f) {
@@ -41,8 +41,7 @@
 </script>
 </head>
 <body>
-    <form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList" method="post" class="breadcrumb form-search">
-        <input id = "buyerId" name="buyerId" type="hidden" value="${buyerId}"/>
+    <form:form id="searchForm" modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/taskIssue/feedbackList" method="post" class="breadcrumb form-search">
         <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
         <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
     </form:form>
@@ -51,8 +50,6 @@
         <thead>
             <tr>
                 <th>订单编号</th>
-                <th>订单类型</th>
-                <th>订单状态</th>
                 <th>问题状态</th>
                 <th>标签</th>
                 <th>问题描述</th>
@@ -62,70 +59,54 @@
                 <th>推送人</th>
                 <th>操作</th>
                 <th>处理结果</th>
-                <th>主订单编号</th>
             </tr>
         </thead>
         <tbody>
-        <c:forEach items="${page.list}" var="tMisCustomerServiceFeedback">
+        <c:forEach items="${page.list}" var="taskIssue">
             <tr>
                 <shiro:hasPermission name="dunning:TMisCustomerServiceFeedback:view">
                 <td>
-                    ${tMisCustomerServiceFeedback.dealcode}
+                    ${taskIssue.dealcode}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.orderTypeText}
+                    ${taskIssue.status.desc}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.orderStatusText}
+                    ${taskIssue.issueTypes2Text}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.statusText}
+                    ${taskIssue.description}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.tagText}
+                    <fmt:formatDate value="${taskIssue.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.problemdescription}
+                    <fmt:formatDate value="${taskIssue.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </td>
                 <td>
-                    <fmt:formatDate value="${tMisCustomerServiceFeedback.pushTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    ${taskIssue.updateBy.name}
                 </td>
                 <td>
-                    <c:if test="${tMisCustomerServiceFeedback.statusText eq '已解决'}">
-                      <fmt:formatDate value="${tMisCustomerServiceFeedback.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                    </c:if>
+                    ${taskIssue.recorderName}
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.updateBy.name}
-                </td>
-                <td>
-                    ${tMisCustomerServiceFeedback.pushpeople}
-                </td>
-                <td>
-                    <c:if test="${tMisCustomerServiceFeedback.statusText eq '未解决'}">
+                    <c:if test="${taskIssue.status eq 'UNRESOLVED'}">
                         <c:choose>
-                            <c:when test="${fns:contains(tMisCustomerServiceFeedback.tagText, '投诉催收')}">
+                            <c:when test="${fns:contains(taskIssue.issueTypesToJson, 'COMPLAIN_SHAKE')}">
                                 <shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-                                    <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                    <input class="btn btn-primary" type="button" feedbackId="${taskIssue.id}"
                                            value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
                                 </shiro:hasPermission>
-                                <shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
-                                    <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
-                                           value="待解决" style="padding:0px 8px 0px 8px;"/>
-                                </shiro:lacksPermission>
                             </c:when>
                             <c:otherwise>
-                                <input id="${tMisCustomerServiceFeedback.operate}" class="btn btn-primary" type="button" feedbackId="${tMisCustomerServiceFeedback.id}"
+                                <input class="btn btn-primary" type="button" feedbackId="${taskIssue.id}"
                                        value="待解决" style="padding:0px 8px 0px 8px;" onclick="changeResult(this);"/>
                             </c:otherwise>
                         </c:choose>
                     </c:if>
                 </td>
                 <td>
-                    ${tMisCustomerServiceFeedback.handlingresult}
-                </td>
-                <td>
-                    ${tMisCustomerServiceFeedback.rootorderid}
+                    ${taskIssue.handlingResult}
                 </td>
                 </shiro:hasPermission>
             </tr>

@@ -475,7 +475,7 @@
 		<li><a id="informationRecovery" href="javascript:void 0;" url="${ctx}/dunning/tMisDunningTask/informationRecovery" onclick="childPage(this)">信息修复</a></li>
 	</shiro:hasPermission>
 	<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:view">
-		<li><a href="javascript:void 0;" url="${ctx}/dunning/tMisCustomerServiceFeedback/feedbackList" onclick="childPage(this)">问题反馈</a></li>
+		<li><a href="javascript:void 0;" url="${ctx}/dunning/taskIssue/feedbackList" onclick="childPage(this)">问题反馈</a></li>
 	</shiro:hasPermission>
 </ul>
 

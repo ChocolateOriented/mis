@@ -382,7 +382,7 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 */
 	public double findMaxModifyAmount(String dealcode);
 	/**
-	 * 计算包含减免的应催金额
+	 * 计算不包含减免的应催金额
 	 * @param dealcode
 	 * @return
 	 */

@@ -149,16 +149,16 @@
 			//setInterval(getNotifyNum, ${oaNotifyRemindInterval});//</c:if>
 		});
 
-		//获取客服通知数
-
+		//待解决问题通知数
         function getCustServiceNotifyNum(){
-            $.get("${ctx}/dunning/tMisCustomerServiceFeedback/custServiceCount",function(data){
+            $.get("${ctx}/dunning/taskIssue/remindIssueCount",function(data){
                 var num = parseInt(data);
-                if (num >= 0 && num < 100){
+                if (num <= 0){
+                  $("#notifyNum0,#notifyNum1").html("");
+				}else if (num > 0 && num < 100){
                     $("#notifyNum0,#notifyNum1").html("("+num+")");
                 }else {
-                    //$("#notifyNum,#notifyNum2").hide()
-                    $("#notifyNum0,#notifyNum1").show().html("(99+)");
+                    $("#notifyNum0,#notifyNum1").html("(99+)");
                 }
             });
         }
@@ -201,17 +201,6 @@
 				}
 			});
 		}
-		function controlNum(){
-		    var text = $("#notifyNum0").html();
-		    text = text.replace('(', '');
-            text = text.replace(')', '');
-            var num = parseInt(text);
-            if (--num <= 0) {
-                $("#notifyNum0").html("");
-			} else {
-                $("#notifyNum0").html("("+ num +")");
-			}
-		}
 	</script>
 </head>
 <body>
@@ -250,20 +239,20 @@
 					<li id="userInfo" class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#" title="个人信息">您好, ${fns:getUser().name}
 							<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
-							<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
-							<span id="notifyNum0" style="color: red;"></span>
-							</shiro:hasPermission>
+							<shiro:hasRole name="dunningCommissioner" >
+								<span id="notifyNum0" style="color: red;"></span>
+							</shiro:hasRole>
 							</shiro:lacksPermission>
 							<span id="notifyNum" class="label label-info hide"></span></a>
 						<ul class="dropdown-menu">
 							<li><a href="${ctx}/sys/user/info" target="mainFrame"><i class="icon-user"></i>&nbsp; 个人信息</a></li>
 							<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i class="icon-lock"></i>&nbsp;  修改密码</a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  我的通知 <span id="notifyNum2" class="label label-info hide"></span></a></li>
-							<li><a href="${ctx}/dunning/tMisCustomerServiceFeedback/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  客服通知
+							<li><a href="${ctx}/dunning/taskIssue/notify" target="mainFrame"><i class="icon-bell"></i>&nbsp;  消息通知
 								<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
-								<shiro:hasPermission name="dunning:tMisCustomerServiceFeedback:OnlyCommissionerview">
-								<span id="notifyNum1" style="color: red;"></span>
-								</shiro:hasPermission>
+								<shiro:hasRole name="dunningCommissioner">
+										<span id="notifyNum1" style="color: red;"></span>
+								</shiro:hasRole>
 								</shiro:lacksPermission>
 							</a></li>
 							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i class="icon-bell"></i>&nbsp;  催收任务 <span id="notifyNum3" class="label label-info hide"></span></a></li>
