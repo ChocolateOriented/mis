@@ -28,15 +28,34 @@
 			background-color: #008000;
 		}
 
+		.colortrue {
+			border: solid #3daae9 1px;
+			border-radius: 5px;
+			margin-bottom: 5px;
+			background-color: #f0f8fd;
+			/*background-color: #e2ffd6;*/
+			padding: 3px 10px 3px 10px;
+		}
+
+		.colorfalse {
+			border: solid #3daae9 1px;
+			border-radius: 5px;
+			margin-bottom: 5px;
+			background-color: #f0f8fd;
+			padding: 3px 10px 3px 10px;
+			/*background-color: #dbf8ff;*/
+		}
+
+
 		.suspense {
 			z-index: 10000;
 			position: absolute;
 			top: 22px;
 			left: -1px;
-			background-color: #f0f8fd;
+			/*background-color: #f0f8fd;*/
 			opacity: 0.9;
-			border: solid #3daae9 1px;
-			border-radius: 5px;
+			/*border: solid #3daae9 1px;*/
+			/*border-radius: 5px;*/
 			outline: none;
 			color: #555;
 			font-size: 13px;
@@ -72,6 +91,7 @@
             var url = "${ctx}/dunning/tMisDunningTask/collection" + method + "?buyerId=${buyerId}&dealcode=${dealcode}&dunningtaskdbid=${dunningtaskdbid}&contactMobile=" + contactMobile + "&contactstype=" + contactstype+"&mobileSelf="+contactMobile;
             if (param) {
                 for (var name in param) {
+
                     if (typeof param[name] != "function") {
                         url = url + "&" + name + "=" + param[name] || "";
                     }
@@ -200,14 +220,35 @@
         }
 
         function editTag(obj) {
-            var tagId = $(obj).parent().attr("tagId");
-            collectionfunction($(obj).parent(), 540, 340, {tagId : tagId});
+//            var tagId = $(obj).parent().attr("tagId");
+//            collectionfunction($(obj).parent(), 540, 340, {tagId : tagId});
+            var tagName = $(obj).parent().attr("tagName");
+            collectionfunction($(obj).parent(), 540, 340, {tagName : tagName});
         }
 
-        function closeTag(obj) {
+        function closeRemark(obj) {
             var tagId = $(obj).parent().attr("tagId");
+            confirmx('确认要删除该备注吗？', function() {
+                $.post("${ctx}/dunning/tMisDunningTag/closeRemark", {id : tagId}, function(data) {
+                    if (data == "OK") {
+                        $(obj).parent().fadeOut(300);
+                        var v = $(obj).parent().parent().children().length;
+                        if(v==1){
+                            $(obj).parent().parent().parent().remove();
+						}
+                        setTimeout(function() {
+                            $(obj).parent().remove();
+                        }, 300);
+                    }
+                });
+            });
+        }
+        function closeTag (obj) {
+
+            var tagName = $(obj).parent().attr("tagName");
+            var buyerid=${buyerId};
             confirmx('确认要删除该标签吗？', function() {
-                $.post("${ctx}/dunning/tMisDunningTag/closeTag", {id : tagId}, function(data) {
+                $.post("${ctx}/dunning/tMisDunningTag/closeTag", {tagName : tagName,buyerid : buyerid}, function(data) {
                     if (data == "OK") {
                         $(obj).parent().fadeOut(300);
                         setTimeout(function() {
@@ -224,8 +265,11 @@
                 var templ = $("#tagTemplate");
                 var elem = templ.clone(true);
                 elem.children("#title").text(data.tagtypeDesc);
+                elem.children(".suspense").children().attr("class","colorfalse");
+                elem.children(".suspense").attr("name",data.tagtype);
                 elem.prop("id", data.tagtype);
-                elem.attr("tagId", tagId);
+                elem.attr("tagName", data.tagtype);
+                elem.find("#remarkId").attr("tagId", data.id);
                 elem.find("#tagtype span").text(data.tagtypeDesc);
                 if (!data.occupation) {
                     elem.find("#occupation").remove();
@@ -243,15 +287,35 @@
         //编辑后刷新标签明细
         function refreshTag(tagId) {
             $.get("${ctx}/dunning/tMisDunningTag/get", {id : tagId}, function(data) {
-                var elem = $(".tag[tagId='" + tagId + "']");
-                elem.find("#tagtype span").text(data.tagtypeDesc);
-                if (data.occupation) {
+                var templ = $("#remarkId");
+                var elem = templ.clone(true);
+                elem.attr("tagId",data.id);
+                if (!data.occupation) {
+                    elem.find("#occupation").remove();
+                } else {
                     elem.find("#occupation span").text(data.occupationDesc);
                 }
                 elem.find("#remark span").text(data.remark);
                 elem.find("#peoplename span").text(data.peoplename);
                 elem.find("#updateDate span").text(data.updateDate);
-                $.jBox.tip("修改成功", "info");
+                elem.parent().parent().attr("name",data.tagtype);
+                var a = $("div[name='"+data.tagtype+"']").children("div").attr("class");
+                if(a == "colorfalse"){
+                    elem.attr("class","colortrue");
+				}else {
+                    elem.attr("class","colorfalse");
+				}
+               $("div[name='"+data.tagtype+"']").prepend(elem);
+
+//                var elem = $(".tag[tagId='" + tagId + "']");
+//                elem.find("#tagtype span").text(data.tagtypeDesc);
+//                if (data.occupation) {
+//                    elem.find("#occupation span").text(data.occupationDesc);
+//                }
+//                elem.find("#remark span").text(data.remark);
+//                elem.find("#peoplename span").text(data.peoplename);
+//                elem.find("#updateDate span").text(data.updateDate);
+//                $.jBox.tip("保存备注成功", "info");
             });
         }
 
@@ -287,37 +351,102 @@
 <body>
 <h4>&nbsp;&nbsp; </h4>
 <h4 style="display:inline-block;position:relative;top:5px;">&nbsp;&nbsp;个人信息&nbsp;&nbsp;</h4>
+<%--<div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;font-size:0px;">--%>
+	<%--<c:forEach items="${tags}" var="tag">--%>
+		<%--<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">--%>
+			<%--<span id="title" style="margin:0px 3px 0px 3px;">${tag.tagtype.desc}</span>--%>
+			<%--<shiro:hasPermission name="dunning:tMisDunningTag:edit">--%>
+				<%--<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>--%>
+				<%--<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>--%>
+			<%--</shiro:hasPermission>--%>
+			<%--<div class="suspense" style="display:none;" tabindex="0">--%>
+				<%--<div>--%>
+
+				<%--<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>--%>
+				<%--&lt;%&ndash;<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>&ndash;%&gt;--%>
+				<%--<c:if test="${not empty tag.occupation.desc}">--%>
+					<%--<div id="occupation" style="white-space:nowrap;">职业类型: <span>${tag.occupation.desc}</span></div>--%>
+				<%--</c:if>--%>
+				<%--<div id="remark" style="white-space:nowrap;">备注: <span>${tag.remark}</span></div>--%>
+				<%--<div id="peoplename" style="white-space:nowrap;">标记人: <span>${tag.peoplename}</span></div>--%>
+				<%--<div id="updateDate" style="white-space:nowrap;">标记时间: <span><fmt:formatDate value="${tag.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/></span></div>--%>
+				<%--</div>--%>
+
+				<%--<div>aaa</div>--%>
+			<%--</div>--%>
+			<%--<div class="suspense" style="display:none;" tabindex="0">--%>
+				<%--aaa--%>
+			<%--</div>--%>
+		<%--</div>--%>
+	<%--</c:forEach>--%>
+	<%--<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">--%>
+		<%--<span id="title" style="margin:0px 3px 0px 3px;"></span>--%>
+		<%--<shiro:hasPermission name="dunning:tMisDunningTag:edit">--%>
+			<%--<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>--%>
+			<%--<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>--%>
+		<%--</shiro:hasPermission>--%>
+		<%--<div class="suspense" style="display:none;" tabindex="0">--%>
+			<%--<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>--%>
+			<%--<div id="occupation" style="white-space:nowrap;">职业类型: <span></span></div>--%>
+			<%--<div id="remark" style="white-space:nowrap;">备注: <span></span></div>--%>
+			<%--<div id="peoplename" style="white-space:nowrap;">标记人: <span></span></div>--%>
+			<%--<div id="updateDate" style="white-space:nowrap;">标记时间: <span></span></div>--%>
+		<%--</div>--%>
+	<%--</div>--%>
+<%--</div>--%>
 <div id="tags" style="display:inline-block;margin-bottom:0px;padding:0px;font-size:0px;">
-	<c:forEach items="${tags}" var="tag">
-		<div id="${tag.tagtype}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="${tag.id}" method="Tag">
-			<span id="title" style="margin:0px 3px 0px 3px;">${tag.tagtype.desc}</span>
+	<c:forEach items="${mapTag}" var="mapTag">
+		<div id="${mapTag.key}" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();"
+			 tagName=${mapTag.key.name()} method="Tag">
+			<span id="title" style="margin:0px 3px 0px 3px;">${mapTag.key.desc}</span>
 			<shiro:hasPermission name="dunning:tMisDunningTag:edit">
 				<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
-				<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
+				<span id="closeTag" onclick="closeTag(this);"
+					  style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 			</shiro:hasPermission>
-			<div class="suspense" style="display:none;" tabindex="0">
-				<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>
-				<c:if test="${not empty tag.occupation.desc}">
-					<div id="occupation" style="white-space:nowrap;">职业类型: <span>${tag.occupation.desc}</span></div>
-				</c:if>
-				<div id="remark" style="white-space:nowrap;">备注: <span>${tag.remark}</span></div>
-				<div id="peoplename" style="white-space:nowrap;">标记人: <span>${tag.peoplename}</span></div>
-				<div id="updateDate" style="white-space:nowrap;">标记时间: <span><fmt:formatDate value="${tag.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/></span></div>
+			<div class="suspense" style="display:none;" tabindex="0" name="${mapTag.key}">
+				<c:set var="colorId" value="false"/>
+				<c:forEach items="${mapTag.value}" var="tag">
+					<c:set var="colorId" value="${!colorId}"/>
+				<div class="color${colorId}" tagId="${tag.id}">
+					<shiro:hasPermission name="dunning:tMisDunningTag:edit">
+					<span id="closeRemark" onclick="closeRemark(this);"
+						  style="cursor:pointer;margin:0px 3px 0px 0px;float: right" >&times;</span>
+					</shiro:hasPermission>
+						<%--<div id="tagtype" style="white-space:nowrap;">敏感类型: <span>${tag.tagtype.desc}</span></div>--%>
+					<c:if test="${not empty tag.occupation.desc}">
+						<div id="occupation" style="white-space:nowrap;">职业类型: <span>${tag.occupation.desc}</span></div>
+					</c:if>
+					<div id="remark" ><div style='display:inline-block;vertical-align: top;'>备注: </div><span style='width: 130px;display:inline-block;word-break: break-all;'>${tag.remark}</span></div>
+					<div id="peoplename" style="white-space:nowrap;">标记人: <span>${tag.peoplename}</span></div>
+					<div id="updateDate" style="white-space:nowrap;">标记时间: <span><fmt:formatDate
+							value="${tag.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/></span></div>
+				</div>
+					<%--<div>&nbsp;</div>--%>
+				</c:forEach>
 			</div>
+
 		</div>
 	</c:forEach>
-	<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagId="" method="Tag" style="display:none;">
+	<div id="tagTemplate" class="tag" onmouseover="showTagDetail(this);" onmouseout="hideTagDetail();" tagName=""
+		 method="Tag" style="display:none;">
 		<span id="title" style="margin:0px 3px 0px 3px;"></span>
 		<shiro:hasPermission name="dunning:tMisDunningTag:edit">
 			<i id="editTag" class="icon-edit" style="cursor:pointer;" onclick="editTag(this);"></i>
 			<span id="closeTag" onclick="closeTag(this);" style="cursor:pointer;margin:0px 3px 0px 0px;">&times;</span>
 		</shiro:hasPermission>
-		<div class="suspense" style="display:none;" tabindex="0">
-			<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>
-			<div id="occupation" style="white-space:nowrap;">职业类型: <span></span></div>
-			<div id="remark" style="white-space:nowrap;">备注: <span></span></div>
-			<div id="peoplename" style="white-space:nowrap;">标记人: <span></span></div>
-			<div id="updateDate" style="white-space:nowrap;">标记时间: <span></span></div>
+		<div class="suspense" style="display:none;" tabindex="0" >
+			<div class="" id="remarkId" tagId="">
+				<shiro:hasPermission name="dunning:tMisDunningTag:edit">
+				<span id="closeRemark" onclick="closeRemark(this);"
+					  style="cursor:pointer;margin:0px 3px 0px 0px;float: right" >&times;</span>
+				</shiro:hasPermission>
+				<%--<div id="tagtype" style="white-space:nowrap;">敏感类型: <span></span></div>--%>
+				<div id="occupation" style="white-space:nowrap;">职业类型: <span></span></div>
+				<div id="remark" ><div style='display:inline-block;vertical-align: top;'>备注: </div><span style='width: 130px;display:inline-block;word-break: break-all;'></span></div>
+				<div id="peoplename" style="white-space:nowrap;">标记人: <span></span></div>
+				<div id="updateDate" style="white-space:nowrap;">标记时间: <span></span></div>
+			</div>
 		</div>
 	</div>
 </div>

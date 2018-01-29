@@ -31,6 +31,8 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
+	@Autowired
+	private TMisDunningTagDao tMisDunningTagDao;
 	
 	/**
 	 * 保存标签
@@ -69,11 +71,18 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 	 * @return
 	 */
 	@Transactional(readOnly = false)
-	public void closeTag(String id) {
-		TMisDunningTag tMisDunningTag = new TMisDunningTag();
-		tMisDunningTag.setId(id);
+	public void closeTag(TMisDunningTag tMisDunningTag) {
+		tMisDunningTag.preUpdate();
 		tMisDunningTag.setDelFlag(TMisDunningTag.DEL_FLAG_DELETE);
-		updateTag(tMisDunningTag);
+		int num = tMisDunningTagDao.upadateDelflag(tMisDunningTag);
+		if (num > 0) {
+			List<TMisDunningTag> list = tMisDunningTagDao.select(tMisDunningTag);
+			for (TMisDunningTag misDunningTag : list){
+				dao.saveTagHistory(tMisDunningTag);
+			}
+		}
+//		tMisDunningTag.setDelFlag(TMisDunningTag.DEL_FLAG_DELETE);
+//		updateTag(tMisDunningTag);
 	}
 	
 	/**
@@ -117,5 +126,10 @@ public class TMisDunningTagService extends CrudService<TMisDunningTagDao, TMisDu
 	public boolean typeExist(TMisDunningTag tMisDunningTag) {
 		
 		return  StringUtils.isBlank(dao.typeExist(tMisDunningTag));
+	}
+	@Transactional(readOnly = false)
+	public void closeRemark(TMisDunningTag tMisDunningTag) {
+		tMisDunningTag.setDelFlag(TMisDunningTag.DEL_FLAG_DELETE);
+		updateTag(tMisDunningTag);
 	}
 }

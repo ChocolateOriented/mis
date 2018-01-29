@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mo9.risk.modules.dunning.enums.TagType;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -71,7 +72,7 @@ public class TMisDunningTagController extends BaseController {
 				result.put("msg", "无法添加更多标签");
 				return result;
 			}
-			 id = tMisDunningTagService.saveTag(tMisDunningTag);
+			id = tMisDunningTagService.saveTag(tMisDunningTag);
 		} catch (Exception e) {
 			logger.warn (e.getMessage());
 		} finally {
@@ -89,25 +90,70 @@ public class TMisDunningTagController extends BaseController {
 	@ResponseBody
 	public Map<String, String> editTag(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> result = new HashMap<String, String>();
-		int num = tMisDunningTagService.editTag(tMisDunningTag);
-		if (num == 0) {
+		String buyerid=tMisDunningTag.getBuyerid();
+		if (buyerid == null || "".equals(buyerid) || tMisDunningTag.getTagtype() == null) {
 			result.put("status", "NO");
-			result.put("msg", "当前标签已被删除");
-		} else {
-			result.put("status", "OK");
-			result.put("id", tMisDunningTag.getId());
+			result.put("msg", "添加备注失败");
+			return result;
 		}
+		String lockStr = buyerid + "." + tMisDunningTag.getTagtype().toString();
+
+		boolean addable = false;
+		String id="";
+		try {
+			//自旋等待5秒
+			long timestamp = System.currentTimeMillis();
+			Long value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
+			while (value != null && timestamp - value < 5000) {
+				value = TMisDunningTagService.dealcodeTagType.putIfAbsent(lockStr, timestamp);
+			}
+			addable = tMisDunningTagService.typeExist(tMisDunningTag);
+			if (!addable) {
+				result.put("status", "NO");
+				result.put("msg", "无法添加更多备注");
+				return result;
+			}
+			id = tMisDunningTagService.saveTag(tMisDunningTag);
+		} catch (Exception e) {
+			logger.warn (e.getMessage());
+		} finally {
+			TMisDunningTagService.dealcodeTagType.remove(lockStr);
+
+		}
+
+		result.put("status", "OK");
+		result.put("id", id);
 		return result;
+		//		Map<String, String> result = new HashMap<String, String>();
+//		int num = tMisDunningTagService.editTag(tMisDunningTag);
+//		if (num == 0) {
+//			result.put("status", "NO");
+//			result.put("msg", "当前标签已被删除");
+//		} else {
+//			result.put("status", "OK");
+//			result.put("id", tMisDunningTag.getId());
+//		}
+//		return result;
 	}
 	
 	@RequiresPermissions("dunning:tMisDunningTag:edit")
 	@RequestMapping(value = "closeTag")
 	@ResponseBody
 	public String closeTag(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-		tMisDunningTagService.closeTag(tMisDunningTag.getId());
+		String tagName = request.getParameter("tagName");
+        tMisDunningTag.setTagtype(TagType.valueOf(tagName));
+        //TagType tagtype = tMisDunningTag.getTagtype();
+        tMisDunningTagService.closeTag(tMisDunningTag);
 		return "OK";
 	}
-	
+    @RequiresPermissions("dunning:tMisDunningTag:edit")
+    @RequestMapping(value = "closeRemark")
+    @ResponseBody
+	public String closeRemark(TMisDunningTag tMisDunningTag, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response){
+        tMisDunningTagService.closeRemark(tMisDunningTag);
+        return "OK";
+    }
+
 	@RequiresPermissions("dunning:tMisDunningTag:edit")
 	@RequestMapping(value = "preCheck")
 	@ResponseBody

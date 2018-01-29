@@ -40,6 +40,7 @@ import com.mo9.risk.modules.dunning.entity.TaskIssue.IssueType;
 import com.mo9.risk.modules.dunning.entity.TmisDunningSmsTemplate;
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
+import com.mo9.risk.modules.dunning.enums.TagType;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.service.MemberInfoService;
 import com.mo9.risk.modules.dunning.service.RiskQualityInfoService;
@@ -177,6 +178,8 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	@Autowired
 	private RiskOrderManager orderManager;
+	@Autowired
+	private TMisDunningOrganizationService tMisDunningOrganizationService;
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
 	@Autowired
@@ -565,6 +568,8 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+			List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
+			model.addAttribute("organizations", organizations);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
@@ -591,7 +596,7 @@ public class TMisDunningTaskController extends BaseController {
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
 		String bizType = request.getParameter("bizType");
-		
+		String organizationName = request.getParameter("organizationName");
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
 				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
 			return new ArrayList<TMisDunningPeople>();
@@ -599,7 +604,7 @@ public class TMisDunningTaskController extends BaseController {
 
 		String dunningpeoplename = request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
+			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;
@@ -851,6 +856,21 @@ public class TMisDunningTaskController extends BaseController {
 		tMisDunningTag.setBuyerid(buyerId);
 		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
 		model.addAttribute("tags", tags);
+
+		Map<TagType,List<TMisDunningTag>> mapTag = new HashMap<>();
+		for(TMisDunningTag t : tags){
+            if(!mapTag.containsKey(t.getTagtype())){
+                List<TMisDunningTag> tagList =  new ArrayList<>();
+                tagList.add(t);
+                mapTag.put(t.getTagtype(),tagList);
+            }else {
+                List<TMisDunningTag> tMisDunningTags = mapTag.get(t.getTagtype());
+                tMisDunningTags.add(t);
+                mapTag.put(t.getTagtype(),tMisDunningTags);
+            }
+        }
+        model.addAttribute("mapTag",mapTag);
+		//model.addAttribute("tags", tags);
 
 		TMisDunningScoreCard tMisDunningScoreCard = riskQualityInfoService.getScoreCardByDealcode(dealcode);
 		model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
@@ -1401,14 +1421,21 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	public String collectionTag(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
-		String tagId = request.getParameter("tagId");
+		String tagName = request.getParameter("tagName");
 		String tagOpr = "save";
-		if (StringUtils.isNotBlank(tagId)) {
+		if (StringUtils.isNotBlank(tagName)) {
+		    //新增备注回显
 			tagOpr = "edit";
-			TMisDunningTag tMisDunningTag = tMisDunningTagService.get(tagId);
-			model.addAttribute("tagId", tagId);
-			model.addAttribute("tMisDunningTag", tMisDunningTag);
+            TMisDunningTag tMisDunningTag1 = new TMisDunningTag();
+            tMisDunningTag1.setBuyerid(buyerId);
+            TagType tagType = TagType.valueOf(tagName);
+            tMisDunningTag1.setTagtype(tagType);
+            model.addAttribute("tMisDunningTag", tMisDunningTag1);
+//            TMisDunningTag tMisDunningTag = tMisDunningTagService.get(tagId);
+//			model.addAttribute("tagId", tagId);
+//			model.addAttribute("tMisDunningTag", tMisDunningTag);
 		} else {
+		    //新增标签
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
 			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);

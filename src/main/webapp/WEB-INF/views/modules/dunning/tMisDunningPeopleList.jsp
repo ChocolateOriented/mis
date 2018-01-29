@@ -180,9 +180,10 @@ function getSelectedPeople() {
 			<li>
 				<label>自动分配：</label>
                 <form:select id="auto" path="auto" class="input-medium">
-                    <form:option value="" label="" />
+                    <form:option value="" label="全部" />
                     <form:option value="t" label="是" />
                     <form:option value="f" label="否" />
+                    <form:option value="c" label="关闭" />
                 </form:select>
 			</li>
 			<li>
@@ -248,7 +249,7 @@ function getSelectedPeople() {
 							${bizType.desc}
 						</c:forEach>
 					</td>
-					<td>${'t' eq tMisDunningPeople.auto ? '启用' : '停止'}</td>
+					<td>${'t' eq tMisDunningPeople.auto ? '启用' :'f' eq tMisDunningPeople.auto ? '停止' : '关闭'}</td>
 					<!-- 	<td>${tMisDunningPeople.dunningpeopletypeText}</td> -->
 					<!-- 	<td>${tMisDunningPeople.rate} </td> -->
 					<shiro:hasPermission name="dunning:tMisDunningPeople:edit">

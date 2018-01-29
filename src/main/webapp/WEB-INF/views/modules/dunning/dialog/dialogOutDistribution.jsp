@@ -95,6 +95,7 @@
             })
 
             var name = $("#groupList").val();
+            var organizationName = $("#organizationName").val();
             var dunningpeoplename = $("#searchName").val() || "";
 
             var param = {
@@ -103,7 +104,8 @@
                 type: grouptype,
                 auto: status,
                 name: $("#groupList").val(),
-                dunningpeoplename: dunningpeoplename
+                dunningpeoplename: dunningpeoplename,
+                organizationName:organizationName
             };
             $.post("${ctx}/dunning/tMisDunningOuterTask/dialogDistributionPeople", param, function(peopleList) {
                 $("#leftContainer").empty();
@@ -172,10 +174,20 @@
                     getPeople();
                 }
             });
+            $('#organization').change(function() {
+                var checked = $('#organization').prop("checked");
+                $('#organizationName').prop("disabled", !checked);
+                if (!checked) {
+                    $('#organizationName').val("");
+                    $('#s2id_organizationName span.select2-chosen').text("选择");
+                    getPeople();
+                }
+            });
             $("input[name='cycles']").change(getPeople);
             $("input[name='grouptype']").change(getPeople);
             $("input[name='status']").change(getPeople);
             $("#groupList").change(getPeople);
+            $("#organizationName").change(getPeople);
             $("#search").click(getPeople);
 
             $('#distributionSave').click(function() {
@@ -313,6 +325,19 @@
 			</div>
 		</div>
 		</shiro:hasPermission>
+		<div class="control-group" style="height: 40px;">
+			<div style="width:20%;display:inline-block;">
+				<input id="organization" type="checkbox"/><label for="groupCheckable">催收机构</label>
+			</div>
+			<div style="width:40%;display:inline-block;">
+				<select id="organizationName" disabled class="input-medium">
+					<option value="" >选择</option>
+					<c:forEach items="${organizations}" var="item">
+						<option value="${item.id}" >${item.name}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</div>
 
 		<div>
 			<p style="font-size: medium;color: #1a1a1a">人员筛选</p>
