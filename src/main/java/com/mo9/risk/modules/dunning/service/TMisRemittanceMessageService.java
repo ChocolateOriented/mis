@@ -151,7 +151,7 @@ public class TMisRemittanceMessageService extends
 	 * @Description 财务上传时间在参数之后的汇款自动查账
 	 */
 	@Transactional(readOnly = false)
-	public void autoAuditAfterFinancialtime(Date date) {
+	public synchronized void autoAuditAfterFinancialtime(Date date) {
 		List<TMisRemittanceMessage> list = dao.findAfterFinancialTimeNotAuditList(date);
 		this.autoAudit(list);
 	}
