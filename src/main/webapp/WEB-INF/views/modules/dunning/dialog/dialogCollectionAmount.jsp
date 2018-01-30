@@ -46,9 +46,14 @@
             //var v= $("#amount").val();
             //var v2 =;
 			var v = ${thisCreditAmount} - $("#amount").val();
-            if(v){
-                $("#showContent").text("减免后应还金额:" +v);
+            var x = Math.round(v*100)/100;
+            if(x){
+
+                $("#showContent").text("减免后应还金额:" +x);
             }
+//            if(v){
+//                $("#showContent").text("减免后应还金额:" +v);
+//            }
 
         }
 	</script>

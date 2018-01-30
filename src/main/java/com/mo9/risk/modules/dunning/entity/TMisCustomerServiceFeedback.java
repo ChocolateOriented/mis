@@ -146,7 +146,11 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
                             COMPLAIN_SHAKE.equals(tag) ? "投诉催收" :
                                     CONSULT_REPAY.equals(tag) ? "协商还款" :
                                             CONTACT_REMARK.equals(tag) ? "备注联系方式" : "";
-            builder.append(tagText).append(",");
+            if(tagText!=""){
+                builder.append(tagText).append(",");
+
+            }
+            //builder.append(tagText).append(",");
         }
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
