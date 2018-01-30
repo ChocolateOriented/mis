@@ -255,6 +255,7 @@
 						<form:option value="">全部</form:option>
 						<form:option value="t">是</form:option>
 						<form:option value="f">否</form:option>
+						<form:option value="c">关闭</form:option>
 					</form:select>
 				</li>
 			</div>
@@ -333,7 +334,7 @@
 					<td>
 						${callingReport.callDuration}
 					</td>
-					<td>${'t' eq callingReport.auto ? '启用' : '停止'}</td>
+					<td>${'t' eq callingReport.auto ? '启用' :'f' eq callingReport.auto ? '停止' : '关闭'}</td>
 				</tr>
 			</c:forEach>
 

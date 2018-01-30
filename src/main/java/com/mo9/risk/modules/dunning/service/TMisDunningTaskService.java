@@ -8,14 +8,7 @@ import com.gamaxpay.commonutil.msf.JacksonConvertor;
 import com.gamaxpay.commonutil.msf.ServiceAddress;
 import com.mo9.risk.modules.dunning.bean.BlackListRelation;
 import com.mo9.risk.modules.dunning.bean.TmpMoveCycle;
-import com.mo9.risk.modules.dunning.dao.TMisContantRecordDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunnedHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningPeopleDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskLogDao;
-import com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao;
-import com.mo9.risk.modules.dunning.dao.TRiskBuyerPersonalInfoDao;
-import com.mo9.risk.modules.dunning.dao.TmisDunningSmsTemplateDao;
+import com.mo9.risk.modules.dunning.dao.*;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -181,6 +174,8 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 	@Autowired
 	private RiskQualityInfoService riskQualityInfoService;
 
+	@Autowired
+	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 
 	public TMisDunningTask get(String id) {
 		return super.get(id);
@@ -1747,8 +1742,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 */
 						List<TMisDunningTask> tasks = entry.getValue();
 	//					int j = 0;
-						for(int i= 0 ; i < tasks.size() ; i++ ){  
+						List<String> dealcodes = new ArrayList<>();
+						for(int i= 0 ; i < tasks.size() ; i++ ){
 							TMisDunningTask dunningTask = (TMisDunningTask)tasks.get(i);
+							dealcodes.add(dunningTask.getDealcode());
 							/**  平均分配法    */
 							int j = i % dunningPeoples.size();                            			 // 平均分配法
 							
@@ -1788,6 +1785,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 * 批量更新每个队列的任务集合
 						 */
 						tMisDunningTaskDao.batchUpdateExpiredTask(tasks);
+						/**
+						 * 当催收人员改变是修改对应通知为未读
+						 */
+						tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
+
 					}
 					/** 
 					 * 保存移入任务Log
@@ -2314,7 +2316,13 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				 * 修改手动分配任务
 				 */
 				tMisDunningTaskDao.batchUpdateDistributionTask(tasks);
-				/** 
+				/**
+				 *
+				 * 根据订单号的催收人改变修改是否已读
+				 */
+					tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
+				/**
+				 *
 				 * 保存移入任务Log
 				 */
 				tMisDunningTaskLogDao.batchInsertTaskLog(inDunningTaskLogs);
@@ -2342,7 +2350,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     public String outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,dunningcycle);
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newOutfingTasksByDealcodes(dealcodes);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
 			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
 			
@@ -2374,7 +2382,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					dunningTask.setDunningpeopleid(dunningPeoples.get(j).getId());
 					dunningTask.setDunningpeoplename(dunningPeoples.get(j).getName());
 					dunningTask.setUpdateBy(UserUtils.getUser());
-					dunningTask.setDunningcycle(dunningcycle);
+					dunningTask.setDunningcycle(assignDunningTaskLogs.get(i).getDunningcycle());
 					dunningTask.setOutsourcingbegindate(new Date());
 					dunningTask.setOutsourcingenddate(outsourcingenddate);
 					tasks.add(dunningTask);
@@ -2390,6 +2398,11 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 				 * 修改手动分配任务
 				 */
 				tMisDunningTaskDao.batchUpdateOutDistributionTask(tasks);
+				/**
+				 *
+				 * 根据订单号的催收人改变修改是否已读
+				 */
+					tMisCustomerServiceFeedbackDao.updateFlagByDealCode(dealcodes);
 				/** 
 				 * 保存移入任务Log
 				 */
@@ -2406,7 +2419,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		} finally {
 			logger.info(dunningcycle + "队列手动分配任务结束" + new Date());
 		}
-    	
+
     }
 
 	/**

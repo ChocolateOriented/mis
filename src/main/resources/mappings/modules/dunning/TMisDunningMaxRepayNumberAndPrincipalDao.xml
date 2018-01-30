@@ -255,8 +255,9 @@
         on a.cycle = b.cycle) c
     </select>
 
-    <select id="countPeopleOfGroup" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningGroup">
-        SELECT g.Name as name, count(a.Id) AS numberOfPeople  FROM t_mis_dunning_people a LEFT JOIN t_mis_dunning_group g on g.id = a.groupId WHERE  a.Invalid = 't' AND g.DelFlag = '0' GROUP BY g.Id
+    <select id="findPeopleOfGroup" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningPeople">
+        SELECT g.Name as groupName, a.DunningCycle as dunningcycle, a.Name as name, a.Auto as auto FROM t_mis_dunning_people a LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
+        WHERE  a.Invalid = 't' AND g.DelFlag = '0';
     </select>
 
 </mapper>

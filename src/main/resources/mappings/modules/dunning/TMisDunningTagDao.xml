@@ -50,7 +50,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-			    ORDER BY a.dbid
+			    ORDER BY a.updatedate DESC
 			</otherwise>
 		</choose>
 	</select>
@@ -178,5 +178,24 @@
 		AND tagtype =#{buyerid}
 		AND delflag = '0'
 	</select>
+	<update id="upadateDelflag">
+		UPDATE t_mis_dunning_tag SET
 
+		<if test="delFlag != null">
+			delflag = #{delFlag},
+		</if>
+		updateby = #{updateBy.name},
+		updatedate = #{updateDate}
+		WHERE BuyerId = #{buyerid}
+		AND TagType = #{tagtype}
+	</update>
+
+	<select id="select" resultType="TMisDunningTag">
+		SELECT
+		<include refid="TMisDunningTagColumns"/>
+		FROM t_mis_dunning_tag a
+		WHERE a.buyerid = #{buyerid}
+		AND BuyerId = #{buyerid}
+		AND TagType = #{tagtype}
+</select>
 </mapper>

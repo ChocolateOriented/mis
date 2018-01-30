@@ -9,11 +9,13 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
+import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.*;
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
+import com.mo9.risk.modules.dunning.enums.TagType;
 import com.mo9.risk.modules.dunning.manager.RiskOrderManager;
 import com.mo9.risk.modules.dunning.service.*;
 import com.mo9.risk.util.PostRequest;
@@ -83,7 +85,10 @@ public class TMisDunningTaskController extends BaseController {
 	private static final Logger actionlog = Logger.getLogger("com.mo9.cuishou.liulan");
 	
  	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
- 
+	@Autowired
+	private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
+	@Autowired
+	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
  	@Autowired
  	private TMisDunningConfigureService tMisDunningConfigureService;
 	
@@ -151,8 +156,8 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisDunningInformationRecoveryService tMisDunningInformationRecoveryService;
 	@Autowired
 	private RiskOrderManager orderManager;
-
-
+	@Autowired
+	private TMisDunningOrganizationService tMisDunningOrganizationService;
 	@Autowired
 	private TMisDunningOrderDao tMisDunningOrderDao;
 
@@ -537,6 +542,8 @@ public class TMisDunningTaskController extends BaseController {
 		try {
 			TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleService.findPeopleByDistributionDunningcycle(dunningcycle);
+			List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
+			model.addAttribute("organizations", organizations);
 			model.addAttribute("dunningPeoples", dunningPeoples);
 			model.addAttribute("dunningcycle", dunningcycle);
 			model.addAttribute("bizType", DebtBizType.valueOf(bizType));
@@ -563,7 +570,7 @@ public class TMisDunningTaskController extends BaseController {
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
 		String bizType = request.getParameter("bizType");
-		
+		String organizationName = request.getParameter("organizationName");
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
 				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
 			return new ArrayList<TMisDunningPeople>();
@@ -571,7 +578,7 @@ public class TMisDunningTaskController extends BaseController {
 
 		String dunningpeoplename = request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType);
+			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;
@@ -827,7 +834,20 @@ public class TMisDunningTaskController extends BaseController {
 		TMisDunningTag tMisDunningTag = new TMisDunningTag();
 		tMisDunningTag.setBuyerid(buyerId);
 		List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
-		model.addAttribute("tags", tags);
+		Map<TagType,List<TMisDunningTag>> mapTag = new HashMap<>();
+		for(TMisDunningTag t : tags){
+            if(!mapTag.containsKey(t.getTagtype())){
+                List<TMisDunningTag> tagList =  new ArrayList<>();
+                tagList.add(t);
+                mapTag.put(t.getTagtype(),tagList);
+            }else {
+                List<TMisDunningTag> tMisDunningTags = mapTag.get(t.getTagtype());
+                tMisDunningTags.add(t);
+                mapTag.put(t.getTagtype(),tMisDunningTags);
+            }
+        }
+        model.addAttribute("mapTag",mapTag);
+		//model.addAttribute("tags", tags);
 		
 		TMisDunningScoreCard tMisDunningScoreCard = riskQualityInfoService.getScoreCardByDealcode(dealcode);
 		model.addAttribute("score", tMisDunningScoreCard == null ? "" : tMisDunningScoreCard.getGrade());
@@ -1371,14 +1391,21 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	public String collectionTag(TMisDunningTask tMisDunningTask, Model model, HttpServletRequest request, HttpServletResponse response) {
 		String buyerId = request.getParameter("buyerId");
 		String dealcode = request.getParameter("dealcode");
-		String tagId = request.getParameter("tagId");
+		String tagName = request.getParameter("tagName");
 		String tagOpr = "save";
-		if (StringUtils.isNotBlank(tagId)) {
+		if (StringUtils.isNotBlank(tagName)) {
+		    //新增备注回显
 			tagOpr = "edit";
-			TMisDunningTag tMisDunningTag = tMisDunningTagService.get(tagId);
-			model.addAttribute("tagId", tagId);
-			model.addAttribute("tMisDunningTag", tMisDunningTag);
+            TMisDunningTag tMisDunningTag1 = new TMisDunningTag();
+            tMisDunningTag1.setBuyerid(buyerId);
+            TagType tagType = TagType.valueOf(tagName);
+            tMisDunningTag1.setTagtype(tagType);
+            model.addAttribute("tMisDunningTag", tMisDunningTag1);
+//            TMisDunningTag tMisDunningTag = tMisDunningTagService.get(tagId);
+//			model.addAttribute("tagId", tagId);
+//			model.addAttribute("tMisDunningTag", tMisDunningTag);
 		} else {
+		    //新增标签
 			TMisDunningTag tMisDunningTag = new TMisDunningTag();
 			tMisDunningTag.setBuyerid(buyerId);
 			List<TMisDunningTag> tags = tMisDunningTagService.findList(tMisDunningTag);
@@ -1420,6 +1447,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 			return "views/error/500";
 		}
 		List<TMisReliefamountHistory> list = tMisReliefamountHistoryService.findListByDealcode(dealcode);
+		double showAmount=	tMisDunningTaskDao.findShowAmount(dealcode);
 		//获取所有的减免原因
 		DerateReason[] derateReasons = DerateReason.values();
 		List<DerateReason> derateReasonList = Arrays.asList(derateReasons);
@@ -1430,6 +1458,7 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 		model.addAttribute("dunningtaskdbid", dunningtaskdbid);
 		model.addAttribute("ispayoff",ispayoff);
 		model.addAttribute("thisCreditAmount",thisCreditAmount);
+		model.addAttribute("showAmount",showAmount);
 		return "modules/dunning/dialog/dialogCollectionAmount";
 	}
 
@@ -1621,8 +1650,8 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 	@RequestMapping(value = "savefreeCreditAmount")
 	@ResponseBody
 	public String savefreeCreditAmount(TMisReliefamountHistory tfHistory,TMisDunningTask task,Model model, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-//		String dunningtaskdbid = request.getParameter("dunningtaskdbid");
 		String amount = request.getParameter("amount");
+		String dealcode = request.getParameter("dealcode");
 		Integer freeCreditAmount = 0;
 		for (Role r : UserUtils.getUser().getRoleList()){
 			if(("减免无上限").equals(r.getName())){
@@ -1630,10 +1659,10 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
 				break;
 			}
 		}
-		if(freeCreditAmount != 1 && Double.parseDouble(amount) > 50){
-			return "减免金额不能大于50元";
+		double maxModifyAmount = tMisDunningTaskDao.findMaxModifyAmount(dealcode);
+		if(freeCreditAmount != 1 && Double.parseDouble(amount) > maxModifyAmount){
+			return "减免金额过大,请检查!";
 		}
-		String dealcode = request.getParameter("dealcode");
 		try {
 			DynamicDataSource.setCurrentLookupKey("updateOrderDataSource");  
 //			List<AppLoginLog> appLoginLogs = tMisDunningTaskDao.findApploginlog("18616297272");
@@ -2101,6 +2130,23 @@ public String orderHistoryList(SerialRepay serialRepay, String dealcode, Model m
  			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
  			if(("payoff").equals(riskOrder.getStatus())){
  				tMisDunningOrderDao.orderSynUpdate(riskOrder);
+				try{
+                    //点击同步订单状态,说明订单已还清,更新通知
+                    TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
+
+                    String nickname=UserUtils.getUser().getName();
+                    if(tf != null){
+                        nickname=tf.getNickname();
+                    }
+                    TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
+                    tMisCustomerServiceFeedback.setDealcode(dealcode);
+                    tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
+                    tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
+                    tMisCustomerServiceFeedback.setNickname(nickname);
+                    tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
+				}catch (Exception e){
+					logger.info("订单已经还清,更新通知状态错误",e);
+				}
  				return "OK";
  			}
  			if(("payment").equals(riskOrder.getStatus())){

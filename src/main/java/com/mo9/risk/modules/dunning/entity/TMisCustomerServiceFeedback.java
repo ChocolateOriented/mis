@@ -36,6 +36,16 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public static final String loan_partial="loan_partial";//普通订单(部分)
     public static final String partial="partial";//部分还款订单
 
+
+    public String getIds() {
+        return ids;
+    }
+
+    public void setIds(String ids) {
+        this.ids = ids;
+    }
+
+    private String  ids ;
     private String dealcode; // 订单编号
     private String type; // 订单类型
     private String status; // 当前催收时的订单状态
@@ -58,6 +68,15 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     private List<String> groupIds;
     private String readFlag;	// 本人阅读状态
 
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    private String contactNumber;
     private String innerKeyWord;//页面关键词是已解决/未解决的话值转存到此字段
     public String getInnerKeyWord() {
         return innerKeyWord;
@@ -298,4 +317,5 @@ public class TMisCustomerServiceFeedback extends DataEntity<TMisCustomerServiceF
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
 }

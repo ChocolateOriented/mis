@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TMisCallingAutomaticSpeechRecognitionDao">
+
+    <select id="findCallingRecordList" resultType="TMisCallingQualityTest">
+        SELECT
+        a.dbid as "dbid",
+        a.id as "id",
+        a.peopleid as "peopleId",
+        p.nickname as "peopleName",
+        a.CallType as "callType",
+        a.TargetNumber as "targetNumber",
+        a.CustomerNo as "customerNo",
+        a.CallTime as "callTime",
+        a.RingTime as "ringTime",
+        a.StartTime as "startTime",
+        a.EndTime as "endTime",
+        a.FinishTime as "finishTime",
+        a.DurationTime as "durationTime",
+        (
+        SELECT o.dealcode FROM t_risk_buyer b
+        INNER JOIN t_risk_order o ON b.id = o.buyer_id
+        INNER JOIN t_mis_dunning_task t ON o.dealcode = t.dealcode
+        WHERE b.mobile = a.TargetNumber
+        ORDER BY o.id DESC
+        LIMIT 1
+        ) as "dealcode",
+        a.Uuid as "uuid"
+        FROM t_mis_calling_record a
+        LEFT JOIN t_mis_dunning_people p on a.peopleid = p.id
+        <include refid="pageListCondotion"></include>
+    </select>
+
+    <select id="listCount" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM t_mis_calling_ASR a
+        LEFT JOIN t_mis_dunning_people p on a.DunningPeopleId = p.id
+        <include refid="pageListCondotion"></include>
+    </select>
+
+    <sql id="pageListCondotion">
+        <where>
+            a.StartTime IS NOT NULL
+            <if test="startTime != null and startTime !=''">
+                AND a.StartTime >= #{startTime}
+            </if>
+            <if test="endTime != null and endTime !=''">
+                AND a.StartTime <![CDATA[ <= ]]> #{endTime}
+            </if>
+            <if test="targetNumber != null and targetNumber != ''">
+                AND a.TargetNumber like CONCAT('%', #{targetNumber}, '%')
+            </if>
+            <if test="dealcode != null and dealcode != ''">
+                AND a.Dealcode LIKE CONCAT('%', #{dealcode}, '%')
+            </if>
+            <if test="peopleName != null and peopleName != ''">
+                AND p.Name LIKE CONCAT('%', #{peopleName}, '%')
+            </if>
+            <if test="groupId != null and groupId != ''">
+                AND p.groupId = #{groupId}
+            </if>
+            <if test="groupIds != null">
+                AND p.groupId in
+                <if test="groupIds.size == 0">
+                    ('')
+                </if>
+                <if test="groupIds.size > 0">
+                    <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+                        #{groupId}
+                    </foreach>
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO t_mis_calling_ASR(
+            Id,
+            productCategory,
+            DunningPeopleId,
+            StartTime,
+            TargetNumber,
+            CallType,
+            DurationTime,
+            Dealcode,
+            sensitiveWordNumber,
+            score,
+            relation,
+            callContent,
+            uuid
+        )VALUES (
+            #{id},
+            #{productCategory},
+            #{peopleId},
+            #{startTime},
+            #{targetNumber},
+            #{callType},
+            #{durationTime},
+            #{dealcode},
+            #{sensitiveWordNumber},
+            #{score},
+            #{relation},
+            #{callContent},
+            #{uuid}
+
+        )
+    </insert>
+    
+    <select id="findList" resultType="TMisCallingQualityTest">
+        SELECT
+        a.dbid as "dbid",
+        a.id as "id",
+        a.DunningPeopleId as "peopleId",
+        a.CallType as "callType",
+        a.TargetNumber as "targetNumber",
+        a.StartTime as "startTime",
+        a.Uuid as "uuid",
+        a.DurationTime as "durationTime",
+        a.sensitiveWordNumber as "sensitiveWordNumber",
+        p.Name as "peopleName",
+        (
+        SELECT o.dealcode FROM t_risk_buyer b
+        INNER JOIN t_risk_order o ON b.id = o.buyer_id
+        INNER JOIN t_mis_dunning_task t ON o.dealcode = t.dealcode
+        WHERE b.mobile = a.TargetNumber
+        ORDER BY o.id DESC
+        LIMIT 1
+        ) as "dealcode"
+        FROM t_mis_calling_asr a
+        LEFT JOIN t_mis_dunning_people p on a.DunningPeopleId = p.id
+        <include refid="pageListCondotion"></include>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+        </choose>
+        <if test="page != null and page.pageSize != -1">
+            LIMIT ${page.firstResult}, ${page.pageSize}
+        </if>
+    </select>
+
+    <select id="findCallingContentById" resultType="String">
+        SELECT callContent FROM t_mis_calling_asr
+        <where>
+            <if test="id != null or id !=''">
+                id = #{id}
+            </if>
+        </where>
+        limit 1;
+    </select>
+
+</mapper>

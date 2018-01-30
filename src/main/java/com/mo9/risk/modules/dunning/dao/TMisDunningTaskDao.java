@@ -261,6 +261,12 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public List<TMisDunningTaskLog> newfingTasksByDealcodes(@Param("dealcodes")List<String> dealcodes,@Param("dunningcycle")String dunningcycle);
+	/**
+	 * 委外手动分案新根据订单号查询任务log
+	 * @param dealcode
+	 * @return
+	 */
+	public List<TMisDunningTaskLog> newOutfingTasksByDealcodes(@Param("dealcodes")List<String> dealcodes);
 	
 	
 	/**
@@ -375,4 +381,16 @@ public interface TMisDunningTaskDao extends CrudDao<TMisDunningTask> {
 	 * @return
 	 */
 	public int batchUpdateOutExtensionTask(List<TMisDunningTask> dunningTasks);
+	/**
+	 * 计算的最大的减免金额度
+	 * @param dealcode
+	 * @return
+	 */
+	public double findMaxModifyAmount(String dealcode);
+	/**
+	 * 计算包含减免的应催金额
+	 * @param dealcode
+	 * @return
+	 */
+	public double findShowAmount(String dealcode);
 }

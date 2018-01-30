@@ -13,7 +13,7 @@
         a.pushpeople AS "pushpeople",
         a.operate AS "operate",
         a.handlingResult AS "handlingresult",
-        a.rootOrderId AS "rootorderid",
+        a.rootOrderId AS "rootorderid"  ,
         a.uname AS "uname",
         a.keyword AS keyword,
         a.pushTime AS "pushTime",
@@ -209,11 +209,107 @@
     <update id="updateFeedback">
         UPDATE t_mis_customer_service_feedback SET
         problemStatus = #{problemstatus},
-        handlingResult=#{handlingresult},
+        handlingResult=CONCAT(
+            handlingResult,
+            #{handlingresult}
+        ),
         updateDate=#{updateDate},
         updateBy=#{updateBy.name},
         readFlag=#{readFlag}
         WHERE id = #{id}
     </update>
 
+    <update id="updateFlagByDealCode">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_mis_customer_service_feedback
+            SET readFlag='0'
+            WHERE dealcode = #{item} AND problemStatus='UNRESOLVED'
+        </foreach>
+    </update>
+
+    <update id="updateHandlingResult"  >
+        <selectKey keyProperty='ids' resultType='String' order='BEFORE'>
+            SELECT
+            (select id FROM t_mis_customer_service_feedback  <where>
+            hashTag LIKE CONCAT('%',#{hashtag},'%')
+            AND dealcode = #{dealcode}
+            AND problemStatus = 'UNRESOLVED'
+            <if test="contactNumber !=null and contactNumber !=''">
+                AND problemDescription LIKE CONCAT('%',#{contactNumber},'%')
+            </if>
+            AND IFNULL(handlingResult,'') NOT LIKE CONCAT('%',#{handlingresult},'%') LIMIT 1
+        </where>)id
+            from DUAL
+        </selectKey>
+       UPDATE t_mis_customer_service_feedback
+        SET
+        handlingResult = CONCAT(
+        IFNULL(handlingResult,''),
+            #{handlingresult}
+        ),
+        <if test="nickname !=null and nickname !=''">
+            updateBy=#{nickname},
+        </if>
+        updateDate=NOW()
+        <where>
+            hashTag LIKE CONCAT('%',#{hashtag},'%')
+            AND dealcode = #{dealcode}
+            AND problemStatus = 'UNRESOLVED'
+            <if test="contactNumber !=null and contactNumber !=''">
+                AND problemDescription LIKE CONCAT('%',#{contactNumber},'%')
+            </if>
+            AND IFNULL(handlingResult,'') NOT LIKE CONCAT('%',#{handlingresult},'%') LIMIT 1
+        </where>
+
+    </update>
+    <select id="getNameById" resultType="String">
+        SELECT
+	    Nickname AS  name
+        FROM
+            t_mis_dunning_people
+        WHERE
+            Id = #{id}
+    </select>
+    <select id="getFeedback" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+        <include refid="tMisCustomerServiceFeedbackColumns"/>
+        FROM
+        t_mis_customer_service_feedback AS a
+        <where>
+            hashTag LIKE CONCAT('%',#{hashtag},'%')
+            AND dealcode = #{dealcode}
+            AND problemStatus = 'UNRESOLVED'
+            <if test="contactNumber !=null and contactNumber !=''">
+                AND problemDescription LIKE CONCAT('%',#{contactNumber},'%')
+            </if>
+            AND IFNULL(handlingResult,'') NOT LIKE CONCAT('%',#{handlingresult},'%')
+        </where>
+    </select>
+    <update id="updateProblemStatus" parameterType="TMisCustomerServiceFeedback">
+        UPDATE t_mis_customer_service_feedback
+        SET
+            <if test="problemstatus !=null and problemstatus !=''">
+			problemStatus=#{problemstatus},
+            </if>
+            handlingResult = CONCAT(
+            IFNULL(handlingResult,''),
+            #{handlingresult}
+            ),
+            <if test="nickname !=null and nickname !=''">
+                updateBy=#{nickname},
+            </if>
+            updateDate=NOW()
+            WHERE
+         id=#{id}
+    </update>
+    <select id="findNickNameByDealcode" resultType="TMisCustomerServiceFeedback" useCache="false">
+        SELECT
+        <include refid="tMisCustomerServiceFeedbackColumns"/>,
+        c.Nickname As "nickname"
+        FROM
+        t_mis_customer_service_feedback a
+        LEFT JOIN t_mis_dunning_task b ON a.dealcode = b.Dealcode
+        LEFT JOIN t_mis_dunning_people c ON b.DunningPeopleId = c.Id
+        WHERE a.dealcode = #{dealcode} LIMIT 1
+    </select>
 </mapper>

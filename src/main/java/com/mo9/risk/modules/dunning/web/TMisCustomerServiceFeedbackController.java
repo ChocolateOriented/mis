@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisCustomerServiceFeedback;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
@@ -12,6 +13,7 @@ import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,8 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
     @Autowired
     private FeedbackSendService feedbackSendService;
 
-
+    @Autowired
+    private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
     @Autowired
     private TMisDunningOrderService tMisDunningOrderService;
 
@@ -62,17 +65,18 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
         }
 
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             Page<TMisCustomerServiceFeedback> page = tMisCustomerServiceFeedbackService.feedbackList(new Page<TMisCustomerServiceFeedback>(request, response), tMisCustomerServiceFeedback);
             model.addAttribute("page", page);
             model.addAttribute("buyerId", buyerId);
             return "modules/dunning/tMisCustomerServiceFeedbackList";
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败,或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+        //finally {
+        //    DynamicDataSource.setCurrentLookupKey("dataSource");
+       // }
 
 
     }
@@ -111,7 +115,13 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback feedback=null;
         try{
-            tMisCustomerServiceFeedbackService.updateFeedback(tMisCustomerServiceFeedback);
+            User user = UserUtils.getUser();
+            String name = tMisCustomerServiceFeedbackDao.getNameById(user.getId());;
+            if(name == null){
+                name = user.getName();
+            }
+            tMisCustomerServiceFeedback.setNickname(name);
+            tMisCustomerServiceFeedbackDao.updateProblemStatus(tMisCustomerServiceFeedback);
             /**
              * 消息发送，数据库更新失败时不会发送
              */
@@ -167,7 +177,7 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
             if("0".equals(tMisCustomerServiceFeedback.getReadFlag())){
                 tMisCustomerServiceFeedback.setReadFlag("1");
@@ -175,11 +185,12 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
                 model.addAttribute("custNotify", "desc");
             }
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+//        finally {
+//            DynamicDataSource.setCurrentLookupKey("dataSource");
+//        }
         model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
         return "modules/dunning/tMisCustomerJboxNotify";
     }
@@ -197,14 +208,15 @@ public class TMisCustomerServiceFeedbackController extends BaseController {
 
         TMisCustomerServiceFeedback tMisCustomerServiceFeedback=null;
         try{
-            DynamicDataSource.setCurrentLookupKey("dataSource_read");
+            //DynamicDataSource.setCurrentLookupKey("dataSource_read");
             tMisCustomerServiceFeedback=tMisCustomerServiceFeedbackService.findCodeStatusTagDesPeople(customerServiceFeedback);
         }catch (Exception e){
-            logger.info("加载反馈通知截图失败,或者切换只读库查询失败",e);
+            logger.info("加载反馈通知截图失败",e);
             return null;
-        }finally {
-            DynamicDataSource.setCurrentLookupKey("dataSource");
         }
+//        finally {
+//            DynamicDataSource.setCurrentLookupKey("dataSource");
+//        }
         model.addAttribute("tMisCustomerServiceFeedback", tMisCustomerServiceFeedback);
         return "modules/dunning/tMisCustomerJboxNotify";
     }
