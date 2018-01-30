@@ -7,6 +7,7 @@ import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
 import com.mo9.risk.modules.dunning.bean.RiskResponse;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
+import com.mo9.risk.modules.dunning.entity.TRiskOrder;
 import com.mo9.risk.modules.dunning.enums.PayStatus;
 import com.mo9.risk.modules.dunning.service.TMisDunningConfigureService;
 import com.mo9.risk.util.PostRequest;
@@ -89,6 +90,7 @@ public class RiskOrderManager {
 	}
 
 	private static final String flashUrl = DictUtils.getDictValue("flashUrl","orderUrl","");
+
 	/**
 	 * @Description 查询代收还款流水
 	 * @param dealcode
@@ -142,5 +144,28 @@ public class RiskOrderManager {
 			data.add(repayObj);
 		}
 		return data;
+	}
+
+	/**
+	 * @Description  查询订单
+	 * @param dealcode
+	 * @return com.mo9.risk.modules.dunning.entity.TRiskOrder
+	 */
+	public TRiskOrder findByDealcode(String dealcode) throws IOException {
+		String privateKey = tMisDunningConfigureService.getConfigureValue("orderRepay.privateKey");
+		String url = riskUrl + "riskportal/limit/order/findByDealcode.do";
+
+		HashMap<String, String> tRiskOrder = new HashMap<String, String>();
+		tRiskOrder.put("dealcode", dealcode);
+		String sign = Md5Encrypt.sign(tRiskOrder, privateKey);
+		tRiskOrder.put("sign", sign);
+		String res = PostRequest.postRequest(url, tRiskOrder);
+		logger.debug(dealcode + "江湖救急订单查询接口" + res);
+
+		if (StringUtils.isBlank(res)) {
+			throw new ServiceException("订单接口回调失败");
+		}
+
+		return JSON.parseObject(res, TRiskOrder.class);
 	}
 }

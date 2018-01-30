@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,7 +27,6 @@ public class RiskQualityInfoManager {
 	 * 日志对象
 	 */
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
 
 //	https://riskclone.mo9.com/scorecard/api/route/v1/scApplicationCol?scVersion=V0_1&mobile={{mobile}}&dealcode={{dealcode}}&buyerId={{buyerId}}&orderId={{orderId}}&old=true
 	/**
@@ -39,6 +39,7 @@ public class RiskQualityInfoManager {
 	 * @return java.lang.String 评分
 	 */
 	public String scApplicationCol(String mobile, String dealcode, String buyerId, String orderId, boolean oldOrder) throws IOException {
+		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
 		String url = riskUrl + "scorecard/api/route/v1/scApplicationCol?scVersion=V0_1";
 		Map<String,String> param = new HashMap<String, String>();
 		param.put("mobile",mobile);
@@ -75,6 +76,7 @@ public class RiskQualityInfoManager {
 		if (StringUtils.isBlank(mobile)){
 			throw new IllegalArgumentException("手机号不能为空");
 		}
+		String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
 		String url = riskUrl + "relagraph/api/route/v1/queryBlackContactNum";
 		Map<String,String> param = new HashMap<String, String>();
 		param.put("mobile",mobile);

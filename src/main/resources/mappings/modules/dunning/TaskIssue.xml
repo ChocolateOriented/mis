@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo9.risk.modules.dunning.dao.TaskIssueDao">
+    <sql id="TaskIssueColumns">
+        a.id AS "id",
+        a.dealcode AS "dealcode",
+        a.status AS "status",
+        a.issueTypes AS "issueTypesByJson",
+        a.description AS "description",
+        a.updateRole AS "updateRole",
+        a.updateDate AS "updateDate",
+        a.updateBy AS "updateBy.name",
+        a.recorderName AS "recorderName",
+        a.createDate AS "createDate",
+        a.handlingIssueTypes AS "handlingIssueTypesByJson",
+        a.handlingResult AS "handlingResult",
+        a.userName AS "userName",
+        a.remindingType AS remindingType,
+        a.issueChannel AS "issueChannel"
+    </sql>
+
+    <select id="get" resultType="TaskIssue" useCache="false">
+        SELECT
+              <include refid="TaskIssueColumns"/>
+        FROM t_mis_dunning_task_issue a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TaskIssue" useCache="false">
+        SELECT
+        <include refid="TaskIssueColumns"/>
+        FROM t_mis_dunning_task_issue a
+        <where>
+            <if test="dealcode != null and dealcode != ''">
+                AND a.dealcode = #{dealcode}
+            </if>
+            <if test="issueChannel != null and issueChannel != ''">
+                AND a.issueChannel = #{issueChannel}
+            </if>
+            <if test="status !=null and status!='' ">
+                AND a.status = #{status}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="dunningPeopleRemindCount" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM t_mis_dunning_task_issue a
+        LEFT JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+        LEFT JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
+        -- 已完成案件任意一人度过即算已读, 未完成案件需要本人读
+        LEFT JOIN t_mis_task_issue_read_record r ON a.status = "UNRESOLVED" AND a.id =r.taskIssueId AND r.userId = #{userid}
+        LEFT JOIN t_mis_task_issue_read_record anyr ON a.status = "RESOLVED" AND a.id =anyr.taskIssueId
+        WHERE p.id = #{userid}
+        AND a.remindingType = "DUNNING_PEOPLE"
+        AND r.taskIssueId IS NULL
+        AND anyr.taskIssueId IS NULL
+    </select>
+
+    <select id="notifyList" resultType="TaskIssuePage" useCache="false">
+        SELECT
+          <include refid="TaskIssueColumns"/>,
+        (r.taskIssueId IS NOT NULL OR anyr.taskIssueId IS NOT NULL) AS "read"
+        FROM t_mis_dunning_task_issue a
+        LEFT JOIN t_mis_dunning_task t ON a.dealcode = t.dealcode
+        LEFT JOIN t_mis_dunning_people p ON t.DunningPeopleId=p.id
+        -- 已完成案件任意一人读过即算已读, 未完成案件需要本人读
+        LEFT JOIN t_mis_task_issue_read_record r ON a.status = "UNRESOLVED" AND a.id =r.taskIssueId AND r.userId = #{currentUserId}
+        LEFT JOIN t_mis_task_issue_read_record anyr ON a.status = "RESOLVED" AND a.id =anyr.taskIssueId
+        <where>
+
+        <if test="keyWord !=null and keyWord!=''">
+            AND (
+                 a.userName LIKE concat('%',#{keyWord},'%')
+                OR a.dealcode LIKE concat(#{keyWord},'%')
+                OR a.description LIKE concat('%',#{keyWord},'%')
+                OR p.Nickname LIKE concat('%',#{keyWord},'%')
+                OR a.recorderName LIKE concat('%',#{keyWord},'%')
+                OR p.name LIKE concat('%',#{keyWord},'%')
+            )
+        </if>
+
+        <if test="issueType !=null and issueType!=''">
+            AND a.issueTypes LIKE concat('%',#{issueType},'%')
+        </if>
+        <if test="status !=null and status!='' ">
+            AND a.status = #{status}
+        </if>
+        <if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+            AND a.createDate BETWEEN #{beginCreateDate} AND #{endCreateDate}
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            AND a.updateBy LIKE  concat ('%',#{updateBy.name},'%')
+        </if>
+        <if test="groupIds != null">
+            AND p.groupId in
+            <if test="groupIds.size == 0">
+                ('')
+            </if>
+            <if test="groupIds.size > 0">
+                <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+                    #{groupId}
+                </foreach>
+            </if>
+        </if>
+        <if test="dunningpeopleid != null and dunningpeopleid != ''">
+            AND t.DunningPeopleId = #{dunningpeopleid}
+        </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="addReadRecord" >
+        INSERT INTO t_mis_task_issue_read_record(
+          taskIssueId,
+          userId
+        )VALUES (
+          #{issueId},
+          #{userId}
+        )
+    </insert>
+
+    <insert id="insert">
+        INSERT INTO t_mis_dunning_task_issue(
+            id,
+            dealcode,
+            status,
+            issueTypes,
+            description,
+            updateRole,
+            updateDate,
+            updateBy,
+            recorderName,
+            createDate,
+            handlingIssueTypes,
+            handlingResult,
+            userName,
+            remindingType,
+            issueChannel
+        )VALUES (
+            #{id},
+            #{dealcode},
+            #{status},
+            #{issueTypesToJson},
+            #{description},
+            #{updateRole},
+            #{updateDate},
+            #{updateBy.name},
+            #{recorderName},
+            #{createDate},
+            #{handlingIssueTypesToJson},
+            #{handlingResult},
+            #{userName},
+            #{remindingType},
+            #{issueChannel}
+        )
+    </insert>
+
+    <update id="update">
+      UPDATE t_mis_dunning_task_issue SET
+        status = #{status},
+        updateRole = #{updateRole},
+        updateDate = #{updateDate},
+        updateBy = #{updateBy.name},
+        handlingIssueTypes = #{handlingIssueTypesToJson},
+        handlingResult = #{handlingResult}
+      WHERE id = #{id}
+    </update>
+
+</mapper>

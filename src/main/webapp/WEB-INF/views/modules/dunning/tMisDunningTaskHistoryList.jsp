@@ -20,16 +20,16 @@
 				$('#btnDeduct').attr("disabled","disabled");
 				window.parent.disableBtn();
 			}
-			
+			if("false"==window.parent.$("#daikouStatus").val()){
+				$("#btnDeduct").attr("disabled",true);
+			}
+
 			$("#allAction").click(function() {
 				var checked = $("#allAction").prop('checked');
 				$("input[name='actions']:not(:disabled)").each(function() {
 					$(this).prop('checked', checked);
 				});
 			});
-			if("false"==window.parent.$("#daikouStatus").val()){
-				$("#btnDeduct").attr("disabled",true);
-			}
 		});
 		
 		function collectionfunction(obj, width, height, param){
@@ -242,22 +242,5 @@
 		</tbody>
 	</table>
 	<div class="pagination">${page}</div>
-	<shiro:hasPermission name="dunning:tMisDunningTask:Commissionerview">
-	<input id="btnSms"   name="btnCollection"  onclick="collectionfunction(this)" class="btn btn-primary" contactstype="${overdueDays<=1 ? 'SELF' : ''}"  method="Sms" type="button" value="催收短信" />
-<!-- 	<input id="btnTel" name="btnCollection" onclick="telAction(this)" class="btn btn-primary" method="TelConclusion"  type="button" value="电催结论"/> -->
-	</shiro:hasPermission>
-	<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-	<input id="btnAmount" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Amount"  type="button" value="调整金额" />
-	<!-- <input id="btnPaid" name="btnCollection" onclick="collectionfunction(this)" class="btn btn-primary" method="Paid"  type="button" value="代付" /> -->
-	</shiro:hasPermission>
-	<shiro:hasPermission name="dunning:tMisDunningDeduct:edit">
-	<input id="btnDeduct" name="btnCollection" onclick="window.parent.deductPreCheck(collectionfunction.bind(null, this, null, 475), document, this)" class="btn btn-primary" method="Deduct"  type="button" value="代扣" />
-	</shiro:hasPermission>
-	<shiro:hasPermission name="dunning:tMisDunningTag:edit">
-	<input id="btnTag" onclick="window.parent.tagPopup(this)" class="btn btn-primary" method="Tag" type="button" value="敏感标签" />
-	</shiro:hasPermission>
-	<shiro:hasPermission name="dunning:tMisDunningTask:outsourcingview">
-	<input id="btnConfirm" name="btnCollection" class="btn btn-primary" method="Confirm"  type="button" value="确认还款" />
-	</shiro:hasPermission>
 </body>
 </html>

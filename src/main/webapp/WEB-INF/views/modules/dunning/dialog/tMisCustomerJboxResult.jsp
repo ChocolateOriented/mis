@@ -19,7 +19,7 @@
                 $("#resultSave").attr('disabled',"true");
                 $.ajax({
                     type: 'POST',
-                    url : "${ctx}/dunning/tMisCustomerServiceFeedback/resultSave",
+                    url : "${ctx}/dunning/taskIssue/resultSave",
                     data: $('#inputForm').serialize(),             //获取表单数据
                     success : function(data) {
                         window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
@@ -41,14 +41,13 @@
 </script>
 </head>
 <body>
-<form:form id="inputForm"  modelAttribute="TMisCustomerServiceFeedback" action="${ctx}/dunning/tMisCustomerServiceFeedback/resultSave" method="post" class="breadcrumb form-search">
+<form id="inputForm" method="post" class="breadcrumb form-search">
     <textarea name="handlingresult" cols="30" rows="10" style="width: 175px;height: 100px" ></textarea>
     <input name="id" type="hidden" value="${id}"/>
-    <input name="problemstatus" type="hidden" value="RESOLVED"/>
     <div style="margin-top: 20px">
         <input id="resultSave" class="btn btn-primary" type="button" value="已解决" />
         <input id="esc" class="btn btn-primary" type="button" value="取消" style="margin-left: 60px"/>
     </div>
-</form:form>
+</form>
 </body>
 </html>

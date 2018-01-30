@@ -14,7 +14,7 @@
 					$("#savefreeCreditAmount").attr('disabled',"true");
  	                $.ajax({
  	                    type: 'POST',
- 	                    url : "${ctx}/dunning/tMisDunningTask/savefreeCreditAmount",
+ 	                    url : "${ctx}/dunning/reliefamount/savefreeCreditAmount",
  	                    data: $('#inputForm').serialize(),             //获取表单数据
  	                    success : function(data) {
  	                        if (data == "OK") {
@@ -31,15 +31,62 @@
  	                    }
  	                });
  		          }
-			}); 
-			
-			
-			// 取消
+			});
+
+		  $('#applyfreeCreditAmount').click(function() {
+				if($("#inputForm").valid()){
+					$("#applyfreeCreditAmount").attr('disabled',"true");
+ 	                $.ajax({
+ 	                    type: 'POST',
+ 	                    url : "${ctx}/dunning/reliefamount/applyFreeCreditAmount",
+ 	                    data: $('#inputForm').serialize(),             //获取表单数据
+ 	                    success : function(data) {
+ 	                        if (data == "OK") {
+ 	                            alert("申请成功, 等待审批");
+							  	window.parent.location.reload();
+ 	                            window.parent.window.jBox.close();            //关闭子窗体
+ 	                        } else {
+ 	                            alert("申请失败"+data);
+ 	                        }
+ 	                    },
+ 	                    error : function(XMLHttpRequest, textStatus, errorThrown){
+ 	                       //通常情况下textStatus和errorThrown只有其中一个包含信息
+ 	                       alert("申请失败:"+textStatus);
+ 	                    }
+ 	                });
+ 		          }
+			});
+
+          $('#refuse').click(function() {
+            if($("#inputForm").valid()){
+              $("#refuse").attr('disabled',"true");
+              $.ajax({
+                type: 'POST',
+                url : "${ctx}/dunning/reliefamount/refuseFreeCreditAmount",
+                data: $('#inputForm').serialize(),             //获取表单数据
+                success : function(data) {
+                  if (data == "OK") {
+                    window.parent.location.reload();
+                    window.parent.window.jBox.close();            //关闭子窗体
+                  } else {
+                    alert("拒绝失败"+data);
+                  }
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                  //通常情况下textStatus和errorThrown只有其中一个包含信息
+                  alert("拒绝失败:"+textStatus);
+                }
+              });
+            }
+          });
+
+          // 取消
 			$('#esc').click(function() {
 				window.parent.window.jBox.close();    
 			});
 
 		});
+
         function showMessenger() {
 
             //alert(${thisCreditAmount});
@@ -57,13 +104,12 @@
 	<ul class="nav nav-tabs">
 	</ul>
 	<%--<br/>--%>
-	<form id="inputForm"  class="form-horizontal">
+	<form:form modelAttribute="tfHistory" id="inputForm" cssClass="form-horizontal">
+		<%--<form  class="form-horizontal">--%>
 		<div class="control-group">
 			<label class="control-label">减免金额：</label>
 			<div class="controls">
-<%-- 				<form:input path="" htmlEscape="false" maxlength="10" class="input-xlarge required digits"/>元 --%>
-<!-- onkeyup="value=value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')" -->
-				<input id="amount" name="amount"  maxlength="10" class="input-xlarge required number" onchange="showMessenger()"/>&nbsp;&nbsp;元
+				<form:input path="reliefamount" id="amount" maxlength="10" class="input-xlarge required number" onchange="showMessenger()"/>&nbsp;&nbsp;元
 				<span class="help-inline"><font color="red">*</font> </span>
 				<div id="showContent"></div>
 			</div>
@@ -71,39 +117,56 @@
 		<div class="control-group">
 			<label class="control-label">减免原因：</label>
 			<div class="controls">
-				<select class="input-medium required" id="derateReason" name="derateReason">
-						<option value="">选择</option>
-						<c:forEach  items="${derateReasonList}" var="drList" >
-						<option value="${drList}">${drList.derateReasonName}</option>
-						</c:forEach>
-				</select>
+				<form:select path="derateReason" class="input-medium required" >
+					<option value="">选择</option>
+					<form:options items="${derateReasonList}" itemLabel="derateReasonName"></form:options>
+				</form:select>
 			</div>
 		</div>
 		<br/>
 		<div class="control-group">
 			<label class="control-label">备注：</label>
 			<div class="controls">
-			<textarea id="remarks" rows="4" name="remarks"  maxlength="500"  ></textarea>
+				<form:textarea path="remarks" rows="4" maxlength="500"></form:textarea>
 			</div>
 		</div>
-		<div style= "padding:19px 180px 20px;" >
-			<input id="savefreeCreditAmount" class="btn btn-primary" type="button" value="减免"/>&nbsp;
-			<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
+		<div style="padding:19px 180px 20px;">
+				<%--减免--%>
+			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
+				<input id="savefreeCreditAmount" class="btn btn-primary" type="button" value="减免"/>
+				<%--有申请使用拒绝, 无申请使用取消--%>
+				<c:choose>
+					<c:when test="${tfHistory.id == null}">
+						<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
+					</c:when>
+					<c:otherwise>
+						<input id="refuse" class="btn btn-primary" type="button" value="拒绝"/>&nbsp;
+					</c:otherwise>
+				</c:choose>
+			</shiro:hasPermission>
+				<%--减免申请--%>
+			<shiro:lacksPermission name="dunning:tMisDunningTask:leaderview">
+				<input id="applyfreeCreditAmount" class="btn btn-primary" type="button" value="申请"/>
+				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
+			</shiro:lacksPermission>
+			&nbsp;
 		</div>
-		<input type="hidden" id="buyerId" name="buyerId" value="${buyerId}" />
-		<input type="hidden" id="dealcode" name="dealcode" value="${dealcode}" />
-		<input type="hidden" id="id" name="id" value="${dunningtaskdbid}" />
-	</form>
+		<form:hidden path="dealcode"/>
+		<form:hidden path="id"/>
+	</form:form>
 		<label id="history" class="control-group">&nbsp;<font color="red">*历史记录(金额不累加,只作为历史减免记录)</font></label>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
 				<th>订单号</th>
 				<th>减免金额</th>
-				<th>减免人</th>
-				<th>时间</th>
+				<th>申请人</th>
+				<th>申请时间</th>
 				<th>减免原因</th>
 				<th>备注</th>
+				<th>审批结果</th>
+				<th>审批人</th>
+				<th>审批时间</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -116,10 +179,10 @@
 					${tMisReliefamountHistory.reliefamount}
 				</td>
 				<td>
-					${tMisReliefamountHistory.createBy.name}
+					${tMisReliefamountHistory.applyUserName}
 				</td>
 				<td>
-					<fmt:formatDate value="${tMisReliefamountHistory.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<fmt:formatDate value="${tMisReliefamountHistory.applyTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<td>
 					${tMisReliefamountHistory.derateReason.derateReasonName}
@@ -131,6 +194,15 @@
 						 <c:if test='${fn:length(tMisReliefamountHistory.remarks)<=6}'>${tMisReliefamountHistory.remarks}</c:if>
 						 
 					</label>
+				</td>
+				<td>
+					${tMisReliefamountHistory.status.desc}
+				</td>
+				<td>
+					${tMisReliefamountHistory.checkUserName}
+				</td>
+				<td>
+					<fmt:formatDate value="${tMisReliefamountHistory.checkTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 			</tr>
 		</c:forEach>

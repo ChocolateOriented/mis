@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo9.risk.modules.dunning.dao.TMisReliefamountHistoryDao">
-    
+
 	<sql id="tMisReliefamountHistoryColumns">
 		a.dbid AS "dbid",
 		a.id AS "id",
@@ -10,26 +10,37 @@
 		a.createdate AS "createdate",
 		a.createby AS "createby",
 		a.derateReason AS "derateReason",
-		a.remark AS "remarks"
+		a.remark AS "remarks",
+		a.status AS "status",
+		a.applyUserId AS "applyUserId",
+		a.applyTime AS "applyTime",
+		a.checkUserId AS "checkUserId",
+		a.checkTime AS "checkTime"
 	</sql>
-	
+
 	<sql id="tMisReliefamountHistoryJoins">
 	</sql>
-    
+
 	<select id="get" resultType="TMisReliefamountHistory">
-		SELECT 
+		SELECT
 			<include refid="tMisReliefamountHistoryColumns"/>
 		FROM t_mis_reliefamount_history a
 		<include refid="tMisReliefamountHistoryJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
+
 	<select id="findList" resultType="TMisReliefamountHistory">
-		SELECT 
+		SELECT
 			<include refid="tMisReliefamountHistoryColumns"/>
 		FROM t_mis_reliefamount_history a
 		<include refid="tMisReliefamountHistoryJoins"/>
 		<where>
+			<if test="dealcode != null and dealcode != ''">
+				AND a.dealcode = #{dealcode}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
 			<if test="dealcode != null and dealcode != ''">
 				AND a.dealcode = #{dealcode}
 			</if>
@@ -42,15 +53,15 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
 	<select id="findAllList" resultType="TMisReliefamountHistory">
-		SELECT 
+		SELECT
 			<include refid="tMisReliefamountHistoryColumns"/>
 		FROM t_mis_reliefamount_history a
 		<include refid="tMisReliefamountHistoryJoins"/>
 		<where>
-			
-		</where>		
+
+		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -59,22 +70,19 @@
 			</otherwise>
 		</choose>
 	</select>
-	
-	<select id="findListByDealcode" resultType="TMisReliefamountHistory">
-		SELECT 
-			a.dbid AS "dbid",
-			a.id AS "id",
-			a.dealcode AS "dealcode",
-			a.reliefamount AS "reliefamount",
-			a.createdate AS "createdate",
-			a.createby AS "createBy.name",
-			a.derateReason AS "derateReason",
-			a.remark AS "remarks"
+
+	<select id="findPageListByDealcode" resultType="TMisReliefamountHistory">
+		SELECT
+			<include refid="tMisReliefamountHistoryColumns"/>,
+      p.`Nickname` AS applyUserName,
+      u.`name` AS checkUserName
 		FROM t_mis_reliefamount_history a
-			WHERE a.dealcode = #{dealcode}
+		LEFT JOIN sys_user u ON a.checkUserId = u.id
+		LEFT JOIN t_mis_dunning_people p ON a.applyUserId = p.Id
+		WHERE status IN ("REFUSE","AGREE")
+		AND a.dealcode = #{dealcode}
 	</select>
-	
-	
+
 	<insert id="insert">
 		INSERT INTO t_mis_reliefamount_history(
 			id,
@@ -83,7 +91,12 @@
 			createdate,
 			createby,
 			derateReason,
-			remark
+			remark,
+			status,
+			applyUserId,
+			applyTime,
+			checkUserId,
+			checkTime
 		) VALUES (
 			#{id},
 			#{dealcode},
@@ -91,7 +104,12 @@
 			#{createDate},
 			#{createBy.name},
 			#{derateReason},
-			#{remarks}
+			#{remarks},
+			#{status},
+			#{applyUserId},
+			#{applyTime},
+			#{checkUserId},
+			#{checkTime}
 		)
 	</insert>
 	
@@ -100,9 +118,10 @@
 			dealcode = #{dealcode},
 			reliefamount = #{reliefamount},
 			derateReason = #{derateReason},
-			remark = #{remarks}
-<!-- 			createdate = #{createdate}, -->
-<!-- 			createby = #{createby} -->
+			remark = #{remarks},
+			status = #{status},
+			checkUserId =	#{checkUserId},
+			checkTime = #{checkTime}
 		WHERE id = #{id}
 	</update>
 	

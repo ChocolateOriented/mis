@@ -3,31 +3,45 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
-import com.alibaba.fastjson.JSON;
-import com.gamaxpay.commonutil.Cipher.Md5Encrypt;
-import com.gamaxpay.commonutil.web.PostRequest;
-import com.mo9.risk.modules.dunning.dao.TMisCustomerServiceFeedbackDao;
-import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
-import com.mo9.risk.modules.dunning.entity.*;
+import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.entity.DunningOrder;
+import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
+import com.mo9.risk.modules.dunning.entity.MemberInfo;
+import com.mo9.risk.modules.dunning.entity.MobileResult;
+import com.mo9.risk.modules.dunning.entity.TBuyerContact;
+import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
+import com.mo9.risk.modules.dunning.entity.TMisDunningScoreCard;
+import com.mo9.risk.modules.dunning.entity.TMisDunningTag;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
+import com.mo9.risk.modules.dunning.entity.TmisDunningNumberClean;
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
-import com.mo9.risk.modules.dunning.service.*;
+import com.mo9.risk.modules.dunning.service.MemberInfoService;
+import com.mo9.risk.modules.dunning.service.RiskQualityInfoService;
+import com.mo9.risk.modules.dunning.service.TMisChangeCardRecordService;
+import com.mo9.risk.modules.dunning.service.TMisDunningDeductService;
+import com.mo9.risk.modules.dunning.service.TMisDunningGroupService;
+import com.mo9.risk.modules.dunning.service.TMisDunningOrganizationService;
+import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTagService;
+import com.mo9.risk.modules.dunning.service.TMisDunningTaskService;
+import com.mo9.risk.modules.dunning.service.TRiskBuyerPersonalInfoService;
 import com.mo9.risk.util.DateUtils;
-import com.thinkgem.jeesite.common.service.ServiceException;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
-
-import java.io.IOException;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
-import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,13 +52,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
-import com.thinkgem.jeesite.common.db.DynamicDataSource;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
  * 
@@ -59,20 +66,8 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 @Controller
 @RequestMapping(value = "${adminPath}/dunning/tMisDunningOuterTask")
 public class TMisDunningOuterTaskController extends BaseController {
-
-	private static final String riskUrl =  DictUtils.getDictValue("riskclone","orderUrl","");
-	@Autowired
-	private TMisCustomerServiceFeedbackService tMisCustomerServiceFeedbackService;
-	@Autowired
-	private TMisCustomerServiceFeedbackDao tMisCustomerServiceFeedbackDao;
 	@Autowired
 	private MemberInfoService memberInfoService;
-	@Autowired
-	private TMisDunningOrderDao tMisDunningOrderDao;
-
-	@Autowired
-	private TMisDunningConfigureService tMisDunningConfigureService;
-
 	@Autowired
 	private TMisDunningTaskService tMisDunningTaskService;
 	@Autowired
@@ -81,8 +76,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 	private TRiskBuyerPersonalInfoService personalInfoDao;
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
-	@Autowired
-	private TBuyerContactService tBuyerContactService;
 	@Autowired
 	private TMisDunningPeopleService tMisDunningPeopleService;
 	@Autowired
@@ -453,61 +446,5 @@ public class TMisDunningOuterTaskController extends BaseController {
 		tMisDunningTaskService.autoTelConclusion3();
 		logger.info(new Date()+"电催结论(Q2,Q3,Q4)下午");
 		return "OK";
-	}
-
-	/**
-	 * 获取江湖救急该笔订单状态
-	 *
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:view")
-	@RequestMapping(value = "orderStatus")
-	@ResponseBody
-	public String getOrderStatus(String dealcode) throws IOException {
-
-		String mes="";
-		try {
-			String privateKey = tMisDunningConfigureService.getConfigureValue("orderRepay.privateKey");
-			String url = riskUrl +"riskportal/limit/order/findByDealcode.do";
-			HashMap<String,String> tRiskOrder = new HashMap<String,String>();
-			tRiskOrder.put("dealcode",dealcode);
-			String sign = Md5Encrypt.sign(tRiskOrder, privateKey);
-			tRiskOrder.put("sign", sign);
-			String res= PostRequest.postRequest(url,tRiskOrder);
-			logger.info(dealcode+"江湖救急订单还款接口参数" + res);
-
-			if (StringUtils.isBlank(res)) {
-				throw new ServiceException("订单接口回调失败");
-			}
-
-			TRiskOrder riskOrder= JSON.parseObject(res,TRiskOrder.class);
-			if(("payoff").equals(riskOrder.getStatus())){
-				tMisDunningOrderDao.orderSynUpdate(riskOrder);
-				try{
-					//点击同步订单状态,说明订单已还清,更新通知
-					TMisCustomerServiceFeedback tf = tMisCustomerServiceFeedbackDao.findNickNameByDealcode(dealcode);
-					String nickname= UserUtils.getUser().getName();
-					if(tf != null){
-						nickname=tf.getNickname();
-					}
-					TMisCustomerServiceFeedback tMisCustomerServiceFeedback = new TMisCustomerServiceFeedback();
-					tMisCustomerServiceFeedback.setDealcode(dealcode);
-					tMisCustomerServiceFeedback.setHandlingresult("订单已还清,");
-					tMisCustomerServiceFeedback.setHashtag("WRITE_OFF");
-					tMisCustomerServiceFeedback.setNickname(nickname);
-					tMisCustomerServiceFeedbackService.changeProblemStatus(tMisCustomerServiceFeedback);
-				}catch (Exception e){
-					logger.info("订单已经还清,更新通知状态错误",e);
-				}
-				return "OK";
-			}
-			if(("payment").equals(riskOrder.getStatus())){
-				return "NO";
-			}
-		}catch (Exception e){
-			logger.warn(e.getMessage());
-			return "";
-		}
-
-		return mes;
 	}
 }

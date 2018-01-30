@@ -317,7 +317,7 @@ function changeStatus( dealcode) {
 
     $.ajax({
         type: 'POST',
-        url : "${ctx}/dunning/tMisDunningOuterTask/orderStatus?dealcode="+dealcode,
+        url : "${ctx}/dunning/tMisDunningTask/orderStatus?dealcode="+dealcode,
         success : function(data) {
             if (data == "OK") {
                 alert("同步成功");
