@@ -31,7 +31,7 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active">消息通知</li>
+		<li class="active"><a href="${ctx}/dunning/taskIssue/notify">消息通知</a></li>
 	</ul>
 	<form:form id="searchForm" modelAttribute="taskIssue" action="${ctx}/dunning/taskIssue/notify" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
