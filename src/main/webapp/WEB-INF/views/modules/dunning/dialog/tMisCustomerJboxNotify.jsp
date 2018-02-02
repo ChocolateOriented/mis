@@ -20,7 +20,7 @@
 <body>
  <div style="background-color: #F5F5F5;height: 136px;padding: 10px">
     <div id="feedbackContainer" style="white-space:nowrap;height: 30px">
-        用户${taskIssue.userName}:订单号
+        用户${taskIssue.userName}, 订单号
         <a href="${ctx}/dunning/tMisDunningTask/pageFather?dealcode=${taskIssue.dealcode}" target="_blank"> ${taskIssue.dealcode} </a>
         ${issueTypesItem.issueTypes2Text}
     </div>
@@ -34,7 +34,15 @@
             </c:if>
         </div>
         <div class="span4 offset3">
-          ${taskIssue.updateRole}:${taskIssue.updateBy.name}
+          ${taskIssue.updateRole}:
+              <c:choose>
+                  <c:when test="${taskIssue.status eq 'RESOLVED'}">
+                    ${taskIssue.updateBy.name}
+                  </c:when>
+                  <c:otherwise>
+                    ${taskIssue.recorderName}
+                  </c:otherwise>
+              </c:choose>
         </div>
     </div>
  </div>

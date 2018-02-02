@@ -15,10 +15,7 @@
 
       function collectionfunction(obj, width, height) {
         var dealcode = $(obj).attr("dealcode");
-        var buyerId = $(obj).attr("buyerId");
-        var dunningtaskdbid = $(obj).attr("dunningtaskdbid");
-        var url = "${ctx}/dunning/tMisDunningTask/collectionAmount?&dealcode=" + dealcode + "&buyerId=" + buyerId + "&dunningtaskdbid="
-            + dunningtaskdbid;
+        var url = "${ctx}/dunning/reliefamount/reliefamountDialog?&dealcode=" + dealcode;
         $.jBox.open("iframe:" + url, $(obj).attr("value"), width || 600,
             height || 430, {
               buttons: {},
@@ -303,7 +300,7 @@
 						<input id="changeSms" onclick="recorded('${tmessage.remittanceConfirmId}')"  class="btn btn-primary" type="button" value="入账"/>
 					</shiro:hasPermission>
 					<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
-						<input id="derate" class="btn btn-primary" onclick="collectionfunction(this)" buyerId="${tmessage.buyerId}" dunningtaskdbid="${tmessage.dunningtaskdbid}" dealcode="${tmessage.dealcode }"  type="button" value="减免" />
+						<input id="derate" class="btn btn-primary" onclick="collectionfunction(this)" dealcode="${tmessage.dealcode }"  type="button" value="减免" />
 					</shiro:hasPermission>
 				</td>
 			</tr>

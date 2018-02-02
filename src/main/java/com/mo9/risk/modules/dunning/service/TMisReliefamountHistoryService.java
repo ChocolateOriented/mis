@@ -4,8 +4,10 @@
 package com.mo9.risk.modules.dunning.service;
 
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
+import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
 import com.mo9.risk.modules.dunning.entity.TMisDunningTask;
 import com.mo9.risk.modules.dunning.entity.TMisReliefamountHistory.ReliefamountStatus;
+import com.mo9.risk.modules.dunning.entity.TRiskBuyerPersonalInfo;
 import com.mo9.risk.modules.dunning.entity.TaskIssue;
 import com.mo9.risk.modules.dunning.entity.TaskIssue.IssueChannel;
 import com.mo9.risk.modules.dunning.entity.TaskIssue.IssueStatus;
@@ -44,6 +46,10 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 	private TMisDunningTaskDao tMisDunningTaskDao;
 	@Autowired
 	private TaskIssueService taskIssueService;
+	@Autowired
+	private TRiskBuyerPersonalInfoService personalInfoService;
+	@Autowired
+	private TMisDunningPeopleService dunningPeopleService;
 
 	public TMisReliefamountHistory get(String id) {
 		return super.get(id);
@@ -73,18 +79,19 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 
 
 	@Transactional(readOnly = false)
-	public boolean savefreeCreditAmount(TMisReliefamountHistory tfHistory, String userId, String taskId) {
+	public boolean savefreeCreditAmount(TMisReliefamountHistory tfHistory, User user, String taskId) {
 		/**
 		 *  保存此订单当前任务的减免金额
 		 */
 		TMisDunningTask task = tMisDunningTaskDao.get(taskId);
 		task.setReliefamount((int) (Double.parseDouble(tfHistory.getReliefamount()) * 100));
 		tMisDunningTaskDao.update(task);
-
-		tfHistory.setCheckUserId(userId);
+		tfHistory.setCheckUserId(user.getId());
 		tfHistory.setCheckTime(new Date());
 		tfHistory.setStatus(ReliefamountStatus.AGREE);
 		this.save(tfHistory);
+
+		this.taskIssueResolution(tfHistory,user,"同意减免");
 		return true;
 	}
 
@@ -93,11 +100,13 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 	 * @Description 申请减免
 	 */
 	@Transactional(readOnly = false)
-	public void applyfreeCreditAmount(TMisReliefamountHistory tfHistory, String userId) {
+	public void applyfreeCreditAmount(TMisReliefamountHistory tfHistory, User user) {
 		tfHistory.setApplyTime(new Date());
-		tfHistory.setApplyUserId(userId);
+		tfHistory.setApplyUserId(user.getId());
 		tfHistory.setStatus(ReliefamountStatus.APPLY);
 		this.save(tfHistory);
+
+		this.creatTaskIssue(tfHistory, user);
 	}
 
 	/**
@@ -120,11 +129,13 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 	 * @Description 拒绝减免申请
 	 */
 	@Transactional(readOnly = false)
-	public void refuseFreeCreditAmount(TMisReliefamountHistory tfHistory, String userId) {
+	public void refuseFreeCreditAmount(TMisReliefamountHistory tfHistory, User user) {
 		tfHistory.setCheckTime(new Date());
-		tfHistory.setCheckUserId(userId);
+		tfHistory.setCheckUserId(user.getId());
 		tfHistory.setStatus(ReliefamountStatus.REFUSE);
 		this.save(tfHistory);
+
+		this.taskIssueResolution(tfHistory,user,"拒绝减免");
 	}
 
 	/**
@@ -152,7 +163,9 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 			return null;
 		}
 		if (dunningpeopleid == null || !dunningpeopleid.equals(reliefamountHistory.getApplyUserId())) {
-			this.refuseFreeCreditAmount(reliefamountHistory, "1");
+			User user = new User();
+			user.setId("1");
+			this.refuseFreeCreditAmount(reliefamountHistory, user);
 			return null;
 		}
 		return reliefamountHistory;
@@ -173,10 +186,19 @@ public class TMisReliefamountHistoryService extends CrudService<TMisReliefamount
 		taskIssue.setIssueTypes(issueTypes);
 		taskIssue.setDealcode(tfHistory.getDealcode());
 		taskIssue.setDescription(String
-				.format("减免金额:%s, 减免原因 %s, 备注: %s", tfHistory.getReliefamount(), tfHistory.getDerateReason().getDerateReasonName(), tfHistory.getRemarks()));
-		taskIssue.setRecorderName(user.getName());
+				.format("减免金额:%s, 减免原因: %s, 备注: %s", tfHistory.getReliefamount(), tfHistory.getDerateReason().getDerateReasonName(), tfHistory.getRemarks()));
+		//使用催收员花名
+		TMisDunningPeople tMisDunningPeople = dunningPeopleService.get(user.getId());
+		if (tMisDunningPeople != null){
+			taskIssue.setRecorderName(tMisDunningPeople.getNickname());
+		}else {
+			taskIssue.setRecorderName(user.getName());
+		}
 		taskIssue.setCreateDate(new Date());
 		taskIssue.setUpdateRole("申请人");
+
+		TRiskBuyerPersonalInfo personalInfo = personalInfoService.getNewBuyerInfoByDealcode(tfHistory.getDealcode());
+		taskIssue.setUserName(personalInfo.getRealName());
 		taskIssueService.save(taskIssue);
 	}
 

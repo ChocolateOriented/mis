@@ -194,6 +194,7 @@
 					AND id.id > c.id
 			)
 	]]>
+	LIMIT 1
 	</select>
 	
 	<select  id="getMessgeByRepaymentTime" resultType="TRiskBuyerPersonalInfo">
