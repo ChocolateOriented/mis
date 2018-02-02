@@ -82,8 +82,10 @@
                  a.userName LIKE concat('%',#{keyWord},'%')
                 OR a.dealcode LIKE concat(#{keyWord},'%')
                 OR a.description LIKE concat('%',#{keyWord},'%')
+                OR a.handlingResult LIKE concat('%',#{keyWord},'%')
                 OR p.Nickname LIKE concat('%',#{keyWord},'%')
                 OR a.recorderName LIKE concat('%',#{keyWord},'%')
+                OR a.updateBy LIKE concat('%',#{keyWord},'%')
                 OR p.name LIKE concat('%',#{keyWord},'%')
             )
         </if>

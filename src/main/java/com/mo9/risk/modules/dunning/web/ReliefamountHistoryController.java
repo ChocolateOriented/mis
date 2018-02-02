@@ -8,6 +8,7 @@ import com.mo9.risk.modules.dunning.service.TMisReliefamountHistoryService;
 import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,6 @@ public class ReliefamountHistoryController extends BaseController {
 	@RequiresPermissions("dunning:tMisDunningTask:view")
 	@RequestMapping(value = "reliefamountDialog")
 	public String reliefamountDialog(String dealcode, Model model) {
-		//获取所有的减免原因
 		TMisReliefamountHistory tfHistory = tMisReliefamountHistoryService.getValidApply(dealcode);
 		if (tfHistory == null){
 			tfHistory = new TMisReliefamountHistory();
@@ -72,15 +72,15 @@ public class ReliefamountHistoryController extends BaseController {
 		if (task == null){
 			return "无此催收任务";
 		}
-		String userId = UserUtils.getUser().getId();
+		User user = UserUtils.getUser();
+		String userId = user.getId();
 		if (!userId.equals(task.getDunningpeopleid())){
 			return "只有案件催收员本人可提出申请";
 		}
 		if (tMisReliefamountHistoryService.selectOneApplyByDealcode(dealcode) != null){
 			return "已存在减免申请, 请等待处理";
 		}
-		tMisReliefamountHistoryService.applyfreeCreditAmount(tfHistory,userId);
-		tMisReliefamountHistoryService.creatTaskIssue(tfHistory,UserUtils.getUser());
+		tMisReliefamountHistoryService.applyfreeCreditAmount(tfHistory,user);
 		return "OK";
 	}
 
@@ -94,12 +94,11 @@ public class ReliefamountHistoryController extends BaseController {
 	@ResponseBody
 	public String refuseFreeCreditAmount(TMisReliefamountHistory tfHistory) {
 		String dealcode = tfHistory.getDealcode();
-		String userId = UserUtils.getUser().getId();
+		User user = UserUtils.getUser();
 		if (tMisReliefamountHistoryService.selectOneApplyByDealcode(dealcode) == null){
 			return "无减免申请";
 		}
-		tMisReliefamountHistoryService.refuseFreeCreditAmount(tfHistory,userId);
-		tMisReliefamountHistoryService.taskIssueResolution(tfHistory,UserUtils.getUser(),"拒绝减免");
+		tMisReliefamountHistoryService.refuseFreeCreditAmount(tfHistory,user);
 		return "OK";
 	}
 
@@ -142,8 +141,7 @@ public class ReliefamountHistoryController extends BaseController {
 			return "无此催收任务";
 		}
 
-		tMisReliefamountHistoryService.savefreeCreditAmount(tfHistory,UserUtils.getUser().getId() ,task.getId());
-		tMisReliefamountHistoryService.taskIssueResolution(tfHistory,UserUtils.getUser(),"同意减免");
+		tMisReliefamountHistoryService.savefreeCreditAmount(tfHistory,UserUtils.getUser() ,task.getId());
 		return "OK";
 	}
 
