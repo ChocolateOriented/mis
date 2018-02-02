@@ -150,21 +150,21 @@ public class TaskIssueService extends CrudService<TaskIssueDao, TaskIssue> {
 		taskIssue.setHandlingResult(handlingresult);
 		taskIssue.setUpdateRole("解决人");
 		taskIssue.setIssueChannel(IssueChannel.CUSTOMER_SERVICE);
-		this.update(taskIssue, user);
-	}
-
-	@Transactional
-	private void update(TaskIssue taskIssue, User user) {
 		//更新人若是有花名则使用花名
-		User updateBy = user;
+		String updateUserName = user.getName();
 		if (user != null && StringUtils.isNotBlank(user.getId())) {
 			TMisDunningPeople people = peopleService.get(user.getId());
 			if (people != null && StringUtils.isNotBlank(people.getNickname())) {
-				updateBy = new User();
-				updateBy.setName(people.getNickname());
+				updateUserName = people.getNickname();
 			}
 		}
+		this.update(taskIssue, updateUserName);
+	}
 
+	@Transactional
+	private void update(TaskIssue taskIssue, String updateUserName) {
+		User updateBy = new User();
+		updateBy.setName(updateUserName);
 		taskIssue.setUpdateDate(new Date());
 		taskIssue.setUpdateBy(updateBy);
 		dao.update(taskIssue);
@@ -213,14 +213,14 @@ public class TaskIssueService extends CrudService<TaskIssueDao, TaskIssue> {
 				issue.setStatus(IssueStatus.RESOLVED);
 			}
 			//如果没有用户, 则选该案件催收员
+			String updateUserName = user.getName();
 			try {
 				if (user == null) {
 					TMisDunningTask task = tMisDunningTaskService.findDunningTaskByDealcode(dealcode);
 					TMisDunningPeople people = peopleService.get(task.getDunningpeopleid());
-					user = new User();
-					user.setName(people.getNickname());
+					updateUserName = people.getNickname();
 				}
-				this.update(issue, user);
+				this.update(issue, updateUserName);
 			} catch (Exception e) {
 				logger.info("案件问题通知自动解决失败", e);
 			}
