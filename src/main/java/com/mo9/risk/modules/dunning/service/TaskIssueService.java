@@ -50,6 +50,7 @@ public class TaskIssueService extends CrudService<TaskIssueDao, TaskIssue> {
 
 
 	@Override
+	@Transactional
 	public void save(TaskIssue entity) {
 		if (entity.getId() !=null && dao.get(entity) == null){
 			entity.setIsNewRecord(true);
