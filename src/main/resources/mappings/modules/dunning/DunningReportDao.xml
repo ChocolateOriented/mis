@@ -100,6 +100,7 @@
 		DunningCycle
 		FROM t_mis_dunning_people
 		WHERE Field1 = 'active'
+		AND Invalid = 't'
 		<if test="group != null and group.id != null and group.id !=''">
 			AND groupid = #{group.id}
 		</if>
@@ -207,6 +208,7 @@
     )AS t ON t.DunningPeopleId = p.Id
     <where>
       p.Field1 = 'active'
+			AND Invalid = 't'
       <if test="group != null and group.id != null and group.id !=''">
         AND p.groupid = #{group.id}
       </if>
