@@ -552,7 +552,7 @@
 		</ul>
 	</form:form>
 	
-	<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
+	<shiro:hasPermission name="dunning:tMisDunningTask:distribution">
 		<input id="distribution"  class="btn btn-primary" type="button" value="手动分案" />
 	</shiro:hasPermission>
 	

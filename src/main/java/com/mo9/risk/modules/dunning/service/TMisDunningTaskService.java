@@ -2285,8 +2285,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 			return "实际均分未还款订单" + assignDunningTaskLogs.size() + "条";
 		} catch (Exception e) {
-			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
-			logger.error("错误信息"+e.getMessage());
+			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚",e);
 			throw new ServiceException(e);
 		} finally {
 			logger.info(dunningcycle + "队列手动分配任务结束" + new Date());
@@ -2303,7 +2302,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
     public String outAssign(List<String> dealcodes,String dunningcycle,List<String> newdunningpeopleids ,Date outsourcingenddate){ 	
     	try {
 			/**  查询手动分配订单任务Log   */
-			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newOutfingTasksByDealcodes(dealcodes);
+			List<TMisDunningTaskLog>  assignDunningTaskLogs = tMisDunningTaskDao.newfingTasksByDealcodes(dealcodes,null);
 			List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeoplesByids(newdunningpeopleids,dunningcycle);
 			logger.info("newfingTasksByDealcodes-查询手动分配订单任务Log " +assignDunningTaskLogs.size()  + "条-"  + new Date());
 			
@@ -2361,8 +2360,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			}
 			return "实际均分未还款订单" + assignDunningTaskLogs.size() + "条";
 		} catch (Exception e) {
-			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚");
-			logger.error("错误信息"+e.getMessage());
+			logger.error(dunningcycle + "队列手动分配任务失败,全部事务回滚",e);
 			throw new ServiceException(e);
 		} finally {
 			logger.info(dunningcycle + "队列手动分配任务结束" + new Date());

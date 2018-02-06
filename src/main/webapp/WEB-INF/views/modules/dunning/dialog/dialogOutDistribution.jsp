@@ -107,7 +107,7 @@
                 dunningpeoplename: dunningpeoplename,
                 organizationName:organizationName
             };
-            $.post("${ctx}/dunning/tMisDunningOuterTask/dialogDistributionPeople", param, function(peopleList) {
+            $.post("${ctx}/dunning/tMisDunningTask/dialogDistributionPeople", param, function(peopleList) {
                 $("#leftContainer").empty();
                 selectedPeoples = [];
                 if (!peopleList) {
@@ -389,10 +389,8 @@
 		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
 		
 		<div class="form-actions">
- 			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-				<input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;
- 				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
- 			</shiro:hasPermission>
+            <input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;
+            <input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
 		</div>
 	</form>
 	

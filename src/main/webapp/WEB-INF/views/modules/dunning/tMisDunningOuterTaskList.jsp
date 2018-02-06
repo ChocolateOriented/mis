@@ -427,7 +427,9 @@ function changeStatus( dealcode) {
 			</li>
 		</ul>
 	</form:form>
-	<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
+	<shiro:hasPermission name="dunning:tMisDunningTask:distribution">
+		<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
+	</shiro:hasPermission>
 	<input id="extensionbutton" class="btn btn-primary" type="button" value="手动留案" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />

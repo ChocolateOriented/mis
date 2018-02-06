@@ -242,7 +242,7 @@ public class TMisDunningOuterTaskController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "dialogOutDistribution")
 	public String dialogOutDistribution(Model model, String dunningcycle, String bizType) {
 		try {
@@ -263,57 +263,13 @@ public class TMisDunningOuterTaskController extends BaseController {
 	}
 
 	/**
-	 * 加载委外手动分案页面
-	 * @param dunningcycle
-	 * @param model
-	 * @return
-	 */
-	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
-	@RequestMapping(value = "dialogOutExtension")
-	public String dialogOutExtension( Model model, String dunningcycle) {
-		model.addAttribute("dunningcycle", dunningcycle);
-		return "modules/dunning/dialog/dialogOutExtension";
-	}
-
-	/**
-	 * 获取手动分案催收人员
-	 * @param request
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
-	@RequestMapping(value = "dialogDistributionPeople")
-	@ResponseBody
-	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
-		List<TMisDunningPeople> dunningpeople = null;
-		String[] dunningcycle = request.getParameterValues("dunningcycle[]");
-		String[] type = request.getParameterValues("type[]");
-		String[] auto = request.getParameterValues("auto[]");
-		String name = request.getParameter("name");
-		String bizType = request.getParameter("bizType");
-		String organizationName = request.getParameter("organizationName");
-
-		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
-				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
-			return new ArrayList<TMisDunningPeople>();
-		}
-
-		String dunningpeoplename=request.getParameter("dunningpeoplename");
-		try{
-			dunningpeople=tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
-		}catch (Exception e){
-			logger.info("",e);
-			return null;
-		}
-		return dunningpeople;
-	}
-
-	/**
 	 * 委外手动分案
 	 * @param orders
 	 * @param dunningcycle
 	 * @param outsourcingenddate
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "outDistributionSave")
 	@ResponseBody
 	public String outDistributionSave(String orders,String dunningcycle, HttpServletRequest request,Date outsourcingenddate) {
@@ -340,7 +296,20 @@ public class TMisDunningOuterTaskController extends BaseController {
 	}
 
 	/**
-	 * 委外手动分案
+	 * 加载委外手动留案页面
+	 * @param dunningcycle
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("dunning:tMisDunningOuterTask:view")
+	@RequestMapping(value = "dialogOutExtension")
+	public String dialogOutExtension( Model model, String dunningcycle) {
+		model.addAttribute("dunningcycle", dunningcycle);
+		return "modules/dunning/dialog/dialogOutExtension";
+	}
+
+	/**
+	 * 委外手动留案
 	 * @param orders
 	 * @param dunningcycle
 	 * @param outsourcingenddate

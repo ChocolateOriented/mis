@@ -380,10 +380,8 @@
 		<input type="hidden" id="dunningcycle" name="dunningcycle" value="${dunningcycle}"/>
 		
 		<div class="form-actions">
- 			<shiro:hasPermission name="dunning:tMisDunningTask:directorview">
-				<input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;
- 				<input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
- 			</shiro:hasPermission>
+            <input id="distributionSave" class="btn btn-primary" type="button" value="分案"/>&nbsp;
+            <input id="esc" class="btn btn-primary" type="button" value="取消"/>&nbsp;
 		</div>
 	</form>
 

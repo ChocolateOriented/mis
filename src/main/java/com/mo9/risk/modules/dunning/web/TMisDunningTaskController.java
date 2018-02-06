@@ -564,7 +564,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "dialogDistribution")
 	public String dialogDistribution(Model model,String dunningcycle, String bizType) {
 		try {
@@ -588,7 +588,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * 获取手动分案催收人员
 	 * @param request
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "dialogDistributionPeople")
 	@ResponseBody
 	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
@@ -621,7 +621,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "distributionSave")
 	@ResponseBody
 	public String distributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
