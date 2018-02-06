@@ -420,16 +420,6 @@
 					<form:options items="${bizTypes}" itemLabel="desc"/>
 				</form:select>
 			</li>
-		<%-- 			<c:if test="${tmiscycle eq 'numberClean' }"> --%>
-<!-- 				<li><label>号码清洗</label> -->
-<%-- 					<form:select  id="numberCleanResult" path="numberCleanResult" class="input-medium"> --%>
-<%-- 						<form:option selected="selected" value="" label="全部"/> --%>
-<%-- 						<c:forEach items="${numberList}" var="number"> --%>
-<%-- 							<form:option value="${number}" label="${number.numberResult }"/> --%>
-<%-- 						</c:forEach> --%>
-<%-- 					</form:select> --%>
-<!-- 				</li> -->
-<%-- 			</c:if> --%>
 			<li><label>催收备注</label>
 				<form:input path="telremark"  htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
@@ -596,10 +586,6 @@
 				<th>订单编号</th>
 				<th>下次跟进日期</th>
 				<th>PTP时间</th>
-                <%--<th>黑名单联系人数</th>--%>
-<%-- 				<c:if test="${tmiscycle eq 'numberClean' }"> --%>
-<!-- 				<th>号码清洗</th> -->
-<%-- 				</c:if> --%>
 				<th>最近登录时间</th>
 			</tr>
 		</thead>
@@ -697,55 +683,6 @@
 				<td>
 					<fmt:formatDate value="${dunningOrder.promisepaydate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
-				<%--<td>--%>
-					<%--<c:choose>--%>
-						<%--<c:when test="${dunningOrder.blackListRelaNum eq null}">--%>
-							<%--获取失败--%>
-						<%--</c:when>--%>
-						<%--<c:otherwise>--%>
-							<%--<div name="detail" class="showSuspense">--%>
-								<%--<font color="red">${dunningOrder.blackListRelaNum}</font>--%>
-								<%--<div class="suspense" tabindex="0">--%>
-									<%--<div class="beautif">mo9黑名单: ${dunningOrder.blackListNumFromMo9}</div>--%>
-									<%--<div class="beautif">第三方黑名单: ${dunningOrder.blackListNumFromThird}</div>--%>
-									<%--<div class="beautif">未知: ${dunningOrder.blackListNumUnknow}</div>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</c:otherwise>--%>
-					<%--</c:choose>--%>
-				<%--</td>--%>
-<%-- 				<c:if test="${tmiscycle eq 'numberClean' }"> --%>
-<!-- 					<td> -->
-<%-- 					  <c:if test="${dunningOrder.status eq 'payment'}"> --%>
-<%-- 						<c:choose> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'YXHM'}"> --%>
-<%-- 								<c:out value="有效号码" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'BZFWQ'}"> --%>
-<%-- 								<c:out value="不在服务区" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'KH'}"> --%>
-<%-- 								<c:out value="空号" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'HMCW'}"> --%>
-<%-- 								<c:out value="号码错误" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'GJ'}"> --%>
-<%-- 								<c:out value="关机" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'TJ'}"> --%>
-<%-- 								<c:out value="停机" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:when test="${dunningOrder.numberCleanResult  eq 'WZ'}"> --%>
-<%-- 								<c:out value="未知" /> --%>
-<%-- 							</c:when> --%>
-<%-- 							<c:otherwise> --%>
-<%-- 								<c:out value="" /> --%>
-<%-- 							</c:otherwise> --%>
-<%-- 						</c:choose> --%>
-<%-- 					 </c:if> --%>
-<!-- 					</td> -->
-<%-- 				</c:if> --%>
 				<td>
 					<fmt:formatDate value="${dunningOrder.latestlogintime}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
