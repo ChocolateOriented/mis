@@ -35,4 +35,18 @@ public interface TMisDunningGroupDao extends CrudDao<TMisDunningGroup> {
 	List<String> findSupervisorGroupList(TMisDunningGroup tMisDunningGroup);
 
 	List<String> findIdsByLeader(User user);
+	
+	/**
+	 * @Description 根据权限查询小组 
+	 * @param group
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningGroup>
+	 */
+	List<TMisDunningGroup> findAuthorizedGroups(TMisDunningGroup group);
+
+	/**
+	 * @Description 用户有权限查询的小组的id
+	 * @param group
+	 * @return java.util.List<java.lang.String>
+	 */
+	List<String> findAuthorizedGroupsIds(TMisDunningGroup group);
 }

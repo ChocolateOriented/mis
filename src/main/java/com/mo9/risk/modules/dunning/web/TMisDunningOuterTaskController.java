@@ -112,7 +112,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
 		//催收小组列表
 		model.addAttribute("mobileResultMap", MobileResult.getActions());
-		model.addAttribute("groupList", tMisDunningGroupService.findList(new TMisDunningGroup()));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
 		model.addAttribute("bizTypes", DebtBizType.values());

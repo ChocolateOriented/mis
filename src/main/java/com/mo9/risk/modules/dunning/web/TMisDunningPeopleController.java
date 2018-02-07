@@ -107,6 +107,15 @@ public class TMisDunningPeopleController extends BaseController {
 	public List<TMisDunningPeople> optionList(TMisDunningPeople tMisDunningPeople) {
 		return tMisDunningPeopleService.findOptionList(tMisDunningPeople);
 	}
+
+	/**
+	 * 按权限查询催收人选择列表
+	 */
+	@RequestMapping(value="authorizedOptionLisat",produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<TMisDunningPeople> authorizedOptionLisat(TMisDunningPeople tMisDunningPeople) {
+		return tMisDunningPeopleService.authorizedOptionLisat(tMisDunningPeople,UserUtils.getUser());
+	}
 	
 	/**
 	 * 加载编辑催收人员页面
@@ -206,71 +215,48 @@ public class TMisDunningPeopleController extends BaseController {
 		}
 		return "OK";
 	}
-	
+
 	/**
 	 * @Description: 检测花名是否唯一
-	 * @param nickname
-	 * @param id
-	 * @return
 	 * @return: Boolean
 	 */
 	@RequiresPermissions("dunning:tMisDunningPeople:view")
 	@RequestMapping(value = "isUniqueNickname")
 	@ResponseBody
-	public Boolean isUniqueNickname(String nickname,String id){
-		return tMisDunningPeopleService.checkNicknameUnique(nickname,id);
+	public Boolean isUniqueNickname(String nickname, String id) {
+		return tMisDunningPeopleService.checkNicknameUnique(nickname, id);
 	}
-	
+
 	/**
-	 * 
 	 * 验证座机号是否正确
-	 * 
-	 * @param extensionNumber
-	 * 
-	 * @return
-	 * 
 	 */
 
 	@RequiresPermissions("dunning:tMisDunningPeople:view")
-
 	@RequestMapping(value = "extensionNumberYanZheng")
-
 	@ResponseBody
-
 	public Boolean valideNumber(String extensionNumber) {
-
 		if (StringUtils.isEmpty(extensionNumber)) {
-
 			return false;
-
 		}
 
 		boolean yanZhengNumber = tMisDunningTaskService.yanZhengNumber(extensionNumber, 2);
-
 		if (!yanZhengNumber) {
-
 			return false;
-
 		}
-
 		return true;
-
 	}
-	
+
 	/**
 	 * 加载分配小组和自动分配等页面
-	 * @param peopleids
-	 * @param model
-	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningPeople:edit")
 	@RequestMapping(value = "dialogOperationPeoPle")
-	public String dialogOperationPeoPle( Model model,String peopleids,String operateId) {
+	public String dialogOperationPeoPle(Model model, String peopleids, String operateId) {
 		try {
 			model.addAttribute("peopleids", peopleids);
 			model.addAttribute("operateId", operateId);
 		} catch (Exception e) {
-			logger.info("加载分配小组和自动分配等页面失败",e);
+			logger.info("加载分配小组和自动分配等页面失败", e);
 			return "views/error/500";
 		}
 		return "modules/dunning/dialog/dialogOperationPeoPle";

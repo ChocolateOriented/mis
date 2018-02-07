@@ -7,16 +7,6 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			var groups = [];
-			if ("${supervisorLimit}" == "true") {
-				var groupOptions = $("#groupList")[0].options;
-				for (var i = 0; i < groupOptions.length; i++) {
-					if (groupOptions[i].value) {
-						groups.push(groupOptions[i].value);
-					}
-				}
-			}
-			
 			 $("a").click(function(){
 				$("a").css("color","");
 				$(this).css("color","#FF8C00");
@@ -28,27 +18,75 @@
         		 window.location.href="${ctx}/dunning/tMisDunningTask/findOrderPageList";
 			 }); 
 				
+            //组类型与组联动查询
+            $("#groupType").on("change",function(){
+                $("#groupList").select2("val", null);
+            });
 			//组与花名联动查询
 			$("#groupList").on("change",function(){
 				$("#peopleList").select2("val", null);
 			});
+
+			$("#groupList").select2({//
+                ajax: {
+                  url: "${ctx}/dunning/tMisDunningGroup/optionList",
+                  dataType: 'json',
+                  quietMillis: 250,
+                  data: function (term, page) {//查询参数 ,term为输入字符
+                    var groupType = $("#groupType").val();
+                    return {
+                      'name':term,
+                      'type':groupType
+                    };
+                  },
+                  results: function (data, page) {//选择要显示的数据
+                    return {results: data};
+                  },
+                  cache: true
+                },
+                multiple: true,
+                initSelection: function (element, callback) {//回显
+                  var ids = $(element).val().split(",");
+                  if (ids == "") {
+                    return;
+                  }
+                  //根据组类型
+                  $.ajax("${ctx}/dunning/tMisDunningGroup/optionList", {
+                    data: function () {
+                      var groupType = $("#groupType").val();
+                      return {type: groupType}
+                    },
+                    dataType: "json"
+                  }).done(function (data) {
+
+                    var backData = [];
+                    var index = 0;
+                    for (var item in data) {
+                      //若回显ids里包含选项则选中
+                      if (ids.indexOf(data[item].id) > -1) {
+                        backData[index] = data[item];
+                        index++;
+                      }
+                    }
+                    callback(backData)
+                  });
+                },
+                formatResult: formatGroupList, //选择显示字段
+                formatSelection: formatGroupList, //选择选中后填写字段
+                width: 300
+              });
+
 			$("#peopleList").select2({//
 			    ajax: {
-			        url: "${ctx}/dunning/tMisDunningPeople/optionList",
+			        url: "${ctx}/dunning/tMisDunningPeople/authorizedOptionLisat",
 			        dataType: 'json',
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
-			        	var groupId=$("#groupList").val(); 
-			        	var param = {};
-			        	if ("${supervisorLimit}" == "true") {
-			        		param = {'group.id': groupId, 
-				            		'group.groupIds': groups.toString(),
-				            		nickname:term};
-			        	} else {
-			        		param = {'group.id': groupId, 
-				            		nickname:term};
-			        	}
-		            	return param;
+			        	var groupIds=$("#groupList").val();
+		            	return {
+						  'group.groupIds': groupIds,
+                          nickname:term
+		            	};
 			        },
 			        results: function (data, page) {//选择要显示的数据
 			        	return { results: data };
@@ -62,10 +100,10 @@
 		            	return;
 		            }
 	            	//根据组查询选项
-	                $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
+	                $.ajax("${ctx}/dunning/tMisDunningPeople/authorizedOptionLisat", {
 	                    data: function(){
-	                    	var groupId = $("#groupList").val();     	
-                    		return {groupId:groupId}             	
+	                    	var groupIds = $("#groupList").val();
+                    		return {'group.groupIds': groupIds}
 	                    },
 	                    dataType: "json"
 	                }).done(function(data) {
@@ -320,7 +358,7 @@
 		function ckFunction(obj){
 			$(obj).css("color","#FF8C00");
         }
-		
+
 		//格式化peopleList选项
 		function formatPeopleList( item ){
 			var nickname = item.nickname ;
@@ -329,7 +367,12 @@
 			}
 			return nickname ;
 		}
-		
+
+        //格式化groupList选项
+        function formatGroupList( item ){
+          return item.name ;
+        }
+
 		//批量代扣
 		function batchDeduct() {
 			$.get('${ctx}/dunning/tMisDunningDeduct/batchDeduct', {}, function(data){
@@ -478,24 +521,18 @@
 					${dunningOrder.taskOverdue ? 'checked' : ''}/>
 				<label for="taskOverdue" style="margin:0px;">过期未跟案件</label>
 			</li>
-			
+
 			<shiro:hasPermission name="dunning:tMisDunningTask:leaderview">
 				<li>
-					<label>催收小组：</label>
-					<form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
+					<label>组类型</label>
+					<form:select id="groupType" path="groupType" htmlEscape="false" class="input-medium">
 						<form:option value="">全部</form:option>
-						<!-- 添加组类型为optgroup -->
-						<c:forEach items="${groupTypes}" var="type">
-							<optgroup label="${type.value}">
-								<!-- 添加类型对应的小组 -->
-								<c:forEach items="${groupList}" var="item">
-									<c:if test="${item.type == type.key}">
-										<option value="${item.id}" groupType="${item.type}" <c:if test="${dunningOrder.dunningPeople.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
-									</c:if>
-								</c:forEach>
-							</optgroup>
-						</c:forEach>
-					</form:select></li>
+						<form:options items="${groupTypes}"/>
+					</form:select>
+				</li>
+				<li>
+					<label>催收小组：</label>
+					<form:input id="groupList" path="groupIds" htmlEscape="false" type="hidden"/>
 				<li>
 				<li>
 					<label >催款人</label>

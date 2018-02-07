@@ -36,6 +36,8 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 
 	@Autowired
 	private TMisDunningPeopleDao tMisDunningPeopleDao;
+	@Autowired
+	private TMisDunningGroupService groupService;
 	
 	public List<TMisDunningPeople> findList(TMisDunningPeople tMisDunningPeople) {
 		return super.findList(this.getDunningPeople(tMisDunningPeople));
@@ -355,5 +357,35 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 		for (int i = 0; i < peopleids.size(); i++) {
 			this.updatePeopleBizTypes(peopleids.get(i),bizTypes);
 		}
+	}
+
+	/**
+	 * @Description 有权限的人员列表
+	 * @param tMisDunningPeople
+	 * @param user
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningPeople>
+	 */
+	public List<TMisDunningPeople> authorizedOptionLisat(TMisDunningPeople tMisDunningPeople, User user) {
+		List<String> allowedGroupIds = groupService.findAllAuthorizedGroupIds(user);
+		TMisDunningGroup group = tMisDunningPeople.getGroup();
+		List<String> queryGroupIds = null;
+		if (group != null) {
+			queryGroupIds = group.getGroupIds();
+		}else {
+			group = new TMisDunningGroup();
+			tMisDunningPeople.setGroup(group);
+		}
+
+		if (allowedGroupIds != null) {//需要进行数据权限限制
+			group.setGroupIds(allowedGroupIds);
+			if (queryGroupIds != null && queryGroupIds.size() > 0) {//有查询条件
+				allowedGroupIds.retainAll(queryGroupIds);//取交集
+			}
+		}else {
+			if (queryGroupIds == null || queryGroupIds.size() == 0) {//无限制且无条件
+				group.setGroupIds(null);
+			}
+		}
+		return this.findOptionList(tMisDunningPeople);
 	}
 }

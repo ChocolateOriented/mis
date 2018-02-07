@@ -772,11 +772,11 @@
 		LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 		LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
 		LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+    LEFT JOIN t_mis_dunning_group AS g ON g.id = p.GroupId
 		LEFT JOIN t_mis_dunning_numberclean AS n ON o.dealcode = n.dealcode
  		AND n.error='0'
  		AND n.state='true'
- 
-		
+
 		<include refid="newfindOrderPageCondition"></include>
 
 		<choose>
@@ -805,11 +805,9 @@
       AND o.type = 'loan'
       AND o.merchant_id = 7
       AND o.`status` IN ('payoff', 'payment' )
-
+    LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+    LEFT JOIN t_mis_dunning_group AS g ON g.id = p.GroupId
 		<!--根据查询条件减少关联表-->
-		<if test="dunningPeople != null or groupIds != null" >
-			LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
-		</if>
 		<if test="mobile != null and mobile != ''">
 			LEFT JOIN t_risk_buyer AS b ON o.buyer_id = b.id
 		</if>
@@ -817,7 +815,6 @@
 			LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
 		</if>
 		<if test="numberCleanResult != null and numberCleanResult != ''">
- 
  			LEFT JOIN t_mis_dunning_numberclean AS n ON o.dealcode = n.dealcode
 			 AND n.error='0'
 			 AND n.state='true'
@@ -831,17 +828,26 @@
 			<if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
 				AND p.groupId = #{dunningPeople.group.id}
 			</if>
-			<if test="groupIds != null">
+			<if test="groupIds != null and groupIds.size > 0">
 				AND p.groupId in
-				<if test="groupIds.size == 0">
-					('')
-				</if>
-				<if test="groupIds.size > 0">
-					<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
-						#{groupId}
-					</foreach>
-				</if>
+        <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+          #{groupId}
+        </foreach>
 			</if>
+      <if test="allowedGroupIds != null">
+        AND p.groupId in
+        <if test="allowedGroupIds.size == 0">
+          ('')
+        </if>
+        <if test="allowedGroupIds.size > 0">
+          <foreach item="groupId" index="index" collection="allowedGroupIds" open="(" separator="," close=")">
+            #{groupId}
+          </foreach>
+        </if>
+      </if>
+      <if test="groupType != null and groupType != ''">
+        AND g.type = #{groupType}
+      </if>
 			<if test="mobile != null and mobile != ''">
 				<!-- 			     # 手机号码 -->
 				AND b.mobile LIKE concat(#{mobile},'%')
@@ -1004,6 +1010,7 @@
         LEFT JOIN t_risk_buyer_idcard AS idc ON idc.buyer_id = o.buyer_id
         LEFT JOIN t_mis_dunning_task AS t ON t.dealcode = o.dealcode
         LEFT JOIN t_mis_dunning_people AS p ON t.DunningPeopleId = p.id
+        LEFT JOIN t_mis_dunning_group AS g ON g.id = p.GroupId
         WHERE
 				o.type = 'loan'
         AND o.merchant_id = 7
@@ -1013,6 +1020,9 @@
         AND t.dunningtaskstatus IN ('dunning', 'finished' )
 <!--         只允许看Q4Q5 -->
         AND t.dunningcycle IN ('Q4','Q5')
+      <if test="groupType != null and groupType != ''">
+        AND g.type = #{groupType}
+      </if>
         <if test="dunningcycle != null and dunningcycle != ''">
                 AND t.dunningcycle = #{dunningcycle}
         </if>
@@ -1023,16 +1033,19 @@
                 <!-- 			     # 催收人过滤    -->
                 AND t.DunningPeopleId = #{dunningpeopleid}
         </if>
-        <if test="dunningPeople != null and dunningPeople.group != null and dunningPeople.group.id != null and dunningPeople.group.id != ''">
-			AND p.groupId = #{dunningPeople.group.id}
-		</if>
+      <if test="groupIds != null and groupIds.size > 0">
+        AND p.groupId in
+        <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+          #{groupId}
+        </foreach>
+      </if>
         <if test="dunningPeople != null and dunningPeople.queryIds != null and dunningPeople.queryIds.size > 0">
             AND t.`DunningPeopleId` in
             <foreach item="item" index="index" collection="dunningPeople.queryIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
-        
+
         <if test="mobile != null and mobile != ''">
                 <!-- 			     # 手机号码 -->
                 AND b.mobile LIKE concat(#{mobile},'%')

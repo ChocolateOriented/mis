@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.entity;
 
+import com.mo9.risk.modules.dunning.entity.TMisDunningGroup.GroupType;
 import java.util.Date;
 import java.util.List;
 
@@ -73,6 +74,8 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 	
 	private TMisDunningPeople dunningPeople ;
 	private List<String> groupIds;
+	private List<String> allowedGroupIds;
+	private GroupType groupType; //
 
 	private Date outsourcingBeginDate ; //委外开始时间
 	private Date beginOutsourcingBeginDate ; //查询开始-委外开始时间
@@ -669,8 +672,24 @@ public class DunningOrder  extends DataEntity<DunningOrder>{
 		this.endDunningtime = null != endDunningtime ? DateUtils.endDate(endDunningtime) : endDunningtime;
 	}
 
+	public GroupType getGroupType() {
+		return groupType;
+	}
+
+	public void setGroupType(GroupType groupType) {
+		this.groupType = groupType;
+	}
+
 	public String getExtension() {
 		return extension;
+	}
+
+	public List<String> getAllowedGroupIds() {
+		return allowedGroupIds;
+	}
+
+	public void setAllowedGroupIds(List<String> allowedGroupIds) {
+		this.allowedGroupIds = allowedGroupIds;
 	}
 
 	public void setExtension(String extension) {

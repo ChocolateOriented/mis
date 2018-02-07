@@ -1,5 +1,7 @@
 package com.mo9.risk.modules.dunning.service;
 
+import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -67,5 +69,67 @@ public class TMisDunningGroupService extends CrudService<TMisDunningGroupDao,TMi
 	 */
 	public List<String> findIdsByLeader(User leader){
 		return dao.findIdsByLeader(leader);
+	}
+
+	/**
+	 * @Description 根据用户权限查询小组
+	 * @param group
+	 * @param user
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningGroup>
+	 */
+	public List<TMisDunningGroup> findAuthorizedGroups(TMisDunningGroup group, User user) {
+		if (group == null){
+			group = new TMisDunningGroup();
+		}
+		int permissions = TMisDunningTaskService.getPermissions();
+		//催收员
+		if (permissions == TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS){
+			return new ArrayList<>();
+		}
+		this.addAuthorizedCondition(group,user);
+		return dao.findAuthorizedGroups(group);
+	}
+
+	/**
+	 * @Description 用户有权限查询的小组的id
+	 * @param user
+	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningGroup>
+	 *   null代表不控制
+	 *   size = 0 代表没有可查的组
+	 */
+	public List<String> findAllAuthorizedGroupIds(User user) {
+		TMisDunningGroup	group = new TMisDunningGroup();
+		//催收员
+		int permissions = TMisDunningTaskService.getPermissions();
+		if (permissions == TMisDunningTaskService.DUNNING_COMMISSIONER_PERMISSIONS){
+			return null;
+		}
+		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS || permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {//组长
+			this.addAuthorizedCondition(group,user);
+			return dao.findAuthorizedGroupsIds(group);
+		}else {//其他角色不做控制
+			return null;
+		}
+	}
+
+	/**
+	 * @Description 根据用户角色添加查询条件
+	 * @param group
+	 * @param user
+	 * @return void
+	 */
+	private void addAuthorizedCondition(TMisDunningGroup group, User user){
+		int permissions = TMisDunningTaskService.getPermissions();
+
+		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {//组长
+			group.setLeader(user);
+		}else if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {//监理
+			TMisDunningOrganization organization = group.getOrganization();
+			if (organization == null){
+				organization = new TMisDunningOrganization();
+				group.setOrganization(organization);
+			}
+			organization.setSupervisor(user);
+		}
 	}
 }

@@ -798,10 +798,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		int permissions = 1;   			// 催收专员
 		for (Role r : UserUtils.getUser().getRoleList()){
 			if(("委外主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
-				permissions += 10;
+				permissions = 10;
 			}
 			if(("催收主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
-				permissions += 100;
+				permissions = 100;
 			}
 			if(("财务主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
 				permissions = 1000;
@@ -872,42 +872,23 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		page.setList(dao.findOrderPageList(entity));
 		return page;
 	}
-	
+
 	/**
 	 * 查询分页数据-优化版
 	 * @param page 分页对象
 	 * @param entity
 	 * @return
 	 */
-	public Page<DunningOrder> newfindOrderPageList(Page<DunningOrder> page, DunningOrder entity) {
+	public Page<DunningOrder> newfindOrderPageList(Page<DunningOrder> page, DunningOrder entity,User user) {
 		int permissions = getPermissions();
-		List<String> allowedGroupIds = new ArrayList<String>();
-		if(DUNNING_ALL_PERMISSIONS == permissions){
-			entity.setDunningpeopleid(null);
-		}
-		if (DUNNING_INNER_PERMISSIONS == permissions) {
-			entity.setDunningpeopleid(null);
-			allowedGroupIds.addAll(tMisDunningGroupService.findIdsByLeader(UserUtils.getUser()));
-			entity.setGroupIds(allowedGroupIds);
-		}
-		if(DUNNING_OUTER_PERMISSIONS == permissions){
-			entity.setDunningpeopleid(null);
-		}
-		if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){
-			if(null == entity.getStatus()){
-				entity.setStatus("payment");
+		if(DUNNING_COMMISSIONER_PERMISSIONS == permissions){//催收员只能查询自己的案件
+			entity.setDunningpeopleid(user.getId());
+
+		}else {
+			List<String> allowedGroupIds = tMisDunningGroupService.findAllAuthorizedGroupIds(user);
+			if (allowedGroupIds != null){
+				entity.setAllowedGroupIds(allowedGroupIds);
 			}
-			entity.setDunningpeopleid(UserUtils.getUser().getId());
-		}
-		if(DUNNING_FINANCIAL_PERMISSIONS == permissions){
-			entity.setDunningpeopleid(null);
-		}
-		if (DUNNING_SUPERVISOR == permissions) {
-			TMisDunningGroup group = new TMisDunningGroup();
-			group.setSupervisor(UserUtils.getUser());
-			List<String> groupIds = tMisDunningGroupService.findSupervisorGroupList(group);
-			allowedGroupIds.addAll(groupIds);
-			entity.setGroupIds(allowedGroupIds);
 		}
 
 		if(null != entity.getStatus() && entity.getStatus().equals("payoff")){
@@ -915,7 +896,6 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		}else{
 			entity.getSqlMap().put("orderbyMap", " t.CreateDate DESC,t.CapitalAmount DESC,t.Dealcode DESC");
 		}
-
 		entity.setPage(page);
 
 		//不使用分页插件,使用自定义的count语句
@@ -924,6 +904,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 
 		List<DunningOrder> orders = dao.newfindOrderPageList(entity);
 		page.setList(orders);
+
 		
 		double creditamount = 0;
 		double corpusamount = 0;

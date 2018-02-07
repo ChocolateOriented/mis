@@ -223,26 +223,11 @@ public class TMisDunningTaskController extends BaseController {
 		if (dunningOrder.getStatus() == null){
 			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
 		}
-
-		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
-		//催收小组列表
-		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
-		int permissions = TMisDunningTaskService.getPermissions();
-		boolean supervisorLimit = false;
-		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
-			tMisDunningGroup.setLeader(UserUtils.getUser());
-			supervisorLimit = true;
-		}
-		if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
-			tMisDunningGroup.setSupervisor(UserUtils.getUser());
-			supervisorLimit = true;
-		}
+		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder,UserUtils.getUser());
 
 		model.addAttribute("mobileResultMap", MobileResult.getActions());
-		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
-		model.addAttribute("supervisorLimit", supervisorLimit);
 		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningTaskList";
 	}
