@@ -110,10 +110,10 @@ public class TMisDunningPeopleController extends BaseController {
 	/**
 	 * 按权限查询催收人选择列表
 	 */
-	@RequestMapping(value="authorizedOptionLisat",produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="authorizedOptionList",produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<TMisDunningPeople> authorizedOptionLisat(TMisDunningPeople tMisDunningPeople) {
-		return tMisDunningPeopleService.authorizedOptionLisat(tMisDunningPeople,UserUtils.getUser());
+	public List<TMisDunningPeople> authorizedOptionList(TMisDunningPeople tMisDunningPeople) {
+		return tMisDunningPeopleService.authorizedOptionList(tMisDunningPeople,UserUtils.getUser());
 	}
 	
 	/**

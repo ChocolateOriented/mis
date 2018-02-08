@@ -365,7 +365,7 @@ public class TMisDunningPeopleService extends CrudService<TMisDunningPeopleDao, 
 	 * @param user
 	 * @return java.util.List<com.mo9.risk.modules.dunning.entity.TMisDunningPeople>
 	 */
-	public List<TMisDunningPeople> authorizedOptionLisat(TMisDunningPeople tMisDunningPeople, User user) {
+	public List<TMisDunningPeople> authorizedOptionList(TMisDunningPeople tMisDunningPeople, User user) {
 		List<String> allowedGroupIds = groupService.findAllAuthorizedGroupIds(user);
 		TMisDunningGroup group = tMisDunningPeople.getGroup();
 		List<String> queryGroupIds = null;

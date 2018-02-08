@@ -21,6 +21,7 @@
             //组类型与组联动查询
             $("#groupType").on("change",function(){
                 $("#groupList").select2("val", null);
+              	$("#groupList").change();
             });
 			//组与花名联动查询
 			$("#groupList").on("change",function(){
@@ -78,7 +79,7 @@
 
 			$("#peopleList").select2({//
 			    ajax: {
-			        url: "${ctx}/dunning/tMisDunningPeople/authorizedOptionLisat",
+			        url: "${ctx}/dunning/tMisDunningPeople/authorizedOptionList",
 			        dataType: 'json',
 			        quietMillis: 250,
 			        data: function (term, page) {//查询参数 ,term为输入字符
@@ -100,7 +101,7 @@
 		            	return;
 		            }
 	            	//根据组查询选项
-	                $.ajax("${ctx}/dunning/tMisDunningPeople/authorizedOptionLisat", {
+	                $.ajax("${ctx}/dunning/tMisDunningPeople/authorizedOptionList", {
 	                    data: function(){
 	                    	var groupIds = $("#groupList").val();
                     		return {'group.groupIds': groupIds}
