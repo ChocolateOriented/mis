@@ -223,51 +223,11 @@ public class TMisDunningTaskController extends BaseController {
 		if (dunningOrder.getStatus() == null){
 			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
 		}
+		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder,UserUtils.getUser());
 
-		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
-		//催收小组列表
-		TMisDunningGroup tMisDunningGroup = new TMisDunningGroup();
-		int permissions = TMisDunningTaskService.getPermissions();
-		boolean supervisorLimit = false;
-		if (permissions == TMisDunningTaskService.DUNNING_INNER_PERMISSIONS) {
-			tMisDunningGroup.setLeader(UserUtils.getUser());
-			supervisorLimit = true;
-		}
-		if (permissions == TMisDunningTaskService.DUNNING_SUPERVISOR) {
-			tMisDunningGroup.setSupervisor(UserUtils.getUser());
-			supervisorLimit = true;
-		}
-		NumberCleanResult[] values = NumberCleanResult.values();
-		List<NumberCleanResult> numberList = Arrays.asList(values);
-		User user=UserUtils.getUser();
-		//控制页面只有对应的队列显示号码清洗
-		String dunningCycles=DictUtils.getDictValue("dunningCycle", "cleanNumber", "Q0,Q1");
-		String[] cycles = dunningCycles.split(",");
-		TMisDunningPeople tMisDunningPeople = tMisDunningPeopleService.get(user.getId());
-		String tmiscycle=null;
-		if(null==tMisDunningPeople){
-//			tmiscycle="numberClean";
-		}else{
-			String dunningCycle=tMisDunningPeople.getDunningcycle();
-			if(StringUtils.isNotBlank(dunningCycle)&&null!=cycles&&cycles.length>0){
-				for (int i = 0; i < cycles.length; i++) {
-					
-					if(dunningCycle.contains(cycles[i])){
-						tmiscycle="numberClean";
-						break;
-					}
-					
-				}
-			}
-		}
-		
 		model.addAttribute("mobileResultMap", MobileResult.getActions());
-		model.addAttribute("groupList", tMisDunningGroupService.findList(tMisDunningGroup));
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
 		model.addAttribute("page", page);
-		model.addAttribute("supervisorLimit", supervisorLimit);
-		model.addAttribute("numberList", numberList);
-		model.addAttribute("tmiscycle", tmiscycle);
 		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningTaskList";
 	}
@@ -564,7 +524,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "dialogDistribution")
 	public String dialogDistribution(Model model,String dunningcycle, String bizType) {
 		try {
@@ -588,7 +548,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * 获取手动分案催收人员
 	 * @param request
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "dialogDistributionPeople")
 	@ResponseBody
 	public List<TMisDunningPeople> DistributionPeople(HttpServletRequest request){
@@ -621,7 +581,7 @@ public class TMisDunningTaskController extends BaseController {
 	 * @param redirectAttributes
 	 * @return
 	 */
-	@RequiresPermissions("dunning:tMisDunningTask:directorview")
+	@RequiresPermissions("dunning:tMisDunningTask:distribution")
 	@RequestMapping(value = "distributionSave")
 	@ResponseBody
 	public String distributionSave(String orders,String dunningcycle, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {

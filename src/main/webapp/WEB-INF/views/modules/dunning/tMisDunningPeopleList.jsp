@@ -146,13 +146,51 @@ function getSelectedPeople() {
   });
   return peopleids;
 }
+
+function peopleFormDialog(id) {
+  var url = "${ctx}/dunning/tMisDunningPeople/form";
+  var diaName = "催收人员添加";
+  if (id != null && id!=""){
+    url = url + "?id="+id;
+    diaName = "催收人员修改"
+  }
+  $.jBox.open("iframe:" + url, diaName , 500, 480, {
+    buttons: {},
+    loaded: function (h) {
+      $(".jbox-content", document).css("overflow-y", "hidden");
+    }
+  });
+}
+
+function batchAddPage(){
+  var url = "${ctx}/dunning/tMisDunningPeople/batchAddPage";
+  $.jBox.open("iframe:" + url, "批量添加" , 500, 450, {
+    buttons: {},
+    loaded: function (h) {
+      $(".jbox-content", document).css("overflow-y", "hidden");
+    }
+  });
+}
+
+function batchAddPage(){
+  $.jBox($("#importBox").html(), {title:"导入数据", width: 500,
+    height:450,  buttons:{"关闭":true}} );
+}
+
+function disableBUtton(){
+  $("#save").attr("disabled","disabled");
+}
+
 </script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisDunningPeople/">催收人员列表</a></li>
 		<shiro:hasPermission name="dunning:tMisDunningPeople:edit">
-			<li><a href="${ctx}/dunning/tMisDunningPeople/form">催收人员添加</a></li>
+			<li><a onclick="peopleFormDialog()">催收人员添加</a></li>
+		</shiro:hasPermission>
+		<shiro:hasPermission name="dunning:tMisDunningPeople:edit">
+			<li><a onclick="batchAddPage()">批量添加</a></li>
 		</shiro:hasPermission>
 	</ul>
 	<form:form id="searchForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/" method="post" class="breadcrumb form-search">
@@ -253,12 +291,31 @@ function getSelectedPeople() {
 					<!-- 	<td>${tMisDunningPeople.dunningpeopletypeText}</td> -->
 					<!-- 	<td>${tMisDunningPeople.rate} </td> -->
 					<shiro:hasPermission name="dunning:tMisDunningPeople:edit">
-						<td><a href="${ctx}/dunning/tMisDunningPeople/form?id=${tMisDunningPeople.id}">修改</a> <a href="${ctx}/dunning/tMisDunningPeople/delete?id=${tMisDunningPeople.id}" onclick="return confirmx('确认要删除该催收人员吗？', this.href)">删除</a></td>
+						<td><a onclick="peopleFormDialog('${tMisDunningPeople.id}')">修改</a> <a href="${ctx}/dunning/tMisDunningPeople/delete?id=${tMisDunningPeople.id}"
+																   onclick="return confirmx('确认要删除该催收人员吗？', this.href)">删除</a></td>
 					</shiro:hasPermission>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
 	<div class="pagination">${page}</div>
+	<%--批量导入--%>
+	<div id="importBox" class="hide">
+		<form  id="importExcel" action="${ctx}/dunning/tMisDunningPeople/fileUpload" method="post" enctype="multipart/form-data"  onsubmit="loading('正在导入，请稍等...');" >
+			<div style="border:1px dashed ;width:300px;height:260px;margin:10px 0px 0px 100px;text-align:center;">
+
+				<div  style="margin-top: 10px ;">
+					<input id="file" type="file" accept=".xls,.xlsx,.csv" name="file" />
+				</div>
+				<div>
+
+				</div>
+				<div  style="margin-top: 180px ;text-align:left; ">
+					<input type="submit" class="btn btn-primary" id="save"  value="确定上传" onclick="disableBUtton()" />
+				</div>
+			</div>
+
+		</form>
+	</div>
 </body>
 </html>

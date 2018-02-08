@@ -130,19 +130,14 @@ public class TMisDunningMaxRepayNumberAndPrincipalService {
      * value：人数
      * @return
      */
-    private Map<String, Integer> countPeopleOfGroup(){
+    private Map<String, Integer> countPeopleOfGroup() {
         List<TMisDunningPeople> list = dunningMaxRepayNumberAndPrincipalDao.findPeopleOfGroup();
         Map<String, Integer> map = new HashMap<String, Integer>();
-        for (TMisDunningPeople people : list){
+        for (TMisDunningPeople people : list) {
             String[] cyclelist = people.getDunningcycle().split(",");
-            for (int i = 0; i < cyclelist.length; i++){
-                if ((!"Q4".equals(cyclelist[i]) && ("t".equals(people.getAuto())))){
-                    String key = people.getGroupName()+"_"+cyclelist[i];
-                    map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
-                }else if ("Q4".equals(cyclelist[i]) && (!"c".equals(people.getAuto()))){
-                    String key = people.getGroupName()+"_"+cyclelist[i];
-                    map.put(key,map.get(key) == null ? 1 : map.get(key) +1);
-                }
+            for (int i = 0; i < cyclelist.length; i++) {
+                String key = people.getGroupName() + "_" + cyclelist[i];
+                map.put(key, map.get(key) == null ? 1 : map.get(key) + 1);
             }
 
         }

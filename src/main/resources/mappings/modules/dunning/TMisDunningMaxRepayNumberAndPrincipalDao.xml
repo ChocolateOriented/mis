@@ -257,7 +257,9 @@
 
     <select id="findPeopleOfGroup" resultType="com.mo9.risk.modules.dunning.entity.TMisDunningPeople">
         SELECT g.Name as groupName, a.DunningCycle as dunningcycle, a.Name as name, a.Auto as auto FROM t_mis_dunning_people a LEFT JOIN t_mis_dunning_group g on g.id = a.groupId
-        WHERE  a.Invalid = 't' AND g.DelFlag = '0';
+        WHERE  a.Invalid = 't'
+        AND a.Auto !='c'
+        AND g.DelFlag = '0';
     </select>
 
 </mapper>

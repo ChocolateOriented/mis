@@ -30,58 +30,116 @@ $(document).ready(function() {
 	// 清空查询功能
 	 $("#empty").click(function(){
       		 window.location.href="${ctx}/dunning/tMisDunningOuterTask/findOrderPageList";
-	 }); 
-		
-	//组与花名联动查询
-	$("#groupList").on("change",function(){
-		$("#peopleList").select2("val", null);
-	});
-	$("#peopleList").select2({//
-	    ajax: {
-	        url: "${ctx}/dunning/tMisDunningPeople/optionList",
-	        dataType: 'json',
-	        quietMillis: 250,
-	        data: function (term, page) {//查询参数 ,term为输入字符
-	        	var groupId=$("#groupList").val(); 
-            	return {'group.id': groupId , nickname:term};
-	        },
-	        results: function (data, page) {//选择要显示的数据
-	        	return { results: data };
-	        },
-	        cache: true
-	    },
+	 });
+
+      //组类型与组联动查询
+      $("#groupType").on("change",function(){
+        $("#groupList").select2("val", null);
+        $("#groupList").change();
+      });
+      //组与花名联动查询
+      $("#groupList").on("change",function(){
+        $("#peopleList").select2("val", null);
+      });
+
+      $("#groupList").select2({//
+        ajax: {
+          url: "${ctx}/dunning/tMisDunningGroup/optionList",
+          dataType: 'json',
+          quietMillis: 250,
+          data: function (term, page) {//查询参数 ,term为输入字符
+            var groupType = $("#groupType").val();
+            return {
+              'name':term,
+              'type':groupType
+            };
+          },
+          results: function (data, page) {//选择要显示的数据
+            return {results: data};
+          },
+          cache: true
+        },
+        multiple: true,
+        initSelection: function (element, callback) {//回显
+          var ids = $(element).val().split(",");
+          if (ids == "") {
+            return;
+          }
+          //根据组类型
+          $.ajax("${ctx}/dunning/tMisDunningGroup/optionList", {
+            data: function () {
+              var groupType = $("#groupType").val();
+              return {type: groupType}
+            },
+            dataType: "json"
+          }).done(function (data) {
+
+            var backData = [];
+            var index = 0;
+            for (var item in data) {
+              //若回显ids里包含选项则选中
+              if (ids.indexOf(data[item].id) > -1) {
+                backData[index] = data[item];
+                index++;
+              }
+            }
+            callback(backData)
+          });
+        },
+        formatResult: formatGroupList, //选择显示字段
+        formatSelection: formatGroupList, //选择选中后填写字段
+        width: 300
+      });
+
+      $("#peopleList").select2({//
+        ajax: {
+          url: "${ctx}/dunning/tMisDunningPeople/authorizedOptionList",
+          dataType: 'json',
+          quietMillis: 250,
+          data: function (term, page) {//查询参数 ,term为输入字符
+            var groupIds=$("#groupList").val();
+            return {
+              'group.groupIds': groupIds,
+              nickname:term
+            };
+          },
+          results: function (data, page) {//选择要显示的数据
+            return { results: data };
+          },
+          cache: true
+        },
         multiple: true,
         initSelection: function(element, callback) {//回显
-          	var ids=$(element).val().split(",");
-            if (ids=="") {
-            	return;
+          var ids=$(element).val().split(",");
+          if (ids=="") {
+            return;
+          }
+          //根据组查询选项
+          $.ajax("${ctx}/dunning/tMisDunningPeople/authorizedOptionList", {
+            data: function(){
+              var groupIds = $("#groupList").val();
+              return {'group.groupIds': groupIds}
+            },
+            dataType: "json"
+          }).done(function(data) {
+
+            var backData = [];
+            var index = 0 ;
+            for ( var item in data) {
+              //若回显ids里包含选项则选中
+              if (ids.indexOf(data[item].id) > -1 ) {
+                backData[index] = data[item] ;
+                index++;
+              }
             }
-           	//根据组查询选项
-               $.ajax("${ctx}/dunning/tMisDunningPeople/optionList", {
-                   data: function(){
-                   	var groupId = $("#groupList").val();     	
-                  		return {groupId:groupId}             	
-                   },
-                   dataType: "json"
-               }).done(function(data) {
-               	
-               	var backData = [];
-               	var index = 0 ;
-               	for ( var item in data) {
-               		//若回显ids里包含选项则选中
-					if (ids.indexOf(data[item].id) > -1 ) {
-						backData[index] = data[item] ;
-						index++;
-					}
-				}
-               	callback(backData)
-               });
+            callback(backData)
+          });
         },
-	    formatResult:formatPeopleList, //选择显示字段
-	    formatSelection:formatPeopleList, //选择选中后填写字段
+        formatResult:formatPeopleList, //选择显示字段
+        formatSelection:formatPeopleList, //选择选中后填写字段
         width:300
-	});
-	
+      });
+
 	 $("#allorder").change(function(){
 	 	if($("#allorder").prop('checked')){
 	 		$("[name='orders']").each(function(){
@@ -303,7 +361,10 @@ function page(n,s){
 	$("#searchForm").submit();
       	return false;
       }
-
+//格式化groupList选项
+function formatGroupList( item ){
+  return item.name ;
+}
 //格式化peopleList选项
 function formatPeopleList( item ){
 	var nickname = item.nickname ;
@@ -374,34 +435,29 @@ function changeStatus( dealcode) {
 				value="<fmt:formatDate value="${dunningOrder.endOutsourcingEndDate}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /></li>
 			<li><label>还清日期</label> <input name="beginPayofftime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" value="<fmt:formatDate value="${dunningOrder.beginPayofftime}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /> 至 <input name="endPayofftime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" value="<fmt:formatDate value="${dunningOrder.endPayofftime}" pattern="yyyy-MM-dd"/>"
 				onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" /></li>
-			<li><label>催收小组：</label> <form:select id="groupList" path="dunningPeople.group.id" class="input-medium">
-					<form:option value="">全部</form:option>
-					<!-- 添加组类型为optgroup -->
-					<c:forEach items="${groupTypes}" var="type">
-						<optgroup label="${type.value}">
-							<!-- 添加类型对应的小组 -->
-							<c:forEach items="${groupList}" var="item">
-								<c:if test="${item.type == type.key}">
-									<option value="${item.id}" <c:if test="${dunningOrder.dunningPeople.group.id == item.id }">selected="selected"</c:if>>${item.name}</option>
-								</c:if>
-							</c:forEach>
-						</optgroup>
-					</c:forEach>
-				</form:select></li>
-			<li>
 			<li><label>催收队列：</label> <form:select path="dunningcycle" class="input-medium">
 					<form:option value="">全部</form:option>
 					<form:option value="Q4">Q4</form:option>
 					<form:option value="Q5">Q5</form:option>
 				</form:select></li>
 			<li>
+			<li>
+				<label>组类型</label>
+				<form:select id="groupType" path="groupType" htmlEscape="false" class="input-medium">
+					<form:option value="">全部</form:option>
+					<form:options items="${groupTypes}"/>
+				</form:select>
+			</li>
+			<li>
+				<label>催收小组：</label>
+				<form:input id="groupList" path="groupIds" htmlEscape="false" type="hidden"/>
+			<li>
+			<li><label>催款人</label> <form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden" /></li>
 			<li><label>留案：</label> <form:select path="extension" class="input-medium">
 				<form:option value="">全部</form:option>
 				<form:option value="on">是</form:option>
 				<form:option value="off">否</form:option>
 			</form:select></li>
-			<li>
-			<li><label>催款人</label> <form:input id="peopleList" path="dunningPeople.queryIds" htmlEscape="false" type="hidden" /></li>
 			<li><label>最近催收</label>
 				<input name="beginDunningtime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					   value="<fmt:formatDate value="${dunningOrder.beginDunningtime}" pattern="yyyy-MM-dd"/>"
@@ -427,7 +483,9 @@ function changeStatus( dealcode) {
 			</li>
 		</ul>
 	</form:form>
-	<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
+	<shiro:hasPermission name="dunning:tMisDunningTask:distribution">
+		<input id="distribution" class="btn btn-primary" type="button" value="手动分案" />
+	</shiro:hasPermission>
 	<input id="extensionbutton" class="btn btn-primary" type="button" value="手动留案" />
 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
 		<input id="autosend" class="btn btn-primary" type="button" value="系统短信发送" />

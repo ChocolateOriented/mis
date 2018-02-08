@@ -5,32 +5,23 @@
 <title>催收机构管理</title>
 <meta name="decorator" content="default" />
 <script type="text/javascript">
-	function add() {
-		if ($("#inputForm").valid()) {
-			$("#btnSubmit").attr('disabled',"true");
-			$("#inputForm").submit();
-		}
-	}
-	
-	function edit() {
+
+	function save() {
 		if ($("#inputForm").valid()) {
 			$("#btnSubmit").attr('disabled',"true");
 			$.ajax({
 				type: 'POST',
-				url : "${ctx}/dunning/tMisDunningOrganization/edit",
+				url : "${ctx}/dunning/tMisDunningOrganization/save",
 				data: $('#inputForm').serialize(),             //获取表单数据
 				success: function(data) {
-					if (data == "OK") {
-						alert("保存成功");
-					} else {
+					if (data != "OK") {
 						alert("保存失败");
 					}
-					window.parent.window.location.reload();
-					window.parent.window.jBox.close();
+				  	window.parent.page();
 				},
 				error : function(XMLHttpRequest, textStatus, errorThrown){
-					alert("保存失败:" + textStatus);
-					window.parent.window.jBox.close();
+				  alert("保存失败:" + textStatus);
+                  window.parent.page();
                 }
 			});
 		}
@@ -42,17 +33,6 @@
 </script>
 </head>
 <body>
-	<c:if test="${opr eq 'add'}">
-		<ul class="nav nav-tabs">
-			<li><a href="${ctx}/dunning/tMisDunningGroup/">催收小组列表</a></li>
-			<li>
-			<a href="${ctx}/dunning/tMisDunningGroup/
-				${not empty TMisDunningOrganization.id? 'edit?id=${TMisDunningOrganization.id}">催收小组修改' : 'form">催收小组添加'}
-			</a>
-			</li>
-			<li class="active"><a href="${ctx}/dunning/tMisDunningOrganization/form?opr=add">催收机构添加</a></li>
-		</ul>
-	</c:if>
 	<br/>
 	<form:form id="inputForm" modelAttribute="tMisDunningOrganization" action="${ctx}/dunning/tMisDunningOrganization/save" method="post" class="form-horizontal">
 		<sys:message content="${message}"/>	
@@ -82,14 +62,9 @@
 			</div>
 		</div>
 		<div class="form-actions">
-			<input id="btnSubmit" class="btn btn-primary" type="button" value="保 存" onclick="${opr}();"/>&nbsp;
-			<c:if test="${opr eq 'add'}">
-				<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1);"/>
-			</c:if>
-			<c:if test="${opr eq 'edit'}">
-				<input id="btnCancel" class="btn" type="button" value="取 消" onclick="esc();"/>
-			</c:if>
-			
+			<input id="btnSubmit" class="btn btn-primary" type="button" value="保 存" onclick="save();"/>&nbsp;
+			<input id="btnCancel" class="btn" type="button" value="取 消" onclick="esc();"/>
+
 		</div>
 	</form:form>
 </body>

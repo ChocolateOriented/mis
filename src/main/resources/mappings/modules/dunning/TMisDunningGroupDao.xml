@@ -105,7 +105,8 @@
 			createdate,
 			updateby,
 			updatedate,
-			delFlag
+			delFlag,
+			organizationId
 		) VALUES (
 			#{id},
 			#{name},
@@ -115,7 +116,8 @@
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
-			#{delFlag}
+			#{delFlag},
+			#{organization.id}
 		)
 	</insert>
 	
@@ -166,4 +168,44 @@
 		AND g.delflag = '0'
 		AND o.delflag = '0'
 	</select>
+
+	<select id="findAuthorizedGroups" resultType="TMisDunningGroup">
+		SELECT
+		<include refid="tMisDunningGroupColumns" />
+		<include refid="tMisDunningGroupJoinsColumns" />
+		FROM t_mis_dunning_group a
+		<include refid="tMisDunningGroupJoins" />
+		<where>
+			a.delFlag = '0'
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat("%",#{name},"%")
+			</if>
+			<include refid="authorityCondition" />
+		</where>
+	</select>
+
+	<select id="findAuthorizedGroupsIds" resultType="String">
+		SELECT
+			a.id
+		FROM t_mis_dunning_group a
+		<include refid="tMisDunningGroupJoins" />
+		<where>
+			a.delFlag = '0'
+			<include refid="authorityCondition" />
+		</where>
+	</select>
+
+	<sql id="authorityCondition">
+		<if test="leader != null and leader.id != null and leader.Id != ''">
+			AND a.leaderId = #{leader.id}
+		</if>
+		<if test="organization != null">
+			<if test="organization.supervisor != null and organization.supervisor.id != null and organization.supervisor.id != ''">
+				AND o.supervisorId = #{organization.supervisor.id}
+			</if>
+		</if>
+	</sql>
 </mapper>

@@ -1,5 +1,6 @@
 package com.mo9.risk.modules.dunning.web;
 
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -92,7 +94,7 @@ public class TMisDunningGroupController extends BaseController {
 		logger.debug("加载编辑催收小组页面");
 		model.addAttribute("users", tMisDunningGroupService.findUserList());
 		model.addAttribute("organizations", tMisDunningOrganizationService.findList(null));
-		return "modules/dunning/tMisDunningGroupForm";
+		return "modules/dunning/dialog/tMisDunningGroupForm";
 	}
 	
 	
@@ -101,6 +103,7 @@ public class TMisDunningGroupController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(TMisDunningGroup tMisDunningGroup, Model model, RedirectAttributes redirectAttributes) {
 		if (!beanValidator(model, tMisDunningGroup)){
 			return form(tMisDunningGroup, model);
@@ -108,8 +111,7 @@ public class TMisDunningGroupController extends BaseController {
 		
 		tMisDunningGroupService.save(tMisDunningGroup);
 		logger.debug("保存催收小组:"+tMisDunningGroup.toString());
-		addMessage(redirectAttributes, "保存催收小组成功");
-		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
+		return "OK";
 	}
 	
 	/**
@@ -167,5 +169,14 @@ public class TMisDunningGroupController extends BaseController {
 		tMisDunningGroup.setGroupIds(Arrays.asList(groupsArr));
 		tMisDunningGroupService.resetGroupOrganization(tMisDunningGroup);
 		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
+	}
+
+	/**
+	 * 小组选择列表, 根据组长监理权限筛选
+	 */
+	@RequestMapping(value="optionList",produces= MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<TMisDunningGroup> optionList(TMisDunningGroup group) {
+		return tMisDunningGroupService.findAuthorizedGroups(group, UserUtils.getUser());
 	}
 }
