@@ -23,7 +23,29 @@ $(document).ready(function() {
 			}
 		}
 	});
-	
+
+  $("#btnSubmit").on("click",function () {
+    if(!$("#inputForm").valid()){
+      return;
+    }
+    $.ajax({
+      type: 'POST',
+      url : "${ctx}/dunning/tMisDunningGroup/save",
+      data: $('#inputForm').serialize(),             //获取表单数据
+      success : function(data) {
+        if (data == "OK") {
+          window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+        } else {
+          alert(data);
+        }
+      },
+      error : function(XMLHttpRequest, textStatus, errorThrown){
+        //通常情况下textStatus和errorThrown只有其中一个包含信息
+        alert("保存失败:"+textStatus);
+      }
+    });
+  });
+
 	$('#orgnizationId').change(function() {
 		var option = $(this).children(":selected");
 		$('#supervisor').text(option.attr('supervisor') || '');
@@ -32,17 +54,6 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/dunning/tMisDunningGroup/">催收小组列表</a></li>
-		<li class="active">
-		<a href="${ctx}/dunning/tMisDunningGroup/
-			${not empty TMisDunningGroup.id? 'edit?id=${TMisDunningGroup.id}">催收小组修改' : 'form">催收小组添加'}
-		</a>
-		</li>
-		<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
-			<li><a href="${ctx}/dunning/tMisDunningOrganization/form?opr=add">催收机构添加</a></li>
-		</shiro:hasPermission>
-	</ul>
 	<br/>
 	<form:form id="inputForm" modelAttribute="TMisDunningGroup" action="${ctx}/dunning/tMisDunningGroup/save" method="post" class="form-horizontal">
 		<sys:message content="${message}"/>	
@@ -92,7 +103,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 		<div class="form-actions">
-			<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;
+			<input id="btnSubmit" class="btn btn-primary" type="button" value="保 存"/>&nbsp;
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>
 	</form:form>

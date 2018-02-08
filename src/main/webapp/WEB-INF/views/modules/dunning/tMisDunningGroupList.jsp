@@ -23,7 +23,7 @@
 			return;
 		}
 		
-		$.jBox.open("iframe:${ctx}/dunning/tMisDunningGroup/distribution?groups=" + groups, "分配机构" , 500, 350, {            
+		$.jBox.open("iframe:${ctx}/dunning/tMisDunningGroup/distribution?groups=" + groups, "分配机构" , 500, 280, {
             buttons: {},
             loaded: function (h) {
                 $(".jbox-content", document).css("overflow-y", "hidden");
@@ -52,21 +52,47 @@
 	}
 	
 	function modifyOrganization() {
-		$.jBox.open("iframe:${ctx}/dunning/tMisDunningOrganization/form?opr=edit", "重配机构" , 500, 350, {            
+		$.jBox.open("iframe:${ctx}/dunning/tMisDunningOrganization/form?opr=edit", "重配机构" , 500, 280, {
             buttons: {},
             loaded: function (h) {
                 $(".jbox-content", document).css("overflow-y", "hidden");
             }
      	});
 	}
+
+    function groupFormDialog(id) {
+      var url = "${ctx}/dunning/tMisDunningGroup/form";
+      var diaName = "催收添加";
+      if (id != null && id!=""){
+        url = "${ctx}/dunning/tMisDunningGroup/edit" + "?id="+id;
+        diaName = "催收小组修改"
+      }
+      $.jBox.open("iframe:" + url, diaName , 500, 400, {
+        buttons: {},
+        loaded: function (h) {
+          $(".jbox-content", document).css("overflow-y", "hidden");
+        }
+      });
+    }
+
+    function organizationFormDialog() {
+      var url = "${ctx}/dunning/tMisDunningOrganization/form?opr=add";
+      var diaName = "催收机构添加";
+      $.jBox.open("iframe:" + url, diaName , 500, 280, {
+        buttons: {},
+        loaded: function (h) {
+          $(".jbox-content", document).css("overflow-y", "hidden");
+        }
+      });
+    }
 </script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/dunning/tMisDunningGroup/">催收小组列表</a></li>
-		<li><a href="${ctx}/dunning/tMisDunningGroup/form">催收小组编辑</a></li>
+		<li><a onclick="groupFormDialog()">催收小组添加</a></li>
 		<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
-			<li><a href="${ctx}/dunning/tMisDunningOrganization/form?opr=add">催收机构添加</a></li>
+			<li><a onclick="organizationFormDialog()" >催收机构添加</a></li>
 		</shiro:hasPermission>
 	</ul>
 	
@@ -103,15 +129,15 @@
 					<form:options items="${supervisors}" itemLabel="name" itemValue="id"/>
 				</form:select>
 			</li>
-		</ul>
-		<ul class="ul-form">
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
-				<li class="btns"><input class="btn btn-primary" type="button" value="分配机构" onclick="distributeGroup();"/></li>
-				<li class="btns"><input class="btn btn-primary" type="button" value="重置机构" onclick="resetDistribution();"/></li>
+				<li class="btns">
+					<input class="btn btn-primary" type="button" value="分配机构" onclick="distributeGroup();"/>
+					<input class="btn btn-primary" type="button" value="重置机构" onclick="resetDistribution();"/>
 				<shiro:hasPermission name="dunning:TMisDunningOrganization:edit">
-					<li class="btns"><input class="btn btn-primary" type="button" value="重配机构" onclick="modifyOrganization();"/></li>
+					<input class="btn btn-primary" type="button" value="重配机构" onclick="modifyOrganization();"/>
 				</shiro:hasPermission>
+				</li>
 			</shiro:hasPermission>
 			<li class="clearfix"></li>
 		</ul>
@@ -158,7 +184,7 @@
 				</td>
 				<shiro:hasPermission name="dunning:TMisDunningGroup:edit">
 				<td>
-    				<a href="${ctx}/dunning/tMisDunningGroup/edit?id=${tMisDunningGroup.id}">修改</a>
+    				<a onclick="groupFormDialog('${tMisDunningGroup.id}')">修改</a>
 					<a href="${ctx}/dunning/tMisDunningGroup/delete?id=${tMisDunningGroup.id}" onclick="return confirmx('确认要删除该催收小组吗？', this.href)">删除</a>
 				</td>
 				</shiro:hasPermission>

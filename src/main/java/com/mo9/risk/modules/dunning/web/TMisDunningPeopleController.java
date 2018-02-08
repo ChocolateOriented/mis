@@ -4,7 +4,6 @@
 package com.mo9.risk.modules.dunning.web;
 
 import com.mo9.risk.modules.dunning.enums.DebtBizType;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -121,7 +120,7 @@ public class TMisDunningPeopleController extends BaseController {
 		model.addAttribute("users",users);
 		model.addAttribute("tMisDunningPeople", tMisDunningPeople);
 		model.addAttribute("bizTypes", DebtBizType.values());
-		return "modules/dunning/tMisDunningPeopleForm";
+		return "modules/dunning/dialog/tMisDunningPeopleForm";
 	}
 
 	/**
@@ -133,14 +132,14 @@ public class TMisDunningPeopleController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:tMisDunningPeople:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(TMisDunningPeople tMisDunningPeople, Model model, RedirectAttributes redirectAttributes) {
 		if (!beanValidator(model, tMisDunningPeople)){
 			return form(tMisDunningPeople, model);
 		}
 
 		tMisDunningPeopleService.save(tMisDunningPeople);
-		addMessage(redirectAttributes, "保存催收人员成功");
-		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
+		return "OK";
 	}
 	
 	/**
@@ -232,27 +231,16 @@ public class TMisDunningPeopleController extends BaseController {
 	 */
 
 	@RequiresPermissions("dunning:tMisDunningPeople:view")
-
 	@RequestMapping(value = "extensionNumberYanZheng")
-
 	@ResponseBody
-
 	public Boolean valideNumber(String extensionNumber) {
-
 		if (StringUtils.isEmpty(extensionNumber)) {
-
 			return false;
-
 		}
-
 		boolean yanZhengNumber = tMisDunningTaskService.yanZhengNumber(extensionNumber, 2);
-
 		if (!yanZhengNumber) {
-
 			return false;
-
 		}
-
 		return true;
 
 	}
@@ -334,8 +322,6 @@ public class TMisDunningPeopleController extends BaseController {
 	}
 	/**
 	 * 批量添加催收员
-	 * @param peopleids
-	 * @param model
 	 * @return
 	 */
 	@RequiresPermissions("dunning:tMisDunningPeople:edit")
@@ -371,7 +357,7 @@ public class TMisDunningPeopleController extends BaseController {
 		}
 		if(!validsInsert){
 			addMessage(redirectAttributes,  "解析文件:" + file.getOriginalFilename() + ",发生失败."+message.toString());
-			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/form?repage";
+			return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningPeople/?repage";
 		}
 		logger.info("导入成功,文件:" + file.getOriginalFilename());
 		addMessage(redirectAttributes,  "导入成功.");
