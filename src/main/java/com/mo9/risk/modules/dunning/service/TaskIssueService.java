@@ -213,13 +213,15 @@ public class TaskIssueService extends CrudService<TaskIssueDao, TaskIssue> {
 			if (handlingIssueTypes.containsAll(issueTypese)) {
 				issue.setStatus(IssueStatus.RESOLVED);
 			}
-			//如果没有用户, 则选该案件催收员
-			String updateUserName = user.getName();
 			try {
+				//如果没有用户, 则选该案件催收员
+				String updateUserName;
 				if (user == null) {
 					TMisDunningTask task = tMisDunningTaskService.findDunningTaskByDealcode(dealcode);
 					TMisDunningPeople people = peopleService.get(task.getDunningpeopleid());
 					updateUserName = people.getNickname();
+				}else {
+					updateUserName = user.getName();
 				}
 				this.update(issue, updateUserName);
 			} catch (Exception e) {

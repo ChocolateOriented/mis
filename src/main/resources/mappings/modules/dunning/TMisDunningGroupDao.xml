@@ -105,7 +105,8 @@
 			createdate,
 			updateby,
 			updatedate,
-			delFlag
+			delFlag,
+			organizationId
 		) VALUES (
 			#{id},
 			#{name},
@@ -115,7 +116,8 @@
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
-			#{delFlag}
+			#{delFlag},
+			#{organization.id}
 		)
 	</insert>
 	

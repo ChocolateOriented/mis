@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
 import com.mo9.risk.modules.dunning.service.TMisDunningOrganizationService;
 import com.mo9.risk.modules.dunning.service.TMisDunningPeopleService;
-import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.web.BaseController;
 
 @Controller
@@ -43,7 +42,7 @@ public class TMisDunningOrganizationController extends BaseController {
 			List<TMisDunningOrganization> organizations = tMisDunningOrganizationService.findList(null);
 			model.addAttribute("organizations", organizations);
 		}
-		return "modules/dunning/tMisDunningOrganizationForm";
+		return "modules/dunning/dialog/tMisDunningOrganizationForm";
 	}
 	
 	/**
@@ -51,19 +50,8 @@ public class TMisDunningOrganizationController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisDunningOrganization:edit")
 	@RequestMapping(value = "save")
-	public String save(TMisDunningOrganization tMisDunningOrganization, Model model, RedirectAttributes redirectAttributes) {
-		tMisDunningOrganizationService.save(tMisDunningOrganization);
-		addMessage(redirectAttributes, "保存催收机构成功");
-		return "redirect:" + Global.getAdminPath() + "/dunning/tMisDunningGroup/?repage";
-	}
-	
-	/**
-	 * 修改催收机构
-	 */
-	@RequiresPermissions("dunning:TMisDunningOrganization:edit")
-	@RequestMapping(value = "edit")
 	@ResponseBody
-	public String edit(TMisDunningOrganization tMisDunningOrganization, Model model, RedirectAttributes redirectAttributes) {
+	public String save(TMisDunningOrganization tMisDunningOrganization, Model model, RedirectAttributes redirectAttributes) {
 		tMisDunningOrganizationService.save(tMisDunningOrganization);
 		return "OK";
 	}

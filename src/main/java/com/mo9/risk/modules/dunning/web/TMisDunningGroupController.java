@@ -94,7 +94,7 @@ public class TMisDunningGroupController extends BaseController {
 		logger.debug("加载编辑催收小组页面");
 		model.addAttribute("users", tMisDunningGroupService.findUserList());
 		model.addAttribute("organizations", tMisDunningOrganizationService.findList(null));
-		return "modules/dunning/tMisDunningGroupForm";
+		return "modules/dunning/dialog/tMisDunningGroupForm";
 	}
 	
 	
@@ -103,6 +103,7 @@ public class TMisDunningGroupController extends BaseController {
 	 */
 	@RequiresPermissions("dunning:TMisDunningGroup:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(TMisDunningGroup tMisDunningGroup, Model model, RedirectAttributes redirectAttributes) {
 		if (!beanValidator(model, tMisDunningGroup)){
 			return form(tMisDunningGroup, model);
@@ -110,8 +111,7 @@ public class TMisDunningGroupController extends BaseController {
 		
 		tMisDunningGroupService.save(tMisDunningGroup);
 		logger.debug("保存催收小组:"+tMisDunningGroup.toString());
-		addMessage(redirectAttributes, "保存催收小组成功");
-		return "redirect:"+Global.getAdminPath()+"/dunning/tMisDunningGroup/?repage";
+		return "OK";
 	}
 	
 	/**

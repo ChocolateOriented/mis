@@ -24,27 +24,11 @@ $(document).ready(function() {
 				    }
 				}
 			}
-// 			extensionNumber:{
-// 				remote:{
-// 					url:"${ctx}/dunning/tMisDunningPeople/extensionNumberYanZheng",
-//    					type:"post",
-//    					dataType: "json", 
-//     				data:{
-// 	    				extensionNumber:function() {
-// 				            return $("#extensionNumber").val();
-// 				        	}
-// 						}
-   					
-// 				}
-// 			}
 		},
 		messages:{
 			nickname:{
 				remote:"该花名已被占用"
 			}
-// 			extensionNumber:{
-// 				remote:"请填写正确的格式"
-// 			}
 		},
 		submitHandler: function(form){
 			loading('正在提交，请稍等...');
@@ -70,12 +54,28 @@ $(document).ready(function() {
 	$("#groupId").on("change",function(event){
 		changGroupType();
 	});
-	
-	
-	$("#batchAdd").click(function(){
-		$.jBox($("#importBox").html(), {title:"导入数据", width: 500, 
-		    height:450,  buttons:{"关闭":true}} );
-	});
+
+	$("#btnSubmit").on("click",function () {
+      	if(!$("#inputForm").valid()){
+      	  return;
+        }
+      $.ajax({
+        type: 'POST',
+        url : "${ctx}/dunning/tMisDunningPeople/save",
+        data: $('#inputForm').serialize(),             //获取表单数据
+        success : function(data) {
+          if (data == "OK") {
+            window.parent.page();                         //调用父窗体方法，当关闭子窗体刷新父窗体
+          } else {
+            alert(data);
+          }
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown){
+          //通常情况下textStatus和errorThrown只有其中一个包含信息
+          alert("保存失败:"+textStatus);
+        }
+      });
+    })
 });
 
 function changGroupType(){
@@ -83,45 +83,10 @@ function changGroupType(){
 	$("#groupType").select2("val", groupType);
 }
 
-function batchAddPage(){
-	var url = "${ctx}/dunning/tMisDunningPeople/batchAddPage";
-	$.jBox.open("iframe:" + url, diaName , 500, 450, {
-           buttons: {},
-           loaded: function (h) {
-               $(".jbox-content", document).css("overflow-y", "hidden");
-           }
-    });
-	
-}
-function disableBUtton(){
-	$("#save").attr("disabled","disabled");
-}
 </script>
 </head>
 <body>
-	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/dunning/tMisDunningPeople/">催收人员列表</a></li>
-		<li class="active"><a href="${ctx}/dunning/tMisDunningPeople/form?id=${tMisDunningPeople.id}">催收人员<shiro:hasPermission name="dunning:tMisDunningPeople:edit">${not empty tMisDunningPeople.dbid?'修改':'添加'}</shiro:hasPermission> <shiro:lacksPermission name="dunning:tMisDunningPeople:edit">查看</shiro:lacksPermission></a></li>
-	</ul>
 	<br />
-	<div id="importBox" class="hide">
-		<form  id="importExcel" action="${ctx}/dunning/tMisDunningPeople/fileUpload" method="post" enctype="multipart/form-data"  onsubmit="loading('正在导入，请稍等...');" >
-			<div style="border:1px dashed ;width:300px;height:260px;margin:10px 0px 0px 100px;text-align:center;">
-			
-				<div  style="margin-top: 10px ;">
-	            <input   id="file" type="file" accept=".xls,.xlsx,.csv" name="file" />
-				
-				</div>	
-				<div>
-				
-				</div>	
-				<div  style="margin-top: 180px ;text-align:left; "> 
-					<input type="submit" class="btn btn-primary" id="save"  value="确定上传" onclick="disableBUtton()" />
-				</div>
-			</div>
-			
-		</form>
-	</div>
 	<sys:message content="${message}" />
 	<form:form id="inputForm" modelAttribute="TMisDunningPeople" action="${ctx}/dunning/tMisDunningPeople/save" method="post" class="form-horizontal" >
 		<input type="hidden" id="dbid" name="dbid" value="${tMisDunningPeople.dbid}" />
@@ -144,7 +109,6 @@ function disableBUtton(){
 					</c:otherwise>
 				</c:choose>
 				<span class="help-inline"><font color="red">*</font> </span>
-				<input type="button"  class="btn btn-primary" id="batchAdd" value="批量添加" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -202,20 +166,6 @@ function disableBUtton(){
 				</form:select>
 			</div>
 		</div>
-<!-- 		<div class="control-group"> -->
-<!-- 			<label class="control-label">催收员坐席号：</label> -->
-<!-- 			<div class="controls"> -->
-<%-- 				<input  value="${tMisDunningPeople.agent }" id=agent name="agent" htmlEscape="false"  class="input-xlarge required "  /> --%>
-<!-- 				<span class="help-inline"><font color="red">*</font></span> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
-<!-- 		<div class="control-group"> -->
-<!-- 			<label class="control-label">催收员分机号：</label> -->
-<!-- 			<div class="controls"> -->
-<%-- 				<input  value="${tMisDunningPeople.extensionNumber }" id="extensionNumber" name="extensionNumber" htmlEscape="false"  class="input-xlarge required "  /> --%>
-<!-- 				<span class="help-inline"><font color="red">*</font></span> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
 		<div class="control-group">
 			<label class="control-label">催收队列：</label>
 			<div class="controls">
@@ -231,27 +181,9 @@ function disableBUtton(){
 			</div>
 		</div>
 
-<!-- 		<div class="control-group"> -->
-<!-- 			<label title="大于1为单笔固定费率，小于1大于0为单笔百分比费率" class="control-label">单笔费率 ：</label> -->
-<!-- 			<div class="controls"> -->
-<%-- 				<form:input path="rate" htmlEscape="false" class="input-xlarge " /> --%>
-<!-- 			</div> -->
-<!-- 		</div> -->
-		<!-- 		<div class="control-group"> -->
-		<!-- 			<label class="control-label">逾期周期起始：</label> -->
-		<!-- 			<div class="controls"> -->
-		<%-- 				<form:input path="begin" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/> --%>
-		<!-- 			</div> -->
-		<!-- 		</div> -->
-		<!-- 		<div class="control-group"> -->
-		<!-- 			<label class="control-label">逾期周期截至：</label> -->
-		<!-- 			<div class="controls"> -->
-		<%-- 				<form:input path="end" htmlEscape="false" maxlength="3" class="input-xlarge digits required"/> --%>
-		<!-- 			</div> -->
-		<!-- 		</div> -->
 		<div class="form-actions">
 			<shiro:hasPermission name="dunning:tMisDunningPeople:edit">
-				<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存" />&nbsp;</shiro:hasPermission>
+				<input id="btnSubmit" class="btn btn-primary" type="button" value="保 存" />&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)" />
 		</div>
 	</form:form>
