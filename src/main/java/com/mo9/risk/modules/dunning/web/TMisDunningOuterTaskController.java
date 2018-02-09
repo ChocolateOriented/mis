@@ -77,8 +77,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 	@Autowired
 	private TMisDunningTaskDao tMisDunningTaskDao;
 	@Autowired
-	private TMisDunningPeopleService tMisDunningPeopleService;
-	@Autowired
 	private TMisChangeCardRecordService tMisChangeCardRecordService;
 	@Autowired
 	private TMisDunningDeductService tMisDunningDeductService;
@@ -108,12 +106,16 @@ public class TMisDunningOuterTaskController extends BaseController {
 		if (dunningOrder.getStatus() == null){
 			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
 		}
-
-		Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			Page<DunningOrder> page = tMisDunningTaskService.findOuterOrderPageList(new Page<DunningOrder>(request, response), dunningOrder);
+			model.addAttribute("page", page);
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		//催收小组列表
 		model.addAttribute("mobileResultMap", MobileResult.getActions());
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
-		model.addAttribute("page", page);
 		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningOuterTaskList";
 	}
@@ -157,7 +159,6 @@ public class TMisDunningOuterTaskController extends BaseController {
 
 		/**
 		 * 加载用户信息页面1
-		 * @param tMisDunningTask
 		 * @param model
 		 * @return
 		 */
