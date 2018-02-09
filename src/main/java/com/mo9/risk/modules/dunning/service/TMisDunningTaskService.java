@@ -798,10 +798,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 		int permissions = 1;   			// 催收专员
 		for (Role r : UserUtils.getUser().getRoleList()){
 			if(("委外主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
-				permissions = 10;
+				permissions += 10;
 			}
 			if(("催收主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
-				permissions = 100;
+				permissions += 100;
 			}
 			if(("财务主管").equals(r.getName())  &&  !r.getDataScope().equals(Role.DATA_SCOPE_SELF)){
 				permissions = 1000;

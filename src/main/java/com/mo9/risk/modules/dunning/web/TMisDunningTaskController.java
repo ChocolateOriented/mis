@@ -223,11 +223,15 @@ public class TMisDunningTaskController extends BaseController {
 		if (dunningOrder.getStatus() == null){
 			dunningOrder.setStatus(DunningOrder.STATUS_PAYMENT);
 		}
-		Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder,UserUtils.getUser());
-
+		try {
+			DynamicDataSource.setCurrentLookupKey("dataSource_read");
+			Page<DunningOrder> page = tMisDunningTaskService.newfindOrderPageList(new Page<DunningOrder>(request, response), dunningOrder,UserUtils.getUser());
+			model.addAttribute("page", page);
+		} finally {
+			DynamicDataSource.setCurrentLookupKey("dataSource");
+		}
 		model.addAttribute("mobileResultMap", MobileResult.getActions());
 		model.addAttribute("groupTypes", TMisDunningGroup.groupTypes) ;
-		model.addAttribute("page", page);
 		model.addAttribute("bizTypes", DebtBizType.values());
 		return "modules/dunning/tMisDunningTaskList";
 	}

@@ -81,7 +81,9 @@
                     <fmt:formatDate value="${taskIssue.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </td>
                 <td>
-                    <fmt:formatDate value="${taskIssue.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    <c:if test="${taskIssue.updateBy.name != null}">
+                        <fmt:formatDate value="${taskIssue.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </c:if>
                 </td>
                 <td>
                     ${taskIssue.updateBy.name}
