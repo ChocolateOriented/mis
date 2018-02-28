@@ -16,6 +16,10 @@
 		
 		$('#save').click(function() {
 			if($("#inputForm").valid()){
+				if(parseFloat($("#payamount").val())<100){
+					$.jBox.tip("扣款金额必须大于100元!", "warning");
+					return;
+				}
 				if ($("input[name='paytype']:checked").val() == "partial") {
 					var payamount = $("#payamount").val();
 					if (parseFloat(payamount) <= parseFloat("${personalInfo.corpusAmount}" || "0") / 100 * 0.5) {
@@ -23,6 +27,10 @@
 						return;
 					}
 					
+					if (parseFloat(payamount) >= parseFloat("${personalInfo.creditAmount}" || "0") / 100) {
+						$.jBox.tip("扣款金额应小于应催金额", "warning");
+						return;
+					}
 					if (parseFloat(payamount) >= parseFloat("${personalInfo.creditAmount}" || "0") / 100) {
 						$.jBox.tip("扣款金额应小于应催金额", "warning");
 						return;

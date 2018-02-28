@@ -61,6 +61,16 @@
 			font-size: 13px;
 			padding: 10px;
 		}
+		.letterClass {
+			z-index: 10000;
+			background-color: #333;
+			color: white;
+			font-size: 13px;
+			padding: 10px;
+			margin-top: -40px;
+   			margin-left: 20px;
+   			border-radius: 10px;
+		}
 	</style>
 	<script type="text/javascript">
       $(document).ready(function () {
@@ -346,6 +356,12 @@
             return  parseInt("${overdueDays}")>parseInt("${controlDay}");
 
         }
+        function letterDetailShow(){
+        	$("#detailLetter").css("display", "block");
+        }
+        function letterDetailHide(){
+        	$("#detailLetter").css("display", "none");
+        }
 	</script>
 </head>
 <body>
@@ -478,7 +494,18 @@
 		<td>发薪日：${personalInfo.paydayDesc}</td>
 	</tr>
 	<tr>
-		<td>证件地址：${not empty personalInfo.ocrAddr ? personalInfo.ocrAddr : "未获取"}</td>
+		<td>
+			证件地址：${not empty personalInfo.ocrAddr ? personalInfo.ocrAddr : "未获取"}
+			<c:if test="${not empty letter && letter.sendResult ne 'BESEND'}">
+			  <i id="letter" class="icon-envelope" style="cursor:pointer;color: #0292e0;font-size: 20px;position: absolute;" onmouseover="letterDetailShow();" onmouseout="letterDetailHide();" >
+			  <div class="letterClass" id="detailLetter" style="display:none" tabindex="0" >
+			  	 <div>当前状态:${letter.sendResult.desc }</div>
+			  	 <div>信函发送时间:<fmt:formatDate value="${letter.sendDate}" pattern="yyyy-MM-dd"/></div>
+			  	 <div>结果更新时间:<fmt:formatDate value="${letter.resultDate}" pattern="yyyy-MM-dd"/></div>
+			  </div>
+			  </i>
+			</c:if>
+		</td>
 		<td>常住地址：${not empty personalInfo.livingAddr ? personalInfo.livingAddr : "未获取"}</td>
 		<td>C卡分数：${score}</td>
 		<td>发薪区间（元）：${personalInfo.salaryDesc}</td>
