@@ -7,6 +7,7 @@ import com.gamaxpay.commonutil.web.GetRequest;
 import com.mo9.risk.modules.dunning.bean.PayChannelInfo;
 import com.mo9.risk.modules.dunning.bean.SerialRepay;
 import com.mo9.risk.modules.dunning.bean.SerialRepay.RepayWay;
+import com.mo9.risk.modules.dunning.dao.TMisDunningLetterDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningOrderDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.AppLoginLog;
@@ -24,6 +25,7 @@ import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
 import com.mo9.risk.modules.dunning.entity.TMisDunnedConclusion;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
@@ -188,6 +190,8 @@ public class TMisDunningTaskController extends BaseController {
 	private TMisReliefamountHistoryService tMisReliefamountHistoryService;
 	@Autowired
 	private TaskIssueService taskIssueService;
+	@Autowired
+	private TMisDunningLetterDao tMisDunningLetterDao;
 
 	private JedisUtils jedisUtils = new JedisUtils();
 	 
@@ -853,6 +857,9 @@ public class TMisDunningTaskController extends BaseController {
 			hasReliefApply = true;
 		}
 		model.addAttribute("hasReliefApply", hasReliefApply);
+		//该订单是否有信函发送
+		TMisDunningLetter letter = tMisDunningLetterDao.findLetterByDealcode(dealcode);
+		model.addAttribute("letter", letter);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	
