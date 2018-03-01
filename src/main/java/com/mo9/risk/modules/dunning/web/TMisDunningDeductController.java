@@ -96,7 +96,7 @@ public class TMisDunningDeductController extends BaseController {
 			result.put("msg", "参数错误");
 			return result;
 		}
-		if(tMisDunningDeduct.getPayamount()<100){
+		if(tMisDunningDeduct.getPayamount()<=100){
 			result.put("result", "NO");
 			result.put("msg", "扣款金额必须大于100元!");
 			return result;

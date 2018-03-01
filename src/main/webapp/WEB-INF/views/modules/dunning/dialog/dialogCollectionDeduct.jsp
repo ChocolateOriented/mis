@@ -16,7 +16,7 @@
 		
 		$('#save').click(function() {
 			if($("#inputForm").valid()){
-				if(parseFloat($("#payamount").val())<100){
+				if(parseFloat($("#payamount").val())<=100){
 					$.jBox.tip("扣款金额必须大于100元!", "warning");
 					return;
 				}

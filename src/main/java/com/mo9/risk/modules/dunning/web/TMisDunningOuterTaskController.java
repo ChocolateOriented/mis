@@ -3,6 +3,7 @@
  */
 package com.mo9.risk.modules.dunning.web;
 
+import com.mo9.risk.modules.dunning.dao.TMisDunningLetterDao;
 import com.mo9.risk.modules.dunning.dao.TMisDunningTaskDao;
 import com.mo9.risk.modules.dunning.entity.DunningOrder;
 import com.mo9.risk.modules.dunning.entity.DunningOuterFile;
@@ -11,6 +12,7 @@ import com.mo9.risk.modules.dunning.entity.MobileResult;
 import com.mo9.risk.modules.dunning.entity.TBuyerContact;
 import com.mo9.risk.modules.dunning.entity.TMisChangeCardRecord;
 import com.mo9.risk.modules.dunning.entity.TMisDunningGroup;
+import com.mo9.risk.modules.dunning.entity.TMisDunningLetter;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrder;
 import com.mo9.risk.modules.dunning.entity.TMisDunningOrganization;
 import com.mo9.risk.modules.dunning.entity.TMisDunningPeople;
@@ -86,7 +88,8 @@ public class TMisDunningOuterTaskController extends BaseController {
 	private RiskQualityInfoService tMisDunningScoreCardService;
 	@Autowired
 	private TMisDunningOrganizationService tMisDunningOrganizationService;
-	
+	@Autowired
+	private TMisDunningLetterDao tMisDunningLetterDao;
 	@ModelAttribute("dunningOrder")
 	public DunningOrder getDunningOrder(@RequestParam(required=false) String id) {
 		DunningOrder entity = null;
@@ -231,7 +234,9 @@ public class TMisDunningOuterTaskController extends BaseController {
 		//model.addAttribute("isDelayable", isDelayable);
 		MemberInfo memberInfo = memberInfoService.getMemberInfo(dealcode);
 		model.addAttribute("memberInfo",memberInfo);
-		
+		//该订单是否有信函发送
+		TMisDunningLetter letter = tMisDunningLetterDao.findLetterByDealcode(dealcode);
+		model.addAttribute("letter", letter);
 		return "modules/dunning/tMisDunningTaskFather";
 	}
 	
