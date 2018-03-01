@@ -1684,7 +1684,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						System.out.println("过期分案产品-findPeopleSumcorpusamountByDunningcycle:参数entry.getKey()"+entry.getKey() 
 						+ "tmpMoveCycle.getDatetimestart()" +tmpMoveCycle.getDatetimestart()+ "tmpMoveCycle.getDatetimeend()" +tmpMoveCycle.getDatetimeend()+ "debtBizType.getValue()" +debtBizType.getValue()+ "debtBizType.getDescription()" +debtBizType.getDescription() );
 						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getValue(),debtBizType.getDescription());
-						System.out.println("过期分案产品-findPeopleSumcorpusamountByDunningcycle:"+ dunningPeoples + "个人员");
+						System.out.println("过期分案产品-findPeopleSumcorpusamountByDunningcycle:"+ dunningPeoples.size() + "个人员");
 						/**
 						 *  平均分配队列集合的催收人员
 						 */
@@ -1729,6 +1729,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							
 							inDunningTaskLogs.add(inDunningTaskLogsMap.get(dunningTask.getId()));
 						}
+						System.out.println("过期分案产品-batchUpdateExpiredTask");
 						/**
 						 * 批量更新每个队列的任务集合
 						 */
