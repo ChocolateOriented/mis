@@ -1637,6 +1637,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 							logger.warn("过期分案产品-" + debtbiztypename + "行为状态out_error：逾期"+dunningTaskLog.getOverduedays() +"天，无法对应周期队列，dealcode:" + dunningTaskLog.getDealcode() + "任务taskID:" + dunningTaskLog.getTaskid()+"不做分配");
 							continue;
 						}
+						System.out.println("过期分案产品-dunningTaskLog.getOverduedays()-" + dunningTaskLog.getOverduedays() + "dict:" + dict);
 						/**
 						 * 任务task修改
 						 */
@@ -1663,6 +1664,7 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 					 * 保存移出任务Log
 					 */
 					tMisDunningTaskLogDao.batchInsertTaskLog(outDunningTaskLogs);
+					System.out.println("过期分案产品-tMisDunningTaskLogDao.batchInsertTaskLog-保存移出任务Log");
 					
 					/**  移入的任务Log集合   */
 					List<TMisDunningTaskLog> inDunningTaskLogs = new ArrayList<TMisDunningTaskLog>();
@@ -1679,8 +1681,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 						 * 根据周期查询催收人员按金额排序
 						 */
 						TmpMoveCycle tmpMoveCycle = this.getTmpMoveCycle(entry.getKey());
+						System.out.println("过期分案产品-findPeopleSumcorpusamountByDunningcycle:参数entry.getKey()"+entry.getKey() 
+						+ "tmpMoveCycle.getDatetimestart()" +tmpMoveCycle.getDatetimestart()+ "tmpMoveCycle.getDatetimeend()" +tmpMoveCycle.getDatetimeend()+ "debtBizType.getValue()" +debtBizType.getValue()+ "debtBizType.getDescription()" +debtBizType.getDescription() );
 						List<TMisDunningPeople> dunningPeoples = tMisDunningPeopleDao.findPeopleSumcorpusamountByDunningcycle(entry.getKey(),tmpMoveCycle.getDatetimestart(),tmpMoveCycle.getDatetimeend(),debtBizType.getValue(),debtBizType.getDescription());
-						
+						System.out.println("过期分案产品-findPeopleSumcorpusamountByDunningcycle:"+ dunningPeoples + "个人员");
 						/**
 						 *  平均分配队列集合的催收人员
 						 */
@@ -2074,6 +2078,15 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 			
 		}
 	}  
+	
+	public static void main(String[] args) {
+		System.out.println("ass");
+			if(rangeInDefined(   -1   , -1, -2)){
+				System.out.println("a");
+			}
+		
+		
+	}
 	
 	/**
 	 * 根据逾期天数，返回该月该日的归属队列
@@ -2547,10 +2560,10 @@ public class TMisDunningTaskService extends CrudService<TMisDunningTaskDao, TMis
 ////		System.out.println(s.split("_")[0] == null);
 //	}
 //	
-	public static void main(String[] args) {
-		System.out.println(DebtBizType.valueOf("JHJJ"));
-		
-	}
+//	public static void main(String[] args) {
+//		System.out.println(DebtBizType.valueOf("JHJJ"));
+//		
+//	}
 	
 //	public static final void main(String[] args)throws Exception
 //	{
