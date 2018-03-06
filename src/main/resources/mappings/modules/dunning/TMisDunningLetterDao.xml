@@ -210,18 +210,14 @@
 		  	<if test="sendDate != null and sendDate != '' ">
 		  	sendDate=#{sendDate},
 		  	</if>
-		  	<if test="postCode != null and postCode != '' ">
-	  		postCode =#{postCode},	
-		  	</if>
 		  	<if test="downLoadFlag != null and downLoadFlag != '' ">
 		  	downLoadFlag =#{downLoadFlag},	
 		  	</if>
 		  	<if test="creditamount != null and creditamount != '' ">
 		  	creditamount =#{creditamount},	
 		  	</if>
-		  	<if test="remark != null and remark != '' ">
 		  	remark =#{remark},	
-		  	</if>
+		  	postCode =#{postCode},	
 		  	sendResult =#{sendResult},
 			resultDate = #{resultDate},
 			updateDate = #{updateDate},
