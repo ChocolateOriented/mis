@@ -226,10 +226,10 @@
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
-	<shiro:hasPermission name="dunning:tMisDunningTask:adminview">
-		<input id="synButton"  class="btn btn-primary" type="button" value="同步历史案件"/>
-		<input id="synButtonToday"  class="btn btn-primary" type="button" value="同步当天案件"/>
-	</shiro:hasPermission>
+<%-- 	<shiro:hasPermission name="dunning:tMisDunningTask:adminview"> --%>
+<!-- 		<input id="synButton"  class="btn btn-primary" type="button" value="同步历史案件"/> -->
+<!-- 		<input id="synButtonToday"  class="btn btn-primary" type="button" value="同步当天案件"/> -->
+<%-- 	</shiro:hasPermission> --%>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>

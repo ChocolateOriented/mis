@@ -53,48 +53,48 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 	 * 同步逾期历史60+(可配置)案件
 	 * 
 	 */
-	@Transactional(readOnly = false)
-	public void synDealcode(){
-		String synDay = DictUtils.getDictValue("synDay", "letter", "");
-		if(StringUtils.isEmpty(synDay)){
-			logger.warn("数据字典未配置需同步的案件天数");
-			return;
-		}
-		Integer daySyn;
-		try{
-			daySyn = Integer.valueOf(synDay);
-		}catch(Exception e){
-			logger.warn("数据字典配置同步的案件天数错误",e);
-			return;
-		}
-		logger.info("开始同步历史信函的案件");
-		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"history");
-		saveSynDealcode(synDealcodeList);
-	}
-	
-	/**
-	 * 同步逾期60(可配置)当天案件
-	 * 
-	 */
-	@Scheduled(cron = "0 30 3 * * ?")
-	@Transactional(readOnly = false)
-	public void synDealcodeToday(){
-		String synDay = DictUtils.getDictValue("synDay", "letter", "");
-		if(StringUtils.isEmpty(synDay)){
-			logger.warn("数据字典未配置需同步的案件天数");
-			return;
-		}
-		Integer daySyn;
-		try{
-			daySyn = Integer.valueOf(synDay);
-		}catch(Exception e){
-			logger.warn("数据字典配置同步的案件天数错误",e);
-			return;
-		}
-		logger.info("开始同步当天信函的案件");
-		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"today");
-		saveSynDealcode(synDealcodeList);
-	}
+//	@Transactional(readOnly = false)
+//	public void synDealcode(){
+//		String synDay = DictUtils.getDictValue("synDay", "letter", "");
+//		if(StringUtils.isEmpty(synDay)){
+//			logger.warn("数据字典未配置需同步的案件天数");
+//			return;
+//		}
+//		Integer daySyn;
+//		try{
+//			daySyn = Integer.valueOf(synDay);
+//		}catch(Exception e){
+//			logger.warn("数据字典配置同步的案件天数错误",e);
+//			return;
+//		}
+//		logger.info("开始同步历史信函的案件");
+//		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"history");
+//		saveSynDealcode(synDealcodeList);
+//	}
+//	
+//	/**
+//	 * 同步逾期60(可配置)当天案件
+//	 * 
+//	 */
+//	@Scheduled(cron = "0 30 3 * * ?")
+//	@Transactional(readOnly = false)
+//	public void synDealcodeToday(){
+//		String synDay = DictUtils.getDictValue("synDay", "letter", "");
+//		if(StringUtils.isEmpty(synDay)){
+//			logger.warn("数据字典未配置需同步的案件天数");
+//			return;
+//		}
+//		Integer daySyn;
+//		try{
+//			daySyn = Integer.valueOf(synDay);
+//		}catch(Exception e){
+//			logger.warn("数据字典配置同步的案件天数错误",e);
+//			return;
+//		}
+//		logger.info("开始同步当天信函的案件");
+//		List<TMisDunningLetter> synDealcodeList=dao.findSynDealcode(daySyn,"today");
+//		saveSynDealcode(synDealcodeList);
+//	}
 	//保存同步的案件
 	private void saveSynDealcode(List<TMisDunningLetter> synDealcodeList) {
 		for (TMisDunningLetter tMisDunningLetter : synDealcodeList) {
@@ -129,7 +129,7 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 				tMisDunningLetter.setSendResult(SendResult.BACKED);
 			}else{
 				message.append("第"+(i+1)+"条状态不对,请检查");
-				throw new ServiceException("第"+(i+1)+"条内容为空,请检查");
+				throw new ServiceException("第"+(i+1)+"条状态不对,请检查");
 			}
 			TMisDunningLetter letter=dao.findLetterByDealcode(dealcode);
 			if(letter ==null){

@@ -63,26 +63,26 @@ public class TMisDunningLetterController extends BaseController {
 		model.addAttribute("sendResults",values);
 		return "modules/dunning/tMisDunningletter";
 	}
-	/**
-	 * 同步历史案件
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@ResponseBody
-	@RequestMapping(value = "synDealcode")
-	public String synDealcode(HttpServletRequest request, HttpServletResponse response) {
-		tMisDunningLetterService.synDealcode();
-		return "Ok";
-	}
-	/**
-	 * 同步当天案件
-	 */
-	@RequiresPermissions("dunning:tMisDunningTask:adminview")
-	@ResponseBody
-	@RequestMapping(value = "synDealcodeToday")
-	public String synDealcodeToday(HttpServletRequest request, HttpServletResponse response) {
-		tMisDunningLetterService.synDealcodeToday();
-		return "Ok";
-	}
+//	/**
+//	 * 同步历史案件
+//	 */
+//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+//	@ResponseBody
+//	@RequestMapping(value = "synDealcode")
+//	public String synDealcode(HttpServletRequest request, HttpServletResponse response) {
+//		tMisDunningLetterService.synDealcode();
+//		return "Ok";
+//	}
+//	/**
+//	 * 同步当天案件
+//	 */
+//	@RequiresPermissions("dunning:tMisDunningTask:adminview")
+//	@ResponseBody
+//	@RequestMapping(value = "synDealcodeToday")
+//	public String synDealcodeToday(HttpServletRequest request, HttpServletResponse response) {
+//		tMisDunningLetterService.synDealcodeToday();
+//		return "Ok";
+//	}
 	/**
 	 * 补发下载邮件
 	 */
