@@ -565,16 +565,22 @@ public class TMisDunningTaskController extends BaseController {
 		String[] type = request.getParameterValues("type[]");
 		String[] auto = request.getParameterValues("auto[]");
 		String name = request.getParameter("name");
-		String bizType = request.getParameter("bizType");
+		String bizTypeOther = request.getParameter("bizTypeOther");
+		String[] bizTypes = request.getParameterValues("bizType[]");
+		String bizTypeString="";
+		 if(bizTypes!=null && bizTypes.length>0){
+			 bizTypeString= StringUtils.join(bizTypes, ",");
+			 
+		 }
 		String organizationName = request.getParameter("organizationName");
 		if ((dunningcycle == null || dunningcycle.length == 0) && (type == null || type.length == 0)
-				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) && StringUtils.isEmpty(bizType)) {
-			return new ArrayList<TMisDunningPeople>();
+				&& (auto == null || auto.length == 0) && StringUtils.isEmpty(name) &&(bizTypes == null || bizTypes.length == 0) ) {
+			return new ArrayList<TMisDunningPeople>(); 
 		}
 
 		String dunningpeoplename = request.getParameter("dunningpeoplename");
 		try{
-			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizType,organizationName);
+			dunningpeople = tMisDunningPeopleService.findPeopleByCycleTypeAutoName(dunningcycle, type, auto, name, dunningpeoplename, bizTypeString,organizationName,bizTypeOther);
 		}catch (Exception e){
 			logger.info("",e);
 			return null;
