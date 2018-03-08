@@ -90,7 +90,7 @@
 						return;
 					}
 					$("#sendLetterDealcodes").val(sendLetterDealcodes);
-					top.$.jBox.confirm("确认要导出列表数据吗？","系统提示",function(v,h,f){
+					top.$.jBox.confirm("确认要发送信函吗？","系统提示",function(v,h,f){
 						if(v=="ok"){
 							$("#searchForm").attr("action","${ctx}/dunning/tMisDunningLetter/sendLetterDealcodes");
 							$("#searchForm").submit();
