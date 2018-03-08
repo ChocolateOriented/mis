@@ -375,12 +375,20 @@
 		<if test="dunningpeoplename != null and dunningpeoplename != ''">
 			AND a.name LIKE concat('%',#{dunningpeoplename},'%')
 		</if>
-		<if test="bizType != null and bizType != ''">
+		<if test="bizTypeString != null and bizTypeString != ''">
+			AND EXISTS (
+				SELECT 1 FROM `t_mis_dunning_people_biz` pb
+				WHERE pb.dunning_people_id = a.id
+				GROUP BY pb.dunning_people_id 
+				HAVING GROUP_CONCAT(pb.debt_biz_type order by pb.debt_biz_type DESC) =#{bizTypeString}
+			)
+		</if>
+		<if test="bizTypeOther != null and bizTypeOther != ''">
 			AND EXISTS (
 				SELECT 1
 				FROM t_mis_dunning_people_biz pb
 				WHERE pb.dunning_people_id = a.id
-				AND pb.debt_biz_type = #{bizType}
+				AND pb.debt_biz_type = #{bizTypeOther}
 			)
 		</if>
 	</select>

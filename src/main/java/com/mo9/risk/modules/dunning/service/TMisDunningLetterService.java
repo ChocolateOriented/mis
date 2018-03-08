@@ -136,9 +136,9 @@ public class TMisDunningLetterService extends CrudService<TMisDunningLetterDao, 
 				message.append("第"+(i+1)+"订单号不对,请检查");
 				throw new ServiceException("第"+(i+1)+"订单号不对,请检查");
 			}
-			if(!"待寄出".equals(letter.getSendResultText())){
-				message.append("第"+(i+1)+"条订单状态不为待寄出不能导入,请检查");
-				throw new ServiceException("第"+(i+1)+"条订单状态不为待寄出不能导入,请检查");
+			if("待发送".equals(letter.getSendResultText())){
+				message.append("第"+(i+1)+"条订单状态为待发送,不能导入,请检查");
+				throw new ServiceException("第"+(i+1)+"条订单状态为待发送,不能导入,请检查");
 			}
 			tMisDunningLetter.setResultDate(new Date());
 			tMisDunningLetter.preInsert();

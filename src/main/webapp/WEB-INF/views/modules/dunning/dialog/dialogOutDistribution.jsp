@@ -93,13 +93,21 @@
             $("input[name='status']:checked").each(function() {
                 status.push($(this).val());
             })
-
+            var bizTypes = [];
+            $("input[name='biztype']:checked").each(function() {
+            	bizTypes.push($(this).val());
+            })
+			var bizTypeOther =$("#biztypeValue").val();
+            if(bizTypes!=null && bizTypes.length>0){
+            	bizTypeOther="";
+            }
+				
             var name = $("#groupList").val();
             var organizationName = $("#organizationName").val();
             var dunningpeoplename = $("#searchName").val() || "";
-
             var param = {
-            	bizType: $("#bizType").val(),
+            	bizType: bizTypes,
+            	bizTypeOther: bizTypeOther,
                 dunningcycle: cycles,
                 type: grouptype,
                 auto: status,
@@ -140,6 +148,34 @@
             $("#orders").val(check_orders);
             $("#selectedOrders").text(check_orders.length);
 
+            $('#biztypes').change(function() {
+                var checked = $('#biztypes').prop("checked");
+                $("input[value='"+$("#biztypeValue").val()+"']").attr("disabled",false);
+                if (!checked) {
+                    $("input[name='biztype']").prop("checked", false);
+                    $("input[name='biztype']").prop("disabled", true);
+                    getPeople();
+                }
+
+            });
+            $("input[value='"+$("#biztypeValue").val()+"']").change(function() {
+              if($(this).attr("checked")){
+                $("input[name='biztype']").attr("disabled", false);
+              }else{
+                	if($('#biztypes').attr("checked")){
+	                	if($("#biztypeValue").val()=="JHJJ"){
+	                    	$("#biztype0").attr("checked", false);
+	                    	$("#biztype0").attr("disabled", true);
+	                	}
+	                	if($("#biztypeValue").val()=="JHJJ_JRZX"){
+	                    	$("#biztype1").attr("checked", false);
+	                    	$("#biztype1").attr("disabled", true);
+	                	}
+                	}
+                }
+
+            });
+            
             $('#cyclesCheckable').change(function() {
                 var checked = $('#cyclesCheckable').prop("checked");
                 $("input[name='cycles']").prop("disabled", !checked);
@@ -189,6 +225,7 @@
             $("#groupList").change(getPeople);
             $("#organizationName").change(getPeople);
             $("#search").click(getPeople);
+            $("input[name='biztype']").change(getPeople);
 
             $('#distributionSave').click(function() {
                 confirmx('是否确认分案?', saveConfirm);
@@ -261,12 +298,13 @@
 		<div id="allpeople">
 			<div class="control-group">
 				<div class="control-group">
+					<input type="hidden" id="biztypeValue" value="${bizType}"/>
 					<div style="width:20%;display:inline-block;">
-						<label style="margin-left:18px;">产品</label>
-						<input type="hidden" id="bizType" value="${bizType}"/>
+						<input id="biztypes" type="checkbox"/><label >产品</label>
 					</div>
 					<div style="width:40%;display:inline-block;">
-						<label>${bizType.desc}<label/>
+						<input id="biztype0" type="checkbox" name="biztype" value="JHJJ_JRZX" disabled/><label for="cycle0">weixin36<label/>&nbsp;
+						<input id="biztype1" type="checkbox" name="biztype" value="JHJJ" disabled/><label for="cycle1">mo9</label>&nbsp;
 					</div>
 				</div>
 				<div style="width:20%;display:inline-block;">
