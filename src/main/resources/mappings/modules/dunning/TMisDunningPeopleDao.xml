@@ -76,8 +76,11 @@
 			<if test="begin != null and end != null and begin != '' and end != ''">
 				AND a.begin = #{begin} AND  a.end = #{end}
 			</if>
-			<if test="dunningcycle != null and dunningcycle != '' ">
+			<if test="dunningcycle != null and dunningcycle != '' and dunningcycle2 == null">
 				AND a.DunningCycle = #{dunningcycle}
+			</if>
+			<if test="dunningcycle != null and dunningcycle != '' and dunningcycle2 != null and dunningcycle2 != '' ">
+				AND (a.DunningCycle = #{dunningcycle} or a.DunningCycle = #{dunningcycle2})
 			</if>
 			<if test="group != null and group.id != null and group.id !='' ">
 				AND a.`groupId` = #{group.id}
