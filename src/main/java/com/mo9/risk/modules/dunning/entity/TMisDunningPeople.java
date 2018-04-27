@@ -42,6 +42,7 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 
 	private String Invalid;
 	private String dunningcycle;
+	private String dunningcycle2;
 
 	private TMisDunningGroup group;
 	private String nickname;
@@ -175,7 +176,27 @@ public class TMisDunningPeople extends DataEntity<TMisDunningPeople> {
 	// }
 	public void setDunningcycle(String dunningcycle) {
 		this.dunningcycle = dunningcycle;
+		this.setDunningcycle2();
 	}
+	public void setDunningcycle2() {
+		 if(this.dunningcycle != null && this.dunningcycle.contains(",")){
+			 StringBuffer buffer = new StringBuffer(" ");
+			 String[] str = this.dunningcycle.split(",");
+			 if(str != null && str.length > 0){
+				 for (int i = str.length-1; i >=0 ; i--) {
+					 if(i==0){
+						 buffer.append(str[i]);
+					 }else{
+						 buffer.append(str[i]+","); 
+					 }
+				 }
+				this.dunningcycle2=buffer.toString().trim();
+			 }
+		 }
+	}
+	 public String getDunningcycle2() {
+		 return dunningcycle2;
+	 }
 	public TMisDunningGroup getGroup() {
 		return group;
 	}
